@@ -1,63 +1,83 @@
-import { useNavigate } from 'react-router-dom'
-import styles from './Home.module.css'
+import { useNavigate } from 'react-router-dom';
+import styles from './Home.module.css';
 
 const QUICK_ACTIONS = [
-  { icon: 'group',      label: 'Clients',  path: '/customers' },
-  { icon: 'assignment', label: 'Tasks',    path: '/tasks' },
-  { icon: 'receipt',    label: 'Invoices', path: '/invoices' },
-  { icon: 'settings',   label: 'Settings', path: '/settings' },
-]
+  { icon: 'person_add', label: 'New Client', path: '/customers' },
+  { icon: 'straighten', label: 'Measure', path: '/measurements' },
+  { icon: 'add_task', label: 'New Task', path: '/tasks' },
+  { icon: 'receipt', label: 'Invoice', path: '/invoices' },
+];
+
+const URGENT_TASKS = [
+  { icon: 'check_circle', name: 'Uchenna New Cloth', due: 'March 26, 2026' },
+  { icon: 'check_circle', name: 'Another Task', due: 'March 27, 2026' },
+];
 
 function Home() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
-    <main className={styles.page}>
-      {/* Greeting */}
-      <section className={styles.greeting}>
-        <p className={styles.greetSub}>Welcome back 👋</p>
-        <h1 className={styles.greetTitle}>My Tailor Shop</h1>
+    <main className={styles.main}>
+      
+      {/* Overview */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Overview</h2>
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <span className={styles.statVal}>2</span>
+            <span className={styles.statLabel}>Clients</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statVal}>1</span>
+            <span className={styles.statLabel}>Active</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statVal}>0</span>
+            <span className={styles.statLabel}>Pending</span>
+          </div>
+        </div>
       </section>
 
-      {/* Quick actions */}
+      <hr className={styles.divider} />
+
+      {/* Quick Actions */}
       <section className={styles.section}>
-        <div className={styles.sectionLabel}>Quick Actions</div>
-        <div className={styles.quickGrid}>
+        <h2 className={styles.sectionTitle}>Quick Actions</h2>
+        <div className={styles.actionsGrid}>
           {QUICK_ACTIONS.map(action => (
-            <button
+            <div
               key={action.path}
-              className={styles.quickCard}
+              className={styles.actionBox}
               onClick={() => navigate(action.path)}
             >
-              <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text2)' }}>
-                {action.icon}
-              </span>
-              <span className={styles.quickLabel}>{action.label}</span>
-            </button>
+              <span className={`mi ${styles.icon}`}>{action.icon}</span>
+              <span>{action.label}</span>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Stats strip */}
+      <hr className={styles.divider} />
+
+      {/* Urgent Tasks */}
       <section className={styles.section}>
-        <div className={styles.sectionLabel}>Overview</div>
-        <div className={styles.statsRow}>
-          <div className={styles.statCard}>
-            <div className={styles.statVal}>0</div>
-            <div className={styles.statLbl}>Clients</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statVal}>0</div>
-            <div className={styles.statLbl}>Pending Orders</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statVal}>₦0</div>
-            <div className={styles.statLbl}>Unpaid</div>
-          </div>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Urgent Tasks</h2>
         </div>
+        {URGENT_TASKS.map(task => (
+          <div key={task.name} className={styles.taskCard}>
+            <span className={`mi ${styles.taskIcon}`}>{task.icon}</span>
+            <div className={styles.taskInfo}>
+              <div className={styles.taskName}>{task.name}</div>
+              <div className={styles.taskDate}>Due: {task.due}</div>
+            </div>
+            <span className={`mi ${styles.chevron}`}>chevron_right</span>
+          </div>
+        ))}
       </section>
+
     </main>
-  )
+  );
 }
 
-export default Home
+export default Home;
