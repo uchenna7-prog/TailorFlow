@@ -1,97 +1,123 @@
-.page {
-  padding: 24px 20px calc(40px + var(--sb));
-  animation: fadeUp 0.4s ease both;
+.main {
+  padding: 20px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
 }
 
-/* ── GREETING ── */
-.greeting {
-  margin-bottom: 32px;
-}
-
-.greetSub {
-  font-size: 0.8rem;
-  color: var(--text3);
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.greetTitle {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-}
-
-/* ── SECTION ── */
+/* Sections */
 .section {
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
-.sectionLabel {
-  font-size: 0.6rem;
+.sectionTitle {
+  font-size: 0.75rem;
   font-weight: 800;
   color: var(--text3);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   margin-bottom: 12px;
 }
 
-/* ── QUICK ACTIONS ── */
-.quickGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+.divider {
+  border: 0;
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
 }
 
-.quickCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  transition: background 0.15s, border-color 0.15s;
-  animation: fadeIn 0.35s ease both;
-}
-.quickCard:active {
-  background: var(--surface2);
-  border-color: var(--border2);
-}
-
-.quickLabel {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--text2);
-  text-align: center;
-}
-
-/* ── STATS ── */
-.statsRow {
+/* Stats Grid */
+.statsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 
 .statCard {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 12px;
-  animation: fadeIn 0.35s ease both;
+  border-radius: 14px;
+  padding: 18px 10px;
+  text-align: center;
 }
 
 .statVal {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 800;
+  display: block;
   margin-bottom: 2px;
 }
 
-.statLbl {
+.statLabel {
   font-size: 0.6rem;
-  font-weight: 700;
   color: var(--text3);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+}
+
+/* Quick Actions Grid */
+.actionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.actionBox {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 24px 15px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.actionBox:active {
+  transform: scale(0.95);
+  background: var(--surface);
+}
+
+.icon {
+  font-size: 1.8rem;
+  color: var(--accent);
+}
+
+/* Urgent Tasks */
+.taskCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.taskIcon {
+  color: var(--success);
+  font-size: 1.4rem;
+}
+
+.taskInfo {
+  flex: 1;
+}
+
+.taskName {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.taskDate {
+  font-size: 0.72rem;
+  color: var(--text3);
+  font-weight: 500;
+}
+
+.chevron {
+  color: var(--text4);
 }
