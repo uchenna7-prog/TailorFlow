@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import Header from '../../components/Header/Header';
 import styles from './Home.module.css';
 
 const QUICK_ACTIONS = [
@@ -13,70 +14,79 @@ const URGENT_TASKS = [
   { icon: 'check_circle', name: 'Another Task', due: 'March 27, 2026' },
 ];
 
-function Home() {
+function Home({ onMenuClick }) {
   const navigate = useNavigate();
 
   return (
-    <main className={styles.main}>
-      
-      {/* Overview */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Overview</h2>
-        <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <span className={styles.statVal}>2</span>
-            <span className={styles.statLabel}>Clients</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statVal}>1</span>
-            <span className={styles.statLabel}>Active</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statVal}>0</span>
-            <span className={styles.statLabel}>Pending</span>
-          </div>
-        </div>
-      </section>
+    <>
+      <Header onMenuClick={onMenuClick} />
 
-      <hr className={styles.divider} />
+      <main className={styles.main}>
+        {/* Greeting */}
+        <section className={styles.section}>
+          <p className={styles.greetSub}>Welcome back 👋</p>
+          <h1 className={styles.greetTitle}>My Tailor Shop</h1>
+        </section>
 
-      {/* Quick Actions */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Quick Actions</h2>
-        <div className={styles.actionsGrid}>
-          {QUICK_ACTIONS.map(action => (
-            <div
-              key={action.path}
-              className={styles.actionBox}
-              onClick={() => navigate(action.path)}
-            >
-              <span className={`mi ${styles.icon}`}>{action.icon}</span>
-              <span>{action.label}</span>
+        {/* Overview */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Overview</h2>
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <span className={styles.statVal}>2</span>
+              <span className={styles.statLabel}>Clients</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statVal}>1</span>
+              <span className={styles.statLabel}>Active</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statVal}>0</span>
+              <span className={styles.statLabel}>Pending</span>
+            </div>
+          </div>
+        </section>
+
+        <hr className={styles.divider} />
+
+        {/* Quick Actions */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Quick Actions</h2>
+          <div className={styles.actionsGrid}>
+            {QUICK_ACTIONS.map(action => (
+              <div
+                key={action.path}
+                className={styles.actionBox}
+                onClick={() => navigate(action.path)}
+              >
+                <span className={`mi ${styles.icon}`}>{action.icon}</span>
+                <span>{action.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <hr className={styles.divider} />
+
+        {/* Urgent Tasks */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Urgent Tasks</h2>
+          </div>
+
+          {URGENT_TASKS.map(task => (
+            <div key={task.name} className={styles.taskCard}>
+              <span className={`mi ${styles.taskIcon}`}>{task.icon}</span>
+              <div className={styles.taskInfo}>
+                <div className={styles.taskName}>{task.name}</div>
+                <div className={styles.taskDate}>Due: {task.due}</div>
+              </div>
+              <span className={`mi ${styles.chevron}`}>chevron_right</span>
             </div>
           ))}
-        </div>
-      </section>
-
-      <hr className={styles.divider} />
-
-      {/* Urgent Tasks */}
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Urgent Tasks</h2>
-        </div>
-        {URGENT_TASKS.map(task => (
-          <div key={task.name} className={styles.taskCard}>
-            <span className={`mi ${styles.taskIcon}`}>{task.icon}</span>
-            <div className={styles.taskInfo}>
-              <div className={styles.taskName}>{task.name}</div>
-              <div className={styles.taskDate}>Due: {task.due}</div>
-            </div>
-            <span className={`mi ${styles.chevron}`}>chevron_right</span>
-          </div>
-        ))}
-      </section>
-
-    </main>
+        </section>
+      </main>
+    </>
   );
 }
 
