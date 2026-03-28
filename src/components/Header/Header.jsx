@@ -16,18 +16,22 @@ function Header({ onMenuClick }) {
   }
   const pageTitle = PAGE_TITLES[location.pathname] ?? 'TailorBook'
 
-  // Page-specific dropdown items with icons
   const PAGE_DROPDOWN = {
     '/': [
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout') },
       { icon: 'settings', label: 'Settings', action: () => navigate('/settings') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
     '/customers': [
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout') },
-      { icon: 'person_add', label: 'Add Client', action: () => navigate('/customers/add') },
       { icon: 'download', label: 'Export Clients', action: () => console.log('Export clients') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-    // Add others as needed...
+    '/tasks': [
+      { icon: 'settings', label: 'Settings', action: () => navigate('/settings') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+    ],
+    '/settings': [
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+    ],
   }
 
   const toggleDropdown = () => setDropdownOpen(prev => !prev)
@@ -97,10 +101,10 @@ function Header({ onMenuClick }) {
                   {(PAGE_DROPDOWN[location.pathname] ?? []).map((item, i, arr) => (
                     <div key={i}>
                       <button
-                        className={styles.dropdownItem}
+                        className={`${styles.dropdownItem} ${item.danger ? styles.danger : ''}`}
                         onClick={() => { closeDropdown(); item.action() }}
                       >
-                        <span className="mi" style={{ fontSize: '1.2rem', color: 'var(--text2)' }}>{item.icon}</span>
+                        <span className="mi" style={{ fontSize: '1.2rem', color: item.danger ? 'var(--danger)' : 'var(--text2)' }}>{item.icon}</span>
                         {item.label}
                       </button>
                       {i < arr.length - 1 && <div className={styles.dropdownSeparator} />}
