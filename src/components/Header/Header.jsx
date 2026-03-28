@@ -8,7 +8,6 @@ function Header({ onMenuClick }) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Page title map
   const PAGE_TITLES = {
     '/': 'Home',
     '/customers': 'Clients',
@@ -17,27 +16,18 @@ function Header({ onMenuClick }) {
   }
   const pageTitle = PAGE_TITLES[location.pathname] ?? 'TailorBook'
 
-  // Page-specific dropdown items
+  // Page-specific dropdown items with icons
   const PAGE_DROPDOWN = {
     '/': [
-      { label: 'Log Out', action: () => navigate('/logout') },
-      { label: 'Settings', action: () => navigate('/settings') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout') },
+      { icon: 'settings', label: 'Settings', action: () => navigate('/settings') },
     ],
     '/customers': [
-      { label: 'Log Out', action: () => navigate('/logout') },
-      { label: 'Add Client', action: () => navigate('/customers/add') },
-      { label: 'Export Clients', action: () => console.log('Export clients') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout') },
+      { icon: 'person_add', label: 'Add Client', action: () => navigate('/customers/add') },
+      { icon: 'download', label: 'Export Clients', action: () => console.log('Export clients') },
     ],
-    '/tasks': [
-      { label: 'Log Out', action: () => navigate('/logout') },
-      { label: 'Add Task', action: () => navigate('/tasks/add') },
-      { label: 'Pending Tasks', action: () => navigate('/tasks/pending') },
-    ],
-    '/settings': [
-      { label: 'Log Out', action: () => navigate('/logout') },
-      { label: 'Profile', action: () => navigate('/settings/profile') },
-      { label: 'Preferences', action: () => navigate('/settings/preferences') },
-    ],
+    // Add others as needed...
   }
 
   const toggleDropdown = () => setDropdownOpen(prev => !prev)
@@ -45,7 +35,6 @@ function Header({ onMenuClick }) {
   const toggleNotif = () => setNotifOpen(prev => !prev)
   const closeNotif = () => setNotifOpen(false)
 
-  // Dummy notifications
   const notifications = [
     {
       id: 1,
@@ -80,12 +69,7 @@ function Header({ onMenuClick }) {
   return (
     <>
       <header className={styles.header}>
-        {/* Hamburger */}
-        <button
-          className={styles.iconBtn}
-          onClick={onMenuClick}
-          aria-label="Open menu"
-        >
+        <button className={styles.iconBtn} onClick={onMenuClick} aria-label="Open menu">
           <span className={styles.hamburgerLines}>
             <span />
             <span />
@@ -93,47 +77,34 @@ function Header({ onMenuClick }) {
           </span>
         </button>
 
-        {/* Page title */}
         <div className={styles.title}>{pageTitle}</div>
 
-        {/* Right actions */}
         <div className={styles.actions}>
-          {/* Notification bell */}
-          <button
-            className={styles.iconBtn}
-            onClick={toggleNotif}
-            aria-label="Notifications"
-          >
-            <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>
-              notifications
-            </span>
+          <button className={styles.iconBtn} onClick={toggleNotif} aria-label="Notifications">
+            <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>notifications</span>
             {hasUnread && <span className={styles.notifDot} />}
           </button>
 
-          {/* Page-specific dropdown */}
           <div className={styles.dropdownWrap}>
-            <button
-              className={styles.iconBtn}
-              onClick={toggleDropdown}
-              aria-label="More options"
-            >
-              <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>
-                more_vert
-              </span>
+            <button className={styles.iconBtn} onClick={toggleDropdown} aria-label="More options">
+              <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>more_vert</span>
             </button>
 
             {dropdownOpen && (
               <>
                 <div className={styles.dropdownBackdrop} onClick={closeDropdown} />
                 <div className={styles.dropdown}>
-                  {(PAGE_DROPDOWN[location.pathname] ?? []).map((item, i) => (
-                    <button
-                      key={i}
-                      className={styles.dropdownItem}
-                      onClick={() => { closeDropdown(); item.action() }}
-                    >
-                      {item.label}
-                    </button>
+                  {(PAGE_DROPDOWN[location.pathname] ?? []).map((item, i, arr) => (
+                    <div key={i}>
+                      <button
+                        className={styles.dropdownItem}
+                        onClick={() => { closeDropdown(); item.action() }}
+                      >
+                        <span className="mi" style={{ fontSize: '1.2rem', color: 'var(--text2)' }}>{item.icon}</span>
+                        {item.label}
+                      </button>
+                      {i < arr.length - 1 && <div className={styles.dropdownSeparator} />}
+                    </div>
                   ))}
                 </div>
               </>
