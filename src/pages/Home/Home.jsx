@@ -27,8 +27,11 @@ function Home({ onMenuClick }) {
           <div className={styles.greetHeader}>
             <span className={styles.greetText}>Welcome back,</span>
             <span className={styles.signatureName}>Uchenna</span>
-            <span className={styles.sparkle}>✨</span>
+            <span className={styles.handIcon}>👋</span>
           </div>
+          <p className={styles.greetSubText}>
+            Here’s what’s happening in your tailoring shop today
+          </p>
         </section>
 
         <div className={styles.sectionDivider} />
@@ -42,11 +45,11 @@ function Home({ onMenuClick }) {
               <span className={styles.statVal}>24</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statLabel}>Pending Orders</span>
+              <span className={styles.statLabel}>Orders</span>
               <span className={styles.statVal}>08</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statLabel}>Pending Tasks</span>
+              <span className={styles.statLabel}>Tasks</span>
               <span className={styles.statVal}>05</span>
             </div>
           </div>
