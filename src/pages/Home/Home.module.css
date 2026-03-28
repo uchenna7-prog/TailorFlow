@@ -18,34 +18,36 @@
 
 /* Greeting */
 .heroSection {
-  padding: 4px 0 4px;
+  padding: 6px 0 6px;
 }
 
 .greetHeader {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: nowrap;        
+  white-space: nowrap;
+  overflow-x: auto;
 }
 
-.greetSub {
-  color: var(--text3);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+.greetText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
   font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .signatureName {
   font-family: 'Great Vibes', cursive;
-  font-size: 2.6rem;
+  font-size: 2.4rem;
   font-weight: 400;
   color: var(--text);
-  margin: 4px 0 0;
   transform: skewX(-12deg);
   display: inline-block;
 }
 
-/* Section titles */
 .sectionTitle {
   font-size: 0.75rem;
   font-weight: 800;
