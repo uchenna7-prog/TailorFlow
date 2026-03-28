@@ -2,39 +2,34 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const CUST_KEY = 'tailorbook_customers'
 
+// ── Load synchronously so data is available on first render ──
+function loadInitialCustomers() {
+  try {
+    const raw = localStorage.getItem(CUST_KEY)
+    if (!raw) return []
+    const saved = JSON.parse(raw)
+    // wipe legacy seed
+    if (saved.length === 1 && saved[0].id === 1 && saved[0].name === 'Uchendu Daniel') {
+      localStorage.removeItem(CUST_KEY)
+      return []
+    }
+    return saved
+  } catch {
+    return []
+  }
+}
+
 const CustomerContext = createContext(null)
 
 export function CustomerProvider({ children }) {
-  const [customers, setCustomers] = useState([])
-  const [loaded, setLoaded] = useState(false)
+  // Lazy initializer — runs synchronously before first render, no useEffect needed
+  const [customers, setCustomers] = useState(loadInitialCustomers)
 
-  // Load once on mount
+  // Persist on every change
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(CUST_KEY)
-      if (raw) {
-        const saved = JSON.parse(raw)
-        // wipe legacy seed
-        if (saved.length === 1 && saved[0].id === 1 && saved[0].name === 'Uchendu Daniel') {
-          localStorage.removeItem(CUST_KEY)
-          setCustomers([])
-        } else {
-          setCustomers(saved)
-        }
-      }
-    } catch {
-      setCustomers([])
-    } finally {
-      setLoaded(true)
-    }
-  }, [])
-
-  // Persist whenever customers changes (but not on initial empty load)
-  useEffect(() => {
-    if (!loaded) return
     try { localStorage.setItem(CUST_KEY, JSON.stringify(customers)) }
     catch { /* ignore */ }
-  }, [customers, loaded])
+  }, [customers])
 
   const addCustomer = useCallback((customer) => {
     setCustomers(prev => [customer, ...prev])
@@ -53,7 +48,7 @@ export function CustomerProvider({ children }) {
   }, [customers])
 
   return (
-    <CustomerContext.Provider value={{ customers, loaded, addCustomer, updateCustomer, deleteCustomer, getCustomer }}>
+    <CustomerContext.Provider value={{ customers, addCustomer, updateCustomer, deleteCustomer, getCustomer }}>
       {children}
     </CustomerContext.Provider>
   )
