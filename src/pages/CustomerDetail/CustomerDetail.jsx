@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { useCustomerData } from '../../hooks/useCustomerData'
 import Header from '../../components/Header/Header'
+import Sidebar from '../../components/Sidebar/Sidebar'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import Toast from '../../components/Toast/Toast'
 import MeasurementsTab from './tabs/MeasurementsTab'
@@ -28,7 +29,7 @@ function getBirthdayBadge(birthday) {
 
 const TABS = ['Measurements', 'Orders', 'Invoice']
 
-export default function CustomerDetail({ onMenuClick }) {
+export default function CustomerDetail() {
   const { id }     = useParams()
   const navigate   = useNavigate()
   const { getCustomer, deleteCustomer } = useCustomers()
@@ -37,6 +38,7 @@ export default function CustomerDetail({ onMenuClick }) {
   const [activeTab, setActiveTab]         = useState('Measurements')
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [toastMsg, setToastMsg]           = useState('')
+  const [sidebarOpen, setSidebarOpen]     = useState(false)
   const toastTimer = useRef(null)
 
   const showToast = useCallback((msg) => {
@@ -65,10 +67,14 @@ export default function CustomerDetail({ onMenuClick }) {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.pageWrapper}>
+      {/* Sidebar */}
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <Header onMenuClick={onMenuClick} />
+      {/* Header */}
+      <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
+      {/* Page Content */}
       <div className={styles.fixedTop} id="topHeader">
         <div className={styles.profileArea}>
           <button className={styles.contactBtn} onClick={() => customer.email && (window.location = `mailto:${customer.email}`)}>
