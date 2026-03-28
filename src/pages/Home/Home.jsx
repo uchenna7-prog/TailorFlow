@@ -26,28 +26,28 @@ function Home({ onMenuClick }) {
         <section className={styles.heroSection}>
           <div className={styles.greetHeader}>
             <span className={styles.greetSub}>Welcome back</span>
-            <span className={styles.sparkle}>✨</span>
+            <span>✨</span>
           </div>
           <h1 className={styles.signatureName}>Uchenna</h1>
         </section>
 
         <div className={styles.sectionDivider} />
 
-        {/* Business Overview */}
+        {/* Overview */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Business Pulse</h2>
+          <h2 className={styles.sectionTitle}>Overview</h2>
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
               <span className={styles.statLabel}>Clients</span>
               <span className={styles.statVal}>24</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statLabel}>Active</span>
+              <span className={styles.statLabel}>Pending Orders</span>
               <span className={styles.statVal}>08</span>
             </div>
-            <div className={styles.statCard + ' ' + styles.statRevenue}>
-              <span className={styles.statLabel}>Revenue</span>
-              <span className={styles.statVal}>₦120k</span>
+            <div className={styles.statCard}>
+              <span className={styles.statLabel}>Pending Tasks</span>
+              <span className={styles.statVal}>05</span>
             </div>
           </div>
         </section>
@@ -56,7 +56,7 @@ function Home({ onMenuClick }) {
 
         {/* Quick Actions */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Studio Tools</h2>
+          <h2 className={styles.sectionTitle}>Quick Actions</h2>
           <div className={styles.actionsGrid}>
             {QUICK_ACTIONS.map((action) => (
               <div
@@ -79,20 +79,31 @@ function Home({ onMenuClick }) {
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Recent Orders</h2>
-            <button className={styles.seeAll} onClick={() => navigate('/orders')}>View list</button>
+            <button
+              className={styles.seeAll}
+              onClick={() => navigate('/orders')}
+            >
+              View list
+            </button>
           </div>
 
           <div className={styles.orderStack}>
             {RECENT_ORDERS.map((order) => (
               <div key={order.name + order.client} className={styles.orderCard}>
-                <div className={styles.orderLeading}>
-                  <div className={styles.orderAvatar}>{order.client[0]}</div>
-                </div>
+                <div className={styles.orderAvatar}>{order.client[0]}</div>
+
                 <div className={styles.orderInfo}>
                   <div className={styles.orderTitle}>{order.name}</div>
-                  <div className={styles.orderSubtitle}>For {order.client} • {order.due}</div>
+                  <div className={styles.orderSubtitle}>
+                    For {order.client} • {order.due}
+                  </div>
                 </div>
-                <div className={`${styles.statusBadge} ${order.status === 'Ready' ? styles.ready : ''}`}>
+
+                <div
+                  className={`${styles.statusBadge} ${
+                    order.status === 'Ready' ? styles.ready : ''
+                  }`}
+                >
                   {order.status}
                 </div>
               </div>
