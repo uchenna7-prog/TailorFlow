@@ -59,10 +59,10 @@ function SideBar({ isOpen, onClose }) {
         {/* Footer */}
         <div className={styles.footer}>
           <div className={styles.user}>
-            <div className={styles.avatar}>TB</div>
+            <div className={styles.avatar}>UU</div>
             <div>
-              <div className={styles.userName}>My Tailor Shop</div>
-              <div className={styles.userRole}>Tailor · Owner</div>
+              <div className={styles.userName}>Uchendu Uchenna</div>
+              
             </div>
           </div>
         </div>
