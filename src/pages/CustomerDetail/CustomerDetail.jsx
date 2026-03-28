@@ -3,14 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { useCustomerData } from '../../hooks/useCustomerData'
 import Header from '../../components/Header/Header'
+import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
+import Toast from '../../components/Toast/Toast'
 import MeasurementsTab from './tabs/MeasurementsTab'
 import OrdersTab from './tabs/OrdersTab'
 import InvoiceTab from './tabs/InvoiceTab'
-import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
-import Toast from '../../components/Toast/Toast'
 import styles from './CustomerDetail.module.css'
 
-// ── HELPERS ──
 function getInitials(name) {
   if (!name) return ''
   const parts = name.trim().split(/\s+/)
@@ -30,18 +29,15 @@ function getBirthdayBadge(birthday) {
 const TABS = ['Measurements', 'Orders', 'Invoice']
 
 export default function CustomerDetail({ onMenuClick }) {
-  const { id }      = useParams()
-  const navigate    = useNavigate()
+  // ── ALL hooks at the top — before any conditional return ──
+  const { id }     = useParams()
+  const navigate   = useNavigate()
   const { getCustomer, deleteCustomer } = useCustomers()
-  const customer    = getCustomer(id)
+  const data       = useCustomerData(id)
 
-  const data = useCustomerData(id)
-
-  // ── ALL hooks must be declared before any early return ──
-  const [activeTab, setActiveTab]       = useState('Measurements')
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [activeTab, setActiveTab]         = useState('Measurements')
   const [deleteConfirm, setDeleteConfirm] = useState(false)
-  const [toastMsg, setToastMsg]         = useState('')
+  const [toastMsg, setToastMsg]           = useState('')
   const toastTimer = useRef(null)
 
   const showToast = useCallback((msg) => {
@@ -50,7 +46,9 @@ export default function CustomerDetail({ onMenuClick }) {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
 
-  // Early return AFTER all hooks
+  // ── Derive after hooks ──
+  const customer = getCustomer(id)
+
   if (!customer) {
     return (
       <div className={styles.notFound}>
@@ -71,24 +69,29 @@ export default function CustomerDetail({ onMenuClick }) {
   return (
     <div className={styles.page}>
 
-      {/* Shared Header — same as all other pages */}
       <Header onMenuClick={onMenuClick} />
 
-      {/* ── FIXED PROFILE AREA ── */}
+      {/* Profile header */}
       <div className={styles.fixedTop} id="topHeader">
-
-        {/* Profile */}
         <div className={styles.profileArea}>
-          <button className={styles.contactBtn} onClick={() => window.location = `mailto:${customer.email}`}>
+          <button
+            className={styles.contactBtn}
+            onClick={() => { if (customer.email) window.location = `mailto:${customer.email}` }}
+          >
             <span className="mi">mail_outline</span>
           </button>
+
           <div className={styles.centralAvatar}>
             {customer.photo
               ? <img src={customer.photo} alt={customer.name} className={styles.avatarImg} />
               : initials
             }
           </div>
-          <button className={styles.contactBtn} onClick={() => window.location = `tel:${customer.phone}`}>
+
+          <button
+            className={styles.contactBtn}
+            onClick={() => { if (customer.phone) window.location = `tel:${customer.phone}` }}
+          >
             <span className="mi">call</span>
           </button>
         </div>
@@ -104,13 +107,12 @@ export default function CustomerDetail({ onMenuClick }) {
           )}
           {bdayBadge && (
             <div className={`${styles.bday} ${bdayBadge.isToday ? styles.bdayToday : ''}`}>
-              <span style={{ fontSize: '0.8rem' }}>🎂</span>
+              <span>🎂</span>
               <span>{bdayBadge.label}</span>
             </div>
           )}
         </div>
 
-        {/* Tabs */}
         <div className={styles.tabs}>
           {TABS.map(tab => (
             <div
@@ -124,8 +126,8 @@ export default function CustomerDetail({ onMenuClick }) {
         </div>
       </div>
 
-      {/* ── SCROLL CONTENT ── */}
-      <div className={styles.scrollContent} id="scrollArea">
+      {/* Tab content */}
+      <div className={styles.scrollContent}>
         {activeTab === 'Measurements' && (
           <MeasurementsTab
             measurements={data.measurements}
@@ -172,7 +174,6 @@ export default function CustomerDetail({ onMenuClick }) {
         </button>
       )}
 
-      {/* Confirm delete customer */}
       <ConfirmSheet
         open={deleteConfirm}
         title="Delete Customer?"
