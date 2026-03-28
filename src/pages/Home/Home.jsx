@@ -25,10 +25,7 @@ function Home({ onMenuClick }) {
         {/* Greeting */}
         <section className={styles.heroSection}>
           <div className={styles.greetHeader}>
-            <span className={styles.greetText}>Welcome back 👋,</span>
-          </div>
-          <div className={styles.signatureWrapper}>
-            <span className={styles.signatureName}>Uchenna</span>
+            <span className={styles.greetText}>Welcome back 👋, Uchenna</span>
           </div>
           <p className={styles.greetSubText}>
             Here’s what’s happening in your tailoring shop today
