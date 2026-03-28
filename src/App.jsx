@@ -16,9 +16,9 @@ function App() {
         <Route path="/"              element={<Home         onMenuClick={() => setSidebarOpen(true)} />} />
         <Route path="/customers"     element={<Customers    onMenuClick={() => setSidebarOpen(true)} />} />
         <Route path="/customers/:id" element={
-          <ErrorBoundary>
+          
             <CustomerDetail onMenuClick={() => setSidebarOpen(true)} />
-          </ErrorBoundary>
+          
         } />
       </Routes>
     </>
