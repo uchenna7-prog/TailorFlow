@@ -3,13 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { useCustomerData } from '../../hooks/useCustomerData'
 import Header from '../../components/Header/Header'
-import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
-import Toast from '../../components/Toast/Toast'
 import MeasurementsTab from './tabs/MeasurementsTab'
 import OrdersTab from './tabs/OrdersTab'
 import InvoiceTab from './tabs/InvoiceTab'
+import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
+import Toast from '../../components/Toast/Toast'
 import styles from './CustomerDetail.module.css'
 
+// ── HELPERS ──
 function getInitials(name) {
   if (!name) return ''
   const parts = name.trim().split(/\s+/)
@@ -20,7 +21,7 @@ function getInitials(name) {
 function getBirthdayBadge(birthday) {
   if (!birthday) return null
   const today = new Date()
-  const bday  = new Date(birthday + 'T00:00:00')
+  const bday = new Date(birthday + 'T00:00:00')
   const isToday = today.getMonth() === bday.getMonth() && today.getDate() === bday.getDate()
   const label = bday.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
   return { label: isToday ? '🎂 Happy Birthday!' : `Birthday: ${label}`, isToday }
@@ -29,15 +30,15 @@ function getBirthdayBadge(birthday) {
 const TABS = ['Measurements', 'Orders', 'Invoice']
 
 export default function CustomerDetail({ onMenuClick }) {
-  // ── ALL hooks at the top — before any conditional return ──
-  const { id }     = useParams()
-  const navigate   = useNavigate()
+  const { id } = useParams()
+  const navigate = useNavigate()
   const { getCustomer, deleteCustomer } = useCustomers()
-  const data       = useCustomerData(id)
+  const customer = getCustomer(id)
+  const data = useCustomerData(id)
 
-  const [activeTab, setActiveTab]         = useState('Measurements')
+  const [activeTab, setActiveTab] = useState('Measurements')
   const [deleteConfirm, setDeleteConfirm] = useState(false)
-  const [toastMsg, setToastMsg]           = useState('')
+  const [toastMsg, setToastMsg] = useState('')
   const toastTimer = useRef(null)
 
   const showToast = useCallback((msg) => {
@@ -46,9 +47,7 @@ export default function CustomerDetail({ onMenuClick }) {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
 
-  // ── Derive after hooks ──
-  const customer = getCustomer(id)
-
+  // ── Guard: customer not found ──
   if (!customer) {
     return (
       <div className={styles.notFound}>
@@ -58,7 +57,7 @@ export default function CustomerDetail({ onMenuClick }) {
     )
   }
 
-  const initials  = getInitials(customer.name)
+  const initials = getInitials(customer.name)
   const bdayBadge = getBirthdayBadge(customer.birthday)
 
   const handleDeleteCustomer = () => {
@@ -68,37 +67,32 @@ export default function CustomerDetail({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
-
+      {/* Shared Header */}
       <Header onMenuClick={onMenuClick} />
 
-      {/* Profile header */}
+      {/* ── FIXED PROFILE AREA ── */}
       <div className={styles.fixedTop} id="topHeader">
         <div className={styles.profileArea}>
           <button
             className={styles.contactBtn}
-            onClick={() => { if (customer.email) window.location = `mailto:${customer.email}` }}
+            onClick={() => customer.email && (window.location = `mailto:${customer.email}`)}
           >
             <span className="mi">mail_outline</span>
           </button>
-
           <div className={styles.centralAvatar}>
-            {customer.photo
-              ? <img src={customer.photo} alt={customer.name} className={styles.avatarImg} />
-              : initials
-            }
+            {customer.photo ? <img src={customer.photo} alt={customer.name} className={styles.avatarImg} /> : initials}
           </div>
-
           <button
             className={styles.contactBtn}
-            onClick={() => { if (customer.phone) window.location = `tel:${customer.phone}` }}
+            onClick={() => customer.phone && (window.location = `tel:${customer.phone}`)}
           >
             <span className="mi">call</span>
           </button>
         </div>
 
         <div className={styles.heroText}>
-          <h2>{customer.name}</h2>
-          <div className={styles.phone}>{customer.phone}</div>
+          <h2>{customer.name || 'No Name'}</h2>
+          {customer.phone && <div className={styles.phone}>{customer.phone}</div>}
           {customer.address && (
             <div className={styles.location}>
               <span className="mi">place</span>
@@ -107,14 +101,15 @@ export default function CustomerDetail({ onMenuClick }) {
           )}
           {bdayBadge && (
             <div className={`${styles.bday} ${bdayBadge.isToday ? styles.bdayToday : ''}`}>
-              <span>🎂</span>
+              <span style={{ fontSize: '0.8rem' }}>🎂</span>
               <span>{bdayBadge.label}</span>
             </div>
           )}
         </div>
 
+        {/* Tabs */}
         <div className={styles.tabs}>
-          {TABS.map(tab => (
+          {TABS.map((tab) => (
             <div
               key={tab}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
@@ -126,9 +121,9 @@ export default function CustomerDetail({ onMenuClick }) {
         </div>
       </div>
 
-      {/* Tab content */}
-      <div className={styles.scrollContent}>
-        {activeTab === 'Measurements' && (
+      {/* ── SCROLL CONTENT ── */}
+      <div className={styles.scrollContent} id="scrollArea">
+        {activeTab === 'Measurements' && data?.measurements && (
           <MeasurementsTab
             measurements={data.measurements}
             onSave={data.saveMeasurement}
@@ -136,7 +131,7 @@ export default function CustomerDetail({ onMenuClick }) {
             showToast={showToast}
           />
         )}
-        {activeTab === 'Orders' && (
+        {activeTab === 'Orders' && data?.orders && (
           <OrdersTab
             orders={data.orders}
             measurements={data.measurements}
@@ -146,7 +141,7 @@ export default function CustomerDetail({ onMenuClick }) {
             showToast={showToast}
           />
         )}
-        {activeTab === 'Invoice' && (
+        {activeTab === 'Invoice' && data?.invoices && (
           <InvoiceTab
             invoices={data.invoices}
             orders={data.orders}
@@ -167,13 +162,14 @@ export default function CustomerDetail({ onMenuClick }) {
           className={styles.fab}
           onClick={() => {
             if (activeTab === 'Measurements') document.dispatchEvent(new CustomEvent('openMeasureModal'))
-            if (activeTab === 'Orders')       document.dispatchEvent(new CustomEvent('openOrderModal'))
+            if (activeTab === 'Orders') document.dispatchEvent(new CustomEvent('openOrderModal'))
           }}
         >
           <span className="mi">add</span>
         </button>
       )}
 
+      {/* Confirm delete customer */}
       <ConfirmSheet
         open={deleteConfirm}
         title="Delete Customer?"
@@ -182,6 +178,7 @@ export default function CustomerDetail({ onMenuClick }) {
         onCancel={() => setDeleteConfirm(false)}
       />
 
+      {/* Toast */}
       <Toast message={toastMsg} />
     </div>
   )
