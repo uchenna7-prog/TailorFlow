@@ -3,14 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { useCustomerData } from '../../hooks/useCustomerData'
 import Header from '../../components/Header/Header'
+import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
+import Toast from '../../components/Toast/Toast'
 import MeasurementsTab from './tabs/MeasurementsTab'
 import OrdersTab from './tabs/OrdersTab'
 import InvoiceTab from './tabs/InvoiceTab'
-import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
-import Toast from '../../components/Toast/Toast'
 import styles from './CustomerDetail.module.css'
 
-// ── HELPERS ──
 function getInitials(name) {
   if (!name) return ''
   const parts = name.trim().split(/\s+/)
@@ -30,29 +29,14 @@ function getBirthdayBadge(birthday) {
 const TABS = ['Measurements', 'Orders', 'Invoice']
 
 export default function CustomerDetail({ onMenuClick }) {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { id }     = useParams()
+  const navigate   = useNavigate()
   const { getCustomer, deleteCustomer } = useCustomers()
-  
-  // 1. Get customer first
-  const customer = getCustomer(id)
+  const data       = useCustomerData(id)
 
-  // 2. CRITICAL: Check if customer exists BEFORE calling any other hooks or rendering
-  if (!customer) {
-    return (
-      <div className={styles.notFound}>
-        <p>Customer not found or data is loading...</p>
-        <button onClick={() => navigate('/customers')}>Back to Clients</button>
-      </div>
-    )
-  }
-
-  // 3. Now it is safe to load the specific data for this ID
-  const data = useCustomerData(id)
-
-  const [activeTab, setActiveTab]           = useState('Measurements')
-  const [deleteConfirm, setDeleteConfirm]   = useState(false)
-  const [toastMsg, setToastMsg]             = useState('')
+  const [activeTab, setActiveTab]         = useState('Measurements')
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [toastMsg, setToastMsg]           = useState('')
   const toastTimer = useRef(null)
 
   const showToast = useCallback((msg) => {
@@ -61,8 +45,19 @@ export default function CustomerDetail({ onMenuClick }) {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
 
-  const initials   = getInitials(customer.name)
-  const bdayBadge  = getBirthdayBadge(customer.birthday)
+  const customer = getCustomer(id)
+
+  if (!customer) {
+    return (
+      <div className={styles.notFound}>
+        <p>Customer not found.</p>
+        <button onClick={() => navigate('/customers')}>Back to Clients</button>
+      </div>
+    )
+  }
+
+  const initials  = getInitials(customer.name)
+  const bdayBadge = getBirthdayBadge(customer.birthday)
 
   const handleDeleteCustomer = () => {
     deleteCustomer(id)
@@ -71,11 +66,12 @@ export default function CustomerDetail({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
+
       <Header onMenuClick={onMenuClick} />
 
       <div className={styles.fixedTop} id="topHeader">
         <div className={styles.profileArea}>
-          <button className={styles.contactBtn} onClick={() => window.location = `mailto:${customer.email}`}>
+          <button className={styles.contactBtn} onClick={() => customer.email && (window.location = `mailto:${customer.email}`)}>
             <span className="mi">mail_outline</span>
           </button>
           <div className={styles.centralAvatar}>
@@ -84,7 +80,7 @@ export default function CustomerDetail({ onMenuClick }) {
               : initials
             }
           </div>
-          <button className={styles.contactBtn} onClick={() => window.location = `tel:${customer.phone}`}>
+          <button className={styles.contactBtn} onClick={() => customer.phone && (window.location = `tel:${customer.phone}`)}>
             <span className="mi">call</span>
           </button>
         </div>
@@ -94,11 +90,13 @@ export default function CustomerDetail({ onMenuClick }) {
           <div className={styles.phone}>{customer.phone}</div>
           {customer.address && (
             <div className={styles.location}>
-              <span className="mi">place</span> {customer.address}
+              <span className="mi">place</span>
+              {customer.address}
             </div>
           )}
           {bdayBadge && (
             <div className={`${styles.bday} ${bdayBadge.isToday ? styles.bdayToday : ''}`}>
+              <span>🎂</span>
               <span>{bdayBadge.label}</span>
             </div>
           )}
@@ -117,35 +115,35 @@ export default function CustomerDetail({ onMenuClick }) {
         </div>
       </div>
 
-      <div className={styles.scrollContent} id="scrollArea">
-        {/* Added optional chaining (data?.prop) to be 100% safe */}
+      <div className={styles.scrollContent}>
         {activeTab === 'Measurements' && (
           <MeasurementsTab
-            measurements={data?.measurements || []}
-            onSave={data?.saveMeasurement}
-            onDelete={data?.deleteMeasurement}
+            measurements={data.measurements}
+            onSave={data.saveMeasurement}
+            onDelete={data.deleteMeasurement}
             showToast={showToast}
           />
         )}
         {activeTab === 'Orders' && (
           <OrdersTab
-            orders={data?.orders || []}
-            measurements={data?.measurements || []}
-            onSave={data?.saveOrder}
-            onDelete={data?.deleteOrder}
-            onStatusChange={data?.updateOrderStatus}
+            orders={data.orders}
+            measurements={data.measurements}
+            onSave={data.saveOrder}
+            onDelete={data.deleteOrder}
+            onStatusChange={data.updateOrderStatus}
             showToast={showToast}
           />
         )}
         {activeTab === 'Invoice' && (
           <InvoiceTab
-            invoices={data?.invoices || []}
-            orders={data?.orders || []}
-            measurements={data?.measurements || []}
+            invoices={data.invoices}
+            orders={data.orders}
+            measurements={data.measurements}
             customer={customer}
-            onSave={data?.saveInvoice}
-            onDelete={data?.deleteInvoice}
-            onStatusChange={data?.updateInvoiceStatus}
+            onSave={data.saveInvoice}
+            onDelete={data.deleteInvoice}
+            onStatusChange={data.updateInvoiceStatus}
+            onNavigateToInvoice={() => setActiveTab('Invoice')}
             showToast={showToast}
           />
         )}
