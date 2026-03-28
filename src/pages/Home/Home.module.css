@@ -9,17 +9,16 @@
   margin: 0 auto;
 }
 
-/* Section Separation */
 .sectionDivider {
   height: 1px;
   background: var(--border);
-  margin: 28px 0;
+  margin: 22px 0;
   opacity: 0.6;
 }
 
-/* Greeting / Signature */
+/* Greeting */
 .heroSection {
-  padding: 10px 0 15px;
+  padding: 4px 0 4px;
 }
 
 .greetHeader {
@@ -30,7 +29,7 @@
 
 .greetSub {
   color: var(--text3);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: 700;
@@ -38,84 +37,53 @@
 
 .signatureName {
   font-family: 'Great Vibes', cursive;
-  font-size: 2.8rem; /* reduced size */
+  font-size: 2.6rem;
   font-weight: 400;
   color: var(--text);
-  margin: 10px 0 5px;
-  transform: skewX(-12deg); /* maintain elegant slant */
+  margin: 4px 0 0;
+  transform: skewX(-12deg);
   display: inline-block;
-  letter-spacing: -0.5px;
 }
 
-/* Stats */
+/* Section titles */
+.sectionTitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 14px;
+}
+
+/* Overview cards */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  gap: 12px;
 }
 
 .statCard {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: 14px;
   padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  transition: transform 0.2s;
-}
-
-.statCard:hover {
-  transform: translateY(-2px);
-}
-
-.statRevenue {
-  background: linear-gradient(160deg, var(--surface), var(--bg));
-  border-color: var(--accent);
 }
 
 .statLabel {
   font-size: 0.65rem;
   color: var(--text3);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  display: block;
+  margin-bottom: 6px;
 }
 
 .statVal {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text);
 }
 
-/* Sections */
-.sectionTitle {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  margin-bottom: 16px;
-}
-
-.sectionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.seeAll {
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-/* Studio Tools */
+/* Quick Actions */
 .actionsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -125,25 +93,25 @@
 .actionBox {
   background: var(--surface);
   border: 1px solid var(--border);
-  padding: 18px;
-  border-radius: 22px;
+  padding: 20px 16px;
+  border-radius: 14px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s;
   cursor: pointer;
 }
 
-.actionBox:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+.actionBox:active {
+  transform: scale(0.97);
 }
 
 .iconCircle {
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
   background: var(--bg);
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,40 +119,52 @@
 }
 
 .icon {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: var(--accent);
 }
 
 .actionLabel {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 700;
+  text-align: center;
 }
 
-/* Orders Stack */
+/* Recent orders */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.seeAll {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .orderStack {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .orderCard {
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 14px;
-  border-radius: 20px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: transform 0.2s;
-}
-
-.orderCard:hover {
-  transform: translateY(-2px);
 }
 
 .orderAvatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   background: var(--surface2);
   color: var(--accent);
   border-radius: 50%;
@@ -192,22 +172,24 @@
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.85rem;
+}
+
+.orderInfo {
+  flex: 1;
 }
 
 .orderTitle {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  margin-bottom: 2px;
 }
 
 .orderSubtitle {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--text3);
 }
 
 .statusBadge {
-  font-size: 0.62rem;
+  font-size: 0.65rem;
   font-weight: 800;
   padding: 6px 10px;
   border-radius: 8px;
