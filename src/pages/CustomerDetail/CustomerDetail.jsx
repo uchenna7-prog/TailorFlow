@@ -21,26 +21,38 @@ function getInitials(name) {
 function getBirthdayBadge(birthday) {
   if (!birthday) return null
   const today = new Date()
-  const bday  = new Date(birthday + 'T00:00:00')
-  const isToday = today.getMonth() === bday.getMonth() && today.getDate() === bday.getDate()
-  const label = bday.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
-  return { label: isToday ? '🎂 Happy Birthday!' : `Birthday: ${label}`, isToday }
+  const bday = new Date(birthday + 'T00:00:00')
+  const isToday =
+    today.getMonth() === bday.getMonth() &&
+    today.getDate() === bday.getDate()
+
+  const label = bday.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+  })
+
+  return {
+    label: isToday ? '🎂 Happy Birthday!' : `Birthday: ${label}`,
+    isToday,
+  }
 }
 
 const TABS = ['Measurements', 'Orders', 'Invoice']
 
 export default function CustomerDetail({ onMenuClick }) {
-  const { id }      = useParams()
-  const navigate    = useNavigate()
-  const { getCustomer, deleteCustomer } = useCustomers()
-  const customer    = getCustomer(id)
+  const { id } = useParams()
+  const navigate = useNavigate()
+
+  // ✅ FIXED: use live customers state directly
+  const { customers, deleteCustomer } = useCustomers()
+  const customer = customers.find(c => String(c.id) === String(id))
 
   const data = useCustomerData(id)
 
-  const [activeTab, setActiveTab]           = useState('Measurements')
-  const [dropdownOpen, setDropdownOpen]     = useState(false)
-  const [deleteConfirm, setDeleteConfirm]   = useState(false)
-  const [toastMsg, setToastMsg]             = useState('')
+  const [activeTab, setActiveTab] = useState('Measurements')
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [toastMsg, setToastMsg] = useState('')
   const toastTimer = useRef(null)
 
   const showToast = useCallback((msg) => {
@@ -53,15 +65,17 @@ export default function CustomerDetail({ onMenuClick }) {
     return (
       <div className={styles.notFound}>
         <p>Customer not found.</p>
-        <button onClick={() => navigate('/customers')}>Back to Clients</button>
+        <button onClick={() => navigate('/customers')}>
+          Back to Clients
+        </button>
       </div>
     )
   }
 
-  const initials   = getInitials(customer.name)
-  const bdayBadge  = getBirthdayBadge(customer.birthday)
+  const initials = getInitials(customer.name)
+  const bdayBadge = getBirthdayBadge(customer.birthday)
 
-  const [sidebarOpen, setSidebarOpen] = useState(false) // kept for dropdown state only
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleDeleteCustomer = () => {
     deleteCustomer(id)
@@ -70,25 +84,35 @@ export default function CustomerDetail({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
-
-      {/* Shared Header — same as all other pages */}
       <Header onMenuClick={onMenuClick} />
 
       {/* ── FIXED PROFILE AREA ── */}
       <div className={styles.fixedTop} id="topHeader">
-
         {/* Profile */}
         <div className={styles.profileArea}>
-          <button className={styles.contactBtn} onClick={() => window.location = `mailto:${customer.email}`}>
+          <button
+            className={styles.contactBtn}
+            onClick={() => (window.location = `mailto:${customer.email}`)}
+          >
             <span className="mi">mail_outline</span>
           </button>
+
           <div className={styles.centralAvatar}>
-            {customer.photo
-              ? <img src={customer.photo} alt={customer.name} className={styles.avatarImg} />
-              : initials
-            }
+            {customer.photo ? (
+              <img
+                src={customer.photo}
+                alt={customer.name}
+                className={styles.avatarImg}
+              />
+            ) : (
+              initials
+            )}
           </div>
-          <button className={styles.contactBtn} onClick={() => window.location = `tel:${customer.phone}`}>
+
+          <button
+            className={styles.contactBtn}
+            onClick={() => (window.location = `tel:${customer.phone}`)}
+          >
             <span className="mi">call</span>
           </button>
         </div>
@@ -96,14 +120,20 @@ export default function CustomerDetail({ onMenuClick }) {
         <div className={styles.heroText}>
           <h2>{customer.name}</h2>
           <div className={styles.phone}>{customer.phone}</div>
+
           {customer.address && (
             <div className={styles.location}>
               <span className="mi">place</span>
               {customer.address}
             </div>
           )}
+
           {bdayBadge && (
-            <div className={`${styles.bday} ${bdayBadge.isToday ? styles.bdayToday : ''}`}>
+            <div
+              className={`${styles.bday} ${
+                bdayBadge.isToday ? styles.bdayToday : ''
+              }`}
+            >
               <span style={{ fontSize: '0.8rem' }}>🎂</span>
               <span>{bdayBadge.label}</span>
             </div>
@@ -115,7 +145,9 @@ export default function CustomerDetail({ onMenuClick }) {
           {TABS.map(tab => (
             <div
               key={tab}
-              className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
+              className={`${styles.tab} ${
+                activeTab === tab ? styles.tabActive : ''
+              }`}
               onClick={() => setActiveTab(tab)}
             >
               {tab}
@@ -134,6 +166,7 @@ export default function CustomerDetail({ onMenuClick }) {
             showToast={showToast}
           />
         )}
+
         {activeTab === 'Orders' && (
           <OrdersTab
             orders={data.orders}
@@ -144,6 +177,7 @@ export default function CustomerDetail({ onMenuClick }) {
             showToast={showToast}
           />
         )}
+
         {activeTab === 'Invoice' && (
           <InvoiceTab
             invoices={data.invoices}
@@ -164,8 +198,12 @@ export default function CustomerDetail({ onMenuClick }) {
         <button
           className={styles.fab}
           onClick={() => {
-            if (activeTab === 'Measurements') document.dispatchEvent(new CustomEvent('openMeasureModal'))
-            if (activeTab === 'Orders')       document.dispatchEvent(new CustomEvent('openOrderModal'))
+            if (activeTab === 'Measurements') {
+              document.dispatchEvent(new CustomEvent('openMeasureModal'))
+            }
+            if (activeTab === 'Orders') {
+              document.dispatchEvent(new CustomEvent('openOrderModal'))
+            }
           }}
         >
           <span className="mi">add</span>
