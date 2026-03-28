@@ -4,13 +4,13 @@
 
 /* ── CSS VARIABLES ── */
 :root {
-  --bg:#ffffff;
+  --bg: #000000;
   --surface: #0a0a0a;
   --surface2: #121212;
   --border: #1f1f1f;
   --border2: #2a2a2a;
   --accent: #ffffff;
-  --text: black;
+  --text: #ffffff;
   --text2: #a0a0a0;
   --text3: #555555;
   --danger: #ff4d4d;
