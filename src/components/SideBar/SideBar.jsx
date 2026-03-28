@@ -2,17 +2,17 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import styles from './SideBar.module.css'
 
 const NAV_ITEMS = [
-  { path: '/',             icon: 'home',          label: 'Home' },
-  { path: '/customers',    icon: 'group',         label: 'Clients' },
-  { path: '/tasks',        icon: 'assignment',    label: 'Tasks' },
-  { path: '/orders',       icon: 'shopping_cart', label: 'Orders' },
-  { path: '/gallery',      icon: 'photo_library', label: 'Gallery' },
-  { path: '/settings',     icon: 'settings',      label: 'Settings' },
-  { path: '/account',      icon: 'person',        label: 'My Account' },
-  { path: '/contact',      icon: 'call',          label: 'Contact Us' },
-  { path: '/share',        icon: 'share',         label: 'Share' },
-  { path: '/faqs',         icon: 'help_outline',  label: 'FAQs' },
-  { path: '/logout',       icon: 'logout',        label: 'Log out' },
+  { path: '/', label: 'Home', icon: 'home' },
+  { path: '/customers', label: 'Clients', icon: 'group' },
+  { path: '/tasks', label: 'Tasks', icon: 'assignment' },
+  { path: '/orders', label: 'Orders', icon: 'shopping_cart' },
+  { path: '/gallery', label: 'Gallery', icon: 'photo_library' },
+  { path: '/settings', label: 'Settings', icon: 'settings' },
+  { path: '/account', label: 'My Account', icon: 'person' },
+  { path: '/contact', label: 'Contact Us', icon: 'call' },
+  { path: '/share', label: 'Share', icon: 'share' },
+  { path: '/faqs', label: 'FAQs', icon: 'help_outline' },
+  { path: '/logout', label: 'Log out', icon: 'logout' },
 ]
 
 function SideBar({ isOpen, onClose }) {
@@ -26,27 +26,31 @@ function SideBar({ isOpen, onClose }) {
 
   return (
     <>
+      {/* Mobile overlay */}
       <div
         className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ''}`}
         onClick={onClose}
       />
 
+      {/* Sidebar */}
       <nav className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
         
-        {/* User at the top */}
+        {/* Top branding + user */}
         <div className={styles.top}>
+          <div className={styles.brand}>
+            Tailor<span>Flow</span>
+          </div>
+          <div className={styles.tagline}>Smart tailoring workflow</div>
+
           <div className={styles.user}>
             <div className={styles.avatar}>UU</div>
-            <div>
-              <div className={styles.userName}>Uchendu Uchenna</div>
-              <div className={styles.userRole}>Tailor · Owner</div>
-            </div>
+            <div className={styles.userName}>Uchendu Uchenna</div>
           </div>
         </div>
 
-        {/* Nav items */}
+        {/* Nav links */}
         <div className={styles.nav}>
-          {NAV_ITEMS.map(item => (
+          {NAV_ITEMS.map((item) => (
             <button
               key={item.path}
               className={`${styles.navItem} ${
@@ -54,17 +58,25 @@ function SideBar({ isOpen, onClose }) {
               }`}
               onClick={() => handleNav(item.path)}
             >
-              <span className="mi nav-icon">{item.icon}</span>
+              <span className="mi">{item.icon}</span>
               {item.label}
             </button>
           ))}
         </div>
 
-        {/* Footer links */}
+        {/* Legal links */}
         <div className={styles.footer}>
-          <button className={styles.footerLink}>Terms & Conditions</button>
-          <button className={styles.footerLink}>Refund / Cancellation Policy</button>
-          <button className={styles.footerLink}>Privacy Policy</button>
+          <button className={styles.footerLink}>
+            Terms & Conditions
+          </button>
+
+          <button className={styles.footerLink}>
+            Refund / Cancellation Policy
+          </button>
+
+          <button className={styles.footerLink}>
+            Privacy Policy
+          </button>
         </div>
       </nav>
     </>
