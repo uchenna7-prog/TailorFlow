@@ -22,20 +22,20 @@ function Home({ onMenuClick }) {
       <Header onMenuClick={onMenuClick} />
 
       <main className={styles.main}>
-        {/* Luxury Greeting Section */}
+        {/* Signature Greeting */}
         <section className={styles.heroSection}>
           <div className={styles.greetHeader}>
             <span className={styles.greetSub}>Welcome back</span>
             <span className={styles.sparkle}>✨</span>
           </div>
           <h1 className={styles.signatureName}>Uchenna</h1>
-          <p className={styles.greetDesc}>
-            Your atelier is active today with <strong>8 premium orders</strong> requiring attention.
-          </p>
         </section>
 
-        {/* Business Pulse (Stats) */}
+        <div className={styles.sectionDivider} />
+
+        {/* Business Overview */}
         <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Business Pulse</h2>
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
               <span className={styles.statLabel}>Clients</span>
@@ -51,6 +51,8 @@ function Home({ onMenuClick }) {
             </div>
           </div>
         </section>
+
+        <div className={styles.sectionDivider} />
 
         {/* Quick Actions */}
         <section className={styles.section}>
@@ -71,11 +73,13 @@ function Home({ onMenuClick }) {
           </div>
         </section>
 
-        {/* Recent Activity */}
+        <div className={styles.sectionDivider} />
+
+        {/* Recent Orders */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Recent Orders</h2>
-            <button className={styles.seeAll} onClick={() => navigate('/orders')}>See all</button>
+            <button className={styles.seeAll} onClick={() => navigate('/orders')}>View list</button>
           </div>
 
           <div className={styles.orderStack}>
@@ -86,7 +90,7 @@ function Home({ onMenuClick }) {
                 </div>
                 <div className={styles.orderInfo}>
                   <div className={styles.orderTitle}>{order.name}</div>
-                  <div className={styles.orderSubtitle}>For {order.client} • Due {order.due}</div>
+                  <div className={styles.orderSubtitle}>For {order.client} • {order.due}</div>
                 </div>
                 <div className={`${styles.statusBadge} ${order.status === 'Ready' ? styles.ready : ''}`}>
                   {order.status}
