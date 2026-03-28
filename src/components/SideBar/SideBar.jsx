@@ -2,10 +2,14 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import styles from './SideBar.module.css'
 
 const NAV_ITEMS = [
-  { path: '/',          icon: 'home',       label: 'Home' },
-  { path: '/customers', icon: 'group',      label: 'Clients' },
-  { path: '/tasks',     icon: 'assignment', label: 'Tasks' },
-  { path: '/settings',  icon: 'settings',   label: 'Settings' },
+  { path: '/',             icon: 'home',        label: 'Home' },
+  { path: '/customers',    icon: 'group',       label: 'Clients' },
+  { path: '/tasks',        icon: 'assignment',  label: 'Tasks' },
+  { path: '/orders',       icon: 'shopping_cart', label: 'Orders' },
+  { path: '/settings',     icon: 'settings',    label: 'Settings' },
+  { path: '/account',      icon: 'person',      label: 'My Account' },
+  { path: '/faqs',         icon: 'help_outline', label: 'FAQs' },
+  { path: '/logout',       icon: 'logout',      label: 'Log out' },
 ]
 
 function SideBar({ isOpen, onClose }) {
