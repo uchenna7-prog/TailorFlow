@@ -1,219 +1,246 @@
-:root {
-  --primary: #4f46e5;
-  --danger: #dc2626;
-  --bg: #ffffff;
-  --bg2: #f9fafb;
-  --text: #111827;
-  --text2: #6b7280;
-  --shadow: rgba(0,0,0,0.1);
-}
-
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
+  gap: 8px;
+  padding: 14px 16px;
   background: var(--bg);
-  box-shadow: 0 2px 6px var(--shadow);
-  position: relative;
-  z-index: 10;
+  border-bottom: 1px solid var(--border);
 }
 
 .title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
+  flex: 1;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 2px;
 }
 
+/* ── ICON BUTTON ── */
 .iconBtn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
-  cursor: pointer;
+  color: var(--text);
+  border-radius: 10px;
+  transition: background 0.15s;
   position: relative;
-  padding: 0.25rem;
-  border-radius: 0.375rem;
-  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.iconBtn:active {
+  background: var(--surface2);
 }
 
-.iconBtn:hover {
-  background: var(--bg2);
+/* ── HAMBURGER LINES ── */
+.hamburgerLines {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 18px;
 }
-
 .hamburgerLines span {
   display: block;
-  width: 20px;
   height: 2px;
   background: var(--text);
-  margin: 4px 0;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
+/* ── NOTIFICATION DOT ── */
 .notifDot {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 7px;
+  right: 7px;
   width: 8px;
   height: 8px;
-  background: var(--primary);
   border-radius: 50%;
+  background: var(--warning);
+  border: 2px solid var(--bg);
 }
 
+/* ── DROPDOWN ── */
 .dropdownWrap {
   position: relative;
 }
 
 .dropdownBackdrop {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 5;
+  inset: 0;
+  z-index: 200;
 }
 
 .dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 6px);
   right: 0;
-  min-width: 180px;
-  background: var(--bg);
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  box-shadow: 0 4px 6px var(--shadow);
-  padding: 0.25rem 0;
-  z-index: 10;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  min-width: 160px;
+  z-index: 300;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+  animation: fadeIn 0.15s ease;
 }
 
 .dropdownItem {
-  width: 100%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text2);
   background: none;
   border: none;
-  font-size: 0.95rem;
-  color: var(--text2);
-  cursor: pointer;
+  width: 100%;
   text-align: left;
+  transition: background 0.12s;
 }
-
-.dropdownItem:hover {
-  background: var(--bg2);
+.dropdownItem:active {
+  background: var(--surface2);
 }
 
 .dropdownSeparator {
   height: 1px;
-  background: #e5e7eb;
-  margin: 0.25rem 0;
+  background: var(--border);
+  margin: 0 8px;
 }
 
-.danger {
-  color: var(--danger);
-  font-weight: 600;
-}
-
+/* ── NOTIFICATION PANEL ── */
 .notifOverlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.2);
-  display: flex;
-  justify-content: flex-end;
-  z-index: 20;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
 }
 
 .notifPanel {
-  width: 320px;
-  max-height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: var(--bg);
-  box-shadow: 0 4px 12px var(--shadow);
   display: flex;
   flex-direction: column;
+  animation: slideDown 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
 }
 
 .notifHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
 }
 
 .notifTitle {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--text);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text2);
 }
 
 .notifBody {
-  overflow-y: auto;
   flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .notifItem {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  position: relative;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 10px;
 }
-
-.notifItem h5 {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.notifItem p {
-  margin: 0.25rem 0 0;
-  font-size: 0.875rem;
-  color: var(--text2);
-}
-
-.notifTime {
-  font-size: 0.75rem;
-  color: var(--text2);
-  margin-top: 0.25rem;
+.notifItem.unread {
+  border-color: rgba(251, 146, 60, 0.3);
+  background: var(--surface2);
 }
 
 .notifIcon {
-  font-size: 1.5rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.1rem;
+}
+.notifIcon.birthday { background: rgba(251, 146, 60, 0.12); }
+.notifIcon.order    { background: rgba(168, 85, 247, 0.12); }
+.notifIcon.invoice  { background: rgba(34, 197, 94, 0.12); }
+
+.notifContent {
+  flex: 1;
+  min-width: 0;
+}
+.notifContent h5 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.notifContent p {
+  font-size: 0.75rem;
+  color: var(--text2);
+  line-height: 1.4;
+}
+
+.notifTime {
+  display: block;
+  font-size: 0.62rem;
+  color: var(--text3);
+  margin-top: 4px;
+  font-weight: 600;
 }
 
 .unreadDot {
-  position: absolute;
-  top: 12px;
-  right: 12px;
   width: 8px;
   height: 8px;
-  background: var(--primary);
   border-radius: 50%;
-}
-
-.unread {
-  background: var(--bg2);
-  border-radius: 0.375rem;
+  background: var(--warning);
+  flex-shrink: 0;
+  margin-top: 5px;
 }
 
 .notifEmpty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  padding-top: 80px;
+  gap: 10px;
   text-align: center;
-  color: var(--text2);
 }
-
 .notifEmpty span {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  opacity: 0.2;
+}
+.notifEmpty p {
+  font-size: 0.85rem;
+  color: var(--text3);
 }
