@@ -45,6 +45,7 @@ export default function CustomerDetail({ onMenuClick }) {
     )
   }
 
+  // ── SAFE: Only call this hook if customer exists
   const data = useCustomerData(id)
 
   const [activeTab, setActiveTab]           = useState('Measurements')
@@ -62,7 +63,7 @@ export default function CustomerDetail({ onMenuClick }) {
   const initials   = getInitials(customer.name)
   const bdayBadge  = getBirthdayBadge(customer.birthday)
 
-  const [sidebarOpen, setSidebarOpen] = useState(false) // kept for dropdown state only
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleDeleteCustomer = () => {
     deleteCustomer(id)
@@ -71,14 +72,10 @@ export default function CustomerDetail({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
-
-      {/* Shared Header */}
       <Header onMenuClick={onMenuClick} />
 
       {/* ── FIXED PROFILE AREA ── */}
       <div className={styles.fixedTop} id="topHeader">
-
-        {/* Profile */}
         <div className={styles.profileArea}>
           <button className={styles.contactBtn} onClick={() => window.location = `mailto:${customer.email}`}>
             <span className="mi">mail_outline</span>
@@ -160,7 +157,6 @@ export default function CustomerDetail({ onMenuClick }) {
         )}
       </div>
 
-      {/* FAB */}
       {activeTab !== 'Invoice' && (
         <button
           className={styles.fab}
@@ -173,7 +169,6 @@ export default function CustomerDetail({ onMenuClick }) {
         </button>
       )}
 
-      {/* Confirm delete customer */}
       <ConfirmSheet
         open={deleteConfirm}
         title="Delete Customer?"
