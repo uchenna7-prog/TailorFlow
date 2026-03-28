@@ -75,8 +75,6 @@ export default function CustomerDetail({ onMenuClick }) {
   const initials = getInitials(customer.name)
   const bdayBadge = getBirthdayBadge(customer.birthday)
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
   const handleDeleteCustomer = () => {
     deleteCustomer(id)
     navigate('/customers')
