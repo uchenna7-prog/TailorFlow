@@ -40,33 +40,9 @@ function Header({ onMenuClick }) {
   const closeNotif = () => setNotifOpen(false)
 
   const notifications = [
-    {
-      id: 1,
-      icon: '🎂',
-      type: 'birthday',
-      title: "Upcoming birthday",
-      body: "Uchendu Uchenna's birthday is in 2 days.",
-      time: 'In 2 days',
-      unread: true,
-    },
-    {
-      id: 2,
-      icon: '✂️',
-      type: 'order',
-      title: 'Pending order: Senator Suit',
-      body: 'Due Apr 10 — awaiting completion.',
-      time: 'Apr 10',
-      unread: true,
-    },
-    {
-      id: 3,
-      icon: '🧾',
-      type: 'invoice',
-      title: 'Unpaid: INV-001',
-      body: 'Senator Suit · ₦25,000 — awaiting payment.',
-      time: 'Mar 28',
-      unread: false,
-    },
+    { id: 1, icon: '🎂', type: 'birthday', title: "Upcoming birthday", body: "Uchendu Uchenna's birthday is in 2 days.", time: 'In 2 days', unread: true },
+    { id: 2, icon: '✂️', type: 'order', title: 'Pending order: Senator Suit', body: 'Due Apr 10 — awaiting completion.', time: 'Apr 10', unread: true },
+    { id: 3, icon: '🧾', type: 'invoice', title: 'Unpaid: INV-001', body: 'Senator Suit · ₦25,000 — awaiting payment.', time: 'Mar 28', unread: false },
   ]
   const hasUnread = notifications.some(n => n.unread)
 
@@ -104,7 +80,7 @@ function Header({ onMenuClick }) {
                         className={`${styles.dropdownItem} ${item.danger ? styles.danger : ''}`}
                         onClick={() => { closeDropdown(); item.action() }}
                       >
-                        <span className="mi" style={{ fontSize: '1.2rem', color: item.danger ? 'var(--danger)' : 'var(--text2)' }}>{item.icon}</span>
+                        <span className="mi" style={{ fontSize: '1.2rem', marginRight: '0.5rem' }}>{item.icon}</span>
                         {item.label}
                       </button>
                       {i < arr.length - 1 && <div className={styles.dropdownSeparator} />}
@@ -117,7 +93,6 @@ function Header({ onMenuClick }) {
         </div>
       </header>
 
-      {/* Notification panel */}
       {notifOpen && (
         <div className={styles.notifOverlay}>
           <div className={styles.notifPanel}>
