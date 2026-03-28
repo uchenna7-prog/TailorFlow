@@ -155,9 +155,9 @@ function MeasureDetail({ measurement, onClose, onDelete }) {
       <div className={styles.detailBody}>
         {measurement.imgSrc && <img src={measurement.imgSrc} alt="Design" className={styles.detailDesign} />}
         <div className={styles.detailUnit}>{unitFull}</div>
-        {measurement.fields.length === 0
+        {(measurement.fields || []).length === 0
           ? <p style={{ color: 'var(--text3)', fontSize: '0.8rem' }}>No fields recorded.</p>
-          : measurement.fields.map((f, i) => (
+          : (measurement.fields || []).map((f, i) => (
               <div key={i} className={styles.measurementRow}>
                 <span className={styles.measureLabel}>{f.name}</span>
                 <span className={styles.measureValue}>{f.value || '—'}</span>
@@ -215,7 +215,9 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
             <div className={styles.cardInfo}>
               <h4>{m.name}</h4>
               <p>{m.date}</p>
-              <span className={styles.unitBadge}>{unitLabel} · {m.fields.length} field{m.fields.length !== 1 ? 's' : ''}</span>
+              <span className={styles.unitBadge}>
+                {unitLabel} · {(m.fields || []).length} field{(m.fields || []).length !== 1 ? 's' : ''}
+              </span>
             </div>
             <div className={styles.cardActions}>
               <button className={styles.cardDelete} onClick={e => { e.stopPropagation(); setConfirmDelete(m) }}>
