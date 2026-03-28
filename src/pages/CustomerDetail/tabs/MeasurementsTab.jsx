@@ -1,25 +1,31 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import ConfirmSheet from '../../../components/ConfirmSheet/ConfirmSheet'
 import styles from './Tabs.module.css'
 
 const UNIT_LABELS = { in: '"', cm: 'cm', yd: 'yd' }
 const UNIT_FULL   = { in: 'Inches (")', cm: 'Centimetres (cm)', yd: 'Yards (yd)' }
 
-// ── MEASUREMENT FORM MODAL ──
+// Defined OUTSIDE components so it's always available
+function freshCard(n) {
+  return {
+    id: Date.now() + Math.random(),
+    label: `Cloth Type ${n}`,
+    name: '',
+    imgSrc: null,
+    fields: [{ id: Date.now() + Math.random(), name: '', value: '' }]
+  }
+}
+
 function MeasureModal({ isOpen, onClose, onSave }) {
   const [unit, setUnit]   = useState('in')
-  const [cards, setCards] = useState([freshCard(1)])
-
-  function freshCard(n) {
-    return { id: Date.now() + Math.random(), label: `Cloth Type ${n}`, name: '', imgSrc: null, fields: [{ id: Date.now(), name: '', value: '' }] }
-  }
+  const [cards, setCards] = useState(() => [freshCard(1)])
 
   const updateCard = (cardId, key, val) =>
     setCards(prev => prev.map(c => c.id === cardId ? { ...c, [key]: val } : c))
 
   const addField = (cardId) =>
     setCards(prev => prev.map(c => c.id === cardId
-      ? { ...c, fields: [...c.fields, { id: Date.now(), name: '', value: '' }] }
+      ? { ...c, fields: [...c.fields, { id: Date.now() + Math.random(), name: '', value: '' }] }
       : c))
 
   const removeField = (cardId, fieldId) =>
@@ -69,7 +75,6 @@ function MeasureModal({ isOpen, onClose, onSave }) {
         <button className="mi" onClick={handleClose} style={{ background: 'none', border: 'none', color: 'var(--text)', fontSize: '1.8rem', cursor: 'pointer' }}>close</button>
       </div>
 
-      {/* Unit selector */}
       <div className={styles.unitsSection}>
         {['in', 'cm', 'yd'].map(u => (
           <button key={u} className={`${styles.unitChip} ${unit === u ? styles.unitChipActive : ''}`} onClick={() => setUnit(u)}>
@@ -141,7 +146,6 @@ function MeasureModal({ isOpen, onClose, onSave }) {
   )
 }
 
-// ── MEASUREMENT DETAIL MODAL ──
 function MeasureDetail({ measurement, onClose, onDelete }) {
   if (!measurement) return null
   const unitFull = UNIT_FULL[measurement.unit] ?? measurement.unit
@@ -170,13 +174,11 @@ function MeasureDetail({ measurement, onClose, onDelete }) {
   )
 }
 
-// ── MAIN TAB ──
 export default function MeasurementsTab({ measurements, onSave, onDelete, showToast }) {
-  const [modalOpen, setModalOpen]       = useState(false)
-  const [detailItem, setDetailItem]     = useState(null)
+  const [modalOpen, setModalOpen]         = useState(false)
+  const [detailItem, setDetailItem]       = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
 
-  // Listen for FAB event from parent
   useEffect(() => {
     const handler = () => setModalOpen(true)
     document.addEventListener('openMeasureModal', handler)
@@ -189,6 +191,7 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
   }
 
   const handleDeleteConfirm = () => {
+    if (!confirmDelete) return
     onDelete(confirmDelete.id)
     showToast('Measurement deleted')
     setConfirmDelete(null)
