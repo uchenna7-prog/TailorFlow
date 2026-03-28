@@ -5,7 +5,7 @@
   transition: margin-left 0.3s ease;
 }
 
-/* When sidebar is open, push content to the right */
+
 .sidebarOpen .scrollContent,
 .sidebarOpen .fixedTop {
   margin-left: 250px; /* match your sidebar width */
