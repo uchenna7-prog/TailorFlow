@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { useCustomerData } from '../../hooks/useCustomerData'
+import Header from '../../components/Header/Header'
 import MeasurementsTab from './tabs/MeasurementsTab'
 import OrdersTab from './tabs/OrdersTab'
 import InvoiceTab from './tabs/InvoiceTab'
@@ -28,10 +29,10 @@ function getBirthdayBadge(birthday) {
 
 const TABS = ['Measurements', 'Orders', 'Invoice']
 
-export default function CustomerDetail() {
+export default function CustomerDetail({ onMenuClick }) {
   const { id }      = useParams()
   const navigate    = useNavigate()
-  const { getCustomer, deleteCustomer, loaded } = useCustomers()
+  const { getCustomer, deleteCustomer } = useCustomers()
   const customer    = getCustomer(id)
 
   const data = useCustomerData(id)
@@ -48,9 +49,6 @@ export default function CustomerDetail() {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
 
-  // Still loading from localStorage — don't render anything yet
-  if (!loaded) return null
-
   if (!customer) {
     return (
       <div className={styles.notFound}>
@@ -63,6 +61,8 @@ export default function CustomerDetail() {
   const initials   = getInitials(customer.name)
   const bdayBadge  = getBirthdayBadge(customer.birthday)
 
+  const [sidebarOpen, setSidebarOpen] = useState(false) // kept for dropdown state only
+
   const handleDeleteCustomer = () => {
     deleteCustomer(id)
     navigate('/customers')
@@ -71,53 +71,11 @@ export default function CustomerDetail() {
   return (
     <div className={styles.page}>
 
-      {/* ── FIXED TOP ── */}
+      {/* Shared Header — same as all other pages */}
+      <Header onMenuClick={onMenuClick} />
+
+      {/* ── FIXED PROFILE AREA ── */}
       <div className={styles.fixedTop} id="topHeader">
-
-        {/* App bar */}
-        <div className={styles.appBar}>
-          <button className={styles.hamburgerBtn} onClick={() => navigate('/customers')}>
-            <div className={styles.hamburgerLines}>
-              <span /><span /><span />
-            </div>
-          </button>
-          <div style={{ flex: 1 }} />
-
-          {/* Notifications */}
-          <button className={styles.appBarIcon}>
-            <span className="mi" style={{ fontSize: '1.4rem' }}>notifications</span>
-          </button>
-
-          {/* Three-dot dropdown */}
-          <div className={styles.dropdownWrap}>
-            <button className={styles.appBarIcon} onClick={() => setDropdownOpen(p => !p)}>
-              <span className="mi" style={{ fontSize: '1.4rem' }}>more_vert</span>
-            </button>
-            {dropdownOpen && (
-              <>
-                <div className={styles.dropdownBackdrop} onClick={() => setDropdownOpen(false)} />
-                <div className={styles.dropdown}>
-                  <button className={styles.dropdownItem} onClick={() => { setDropdownOpen(false); navigate('/customers') }}>
-                    <span className="mi">arrow_back</span> Back to Clients
-                  </button>
-                  <button className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                    <span className="mi">edit</span> Edit Customer
-                  </button>
-                  <button className={styles.dropdownItem} onClick={() => { setDropdownOpen(false); window.location = `tel:${customer.phone}` }}>
-                    <span className="mi">call</span> Call Customer
-                  </button>
-                  <button className={styles.dropdownItem} onClick={() => { setDropdownOpen(false); window.location = `mailto:${customer.email}` }}>
-                    <span className="mi">mail_outline</span> Send Email
-                  </button>
-                  <div className={styles.dropdownDivider} />
-                  <button className={`${styles.dropdownItem} ${styles.danger}`} onClick={() => { setDropdownOpen(false); setDeleteConfirm(true) }}>
-                    <span className="mi">delete_outline</span> Delete Customer
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
 
         {/* Profile */}
         <div className={styles.profileArea}>
