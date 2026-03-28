@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useCustomers } from '../../contexts/CustomerContext'
+import Header from '../../components/Header/Header'
 import styles from './Customers.module.css'
-
-const CUST_KEY = 'tailorbook_customers'
 
 // ── HELPERS ──
 function getInitials(name) {
@@ -260,41 +260,15 @@ function CustomerCard({ customer, onDelete, onOpen, index }) {
 }
 
 // ── MAIN PAGE ──
-export default function Customers() {
+export default function Customers({ onMenuClick }) {
   const navigate = useNavigate()
+  const { customers, addCustomer, deleteCustomer } = useCustomers()
 
-  const [customers, setCustomers]         = useState([])
   const [query, setQuery]                 = useState('')
   const [formOpen, setFormOpen]           = useState(false)
-  const [deleteTarget, setDeleteTarget]   = useState(null) // customer to confirm-delete
+  const [deleteTarget, setDeleteTarget]   = useState(null)
   const [toastMsg, setToastMsg]           = useState('')
   const toastTimer = useRef(null)
-
-  // ── LOAD from localStorage on mount ──
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(CUST_KEY)
-      if (raw) {
-        const saved = JSON.parse(raw)
-        // wipe old seed entry
-        if (saved.length === 1 && saved[0].id === 1 && saved[0].name === 'Uchendu Daniel') {
-          localStorage.removeItem(CUST_KEY)
-          setCustomers([])
-        } else {
-          setCustomers(saved)
-        }
-      }
-    } catch {
-      setCustomers([])
-    }
-  }, [])
-
-  // ── PERSIST whenever customers changes ──
-  useEffect(() => {
-    try {
-      localStorage.setItem(CUST_KEY, JSON.stringify(customers))
-    } catch { /* ignore */ }
-  }, [customers])
 
   // ── TOAST helper ──
   const showToast = (msg) => {
@@ -303,25 +277,19 @@ export default function Customers() {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }
 
-  // ── SAVE new customer ──
   const handleSave = ({ name, phone, phoneType, email, address, birthday, notes, photo }) => {
     if (!name)  { showToast('Name is required');         return }
     if (!phone) { showToast('Phone number is required'); return }
-
     const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    const customer = {
-      id: Date.now(),
-      name, phone, phoneType, email, address, birthday, notes, photo, date: today
-    }
-    setCustomers(prev => [customer, ...prev])
+    const customer = { id: Date.now(), name, phone, phoneType, email, address, birthday, notes, photo, date: today }
+    addCustomer(customer)
     setFormOpen(false)
     showToast(`${name} added ✓`)
   }
 
-  // ── DELETE ──
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return
-    setCustomers(prev => prev.filter(c => c.id !== deleteTarget.id))
+    deleteCustomer(deleteTarget.id)
     showToast(`${deleteTarget.name} deleted`)
     setDeleteTarget(null)
   }
@@ -342,6 +310,7 @@ export default function Customers() {
 
   return (
     <div className={styles.page}>
+      <Header onMenuClick={onMenuClick} />
 
       {/* Search */}
       <div className={styles.searchContainer}>
