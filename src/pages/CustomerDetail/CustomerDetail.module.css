@@ -1,68 +1,4 @@
-.page {
-  background: var(--bg);
-  min-height: 100dvh;
-}
-
-/* PROFILE */
-.profileSection {
-  display: flex;
-  gap: 12px;
-  padding: 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-.leftColumn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: var(--surface2);
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  font-size: 28px;
-  border: 2px solid var(--accent);
-}
-
-.avatarImg {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.birthday {
-  font-size: 0.8rem;
-  color: orange;
-}
-
-/* RIGHT */
-.rightColumn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.name {
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.meta {
-  display: flex;
-  gap: 4px;
-  font-size: 0.75rem;
-  color: var(--text2);
-}
-
-/* ACTIONS */
+/* ACTION BUTTONS */
 .actions {
   display: flex;
   justify-content: space-around;
@@ -80,10 +16,17 @@
   cursor: pointer;
 }
 
+/* ✅ FIX: WHITE TEXT + ICON */
 .light {
-  background: var(--surface2);
+  background: var(--accent);
+  color: #fff;
 }
 
+.light .mi {
+  color: #fff;
+}
+
+/* FULL BODY BUTTON */
 .primary {
   background: #fff;
   color: #000;
@@ -103,15 +46,23 @@
   font-size: 0.7rem;
   cursor: pointer;
   color: var(--text3);
+  position: relative;
 }
 
+/* ✅ FIX: ACTIVE TAB LINE */
 .active {
   color: var(--accent);
 }
 
-/* CONTENT */
-.content {
-  padding: 14px;
+.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
 }
 
 /* FAB */
