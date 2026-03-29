@@ -8,7 +8,6 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Default page titles
   const PAGE_TITLES = {
     '/': 'Home',
     '/customers': 'Clients',
@@ -74,7 +73,6 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
   return (
     <>
       <header className={`${styles.header} ${type === 'back' ? styles.backHeader : ''}`}>
-        {/* LEFT: Back button + title */}
         <div className={styles.leftSide}>
           {type === 'default' && (
             <button className={styles.iconBtn} onClick={onMenuClick} aria-label="Open menu">
@@ -89,24 +87,21 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
           <div className={styles.title}>{pageTitle}</div>
         </div>
 
-        {/* RIGHT: Custom actions for back pages */}
         {type === 'back' && customActions.length > 0 && (
           <div className={styles.rightActions}>
             {customActions.map((action, i) => (
-              <button
-                key={i}
-                className={`${styles.iconBtn} ${action.className || ''}`}
-                onClick={action.onClick}
-                aria-label={action.label}
-                style={{ color: action.color || 'var(--text2)' }}
-              >
-                <span className="mi-outlined" style={{ fontSize: '1.5rem' }}>{action.icon}</span>
+              <button key={i} className={styles.iconBtn} onClick={action.onClick} aria-label={action.label}>
+                <span
+                  className={`mi${action.outlined ? '-outlined' : ''}`}
+                  style={{ fontSize: '1.4rem', color: action.color || 'var(--text2)' }}
+                >
+                  {action.icon}
+                </span>
               </button>
             ))}
           </div>
         )}
 
-        {/* DEFAULT PAGE RIGHT ACTIONS */}
         {type === 'default' && (
           <div className={styles.rightActions}>
             <button className={styles.iconBtn} onClick={toggleNotif} aria-label="Notifications">
@@ -143,7 +138,6 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
         )}
       </header>
 
-      {/* Notification panel (default only) */}
       {type === 'default' && notifOpen && (
         <div className={styles.notifOverlay}>
           <div className={styles.notifPanel}>
