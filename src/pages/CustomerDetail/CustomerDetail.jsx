@@ -55,17 +55,15 @@ export default function CustomerDetail({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
-      {/* HEADER */}
-      <div className={styles.header}>
-        <button
-          className="mi"
-          onClick={() => navigate(-1)}
-          style={{ fontSize: '1.8rem', background: 'none', border: 'none', cursor: 'pointer' }}
-        >
-          arrow_back
-        </button>
-        <div className={styles.headerTitle}>Customer Details</div>
-      </div>
+      {/* ✅ Header: big back button, page title, edit + outlined delete */}
+      <Header
+        type="back"
+        title="Customer Details"
+        customActions={[
+          { icon: 'edit', label: 'Edit Customer', onClick: () => navigate(`/customers/edit/${id}`) },
+          { icon: 'delete', label: 'Delete Customer', onClick: () => deleteCustomer(id), className: 'outlined', color: 'var(--danger)' },
+        ]}
+      />
 
       {/* PROFILE */}
       <div className={styles.profileSection}>
@@ -101,18 +99,6 @@ export default function CustomerDetail({ onMenuClick }) {
               {customer.address}
             </div>
           )}
-
-          {/* DELETE BUTTON */}
-          <button
-            className={`${styles.btn} ${styles.outlined}`}
-            onClick={() => {
-              deleteCustomer(id)
-              showToast(`${customer.name} deleted`)
-              navigate(-1)
-            }}
-          >
-            <span className="mi" style={{ color: 'var(--danger)' }}>delete_outline</span> Delete
-          </button>
         </div>
       </div>
 
