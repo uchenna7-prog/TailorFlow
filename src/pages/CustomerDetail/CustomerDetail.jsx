@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { useCustomerData } from '../../hooks/useCustomerData'
 import Header from '../../components/Header/Header'
-import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import Toast from '../../components/Toast/Toast'
 import MeasurementsTab from './tabs/MeasurementsTab'
 import OrdersTab from './tabs/OrdersTab'
@@ -18,41 +17,21 @@ function getInitials(name) {
     : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
+function getBirthday(birthday) {
+  if (!birthday) return null
+  const d = new Date(birthday)
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 const TABS = [
-  { id: 'dress', label: 'Dress' },
+  { id: 'dress', label: 'Dress Measurements' },
   { id: 'orders', label: 'Orders' },
   { id: 'invoice', label: 'Invoice' },
 ]
 
-function BodyPanel({ customer, onClose }) {
-  const entries = Object.entries(customer.bodyMeasurements || {})
-
-  return (
-    <div className={styles.sheet} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={styles.sheetContent}>
-        <h3>Full Body Measurements</h3>
-
-        <div className={styles.grid}>
-          {entries.length === 0 ? (
-            <p>No measurements yet</p>
-          ) : (
-            entries.map(([k, v]) => (
-              <div key={k} className={styles.card}>
-                <div className={styles.label}>{k}</div>
-                <div className={styles.value}>{v}"</div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function CustomerDetail({ onMenuClick }) {
   const { id } = useParams()
-  const navigate = useNavigate()
-  const { getCustomer, deleteCustomer } = useCustomers()
+  const { getCustomer } = useCustomers()
   const data = useCustomerData(id)
 
   const [tab, setTab] = useState('dress')
@@ -67,23 +46,27 @@ export default function CustomerDetail({ onMenuClick }) {
   }, [])
 
   const customer = getCustomer(id)
-
-  if (!customer) {
-    return <div>Not found</div>
-  }
+  if (!customer) return <div>Not found</div>
 
   const initials = getInitials(customer.name)
+  const birthday = getBirthday(customer.birthday)
 
   return (
     <div className={styles.page}>
       <Header onMenuClick={onMenuClick} />
 
-      {/* PROFILE SECTION */}
+      {/* PROFILE */}
       <div className={styles.profileSection}>
         <div className={styles.left}>
           <div className={styles.avatar}>
             {customer.photo ? <img src={customer.photo} /> : initials}
           </div>
+
+          {birthday && (
+            <div className={styles.birthday}>
+              🎈 {birthday}
+            </div>
+          )}
         </div>
 
         <div className={styles.right}>
@@ -115,16 +98,18 @@ export default function CustomerDetail({ onMenuClick }) {
       {/* ACTION BUTTONS */}
       <div className={styles.actions}>
         <button onClick={() => window.location = `tel:${customer.phone}`}>
-          <span className="material-symbols-outlined">call</span> Call
+          <span className="material-symbols-outlined">call</span>
+          Call
         </button>
 
         <button onClick={() => window.location = `mailto:${customer.email}`}>
-          <span className="material-symbols-outlined">mail</span> Email
+          <span className="material-symbols-outlined">mail</span>
+          Email
         </button>
 
         <button className={styles.primary} onClick={() => setBodyOpen(true)}>
           <span className="material-symbols-outlined">straighten</span>
-          Body
+          Full Body Measurements
         </button>
       </div>
 
@@ -154,7 +139,22 @@ export default function CustomerDetail({ onMenuClick }) {
         )}
       </div>
 
-      {bodyOpen && <BodyPanel customer={customer} onClose={() => setBodyOpen(false)} />}
+      {/* ✅ FAB BACK */}
+      {(tab === 'dress' || tab === 'orders') && (
+        <button
+          className={styles.fab}
+          onClick={() => {
+            if (tab === 'dress') {
+              document.dispatchEvent(new CustomEvent('openMeasureModal'))
+            }
+            if (tab === 'orders') {
+              document.dispatchEvent(new CustomEvent('openOrderModal'))
+            }
+          }}
+        >
+          <span className="material-symbols-outlined">add</span>
+        </button>
+      )}
 
       <Toast message={toastMsg} />
     </div>
