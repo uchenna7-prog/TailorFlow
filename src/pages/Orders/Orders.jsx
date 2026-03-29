@@ -74,6 +74,7 @@ export default function Orders({ onMenuClick }) {
   const [orders, setOrders] = useState([])
   const [activeTab, setActiveTab] = useState('all')
   const tabsRef = useRef(null)
+  const prevIndexRef = useRef(0)
 
   useEffect(() => {
     setOrders(loadOrders())
@@ -87,24 +88,36 @@ export default function Orders({ onMenuClick }) {
 
     const tab = e.currentTarget;
 
-    const containerRect = container.getBoundingClientRect();
-    const tabRect = tab.getBoundingClientRect();
+    const currentIndex = TABS.findIndex(t => t.id === tabId)
+    const prevIndex = prevIndexRef.current
 
-    // If tab is cut off on the right → scroll just enough right
-    if (tabRect.right > containerRect.right) {
-      container.scrollBy({
-        left: tabRect.right - containerRect.right,
-        behavior: 'smooth'
-      });
-    }
+    const direction = currentIndex > prevIndex ? 1 : -1
 
-    // If tab is cut off on the left → scroll just enough left
-    else if (tabRect.left < containerRect.left) {
-      container.scrollBy({
-        left: tabRect.left - containerRect.left,
-        behavior: 'smooth'
-      });
-    }
+    // 🔥 Your original scroll
+    container.scrollBy({
+      left: 100 * direction,
+      behavior: 'smooth'
+    })
+
+    // 🔥 NEW: Ensure tab is fully visible
+    setTimeout(() => {
+      const containerRect = container.getBoundingClientRect();
+      const tabRect = tab.getBoundingClientRect();
+
+      if (tabRect.right > containerRect.right) {
+        container.scrollBy({
+          left: tabRect.right - containerRect.right,
+          behavior: 'smooth'
+        });
+      } else if (tabRect.left < containerRect.left) {
+        container.scrollBy({
+          left: tabRect.left - containerRect.left,
+          behavior: 'smooth'
+        });
+      }
+    }, 200) // wait for first scroll to finish
+
+    prevIndexRef.current = currentIndex
   }
 
   // ── FILTER ──
