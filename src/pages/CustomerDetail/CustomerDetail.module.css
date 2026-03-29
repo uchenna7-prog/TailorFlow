@@ -60,7 +60,7 @@
 .birthday {
   font-weight: 600;
   font-size: 0.8rem;
-  color: #f4b400;
+  color: var(--warning);
   white-space: nowrap;
 }
 
@@ -84,14 +84,14 @@
   gap: 4px;
   color: var(--text2);
   font-size: 0.75rem;
-  align-items: flex-start; /* icon aligns with top of first line of text */
+  align-items: flex-start;
 }
 
 .meta .mi {
   font-size: 0.9rem;
   line-height: 1;
   display: inline-flex;
-  align-items: flex-start; /* aligns icon with first line of text */
+  align-items: flex-start;
   justify-content: center;
   margin-top: 2px; /* optional small offset for visual alignment */
   color: inherit;
@@ -118,26 +118,24 @@
   white-space: nowrap;
 }
 
-/* Call & Email → dark gray/black with white text */
+/* Call & Email → gray background with black text */
 .btn.light {
-  background: #111;
-  color: #fff;
+  background: var(--surface2);
+  color: var(--text);
 }
 
 .btn.light .mi {
-  color: #fff;
-  font-size: 0.9rem;
+  color: var(--text);
 }
 
-/* Full Body → white CTA */
+/* Full Body Measurements → black background with white text */
 .btn.primary {
-  background: #fff;
-  color: #000;
+  background: var(--text);
+  color: var(--bg);
 }
 
 .btn.primary .mi {
-  color: #000;
-  font-size: 0.9rem;
+  color: var(--bg);
 }
 
 /* ── TABS ── */
@@ -172,7 +170,7 @@
   left: 10%;
   right: 10%;
   height: 2px;
-  background: #fff;
+  background: var(--accent);
   border-radius: 1px;
 }
 
@@ -184,19 +182,19 @@
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: #fff;
-  color: #000;
+  background: var(--text); /* black background */
+  color: var(--bg); /* white icon */
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(255,255,255,0.12);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
 .fab .mi {
-  color: #000;
+  color: var(--bg);
   font-size: 1.6rem;
 }
 
