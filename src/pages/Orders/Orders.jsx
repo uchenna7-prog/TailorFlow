@@ -1,8 +1,5 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
-import { useCustomers } from '../../contexts/CustomerContext'
+import { useState, useEffect } from 'react'
 import Header from '../../components/Header/Header'
-import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
-import Toast from '../../components/Toast/Toast'
 import styles from './Orders.module.css'
 
 // ── STORAGE ──
@@ -15,11 +12,6 @@ function loadOrders() {
   } catch { return [] }
 }
 
-function saveOrders(orders) {
-  try { localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)) }
-  catch {}
-}
-
 // ── HELPERS ──
 function isOverdue(order) {
   if (!order.dueDate || order.status === 'completed') return false
@@ -27,7 +19,7 @@ function isOverdue(order) {
 }
 
 function daysUntil(dateStr) {
-  if (!dateStr) return null
+  if (!dateStr) return ''
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const due = new Date(dateStr + 'T00:00:00')
@@ -39,153 +31,21 @@ function daysUntil(dateStr) {
   return `${diff}d left`
 }
 
-// ── ADD ORDER MODAL ──
-function AddOrderModal({ isOpen, onClose, onSave, customers }) {
-  const [desc, setDesc] = useState('')
-  const [dueDate, setDueDate] = useState('')
-  const [custQuery, setCustQuery] = useState('')
-  const [selectedCust, setSelectedCust] = useState(null)
-  const [custDropOpen, setCustDropOpen] = useState(false)
-
-  const filteredCusts = custQuery.trim()
-    ? customers.filter(c =>
-        c.name.toLowerCase().includes(custQuery.toLowerCase()) ||
-        c.phone?.includes(custQuery)
-      )
-    : customers
-
-  const reset = () => {
-    setDesc('')
-    setDueDate('')
-    setCustQuery('')
-    setSelectedCust(null)
-    setCustDropOpen(false)
-  }
-
-  const handleSave = () => {
-    if (!desc.trim() || !selectedCust) return
-
-    onSave({
-      id: Date.now() + Math.random(),
-      desc: desc.trim(),
-      dueDate,
-      status: 'pending',
-      customerId: selectedCust.id,
-      customerName: selectedCust.name,
-      createdAt: new Date().toISOString()
-    })
-
-    reset()
-    onClose()
-  }
-
-  return (
-    <div className={`${styles.modalOverlay} ${isOpen ? styles.modalOpen : ''}`}>
-      <div className={styles.modalHeader}>
-        <span className={styles.modalTitle}>New Order</span>
-        <button className={styles.modalClose} onClick={onClose}>
-          <span className="mi">close</span>
-        </button>
-      </div>
-
-      <div className={styles.modalBody}>
-        {/* Outfit */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Outfit *</label>
-          <textarea
-            className={styles.textarea}
-            placeholder="e.g. Senator wear, Agbada, Wedding gown..."
-            value={desc}
-            onChange={e => setDesc(e.target.value)}
-          />
-        </div>
-
-        {/* Customer */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Client *</label>
-
-          {selectedCust ? (
-            <div className={styles.selectedChip}>
-              <span className={styles.chipName}>{selectedCust.name}</span>
-              <button
-                className={styles.chipRemove}
-                onClick={() => setSelectedCust(null)}
-              >
-                <span className="mi">close</span>
-              </button>
-            </div>
-          ) : (
-            <div className={styles.searchWrap}>
-              <span className="mi">search</span>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Search client..."
-                value={custQuery}
-                onChange={e => {
-                  setCustQuery(e.target.value)
-                  setCustDropOpen(true)
-                }}
-                onFocus={() => setCustDropOpen(true)}
-              />
-
-              {custDropOpen && custQuery && (
-                <div className={styles.dropdown}>
-                  {filteredCusts.length === 0 ? (
-                    <div className={styles.dropEmpty}>No clients found</div>
-                  ) : (
-                    filteredCusts.map(c => (
-                      <button
-                        key={c.id}
-                        className={styles.dropItem}
-                        onClick={() => {
-                          setSelectedCust(c)
-                          setCustQuery('')
-                          setCustDropOpen(false)
-                        }}
-                      >
-                        <div className={styles.dropName}>{c.name}</div>
-                        <div className={styles.dropMeta}>{c.phone}</div>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Due Date */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Delivery Date</label>
-          <input
-            type="date"
-            className={styles.input}
-            value={dueDate}
-            onChange={e => setDueDate(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className={styles.modalSaveBar}>
-        <button className={styles.btnSave} onClick={handleSave}>
-          Add Order
-        </button>
-      </div>
-    </div>
-  )
-}
+// ── TABS ──
+const TABS = [
+  { id: 'all', label: 'All', icon: 'assignment' },
+  { id: 'pending', label: 'Pending', icon: 'schedule' },
+  { id: 'completed', label: 'Completed', icon: 'check_circle' },
+  { id: 'overdue', label: 'Overdue', icon: 'alarm_on' },
+]
 
 // ── ORDER CARD ──
-function OrderCard({ order, onDelete, onOpen }) {
+function OrderCard({ order }) {
   const overdue = isOverdue(order)
   const due = daysUntil(order.dueDate)
 
   return (
-    <div
-      className={`${styles.card} ${order.status === 'completed' ? styles.done : ''} ${overdue ? styles.overdue : ''}`}
-      onClick={onOpen}
-    >
+    <div className={`${styles.card} ${overdue ? styles.overdue : ''}`}>
       <div className={styles.cardContent}>
         <div className={styles.cardTitle}>{order.desc}</div>
 
@@ -203,142 +63,61 @@ function OrderCard({ order, onDelete, onOpen }) {
           )}
         </div>
       </div>
-
-      <button
-        className={styles.deleteBtn}
-        onClick={e => {
-          e.stopPropagation()
-          onDelete(order)
-        }}
-      >
-        <span className="mi">delete_outline</span>
-      </button>
     </div>
   )
 }
-
-// ── ORDER DETAIL ──
-function OrderDetail({ order, onClose, onUpdate, onDelete }) {
-  if (!order) return null
-
-  return (
-    <div
-      className={styles.detailOverlay}
-      onClick={e => e.target === e.currentTarget && onClose()}
-    >
-      <div className={styles.detailPanel}>
-        <div className={styles.detailHeader}>
-          <div className={styles.detailTitle}>Order Details</div>
-          <button onClick={onClose}>
-            <span className="mi">close</span>
-          </button>
-        </div>
-
-        <div className={styles.detailBody}>
-          <p className={styles.detailDesc}>{order.desc}</p>
-
-          <div className={styles.detailGrid}>
-            <div className={styles.detailCell}>
-              <div className={styles.detailCellLabel}>Client</div>
-              <div className={styles.detailCellVal}>{order.customerName}</div>
-            </div>
-
-            <div className={styles.detailCell}>
-              <div className={styles.detailCellLabel}>Status</div>
-              <div className={styles.detailCellVal}>{order.status}</div>
-            </div>
-          </div>
-
-          <button
-            className={styles.statusBtn}
-            onClick={() => onUpdate(order.id)}
-          >
-            Mark as Completed
-          </button>
-
-          <button
-            className={styles.detailDeleteBtn}
-            onClick={() => onDelete(order)}
-          >
-            Delete Order
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── TABS ──
-const TABS = [
-  { id: 'active', label: 'Active' },
-  { id: 'pending', label: 'Pending' },
-  { id: 'completed', label: 'Completed' },
-  { id: 'overdue', label: 'Overdue' },
-]
 
 // ── MAIN PAGE ──
 export default function Orders({ onMenuClick }) {
-  const { customers } = useCustomers()
+  const [orders, setOrders] = useState([])
+  const [activeTab, setActiveTab] = useState('all')
 
-  const [orders, setOrders] = useState(() => loadOrders())
-  const [activeTab, setActiveTab] = useState('active')
-  const [modalOpen, setModalOpen] = useState(false)
-  const [detail, setDetail] = useState(null)
-  const [confirmDel, setConfirmDel] = useState(null)
-  const [toast, setToast] = useState('')
-  const timer = useRef()
-
-  const showToast = useCallback(msg => {
-    setToast(msg)
-    clearTimeout(timer.current)
-    timer.current = setTimeout(() => setToast(''), 2000)
+  useEffect(() => {
+    setOrders(loadOrders())
   }, [])
 
-  useEffect(() => saveOrders(orders), [orders])
-
-  const addOrder = order => {
-    setOrders(prev => [order, ...prev])
-    showToast('Order added')
-  }
-
-  const markCompleted = id => {
-    setOrders(prev =>
-      prev.map(o =>
-        String(o.id) === String(id) ? { ...o, status: 'completed' } : o
-      )
-    )
-    setDetail(null)
-    showToast('Order completed ✓')
-  }
-
-  const handleDelete = () => {
-    if (!confirmDel) return
-    setOrders(prev => prev.filter(o => String(o.id) !== String(confirmDel.id)))
-    setConfirmDel(null)
-    setDetail(null)
-    showToast('Order deleted')
-  }
-
+  // ── FILTER ──
   const filtered = orders.filter(o => {
-    if (activeTab === 'active') return o.status !== 'completed' && !isOverdue(o)
-    if (activeTab === 'pending') return o.status === 'pending'
+    if (activeTab === 'all') return true
+    if (activeTab === 'pending') return o.status !== 'completed' && !isOverdue(o)
     if (activeTab === 'completed') return o.status === 'completed'
     if (activeTab === 'overdue') return isOverdue(o)
     return true
   })
 
+  // ── COUNTS ──
   const counts = {
-    active: orders.filter(o => o.status !== 'completed' && !isOverdue(o)).length,
-    pending: orders.filter(o => o.status === 'pending').length,
+    all: orders.length,
+    pending: orders.filter(o => o.status !== 'completed' && !isOverdue(o)).length,
     completed: orders.filter(o => o.status === 'completed').length,
     overdue: orders.filter(o => isOverdue(o)).length,
+  }
+
+  // ── EMPTY STATE CONFIG ──
+  const EMPTY_CONFIG = {
+    all: {
+      icon: 'assignment',
+      text: 'No orders yet.'
+    },
+    pending: {
+      icon: 'schedule',
+      text: 'No pending orders.'
+    },
+    completed: {
+      icon: 'check_circle',
+      text: 'No completed orders yet.'
+    },
+    overdue: {
+      icon: 'alarm_on',
+      text: 'No overdue orders. Good job!'
+    }
   }
 
   return (
     <div className={styles.page}>
       <Header onMenuClick={onMenuClick} />
 
-      {/* Tabs */}
+      {/* ── TABS ── */}
       <div className={styles.tabs}>
         {TABS.map(tab => (
           <div
@@ -346,7 +125,9 @@ export default function Orders({ onMenuClick }) {
             className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
+            <span className="mi">{tab.icon}</span>
             {tab.label}
+
             {counts[tab.id] > 0 && (
               <span className={`${styles.tabBadge} ${tab.id === 'overdue' ? styles.badgeOverdue : ''}`}>
                 {counts[tab.id]}
@@ -356,57 +137,21 @@ export default function Orders({ onMenuClick }) {
         ))}
       </div>
 
-      {/* List */}
+      {/* ── LIST ── */}
       <div className={styles.listArea}>
-        {filtered.length === 0 && (
+        {filtered.length === 0 ? (
           <div className={styles.emptyState}>
-            <span className="mi" style={{ fontSize: '2.5rem', opacity: 0.2 }}>
-              assignment
+            <span className="mi" style={{ fontSize: '2.8rem', opacity: 0.2 }}>
+              {EMPTY_CONFIG[activeTab].icon}
             </span>
-            <p>No orders here.</p>
+            <p>{EMPTY_CONFIG[activeTab].text}</p>
           </div>
+        ) : (
+          filtered.map(order => (
+            <OrderCard key={order.id} order={order} />
+          ))
         )}
-
-        {filtered.map(order => (
-          <OrderCard
-            key={order.id}
-            order={order}
-            onDelete={setConfirmDel}
-            onOpen={() => setDetail(order)}
-          />
-        ))}
       </div>
-
-      {/* FAB */}
-      <button className={styles.fab} onClick={() => setModalOpen(true)}>
-        <span className="mi">add</span>
-      </button>
-
-      <AddOrderModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={addOrder}
-        customers={customers}
-      />
-
-      {detail && (
-        <OrderDetail
-          order={detail}
-          onClose={() => setDetail(null)}
-          onUpdate={markCompleted}
-          onDelete={setConfirmDel}
-        />
-      )}
-
-      <ConfirmSheet
-        open={!!confirmDel}
-        title="Delete Order?"
-        message="This can't be undone."
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmDel(null)}
-      />
-
-      <Toast message={toast} />
     </div>
   )
 }
