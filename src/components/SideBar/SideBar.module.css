@@ -1,5 +1,3 @@
-
-
 /* ── OVERLAY ── */
 .overlay {
   position: fixed;
@@ -66,7 +64,7 @@
 
 /* Brand with normal font (no tailor font) */
 .brand {
-  font-family: 'DM Sans', sans-serif; /* Use your previous font */
+  font-family: 'DM Sans', sans-serif;
   font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: -0.4px;
@@ -146,6 +144,7 @@
   width: 100%;
   text-align: left;
   transition: background 0.2s ease, color 0.2s ease;
+  cursor: pointer;
 }
 
 .navItem:hover {
@@ -165,6 +164,12 @@
   font-size: 1.25rem;
 }
 
+/* Target Log Out specifically by its path attribute in JSX or Danger state */
+.navItem[onclick*="/logout"], 
+.navItem:last-child {
+  color: var(--danger);
+}
+
 /* ── LEGAL LINKS ── */
 .footer {
   padding: 6px 16px 20px;
@@ -182,6 +187,7 @@
   color: var(--text3);
   padding: 4px 0;
   line-height: 1.4;
+  cursor: pointer;
 }
 
 .footerLink:hover {
