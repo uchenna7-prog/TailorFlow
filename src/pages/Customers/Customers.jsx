@@ -151,7 +151,7 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
     <div className={`${styles.formOverlay} ${isOpen ? styles.formOverlayOpen : ''}`}>
       <div className={styles.formHeader}>
         <button className="mi" onClick={handleClose} style={{ background:'none', border:'none', color:'var(--text)', fontSize:'1.8rem', cursor:'pointer' }}>arrow_back</button>
-        <div className={styles.formHeaderTitle}>New Client</div>
+        <div className={styles.formHeaderTitle}>New Customer</div>
         <div style={{ width: 36 }} />
       </div>
 
