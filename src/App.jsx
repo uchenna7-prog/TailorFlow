@@ -5,7 +5,7 @@ import Home from './pages/Home/Home'
 import Customers from './pages/Customers/Customers'
 import CustomerDetail from './pages/CustomerDetail/CustomerDetail'
 import Tasks from './pages/Tasks/Tasks'
-
+import Orders from './pages/Orders/Orders' // ✅ ADD THIS
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -13,14 +13,27 @@ function App() {
   return (
     <>
       <SideBar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
       <Routes>
-        <Route path="/"              element={<Home         onMenuClick={() => setSidebarOpen(true)} />} />
-        <Route path="/customers"     element={<Customers    onMenuClick={() => setSidebarOpen(true)} />} />
-        <Route path="/tasks"         element={<Tasks        onMenuClick={() => setSidebarOpen(true)} />} />
+        <Route path="/" element={
+          <Home onMenuClick={() => setSidebarOpen(true)} />
+        } />
+
+        <Route path="/customers" element={
+          <Customers onMenuClick={() => setSidebarOpen(true)} />
+        } />
+
+        <Route path="/tasks" element={
+          <Tasks onMenuClick={() => setSidebarOpen(true)} />
+        } />
+
+        {/* ✅ NEW ORDERS ROUTE */}
+        <Route path="/orders" element={
+          <Orders onMenuClick={() => setSidebarOpen(true)} />
+        } />
+
         <Route path="/customers/:id" element={
-          
-            <CustomerDetail onMenuClick={() => setSidebarOpen(true)} />
-          
+          <CustomerDetail onMenuClick={() => setSidebarOpen(true)} />
         } />
       </Routes>
     </>
