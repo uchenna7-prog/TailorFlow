@@ -127,6 +127,7 @@
   flex-shrink: 0;
 }
 
+/* DELETE BUTTON ICON RED */
 .custDeleteBtn {
   width: 34px;
   height: 34px;
@@ -137,7 +138,8 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  color: var(--danger);
 }
 .custDeleteBtn:active {
   background: rgba(255, 77, 77, 0.12);
@@ -179,7 +181,7 @@
   height: 56px;
   border-radius: 50%;
   background: var(--accent);
-  color: #000;
+  color: #fff; /* plus icon white for light mode */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -346,6 +348,12 @@
 }
 .btnSave:active {
   opacity: 0.85;
+}
+
+/* Black buttons text/icons white */
+.blackBtn {
+  background: #000;
+  color: #fff;
 }
 
 /* ── CONFIRM DELETE SHEET ── */
