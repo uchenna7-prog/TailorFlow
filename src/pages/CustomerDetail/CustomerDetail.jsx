@@ -153,11 +153,12 @@ export default function CustomerDetail({ onMenuClick }) {
         {activeTab === 'dress' && (
   <MeasurementsTab
     measurements={data.measurements}
-    onSave={data.addMeasurement}
+    onSave={data.saveMeasurement}   // ✅ FIXED
     onDelete={data.deleteMeasurement}
     showToast={showToast}
   />
 )}
+
 
         {activeTab === 'orders' && (
           <OrdersTab
