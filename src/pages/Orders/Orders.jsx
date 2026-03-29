@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './Orders.module.css';
 import { useOrders } from '../../contexts/OrdersContext'; // assuming you have a context
 
@@ -6,17 +6,12 @@ export default function Orders() {
   const { orders } = useOrders(); // all orders from context or API
   const [filter, setFilter] = useState('all'); // all, pending, completed, overdue
 
-  
-  const counts = {
-    all: orders.length,
-    pending: orders.filter(o => o.status === 'pending').length,
-    completed: orders.filter(o => o.status === 'completed').length,
-    overdue: orders.filter(o => o.status === 'overdue').length,
-  };
-
   const filteredOrders = orders.filter(order => {
     if (filter === 'all') return true;
-    return order.status === filter;
+    if (filter === 'pending') return order.status === 'pending';
+    if (filter === 'completed') return order.status === 'completed';
+    if (filter === 'overdue') return order.status === 'overdue';
+    return true;
   });
 
   return (
@@ -30,7 +25,6 @@ export default function Orders() {
             onClick={() => setFilter(tab)}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            <span className={styles.tabBadge}>{counts[tab]}</span>
           </div>
         ))}
       </div>
