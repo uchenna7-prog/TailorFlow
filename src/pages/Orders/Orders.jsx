@@ -125,7 +125,6 @@ export default function Orders({ onMenuClick }) {
             className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
             onClick={() => setActiveTab(tab.id)}
           >
-            <span className="mi">{tab.icon}</span>
             {tab.label}
 
             {counts[tab.id] > 0 && (
