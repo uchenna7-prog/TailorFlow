@@ -127,7 +127,7 @@
   flex-shrink: 0;
 }
 
-/* ── DELETE BUTTON ── */
+/* DELETE BUTTON ICON RED */
 .custDeleteBtn {
   width: 34px;
   height: 34px;
@@ -138,17 +138,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  color: var(--danger);
 }
 .custDeleteBtn:active {
   background: rgba(255, 77, 77, 0.12);
   border-color: var(--danger);
-}
-/* make delete icon red */
-.custDeleteBtn,
-.custDeleteBtn svg,
-.custDeleteBtn i {
-  color: var(--danger);
 }
 
 /* ── EMPTY STATE ── */
@@ -186,7 +181,7 @@
   height: 56px;
   border-radius: 50%;
   background: var(--accent);
-  color: #000;
+  color: #fff; /* plus icon white for light mode */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,12 +249,6 @@
   align-items: center;
   justify-content: center;
 }
-/* camera badge text/icons white for modal */
-.camBadge,
-.camBadge svg,
-.camBadge i {
-  color: #000; /* camera icon stays black */
-}
 
 .photoInitials {
   font-size: 1.5rem;
@@ -274,6 +263,22 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+.camBadge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  color: #000;
+  border-radius: 50%;
+  border: 2.5px solid var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
 /* Form inputs */
@@ -326,7 +331,6 @@
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
 
-/* Add Customer button inside modal */
 .btnSave {
   background: var(--accent);
   color: #000;
@@ -345,11 +349,11 @@
 .btnSave:active {
   opacity: 0.85;
 }
-/* force white text/icons inside modal buttons */
-.btnSave.blackBtn,
-.btnSave.blackBtn svg,
-.btnSave.blackBtn i {
-  color: #fff !important;
+
+/* Black buttons text/icons white */
+.blackBtn {
+  background: #000;
+  color: #fff;
 }
 
 /* ── CONFIRM DELETE SHEET ── */
