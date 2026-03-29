@@ -294,7 +294,7 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
       </div>
 
       <div className={styles.formSaveBar}>
-        <button className={styles.btnSave} onClick={handleSave}>Add Client</button>
+        <button className={styles.btnSave} onClick={handleSave}>Add Customer</button>
       </div>
     </div>
   )
@@ -379,7 +379,7 @@ export default function Customers({ onMenuClick }) {
 
       <div className={styles.scrollArea}>
         {customers.length === 0 && (
-          <div className={styles.emptyState}><div className={styles.emptyIcon}>👤</div><p>No clients yet.</p><span>Tap + to add your first client</span></div>
+          <div className={styles.emptyState}><div className={styles.emptyIcon}>👤</div><p>No customer yet.</p><span>Tap + to add your first customer</span></div>
         )}
         {customers.length > 0 && filtered.length === 0 && (
           <div className={styles.emptyState}><div className={styles.emptyIcon}>🔍</div><p>No matches found.</p><span>Try a different name or number</span></div>
