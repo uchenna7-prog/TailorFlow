@@ -11,7 +11,7 @@
   border-bottom: 1px solid var(--border);
 }
 
-.left {
+.leftColumn {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,24 +25,25 @@
   background: var(--surface2);
   display: grid;
   place-items: center;
-  font-size: 28px;
   font-weight: 700;
+  font-size: 28px;
   border: 2px solid var(--accent);
 }
 
-.avatar img {
+.avatarImg {
   width: 100%;
   height: 100%;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .birthday {
   font-size: 0.8rem;
-  font-weight: 600;
   color: orange;
 }
 
-.right {
+/* RIGHT */
+.rightColumn {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -61,39 +62,32 @@
   color: var(--text2);
 }
 
-/* ACTION BUTTONS */
+/* ACTIONS */
 .actions {
   display: flex;
   justify-content: space-around;
-  gap: 8px;
-  padding: 12px 14px;
+  padding: 10px;
 }
 
-.actions button {
-  flex: 1;
+.btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-
-  padding: 8px;
-  border-radius: 10px;
-  border: none;
-
+  gap: 4px;
+  padding: 6px 10px;
   font-size: 0.75rem;
-  font-weight: 600;
-
-  white-space: nowrap;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
 }
 
-.actions button:not(.primary) {
+.light {
   background: var(--surface2);
-  color: var(--text);
 }
 
 .primary {
-  background: #000;
-  color: #fff;
+  background: #fff;
+  color: #000;
+  border: 1px solid var(--border);
 }
 
 /* TABS */
@@ -107,34 +101,31 @@
 .tab {
   padding: 10px;
   font-size: 0.7rem;
-  font-weight: 700;
+  cursor: pointer;
   color: var(--text3);
 }
 
 .active {
   color: var(--accent);
-  border-bottom: 2px solid var(--accent);
 }
 
 /* CONTENT */
 .content {
-  padding: 12px;
+  padding: 14px;
 }
 
 /* FAB */
 .fab {
   position: fixed;
-  bottom: calc(30px + var(--sb));
-  right: 22px;
-  width: 58px;
-  height: 58px;
+  bottom: 30px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  border: none;
+  background: #fff;
+  color: #000;
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
