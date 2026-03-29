@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Header from '../../components/Header/Header'
 import styles from './Orders.module.css'
 
@@ -73,10 +73,21 @@ function OrderCard({ order }) {
 export default function Orders({ onMenuClick }) {
   const [orders, setOrders] = useState([])
   const [activeTab, setActiveTab] = useState('all')
+  const tabsRef = useRef(null)
 
   useEffect(() => {
     setOrders(loadOrders())
   }, [])
+
+  const handleTabClick = (e, tabId) => {
+    setActiveTab(tabId)
+    // Scroll the clicked tab into view automatically
+    e.currentTarget.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    })
+  }
 
   // ── FILTER ──
   const filtered = orders.filter(o => {
@@ -114,12 +125,12 @@ export default function Orders({ onMenuClick }) {
       <Header title="Orders" onMenuClick={onMenuClick} />
 
       {/* ── TABS ── */}
-      <div className={styles.tabs}>
+      <div className={styles.tabs} ref={tabsRef}>
         {TABS.map(tab => (
           <div
             key={tab.id}
             className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={(e) => handleTabClick(e, tab.id)}
           >
             {tab.label}
 
