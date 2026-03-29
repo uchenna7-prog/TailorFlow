@@ -6,7 +6,7 @@ export default function Orders() {
   const { orders } = useOrders(); // all orders from context or API
   const [filter, setFilter] = useState('all'); // all, pending, completed, overdue
 
-  // Count orders for each status
+  
   const counts = {
     all: orders.length,
     pending: orders.filter(o => o.status === 'pending').length,
