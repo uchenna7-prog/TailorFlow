@@ -142,7 +142,7 @@
 .checkboxDone {
   background: var(--accent);
   border-color: var(--accent);
-  color: #000;
+  color: var(--bg); /* Using background color variable for the icon on accented background */
 }
 
 /* Content */
@@ -232,7 +232,7 @@
   height: 58px;
   border-radius: 50%;
   background: var(--accent);
-  color: #000;
+  color: var(--bg); /* White icon/text color */
   border: none;
   box-shadow: 0 8px 24px rgba(255,255,255,0.12);
   display: flex;
@@ -435,7 +435,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #000;
+  background: var(--bg); /* Thumb color on toggle */
   transition: transform 0.2s;
 }
 .toggleOn .toggleThumb { transform: translateX(18px); }
@@ -573,7 +573,7 @@
 }
 .btnSave {
   background: var(--accent);
-  color: #000;
+  color: var(--bg); /* White text color for accented button */
   width: 100%;
   padding: 17px;
   border-radius: 14px;
