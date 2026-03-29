@@ -2,19 +2,20 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import styles from './Header.module.css'
 
-function Header({ onMenuClick }) {
+function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
+  // Default page titles
   const PAGE_TITLES = {
     '/': 'Home',
     '/customers': 'Clients',
     '/tasks': 'Tasks',
     '/settings': 'Settings',
   }
-  const pageTitle = PAGE_TITLES[location.pathname] ?? 'TailorBook'
+  const pageTitle = title ?? PAGE_TITLES[location.pathname] ?? 'TailorBook'
 
   const PAGE_DROPDOWN = {
     '/': [
@@ -73,52 +74,69 @@ function Header({ onMenuClick }) {
   return (
     <>
       <header className={styles.header}>
-        <button className={styles.iconBtn} onClick={onMenuClick} aria-label="Open menu">
-          <span className={styles.hamburgerLines}>
-            <span />
-            <span />
-            <span />
-          </span>
-        </button>
+        {/* Left icon */}
+        {type === 'default' && (
+          <button className={styles.iconBtn} onClick={onMenuClick} aria-label="Open menu">
+            <span className={styles.hamburgerLines}><span /><span /><span /></span>
+          </button>
+        )}
+        {type === 'back' && (
+          <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="Go back">
+            ←
+          </button>
+        )}
 
+        {/* Title */}
         <div className={styles.title}>{pageTitle}</div>
 
+        {/* Right actions */}
         <div className={styles.actions}>
-          <button className={styles.iconBtn} onClick={toggleNotif} aria-label="Notifications">
-            <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>notifications</span>
-            {hasUnread && <span className={styles.notifDot} />}
-          </button>
+          {type === 'default' && (
+            <>
+              <button className={styles.iconBtn} onClick={toggleNotif} aria-label="Notifications">
+                <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>notifications</span>
+                {hasUnread && <span className={styles.notifDot} />}
+              </button>
 
-          <div className={styles.dropdownWrap}>
-            <button className={styles.iconBtn} onClick={toggleDropdown} aria-label="More options">
-              <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>more_vert</span>
-            </button>
+              <div className={styles.dropdownWrap}>
+                <button className={styles.iconBtn} onClick={toggleDropdown} aria-label="More options">
+                  <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>more_vert</span>
+                </button>
 
-            {dropdownOpen && (
-              <>
-                <div className={styles.dropdownBackdrop} onClick={closeDropdown} />
-                <div className={styles.dropdown}>
-                  {(PAGE_DROPDOWN[location.pathname] ?? []).map((item, i, arr) => (
-                    <div key={i}>
-                      <button
-                        className={`${styles.dropdownItem} ${item.danger ? styles.danger : ''}`}
-                        onClick={() => { closeDropdown(); item.action() }}
-                      >
-                        <span className="mi" style={{ fontSize: '1.2rem', color: item.danger ? 'var(--danger)' : 'var(--text2)' }}>{item.icon}</span>
-                        {item.label}
-                      </button>
-                      {i < arr.length - 1 && <div className={styles.dropdownSeparator} />}
+                {dropdownOpen && (
+                  <>
+                    <div className={styles.dropdownBackdrop} onClick={closeDropdown} />
+                    <div className={styles.dropdown}>
+                      {(PAGE_DROPDOWN[location.pathname] ?? []).map((item, i, arr) => (
+                        <div key={i}>
+                          <button
+                            className={`${styles.dropdownItem} ${item.danger ? styles.danger : ''}`}
+                            onClick={() => { closeDropdown(); item.action() }}
+                          >
+                            <span className="mi" style={{ fontSize: '1.2rem', color: item.danger ? 'var(--danger)' : 'var(--text2)' }}>{item.icon}</span>
+                            {item.label}
+                          </button>
+                          {i < arr.length - 1 && <div className={styles.dropdownSeparator} />}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Custom actions for back pages (edit/delete/etc.) */}
+          {type === 'back' && customActions.map((action, i) => (
+            <button key={i} className={styles.iconBtn} onClick={action.onClick} aria-label={action.label}>
+              <span className="mi" style={{ fontSize: '1.4rem', color: action.color || 'var(--text2)' }}>{action.icon}</span>
+            </button>
+          ))}
         </div>
       </header>
 
-      {/* Notification panel */}
-      {notifOpen && (
+      {/* Notification panel (default only) */}
+      {type === 'default' && notifOpen && (
         <div className={styles.notifOverlay}>
           <div className={styles.notifPanel}>
             <div className={styles.notifHeader}>
