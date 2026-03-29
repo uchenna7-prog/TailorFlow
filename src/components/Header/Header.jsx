@@ -71,6 +71,16 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
   ]
   const hasUnread = notifications.some(n => n.unread)
 
+  // Helper to automatically switch to outlined icons
+  const getIconName = (icon, action) => {
+    if (action.className === 'outlined') {
+      // Only switch 'edit' or 'delete' icons to outlined
+      if (icon === 'edit') return 'edit_outlined'
+      if (icon === 'delete') return 'delete_outline'
+    }
+    return icon
+  }
+
   return (
     <>
       <header className={styles.header}>
@@ -82,7 +92,7 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
         )}
         {type === 'back' && (
           <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="Go back">
-            <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>arrow_back</span>
+            <span className="mi">arrow_back</span>
           </button>
         )}
 
@@ -129,7 +139,9 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
           {/* Custom actions for back pages (edit/delete/etc.) */}
           {type === 'back' && customActions.map((action, i) => (
             <button key={i} className={styles.iconBtn} onClick={action.onClick} aria-label={action.label}>
-              <span className="mi" style={{ fontSize: '1.4rem', color: action.color || 'var(--text2)' }}>{action.icon}</span>
+              <span className="mi" style={{ fontSize: '1.4rem', color: action.color || 'var(--text2)' }}>
+                {getIconName(action.icon, action)}
+              </span>
             </button>
           ))}
         </div>
