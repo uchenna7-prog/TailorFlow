@@ -8,6 +8,7 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
   const navigate = useNavigate()
   const location = useLocation()
 
+  // Default page titles
   const PAGE_TITLES = {
     '/': 'Home',
     '/customers': 'Clients',
@@ -40,86 +41,109 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
   const closeNotif = () => setNotifOpen(false)
 
   const notifications = [
-    { id: 1, icon: '🎂', type: 'birthday', title: "Upcoming birthday", body: "Uchendu Uchenna's birthday is in 2 days.", time: 'In 2 days', unread: true },
-    { id: 2, icon: '✂️', type: 'order', title: 'Pending order: Senator Suit', body: 'Due Apr 10 — awaiting completion.', time: 'Apr 10', unread: true },
-    { id: 3, icon: '🧾', type: 'invoice', title: 'Unpaid: INV-001', body: 'Senator Suit · ₦25,000 — awaiting payment.', time: 'Mar 28', unread: false },
+    {
+      id: 1,
+      icon: '🎂',
+      type: 'birthday',
+      title: "Upcoming birthday",
+      body: "Uchendu Uchenna's birthday is in 2 days.",
+      time: 'In 2 days',
+      unread: true,
+    },
+    {
+      id: 2,
+      icon: '✂️',
+      type: 'order',
+      title: 'Pending order: Senator Suit',
+      body: 'Due Apr 10 — awaiting completion.',
+      time: 'Apr 10',
+      unread: true,
+    },
+    {
+      id: 3,
+      icon: '🧾',
+      type: 'invoice',
+      title: 'Unpaid: INV-001',
+      body: 'Senator Suit · ₦25,000 — awaiting payment.',
+      time: 'Mar 28',
+      unread: false,
+    },
   ]
   const hasUnread = notifications.some(n => n.unread)
-
-  const getIconName = (icon, action) => {
-    if (action.className === 'outlined') {
-      if (icon === 'edit') return 'edit_outlined'
-      if (icon === 'delete') return 'delete_outline'
-    }
-    return icon
-  }
 
   return (
     <>
       <header className={`${styles.header} ${type === 'back' ? styles.backHeader : ''}`}>
-        {/* LEFT: Back button */}
-        {type === 'default' && (
-          <button className={styles.iconBtn} onClick={onMenuClick} aria-label="Open menu">
-            <span className={styles.hamburgerLines}><span /><span /><span /></span>
-          </button>
-        )}
-        {type === 'back' && (
-          <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="Go back">
-            <span className="mi">arrow_back</span>
-          </button>
-        )}
-
-        {/* CENTER: Title */}
-        <div className={styles.title}>{pageTitle}</div>
-
-        {/* RIGHT: Actions */}
-        <div className={styles.rightActions}>
-          {type === 'back' && customActions.map((action, i) => (
-            <button key={i} className={styles.iconBtn} onClick={action.onClick} aria-label={action.label}>
-              <span className="mi" style={{ fontSize: '1.4rem', color: action.color || 'var(--text2)' }}>
-                {getIconName(action.icon, action)}
-              </span>
-            </button>
-          ))}
-
+        {/* LEFT: Back button + title */}
+        <div className={styles.leftSide}>
           {type === 'default' && (
-            <>
-              <button className={styles.iconBtn} onClick={toggleNotif} aria-label="Notifications">
-                <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>notifications</span>
-                {hasUnread && <span className={styles.notifDot} />}
+            <button className={styles.iconBtn} onClick={onMenuClick} aria-label="Open menu">
+              <span className={styles.hamburgerLines}><span /><span /><span /></span>
+            </button>
+          )}
+          {type === 'back' && (
+            <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="Go back">
+              <span className="mi" style={{ fontSize: '1.8rem' }}>arrow_back</span>
+            </button>
+          )}
+          <div className={styles.title}>{pageTitle}</div>
+        </div>
+
+        {/* RIGHT: Custom actions for back pages */}
+        {type === 'back' && customActions.length > 0 && (
+          <div className={styles.rightActions}>
+            {customActions.map((action, i) => (
+              <button
+                key={i}
+                className={`${styles.iconBtn} ${action.className || ''}`}
+                onClick={action.onClick}
+                aria-label={action.label}
+                style={{ color: action.color || 'var(--text2)' }}
+              >
+                <span className="mi-outlined" style={{ fontSize: '1.5rem' }}>{action.icon}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* DEFAULT PAGE RIGHT ACTIONS */}
+        {type === 'default' && (
+          <div className={styles.rightActions}>
+            <button className={styles.iconBtn} onClick={toggleNotif} aria-label="Notifications">
+              <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>notifications</span>
+              {hasUnread && <span className={styles.notifDot} />}
+            </button>
+
+            <div className={styles.dropdownWrap}>
+              <button className={styles.iconBtn} onClick={toggleDropdown} aria-label="More options">
+                <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>more_vert</span>
               </button>
 
-              <div className={styles.dropdownWrap}>
-                <button className={styles.iconBtn} onClick={toggleDropdown} aria-label="More options">
-                  <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>more_vert</span>
-                </button>
-
-                {dropdownOpen && (
-                  <>
-                    <div className={styles.dropdownBackdrop} onClick={closeDropdown} />
-                    <div className={styles.dropdown}>
-                      {(PAGE_DROPDOWN[location.pathname] ?? []).map((item, i, arr) => (
-                        <div key={i}>
-                          <button
-                            className={`${styles.dropdownItem} ${item.danger ? styles.danger : ''}`}
-                            onClick={() => { closeDropdown(); item.action() }}
-                          >
-                            <span className="mi" style={{ fontSize: '1.2rem', color: item.danger ? 'var(--danger)' : 'var(--text2)' }}>{item.icon}</span>
-                            {item.label}
-                          </button>
-                          {i < arr.length - 1 && <div className={styles.dropdownSeparator} />}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
-          )}
-        </div>
+              {dropdownOpen && (
+                <>
+                  <div className={styles.dropdownBackdrop} onClick={closeDropdown} />
+                  <div className={styles.dropdown}>
+                    {(PAGE_DROPDOWN[location.pathname] ?? []).map((item, i, arr) => (
+                      <div key={i}>
+                        <button
+                          className={`${styles.dropdownItem} ${item.danger ? styles.danger : ''}`}
+                          onClick={() => { closeDropdown(); item.action() }}
+                        >
+                          <span className="mi" style={{ fontSize: '1.2rem', color: item.danger ? 'var(--danger)' : 'var(--text2)' }}>{item.icon}</span>
+                          {item.label}
+                        </button>
+                        {i < arr.length - 1 && <div className={styles.dropdownSeparator} />}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* Notification panel */}
+      {/* Notification panel (default only) */}
       {type === 'default' && notifOpen && (
         <div className={styles.notifOverlay}>
           <div className={styles.notifPanel}>
