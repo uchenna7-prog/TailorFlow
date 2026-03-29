@@ -2,8 +2,34 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-/* ── CSS VARIABLES ── */
+/* ── LIGHT MODE (default) ── */
 :root {
+  /* COLORS */
+  --bg: #ffffff;
+  --surface: #f9f9f9;
+  --surface2: #f0f0f0;
+  --border: #e0e0e0;
+  --border2: #d0d0d0;
+  --accent: #000000;
+  --text: #000000;
+  --text2: #555555;
+  --text3: #888888;
+  --danger: #ff4d4d;
+  --success: #22c55e;
+  --warning: #fb923c;
+
+  /* LAYOUT */
+  --sidebar-width: 240px;
+
+  /* SAFE AREAS */
+  --st: env(safe-area-inset-top, 0px);
+  --sb: env(safe-area-inset-bottom, 0px);
+  --sl: env(safe-area-inset-left, 0px);
+  --sr: env(safe-area-inset-right, 0px);
+}
+
+/* ── DARK MODE ── */
+:root[data-theme="dark"] {
   --bg: #000000;
   --surface: #0a0a0a;
   --surface2: #121212;
@@ -61,7 +87,6 @@ body,
 }
 
 /* ── LAYOUT SHELL ── */
-/* The main app layout: sidebar fixed on left, content offset to the right */
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -75,7 +100,6 @@ body,
   transition: margin-left 0.3s ease;
 }
 
-/* On mobile, sidebar overlays so no margin needed */
 @media (max-width: 768px) {
   .app-content {
     margin-left: 0;
@@ -126,7 +150,6 @@ textarea {
   from { opacity: 0; transform: translateX(16px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-
 
 /* Material Icons Fix */
 .mi,
