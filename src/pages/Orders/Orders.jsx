@@ -74,7 +74,6 @@ export default function Orders({ onMenuClick }) {
   const [orders, setOrders] = useState([])
   const [activeTab, setActiveTab] = useState('all')
   const tabsRef = useRef(null)
-  const prevIndexRef = useRef(0) // 🔥 track previous tab index
 
   useEffect(() => {
     setOrders(loadOrders())
@@ -86,18 +85,26 @@ export default function Orders({ onMenuClick }) {
     const container = tabsRef.current;
     if (!container) return;
 
-    const currentIndex = TABS.findIndex(t => t.id === tabId)
-    const prevIndex = prevIndexRef.current
+    const tab = e.currentTarget;
 
-    // Decide direction
-    const direction = currentIndex > prevIndex ? 1 : -1
+    const containerRect = container.getBoundingClientRect();
+    const tabRect = tab.getBoundingClientRect();
 
-    container.scrollBy({
-      left: 100 * direction,
-      behavior: 'smooth'
-    })
+    // If tab is cut off on the right → scroll just enough right
+    if (tabRect.right > containerRect.right) {
+      container.scrollBy({
+        left: tabRect.right - containerRect.right,
+        behavior: 'smooth'
+      });
+    }
 
-    prevIndexRef.current = currentIndex
+    // If tab is cut off on the left → scroll just enough left
+    else if (tabRect.left < containerRect.left) {
+      container.scrollBy({
+        left: tabRect.left - containerRect.left,
+        behavior: 'smooth'
+      });
+    }
   }
 
   // ── FILTER ──
