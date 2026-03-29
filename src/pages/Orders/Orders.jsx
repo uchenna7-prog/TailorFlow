@@ -85,11 +85,25 @@ export default function Orders({ onMenuClick }) {
     const container = tabsRef.current;
     if (!container) return;
 
-    // Scroll a small amount to the right whenever a tab is clicked
-    container.scrollBy({
-      left: 100, // adjust this value to change scroll distance
-      behavior: 'smooth'
-    });
+    const tabElement = e.currentTarget;
+
+    const containerRect = container.getBoundingClientRect();
+    const tabRect = tabElement.getBoundingClientRect();
+
+    // Scroll right if tab is out of view on the right
+    if (tabRect.right > containerRect.right) {
+      container.scrollBy({
+        left: 100,
+        behavior: 'smooth'
+      });
+    }
+    // Scroll left if tab is out of view on the left
+    else if (tabRect.left < containerRect.left) {
+      container.scrollBy({
+        left: -100,
+        behavior: 'smooth'
+      });
+    }
   }
 
   // ── FILTER ──
