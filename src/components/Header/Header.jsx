@@ -9,8 +9,8 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
   const location = useLocation()
 
   const PAGE_TITLES = {
-    '/': 'Home',
-    '/customers': 'Clients',
+    '/': 'Dashboard',
+    '/customers': 'Customers',
     '/tasks': 'Tasks',
     '/settings': 'Settings',
   }
