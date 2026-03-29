@@ -22,7 +22,9 @@ function InvoiceDetail({ invoice, customer, onClose, onDelete, onStatusChange })
         <div className={styles.invoiceStatusRow}>
           {invoice.status === 'paid'
             ? <>
-                <button className={`${styles.invoiceStatusBtn} ${styles.invoicePaid}`} onClick={() => onStatusChange(invoice.id, 'paid')}>✓ Paid</button>
+                <button className={`${styles.invoiceStatusBtn} ${styles.invoicePaid}`} onClick={() => onStatusChange(invoice.id, 'paid')}>
+                  <span className="mi" style={{ fontSize: '1rem', verticalAlign: 'middle', marginRight: '4px' }}>check_circle</span> Paid
+                </button>
                 <button className={styles.invoiceStatusBtn} onClick={() => onStatusChange(invoice.id, 'unpaid')}>Mark Unpaid</button>
               </>
             : <>
@@ -158,7 +160,7 @@ export default function InvoiceTab({ invoices, orders, measurements, customer, o
     <>
       {invoices.length === 0 && (
         <div className={styles.emptyState}>
-          <span style={{ fontSize: '2.8rem', opacity: 0.4 }}>🧾</span>
+          <span className="mi" style={{ fontSize: '2.8rem', opacity: 0.4 }}>receipt_long</span>
           <p>No invoices yet.</p>
           <span className={styles.hint}>Generate one from an order</span>
         </div>
@@ -170,7 +172,7 @@ export default function InvoiceTab({ invoices, orders, measurements, customer, o
         const statusLabel = inv.status === 'paid' ? 'Paid' : 'Unpaid'
         return (
           <div key={inv.id} className={styles.invoiceCard} onClick={() => setDetailInvoice(inv)}>
-            <div className={styles.invoiceCardIcon}>🧾</div>
+            <div className={styles.invoiceCardIcon}><span className="mi">receipt_long</span></div>
             <div className={styles.invoiceCardInfo}>
               <h4>{inv.orderDesc}</h4>
               <p>{inv.date} <span className={`${styles.statusBadge} ${statusClass}`} style={{ marginLeft: 4 }}>{statusLabel}</span></p>
