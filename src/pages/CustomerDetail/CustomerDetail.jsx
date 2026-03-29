@@ -55,13 +55,13 @@ export default function CustomerDetail({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
-      {/* ✅ Header: big back button, page title, edit + outlined delete */}
+      {/* ✅ Header: big back button (arrow_back), page title, edit + outlined delete */}
       <Header
         type="back"
         title="Customer Details"
         customActions={[
-          { icon: 'edit', label: 'Edit Customer', onClick: () => navigate(`/customers/edit/${id}`) },
-          { icon: 'delete', label: 'Delete Customer', onClick: () => deleteCustomer(id), className: 'outlined', color: 'var(--danger)' },
+          { icon: 'edit_outlined', label: 'Edit Customer', onClick: () => navigate(`/customers/edit/${id}`) },
+          { icon: 'delete_outline', label: 'Delete Customer', onClick: () => deleteCustomer(id), color: 'var(--danger)' },
         ]}
       />
 
