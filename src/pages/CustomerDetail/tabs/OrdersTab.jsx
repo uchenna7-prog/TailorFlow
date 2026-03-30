@@ -194,8 +194,11 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
         <div className={styles.detailDate}>Placed on {order.date}</div>
 
         <button className={styles.generateInvoiceBtn} onClick={() => onGenerateInvoice(order.id)}>
-          <span className="mi" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: '4px' }}>receipt</span> Generate Invoice
-        </button>
+  <span className="mi" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: '4px' }}>
+    request_quote
+  </span>
+  Generate Invoice
+</button>
       </div>
     </div>
   )
