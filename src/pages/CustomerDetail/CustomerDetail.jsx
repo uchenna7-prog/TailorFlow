@@ -1,9 +1,8 @@
-import { useState, useRef, useCallback, useEffect } from 'react' // 👈 added useEffect
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { useCustomerData } from '../../hooks/useCustomerData'
 import Header from '../../components/Header/Header'
-import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import Toast from '../../components/Toast/Toast'
 import MeasurementsTab from './tabs/MeasurementsTab'
 import OrdersTab from './tabs/OrdersTab'
@@ -41,32 +40,52 @@ export default function CustomerDetail({ onMenuClick }) {
   const [toastMsg, setToastMsg] = useState('')
   const toastTimer = useRef(null)
 
-  const fixedRef = useRef(null) // 👈 added
+  const fixedRef = useRef(null)
 
   useEffect(() => {
     if (fixedRef.current) {
       const height = fixedRef.current.offsetHeight
       document.documentElement.style.setProperty('--fixed-top-height', `${height}px`)
     }
-  }, [activeTab, data]) // 👈 added
+  }, [activeTab, data])
 
   const showToast = useCallback((msg) => {
     setToastMsg(msg)
     clearTimeout(toastTimer.current)
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
-  
-  
+
   useEffect(() => {
-  const handler = () => setActiveTab('invoice')
-  document.addEventListener('switchToInvoiceTab', handler)
-  return () => document.removeEventListener('switchToInvoiceTab', handler)
-}, [])
+    const handler = () => setActiveTab('invoice')
+    document.addEventListener('switchToInvoiceTab', handler)
+    return () => document.removeEventListener('switchToInvoiceTab', handler)
+  }, [])
+
   const customer = getCustomer(id)
   if (!customer) return null
 
   const initials = getInitials(customer.name)
   const birthday = getBirthday(customer.birthday)
+
+  // --- FIX: local state for invoices to ensure immediate UI update ---
+  const [invoicesState, setInvoicesState] = useState(data.invoices || [])
+
+  const handleSaveInvoice = (invoice) => {
+    data.saveInvoice(invoice) // call hook to persist
+    setInvoicesState(prev => [...prev, invoice]) // update local state
+  }
+
+  const handleDeleteInvoice = (id) => {
+    data.deleteInvoice(id)
+    setInvoicesState(prev => prev.filter(inv => String(inv.id) !== String(id)))
+  }
+
+  const handleStatusChangeInvoice = (id, status) => {
+    data.updateInvoiceStatus(id, status)
+    setInvoicesState(prev =>
+      prev.map(inv => (String(inv.id) === String(id) ? { ...inv, status } : inv))
+    )
+  }
 
   return (
     <div className={styles.page}>
@@ -85,7 +104,6 @@ export default function CustomerDetail({ onMenuClick }) {
         ]}
       />
 
-      {/* 👇 added ref */}
       <div className={styles.fixedTopContainer} ref={fixedRef}>
         <div className={styles.profileSection}>
           <div className={styles.leftColumn}>
@@ -183,14 +201,13 @@ export default function CustomerDetail({ onMenuClick }) {
 
         {activeTab === 'invoice' && (
           <InvoiceTab
-            invoices={data.invoices}
+            invoices={invoicesState} // <-- use local state
             orders={data.orders}
             measurements={data.measurements}
             customer={customer}
-            onSave={data.saveInvoice}
-            onDelete={data.deleteInvoice}
-            onStatusChange={data.updateInvoiceStatus}
-            onNavigateToInvoice={() => setActiveTab('invoice')}
+            onSave={handleSaveInvoice} // <-- updated
+            onDelete={handleDeleteInvoice} // <-- updated
+            onStatusChange={handleStatusChangeInvoice} // <-- updated
             showToast={showToast}
           />
         )}
