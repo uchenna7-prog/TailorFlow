@@ -5,7 +5,6 @@ import Toast from '../../components/Toast/Toast'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import styles from './Settings.module.css'
 
-// ── TEMPLATE PREVIEW COMPONENTS ──
 
 function StandardTemplate() {
   return (
