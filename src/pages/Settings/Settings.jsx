@@ -5,100 +5,153 @@ import Toast from '../../components/Toast/Toast'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import styles from './Settings.module.css'
 
-// ── TEMPLATE COMPONENT 1: EDITABLE (Centered Brand) ──
+// ── 1. EDITABLE TEMPLATE (Full Document) ──
 function EditableTemplate() {
   return (
     <div className={styles.pBase}>
-      <div className={styles.pEditHeader}>
-        <div className={styles.pBrandSmall}>Your Company Name</div>
-        <div className={styles.pBrandSub}>Street Address, City, State</div>
-        <div className={styles.pLargeTitle}>INVOICE</div>
+      <div className={styles.pHeader}>
+        <div className={styles.pBrandCenter}>
+          <div className={styles.pBrandName}>Your Company Name</div>
+          <div className={styles.pBrandSub}>123 Street Address, City, State, Zip Code</div>
+        </div>
+        <div className={styles.pLargeTitleCenter}>INVOICE</div>
       </div>
-      <div className={styles.pMetaRow}>
-        <div className={styles.pBillTo}><strong>BILL TO:</strong><br/>Customer Name</div>
-        <div className={styles.pInvoiceInfo}>
-          <div>Inv #: 0000001</div>
-          <div>Date: 30/03/2026</div>
+      <div className={styles.pBody}>
+        <div className={styles.pMetaRow}>
+          <div><strong>BILL TO:</strong><br/>Customer Name<br/>Street Address<br/>City, State, Zip</div>
+          <div style={{ textAlign: 'right' }}>
+            Invoice #: <strong>0000001</strong><br/>
+            Issue Date: <strong>Date Field</strong><br/>
+            Due Date: <strong>Date Field</strong>
+          </div>
+        </div>
+        <div className={styles.pTableModern}>
+          <div className={styles.pTHead}><span>Description</span><span>Price</span><span>QTY</span><span>Total</span></div>
+          {[1, 2, 3].map(i => (
+            <div key={i} className={styles.pTRow}><span>Line Item & Description</span><span>$0.00</span><span>1</span><span>$0.00</span></div>
+          ))}
+        </div>
+        <div className={styles.pSummary}>
+          <div className={styles.pSumRow}><span>Subtotal</span><span>$0.00</span></div>
+          <div className={styles.pSumRow}><span>Tax</span><span>$0.00</span></div>
+          <div className={`${styles.pSumRow} ${styles.pBold}`}><span>Total Due</span><span>$0.00</span></div>
         </div>
       </div>
-      <div className={styles.pModernTable}>
-        <div className={styles.pMHead}><span>Description</span><span>Price</span><span>Total</span></div>
-        <div className={styles.pMRow}><span>Tailored Suit</span><span>$0.00</span><span>$0.00</span></div>
+      <div className={styles.pFooter}>
+        <div className={styles.pFootSection}><strong>Payment Terms:</strong><br/>Add your payment terms such as bank details.</div>
+        <div className={styles.pFootSection}><strong>Notes:</strong><br/>Add any additional notes.</div>
       </div>
     </div>
   )
 }
 
-// ── TEMPLATE COMPONENT 2: PRINTABLE (Gold Accent) ──
+// ── 2. PRINTABLE TEMPLATE (Full Document) ──
 function PrintableTemplate() {
   return (
     <div className={styles.pBase}>
-      <div className={styles.pGoldBar} />
-      <div className={styles.pPrintHeader}>
+      <div className={styles.pGoldBarFull} />
+      <div className={styles.pHeaderSplit}>
         <div className={styles.pLargeTitle}>INVOICE</div>
-        <div className={styles.pInvoiceInfoRight}>
-          <span>ISSUE DATE: 30/03/2026</span>
-          <span>INVOICE #: 0000001</span>
+        <div className={styles.pMetaRight}>
+          <div>ISSUE DATE: <strong>Date Field</strong></div>
+          <div>DUE DATE: <strong>Date Field</strong></div>
+          <div>INVOICE #: <strong>0000001</strong></div>
         </div>
       </div>
-      <div className={styles.pMetaSplit}>
-        <div><strong>BILL FROM:</strong><br/>Your Company</div>
-        <div style={{textAlign: 'right'}}><strong>BILL TO:</strong><br/>Customer Name</div>
+      <div className={styles.pBody}>
+        <div className={styles.pMetaRow} style={{ borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
+          <div><strong>BILL FROM:</strong><br/>Your Company Name<br/>Street Address<br/>Phone Number</div>
+          <div style={{ textAlign: 'right' }}><strong>BILL TO:</strong><br/>Customer Name<br/>Street Address<br/>City, State, Zip</div>
+        </div>
+        <div className={styles.pTableModern} style={{ marginTop: '20px' }}>
+          <div className={styles.pTHead}><span>Description</span><span>Price</span><span>QTY</span><span>Total</span></div>
+          {[1, 2, 3].map(i => (
+            <div key={i} className={styles.pTRow}><span>Line Item & Description</span><span>$0.00</span><span>1</span><span>$0.00</span></div>
+          ))}
+        </div>
+        <div className={styles.pSummarySide}>
+          <div className={styles.pSumRow}><span>Subtotal</span><span>$0.00</span></div>
+          <div className={styles.pSumRow}><span>Tax</span><span>$0.00</span></div>
+          <div className={`${styles.pSumRow} ${styles.pTotalBox}`}><span>Total Due</span><span>$0.00</span></div>
+        </div>
       </div>
-      <div className={styles.pModernTable}>
-        <div className={styles.pMHead}><span>Description</span><span>QTY</span><span>Total</span></div>
-        <div className={styles.pMRow}><span>Line Item</span><span>1</span><span>$0.00</span></div>
+      <div className={styles.pFooter}>
+        <div className={styles.pFootSection}><strong>Payment Terms:</strong><br/>Bank Name, Account #</div>
       </div>
     </div>
   )
 }
 
-// ── TEMPLATE COMPONENT 3: CUSTOM (Purple Banner) ──
+// ── 3. CUSTOM TEMPLATE (Full Document) ──
 function CustomTemplate() {
   return (
-    <div className={styles.pBase}>
-      <div className={styles.pPurpleHeader}>
-        <div className={styles.pLogoBox}>Place logo here</div>
+    <div className={styles.pBase} style={{ padding: 0 }}>
+      <div className={styles.pPurpleBanner}>
+        <div className={styles.pLogoBoxWhite}>Place logo here</div>
         <div className={styles.pLargeTitleWhite}>INVOICE</div>
+        <div className={styles.pWhiteNo}>0000001</div>
       </div>
-      <div className={styles.pMetaRow} style={{marginTop: 10}}>
-        <div><strong>BILL FROM:</strong><br/>Your Company</div>
-        <div><strong>BILL TO:</strong><br/>Customer Name</div>
+      <div className={styles.pBody} style={{ padding: '20px' }}>
+        <div className={styles.pMetaRow}>
+          <div><strong>BILL FROM:</strong><br/>Your Company Name</div>
+          <div><strong>BILL TO:</strong><br/>Customer Name</div>
+          <div style={{ textAlign: 'right' }}><strong>DATE:</strong><br/>Date Field</div>
+        </div>
+        <div className={styles.pTableModern} style={{ marginTop: '20px' }}>
+          <div className={styles.pTHead}><span>Description</span><span>Price</span><span>QTY</span><span>Total</span></div>
+          {[1, 2].map(i => (
+            <div key={i} className={styles.pTRow}><span>Line Item & Description</span><span>$0.00</span><span>1</span><span>$0.00</span></div>
+          ))}
+        </div>
+        <div className={styles.pSummary}>
+          <div className={styles.pSumRow}><span>Subtotal</span><span>$0.00</span></div>
+          <div className={`${styles.pSumRow} ${styles.pBold}`}><span>Total Due</span><span>$0.00</span></div>
+        </div>
       </div>
-      <div className={styles.pModernTable}>
-        <div className={styles.pMHead}><span>Description</span><span>Price</span><span>Total</span></div>
-        <div className={styles.pMRow}><span>Service Item</span><span>$0.00</span><span>$0.00</span></div>
+      <div className={styles.pPurpleBottom}>
+        <div className={styles.pFootSectionWhite}><strong>Payment Terms:</strong> Add details here</div>
       </div>
-      <div className={styles.pPurpleFooter} />
     </div>
   )
 }
 
-// ── TEMPLATE COMPONENT 4: FREE (Boxed Header) ──
+// ── 4. FREE TEMPLATE (Full Document) ──
 function FreeTemplate() {
   return (
     <div className={styles.pBase}>
-      <div className={styles.pFreeHeader}>
+      <div className={styles.pHeaderFree}>
         <div className={styles.pTitleBlock}>
           <div className={styles.pLargeTitle}>INVOICE</div>
           <div className={styles.pSubNo}>0000001</div>
         </div>
-        <div className={styles.pLogoPlaceholder}>ADD YOUR LOGO</div>
+        <div className={styles.pLogoPlaceholderBig}>ADD YOUR LOGO</div>
       </div>
-      <div className={styles.pGrayBorderBox}>
-        <div className={styles.pBoxCol}><strong>BILL FROM:</strong><br/>Your Company</div>
-        <div className={styles.pBoxCol}><strong>BILL TO:</strong><br/>Customer Name</div>
-        <div className={styles.pBoxCol}><strong>DATE:</strong><br/>30/03/2026</div>
+      <div className={styles.pFreeGrid}>
+        <div className={styles.pFreeBox}><strong>BILL FROM:</strong><br/>Your Company Name<br/>Address<br/>Phone</div>
+        <div className={styles.pFreeBox}><strong>BILL TO:</strong><br/>Customer Name<br/>Address</div>
+        <div className={styles.pFreeBox}><strong>DETAILS:</strong><br/>Issue: Date<br/>Due: Date</div>
       </div>
-      <div className={styles.pModernTable}>
-        <div className={styles.pMHead}><span>Description</span><span>Total</span></div>
-        <div className={styles.pMRow}><span>Line Item & Description</span><span>$0.00</span></div>
+      <div className={styles.pBody}>
+        <div className={styles.pTableModern}>
+          <div className={styles.pTHead}><span>Description</span><span>Price</span><span>QTY</span><span>Total</span></div>
+          {[1, 2, 3].map(i => (
+            <div key={i} className={styles.pTRow}><span>Line Item & Description</span><span>$0.00</span><span>1</span><span>$0.00</span></div>
+          ))}
+        </div>
+        <div className={styles.pSummary}>
+          <div className={styles.pSumRow}><span>Subtotal</span><span>$0.00</span></div>
+          <div className={`${styles.pSumRow} ${styles.pBold}`}><span>Total Due</span><span>$0.00</span></div>
+        </div>
+      </div>
+      <div className={styles.pFooterGray}>
+        Thank you for your business!
       </div>
     </div>
   )
 }
 
-// ── SMALL REUSABLE COMPONENTS ──
+// ── SETTINGS PAGE COMPONENTS ──
+
 function SectionHeader({ icon, label }) {
   return (
     <div className={styles.sectionHeader}>
@@ -132,49 +185,44 @@ function Toggle({ value, onChange }) {
   )
 }
 
-// ── TEMPLATE MODAL ──
 function TemplateModal({ isOpen, currentTemplate, onClose, onSelect }) {
   const [selected, setSelected] = useState(currentTemplate || 'editable')
 
   const TEMPLATES = [
-    { id: 'editable', label: 'Editable Template', Component: EditableTemplate },
-    { id: 'printable', label: 'Printable Template', Component: PrintableTemplate },
-    { id: 'custom', label: 'Custom Template', Component: CustomTemplate },
-    { id: 'free', label: 'Free Template', Component: FreeTemplate }
+    { id: 'editable', label: 'Editable Clothing Store', Component: EditableTemplate },
+    { id: 'printable', label: 'Printable Clothing Store', Component: PrintableTemplate },
+    { id: 'custom', label: 'Custom Clothing Store', Component: CustomTemplate },
+    { id: 'free', label: 'Free Clothing Store', Component: FreeTemplate }
   ]
 
   if (!isOpen) return null
 
   return (
-    <div className={styles.editOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className={styles.templateSheet}>
-        <div className={styles.editHandle} />
-        <div className={styles.editHeader}>
-          <span className={styles.editTitle}>Choose Invoice Template</span>
-          <button className={styles.editClose} onClick={onClose}><span className="mi">close</span></button>
-        </div>
-        <div className={styles.templateList}>
-          {TEMPLATES.map(t => (
-            <div key={t.id} className={styles.templateOption} onClick={() => setSelected(t.id)}>
-              <div className={`${styles.templatePreview} ${selected === t.id ? styles.previewActive : ''}`}>
-                <t.Component />
-              </div>
-              <div className={styles.templateFooter}>
-                <div className={`${styles.radio} ${selected === t.id ? styles.radioActive : ''}`} />
-                <span className={styles.templateLabel}>{t.label}</span>
-              </div>
+    <div className={styles.fullOverlay}>
+      <div className={styles.fullHeader}>
+        <button className={styles.backBtn} onClick={onClose}>
+          <span className="mi">arrow_back</span>
+        </button>
+        <span className={styles.fullTitle}>Invoice Templates</span>
+        <button className={styles.fullSave} onClick={() => { onSelect(selected); onClose() }}>Select</button>
+      </div>
+      <div className={styles.fullContent}>
+        {TEMPLATES.map(t => (
+          <div key={t.id} className={styles.templateWrapper} onClick={() => setSelected(t.id)}>
+            <div className={`${styles.fullPreviewContainer} ${selected === t.id ? styles.fullPreviewActive : ''}`}>
+              <t.Component />
             </div>
-          ))}
-        </div>
-        <div className={styles.editFooter}>
-          <button className={styles.editSave} onClick={() => { onSelect(selected); onClose() }}>Select</button>
-        </div>
+            <div className={styles.templateInfo}>
+              <div className={`${styles.radio} ${selected === t.id ? styles.radioActive : ''}`} />
+              <span className={styles.templateLabel}>{t.label}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
-// ── MAIN PAGE ──
 export default function Settings({ onMenuClick }) {
   const { settings, updateSetting, resetSettings } = useSettings()
   const [toastMsg, setToastMsg]   = useState('')
@@ -195,35 +243,33 @@ export default function Settings({ onMenuClick }) {
       <div className={styles.scrollArea}>
         <SectionHeader icon="palette" label="Appearance" />
         <div className={styles.card}>
-          <SettingRow icon="dark_mode" label="Dark Mode" sub="Toggle dark appearance">
+          <SettingRow icon="dark_mode" label="Dark Mode" sub="Toggle interface theme">
             <Toggle value={settings.theme === 'dark'} onChange={v => updateSetting('theme', v ? 'dark' : 'light')} />
           </SettingRow>
         </div>
 
         <SectionHeader icon="receipt_long" label="Invoice" />
         <div className={styles.card}>
-          <SettingRow icon="description" label="Invoice Template" sub="Choose your design" chevron onClick={() => setTemplateModal(true)}>
+          <SettingRow icon="description" label="Choose Template" sub="Select your preferred invoice design" chevron onClick={() => setTemplateModal(true)}>
             <span className={styles.rowValue}>{settings.invoiceTemplate || 'Editable'}</span>
-          </SettingRow>
-          <div className={styles.divider} />
-          <SettingRow icon="tag" label="Prefix" sub="Invoice Numbering">
-            <span className={styles.rowValue}>{settings.invoicePrefix}</span>
           </SettingRow>
         </div>
 
-        <SectionHeader icon="storage" label="Data Management" />
+        <SectionHeader icon="storage" label="Data" />
         <div className={styles.card}>
-          <SettingRow icon="restart_alt" label="Reset Settings" chevron onClick={() => setResetConfirm(true)} />
-          <div className={styles.divider} />
-          <SettingRow icon="delete_forever" label="Clear All Data" chevron onClick={() => setClearConfirm(true)}>
-            <span style={{ color: 'var(--danger)', fontSize: '0.75rem', fontWeight: 700 }}>Danger</span>
-          </SettingRow>
+          <SettingRow icon="delete_forever" label="Clear Data" chevron onClick={() => setClearConfirm(true)} />
         </div>
       </div>
 
-      <TemplateModal isOpen={templateModal} currentTemplate={settings.invoiceTemplate} onClose={() => setTemplateModal(false)} onSelect={(val) => { updateSetting('invoiceTemplate', val); showToast('Template updated ✓') }} />
-      <ConfirmSheet open={clearConfirm} title="Clear All Data?" onConfirm={() => { localStorage.clear(); setClearConfirm(false); showToast('Cleared'); }} onCancel={() => setClearConfirm(false)} />
-      <ConfirmSheet open={resetConfirm} title="Reset Settings?" onConfirm={() => { resetSettings(); setResetConfirm(false); showToast('Reset'); }} onCancel={() => setResetConfirm(false)} />
+      <TemplateModal 
+        isOpen={templateModal} 
+        currentTemplate={settings.invoiceTemplate} 
+        onClose={() => setTemplateModal(false)} 
+        onSelect={(v) => { updateSetting('invoiceTemplate', v); showToast('Template Selected') }} 
+      />
+
+      <ConfirmSheet open={clearConfirm} title="Delete All Data?" onConfirm={() => { localStorage.clear(); setClearConfirm(false); showToast('Cleared'); }} onCancel={() => setClearConfirm(false)} />
+      <ConfirmSheet open={resetConfirm} title="Reset?" onConfirm={() => { resetSettings(); setResetConfirm(false); showToast('Reset'); }} onCancel={() => setResetConfirm(false)} />
       <Toast message={toastMsg} />
     </div>
   )
