@@ -18,18 +18,46 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
 
   const PAGE_DROPDOWN = {
     '/': [
-      { icon: 'settings', label: 'Settings', action: () => navigate('/settings') },
+      { icon: 'share', label: 'Share App', action: () => console.log('Share app') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
+
     '/customers': [
       { icon: 'download', label: 'Export Clients', action: () => console.log('Export clients') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
+
     '/tasks': [
       { icon: 'settings', label: 'Settings', action: () => navigate('/settings') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
+
+    '/orders': [
+      { icon: 'download', label: 'Export Orders', action: () => console.log('Export orders') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+    ],
+
+    '/gallery': [
+      { icon: 'upload', label: 'Upload Image', action: () => console.log('Upload image') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+    ],
+
     '/settings': [
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+    ],
+
+    '/account': [
+      { icon: 'edit', label: 'Edit Profile', action: () => console.log('Edit profile') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+    ],
+
+    '/contact': [
+      { icon: 'email', label: 'Send Message', action: () => console.log('Send message') },
+      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+    ],
+
+    '/faqs': [
+      { icon: 'help', label: 'Get Help', action: () => console.log('Help clicked') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
   }
