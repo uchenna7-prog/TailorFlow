@@ -1,75 +1,78 @@
-
 .page { background: var(--bg); min-height: 100dvh; display: flex; flex-direction: column; }
 .scrollArea { flex: 1; overflow-y: auto; padding: 8px 16px 40px; }
 .sectionHeader { display: flex; align-items: center; gap: 7px; padding: 20px 4px 8px; }
-.sectionLabel { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text3); }
+.sectionLabel { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--text3); }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-.divider { height: 1px; background: var(--border); margin: 0 16px; }
 
-/* ── SETTING ROWS ── */
-.row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 56px; }
+.row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
 .rowTappable:active { background: var(--surface2); }
 .rowIcon { width: 32px; height: 32px; border-radius: 9px; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); }
 .rowText { flex: 1; }
 .rowLabel { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.rowSub { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
-.rowValue { font-size: 0.78rem; font-weight: 700; color: var(--text3); }
+.rowSub { font-size: 0.72rem; color: var(--text3); }
+.rowValue { font-size: 0.78rem; font-weight: 700; color: var(--accent); }
 
-/* ── TOGGLE ── */
-.toggle { width: 44px; height: 26px; border-radius: 13px; background: var(--border2); border: none; position: relative; cursor: pointer; transition: 0.2s; }
+.toggle { width: 44px; height: 26px; border-radius: 13px; background: var(--border2); border: none; position: relative; }
 .toggleOn { background: var(--accent); }
 .toggleThumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #000; transition: 0.2s; }
 .toggleOn .toggleThumb { transform: translateX(18px); }
 
-/* ── MODALS ── */
-.editOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 4000; display: flex; align-items: flex-end; backdrop-filter: blur(4px); }
-.templateSheet { width: 100%; background: var(--surface); border-radius: 24px 24px 0 0; animation: slideUp 0.3s ease; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.editHandle { width: 40px; height: 4px; background: var(--border2); margin: 12px auto; border-radius: 2px; }
-.editHeader { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--border); }
-.editTitle { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text2); }
-.editClose { background: none; border: none; color: var(--text); }
-.editFooter { padding: 0 20px 30px; }
-.editSave { width: 100%; padding: 16px; border-radius: 12px; border: none; background: var(--accent); color: #000; font-weight: 800; }
+/* ── FULL SCREEN MODAL ── */
+.fullOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; flex-direction: column; animation: slideIn 0.3s ease; }
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-/* ── TEMPLATE LIST ── */
-.templateList { padding: 20px; display: flex; flex-direction: column; gap: 24px; max-height: 65vh; overflow-y: auto; }
-.templatePreview { width: 100%; border: 2px solid var(--border); border-radius: 12px; background: #fff; overflow: hidden; }
-.previewActive { border-color: var(--accent); }
-.templateFooter { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-.radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border2); }
+.fullHeader { display: flex; align-items: center; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.backBtn { background: none; border: none; color: var(--text); padding: 8px; margin-right: 12px; }
+.fullTitle { flex: 1; font-weight: 800; font-size: 1rem; color: var(--text); }
+.fullSave { background: var(--accent); border: none; padding: 8px 16px; border-radius: 8px; font-weight: 800; color: #000; }
+
+.fullContent { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 32px; }
+.templateWrapper { display: flex; flex-direction: column; gap: 12px; }
+.fullPreviewContainer { width: 100%; background: #fff; border-radius: 8px; border: 2px solid transparent; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; transform: scale(1); transition: 0.2s; }
+.fullPreviewActive { border-color: var(--accent); transform: scale(1.02); }
+
+.templateInfo { display: flex; align-items: center; gap: 10px; padding: 0 4px; }
+.radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border2); }
 .radioActive { background: var(--accent); border-color: var(--accent); position: relative; }
-.radioActive::after { content: ''; position: absolute; inset: 4px; background: #000; border-radius: 50%; }
-.templateLabel { font-size: 0.85rem; font-weight: 700; color: var(--text); }
+.radioActive::after { content: ''; position: absolute; inset: 5px; background: #000; border-radius: 50%; }
+.templateLabel { font-weight: 700; color: var(--text); font-size: 0.9rem; }
 
-/* ── INTERNAL PREVIEW COMPONENTS CSS ── */
-.pBase { padding: 15px; color: #333; font-family: sans-serif; font-size: 10px; line-height: 1.2; }
-.pLargeTitle { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px; }
-.pLargeTitleWhite { font-size: 1.4rem; font-weight: 900; color: #fff; }
+/* ── DOCUMENT STYLES (Inside Previews) ── */
+.pBase { padding: 20px; color: #1a1a1a; font-family: 'Inter', sans-serif; font-size: 9px; min-height: 400px; display: flex; flex-direction: column; }
+.pLargeTitle { font-size: 22px; font-weight: 900; letter-spacing: -1px; }
+.pLargeTitleCenter { font-size: 20px; font-weight: 900; text-align: center; margin: 15px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 5px 0; }
+.pBody { flex: 1; margin: 20px 0; }
+.pMetaRow { display: flex; justify-content: space-between; margin-bottom: 20px; }
 
-/* Editable */
-.pEditHeader { text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
-.pBrandSmall { font-weight: 800; font-size: 11px; }
-.pBrandSub { color: #888; font-size: 8px; }
+/* Table */
+.pTableModern { width: 100%; border-collapse: collapse; }
+.pTHead { display: flex; justify-content: space-between; font-weight: 800; border-bottom: 2px solid #1a1a1a; padding-bottom: 5px; margin-bottom: 8px; }
+.pTRow { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 6px 0; }
+.pTRow span:nth-child(1) { flex: 2; }
+.pTRow span:not(:nth-child(1)) { flex: 1; text-align: right; }
 
-/* Printable */
-.pGoldBar { height: 6px; background: #f1c40f; margin: -15px -15px 10px; }
-.pPrintHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.pInvoiceInfoRight { text-align: right; font-size: 7px; color: #666; display: flex; flex-direction: column; }
+/* Summary */
+.pSummary { margin-left: auto; width: 40%; margin-top: 15px; }
+.pSumRow { display: flex; justify-content: space-between; padding: 3px 0; }
+.pBold { font-weight: 900; font-size: 11px; border-top: 1px solid #1a1a1a; margin-top: 5px; }
 
-/* Custom */
-.pPurpleHeader { background: #9b59b6; margin: -15px -15px 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-.pLogoBox { border: 1px dashed rgba(255,255,255,0.5); padding: 5px; color: #fff; font-size: 7px; }
-.pPurpleFooter { height: 30px; background: #9b59b6; margin: 15px -15px -15px; opacity: 0.2; }
+/* Specialized Styles */
+.pBrandCenter { text-align: center; }
+.pBrandName { font-size: 14px; font-weight: 800; }
+.pBrandSub { color: #666; font-size: 8px; }
 
-/* Free */
-.pFreeHeader { display: flex; justify-content: space-between; margin-bottom: 10px; }
-.pLogoPlaceholder { background: #f5f5f5; border: 1px solid #ddd; padding: 10px; font-weight: 700; color: #aaa; }
-.pGrayBorderBox { border-top: 1px solid #eee; border-bottom: 1px solid #eee; display: flex; padding: 8px 0; margin-bottom: 10px; }
-.pBoxCol { flex: 1; font-size: 7px; }
+.pGoldBarFull { height: 8px; background: #eab308; margin: -20px -20px 15px; }
+.pHeaderSplit { display: flex; justify-content: space-between; align-items: flex-start; }
+.pMetaRight { text-align: right; font-size: 8px; line-height: 1.5; }
+.pTotalBox { background: #f8fafc; padding: 8px; font-weight: 900; border-left: 3px solid #1a1a1a; }
 
-/* Table Logic */
-.pModernTable { margin-top: 10px; }
-.pMHead { display: flex; justify-content: space-between; font-weight: 800; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 4px; }
-.pMRow { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 4px 0; }
-.pMetaRow, .pMetaSplit { display: flex; justify-content: space-between; font-size: 8px; }
+.pPurpleBanner { background: #7c3aed; color: #fff; padding: 25px 20px; display: flex; justify-content: space-between; align-items: center; }
+.pLogoBoxWhite { border: 1px dashed rgba(255,255,255,0.4); padding: 8px; font-size: 7px; }
+.pLargeTitleWhite { font-size: 20px; font-weight: 900; }
+.pPurpleBottom { background: #7c3aed; padding: 15px 20px; margin-top: auto; color: #fff; opacity: 0.9; }
+
+.pHeaderFree { display: flex; justify-content: space-between; align-items: center; }
+.pLogoPlaceholderBig { background: #f3f4f6; border: 1px solid #e5e7eb; padding: 15px; font-weight: 800; color: #9ca3af; }
+.pFreeGrid { display: flex; gap: 10px; margin: 15px 0; }
+.pFreeBox { flex: 1; border: 1px solid #eee; padding: 8px; font-size: 7px; }
+.pFooterGray { background: #f9fafb; padding: 10px; text-align: center; font-weight: 700; margin-top: auto; }
