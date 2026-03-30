@@ -295,3 +295,88 @@
   transition: opacity 0.2s;
 }
 .editSave:active { opacity: 0.85; }
+
+
+/* ... keep your existing styles ... */
+
+.templateList {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.templateCard {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface2);
+}
+
+.templateActive {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.templatePreview {
+  height: 120px;
+  background: #fff; /* Invoices are usually white */
+  border-radius: 8px;
+  margin-bottom: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.previewHeader { color: #333; font-weight: 900; font-size: 10px; text-align: center; }
+.previewLine { height: 4px; background: #eee; border-radius: 2px; }
+.previewTable { border: 1px solid #eee; flex: 1; border-radius: 4px; }
+.previewRow { height: 8px; border-bottom: 1px solid #eee; background: #f9f9f9; }
+
+.previewBadge {
+    position: absolute;
+    bottom: 0; right: 0;
+    background: var(--accent);
+    color: #000;
+    font-size: 8px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px 0 0 0;
+}
+
+.templateInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.radioCircle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.templateActive .radioCircle {
+  border-color: var(--accent);
+}
+
+.radioInner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
