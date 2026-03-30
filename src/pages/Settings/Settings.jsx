@@ -290,28 +290,6 @@ function FullModal({ title, onBack, onSave, children }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Premium upsell banner — shown inside locked modals / sections
-// ─────────────────────────────────────────────────────────────
-
-function PremiumBanner({ onUpgrade }) {
-  return (
-    <div className={styles.premiumBanner}>
-      <div className={styles.premiumBannerGlow} />
-      <span className="mi" style={{ fontSize: '2rem', color: 'var(--accent)' }}>workspace_premium</span>
-      <div className={styles.premiumBannerText}>
-        <div className={styles.premiumBannerTitle}>TailorBook Pro</div>
-        <div className={styles.premiumBannerSub}>
-          Unlock custom invoice templates, branded PDFs, tax lines, and more.
-        </div>
-      </div>
-      <button className={styles.premiumBannerBtn} onClick={onUpgrade}>
-        Upgrade · Pro
-      </button>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
 // MODAL: Invoice Template Picker
 // ─────────────────────────────────────────────────────────────
 
@@ -354,10 +332,10 @@ function TemplateModal({ isOpen, currentTemplate, onClose, onSelect }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// MODAL: Invoice Settings (Premium)
+// MODAL: Invoice Settings
 // ─────────────────────────────────────────────────────────────
 
-function InvoiceSettingsModal({ onBack, showToast, isPremium, onUpgrade }) {
+function InvoiceSettingsModal({ onBack, showToast }) {
   const { settings, updateMany } = useSettings()
 
   const [local, setLocal] = useState({
@@ -378,11 +356,9 @@ function InvoiceSettingsModal({ onBack, showToast, isPremium, onUpgrade }) {
   }
 
   return (
-    <FullModal title="Invoice Settings" onBack={onBack} onSave={isPremium ? save : undefined}>
+    <FullModal title="Invoice Settings" onBack={onBack} onSave={save}>
 
-      {!isPremium && <PremiumBanner onUpgrade={onUpgrade} />}
-
-      <div style={{ opacity: isPremium ? 1 : 0.4, pointerEvents: isPremium ? 'auto' : 'none' }}>
+      <div>
 
         <FieldGroup>
           <Field label="Invoice Number Prefix" hint="Shown before the number, e.g. INV-0042.">
@@ -503,45 +479,26 @@ export default function Settings({ onMenuClick, isPremium = false, onUpgrade = (
           </SettingRow>
         </div>
 
-        {/* ── INVOICE (PREMIUM) ── */}
-        <SectionHeader icon="receipt_long" label="Invoice" premium />
+        {/* ── INVOICE ── */}
+        <SectionHeader icon="receipt_long" label="Invoice" />
         <div className={styles.card}>
           <SettingRow
             icon="tune"
             label="Invoice Settings"
-            sub={isPremium
-              ? `${settings.invoiceCurrency} · ${settings.invoicePrefix} · Due ${settings.invoiceDueDays}d`
-              : 'Currency, prefix, tax, footer & more'}
+            sub={`${settings.invoiceCurrency} · ${settings.invoicePrefix} · Due ${settings.invoiceDueDays}d`}
             onClick={() => setInvoiceModal(true)}
-            chevron={isPremium}
-            locked={!isPremium}
+            chevron
           />
           <SettingRow
             icon="description"
             label="Invoice Template"
-            sub={isPremium ? 'Choose your preferred invoice design' : 'Unlock premium templates'}
-            value={isPremium ? settings.invoiceTemplate : undefined}
-            onClick={isPremium ? () => setTemplateModal(true) : undefined}
-            chevron={isPremium}
-            locked={!isPremium}
+            sub="Choose your preferred invoice design"
+            value={settings.invoiceTemplate}
+            onClick={() => setTemplateModal(true)}
+            chevron
             divider={false}
           />
         </div>
-
-        {/* ── Premium upsell card (only when not premium) ── */}
-        {!isPremium && (
-          <div className={styles.premiumCard} onClick={onUpgrade}>
-            <div className={styles.premiumCardGlow} />
-            <div className={styles.premiumCardLeft}>
-              <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--accent)' }}>workspace_premium</span>
-              <div>
-                <div className={styles.premiumCardTitle}>Unlock TailorBook Pro</div>
-                <div className={styles.premiumCardSub}>Custom invoices, tax lines, branded PDFs and more</div>
-              </div>
-            </div>
-            <span className="mi" style={{ fontSize: '1rem', color: 'var(--accent)' }}>chevron_right</span>
-          </div>
-        )}
 
         {/* ── NOTIFICATIONS ── */}
         <SectionHeader icon="notifications" label="Notifications" />
@@ -601,8 +558,6 @@ export default function Settings({ onMenuClick, isPremium = false, onUpgrade = (
         <InvoiceSettingsModal
           onBack={() => setInvoiceModal(false)}
           showToast={showToast}
-          isPremium={isPremium}
-          onUpgrade={onUpgrade}
         />
       )}
 
