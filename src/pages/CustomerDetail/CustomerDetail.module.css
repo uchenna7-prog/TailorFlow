@@ -5,19 +5,28 @@
   flex-direction: column;
 }
 
+/* ── FIXED TOP CONTAINER ── */
+.fixedTopContainer {
+  position: fixed;
+  top: var(--header-height, 60px); /* height of your Header */
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
 
+/* ── PROFILE SECTION ── */
 .profileSection {
   display: flex;
   gap: 12px;
   padding: 18px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  position: sticky; 
-  top: 0;
-  z-index: 50;
 }
 
-
+/* Left & Right columns */
 .leftColumn { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--surface2); display: grid; place-items: center; font-weight: 700; font-size: 28px; border: 2px solid var(--accent); color: var(--accent); overflow: hidden; }
 .avatarImg { width: 100%; height: 100%; object-fit: cover; }
@@ -26,14 +35,6 @@
 .name { font-size: 1.1rem; font-weight: 700; }
 .meta { display: flex; gap: 4px; color: var(--text2); font-size: 0.75rem; align-items: flex-start; }
 .meta .mi { font-size: 0.9rem; line-height: 1; display: inline-flex; align-items: flex-start; justify-content: center; margin-top: 2px; color: inherit; }
-
-/* ── SCROLLABLE TABS + CONTENT ── */
-.scrollContent {
-  overflow-y: auto; /* enable scroll under profile */
-  flex: 1;
-  padding: 0 20px 120px;
-  margin-top: 12px;
-}
 
 /* ── ACTION BUTTONS ── */
 .actions { display: flex; justify-content: space-around; gap: 6px; margin: 12px 0; padding: 0 12px; }
@@ -49,16 +50,19 @@
 .tab.active { color: var(--accent); font-weight: 800; }
 .tab.active::after { content: ''; position: absolute; bottom: 0; left: 10%; right: 10%; height: 2px; background: var(--accent); border-radius: 1px; }
 
-/* ── CONTENT: add spacing for first child ── */
-.content > *:first-child {
-  margin-top: 12px;
+/* ── SCROLLABLE CONTENT ── */
+.scrollContent {
+  margin-top: calc(18px + 80px + 12px + 48px + 22px); /* profile + actions + tabs spacing approx */
+  padding: 12px 20px 120px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Add small top margin to first scrollable child */
+.scrollContent > *:first-child {
+  margin-top: 6px;
 }
 
 /* ── FAB ── */
 .fab { position: fixed; bottom: calc(30px + var(--sb)); right: 22px; width: 58px; height: 58px; border-radius: 50%; background: var(--text); color: var(--bg); border: none; display: flex; align-items: center; justify-content: center; z-index: 200; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
 .fab .mi { color: var(--bg); font-size: 1.6rem; }
-
-/* ── BODY PANEL: add margin for first child ── */
-.bodyPanel > div:first-child {
-  margin-top: 12px;
-}
