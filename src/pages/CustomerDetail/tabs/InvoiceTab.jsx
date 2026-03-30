@@ -103,6 +103,8 @@ export default function InvoiceTab({ invoices, orders, measurements, customer, o
   useEffect(() => {
     const handler = (e) => {
       const { orderId } = e.detail
+      
+      // Check against current invoices to avoid duplicates
       const existing = invoices.find(inv => String(inv.orderId) === String(orderId))
       if (existing) {
         showToast('Invoice already exists for this order')
@@ -113,6 +115,7 @@ export default function InvoiceTab({ invoices, orders, measurements, customer, o
       const order = orders.find(o => String(o.id) === String(orderId))
       if (!order) return
 
+      // --- FIX: Now correctly uses the latest invoices.length ---
       const invNumber = `INV-${String(invoices.length + 1).padStart(3, '0')}`
       const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       const ids = order.measurementIds?.length ? order.measurementIds : (order.measurementId ? [order.measurementId] : [])
@@ -139,7 +142,7 @@ export default function InvoiceTab({ invoices, orders, measurements, customer, o
 
     document.addEventListener('generateInvoice', handler)
     return () => document.removeEventListener('generateInvoice', handler)
-  }, [orders, measurements, onSave, showToast]) // removed invoices from deps
+  }, [invoices, orders, measurements, onSave, showToast]) // invoices must be in dependency array
 
   const handleDeleteConfirm = () => {
     if (!confirmDel) return
