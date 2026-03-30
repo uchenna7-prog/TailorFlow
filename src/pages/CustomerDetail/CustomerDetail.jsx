@@ -55,18 +55,18 @@ export default function CustomerDetail({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
-      {/* ✅ Header: big back button, page title, edit + outlined delete */}
+      {/* ✅ Header */}
       <Header
         type="back"
         title="Customer Details"
         customActions={[
           { icon: 'edit', label: 'Edit Customer', onClick: () => navigate(`/customers/edit/${id}`) },
           {
-  icon: 'delete',
-  label: 'Delete Customer',
-  onClick: () => deleteCustomer(id),
-  outlined: true, // ✅ THIS is the key
-  color: 'var(--danger)'
+            icon: 'delete',
+            label: 'Delete Customer',
+            onClick: () => deleteCustomer(id),
+            outlined: true,
+            color: 'var(--danger)'
           },
         ]}
       />
@@ -108,84 +108,87 @@ export default function CustomerDetail({ onMenuClick }) {
         </div>
       </div>
 
-      {/* ACTIONS */}
-      <div className={styles.actions}>
-        <button
-          className={`${styles.btn} ${styles.light}`}
-          onClick={() => window.location = `tel:${customer.phone}`}
-        >
-          <span className="mi">call</span>
-          Call
-        </button>
-
-        <button
-          className={`${styles.btn} ${styles.light}`}
-          onClick={() => window.location = `mailto:${customer.email}`}
-        >
-          <span className="mi">mail_outline</span>
-          Email
-        </button>
-
-        <button
-          className={`${styles.btn} ${styles.primary}`}
-          onClick={() => setBodyPanelOpen(true)}
-        >
-          <span className="mi">straighten</span>
-          Full Body Measurements
-        </button>
-      </div>
-
-      {/* TABS */}
-      <div className={styles.tabs}>
-        {TABS.map(tab => (
-          <div
-            key={tab.id}
-            className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+      {/* SCROLLABLE TABS + CONTENT */}
+      <div className={styles.scrollContent}>
+        {/* ACTIONS */}
+        <div className={styles.actions}>
+          <button
+            className={`${styles.btn} ${styles.light}`}
+            onClick={() => window.location = `tel:${customer.phone}`}
           >
-            {tab.label}
-          </div>
-        ))}
+            <span className="mi">call</span>
+            Call
+          </button>
+
+          <button
+            className={`${styles.btn} ${styles.light}`}
+            onClick={() => window.location = `mailto:${customer.email}`}
+          >
+            <span className="mi">mail_outline</span>
+            Email
+          </button>
+
+          <button
+            className={`${styles.btn} ${styles.primary}`}
+            onClick={() => setBodyPanelOpen(true)}
+          >
+            <span className="mi">straighten</span>
+            Full Body Measurements
+          </button>
+        </div>
+
+        {/* TABS */}
+        <div className={styles.tabs}>
+          {TABS.map(tab => (
+            <div
+              key={tab.id}
+              className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </div>
+          ))}
+        </div>
+
+        {/* CONTENT */}
+        <div className={styles.content}>
+          {activeTab === 'dress' && (
+            <MeasurementsTab
+              measurements={data.measurements}
+              onSave={data.saveMeasurement}
+              onDelete={data.deleteMeasurement}
+              showToast={showToast}
+            />
+          )}
+
+          {activeTab === 'orders' && (
+            <OrdersTab
+              orders={data.orders}
+              measurements={data.measurements}
+              onSave={data.saveOrder}
+              onDelete={data.deleteOrder}
+              onStatusChange={data.updateOrderStatus}
+              showToast={showToast}
+            />
+          )}
+
+          {activeTab === 'invoice' && (
+            <InvoiceTab
+              invoices={data.invoices}
+              orders={data.orders}
+              measurements={data.measurements}
+              customer={customer}
+              onSave={data.saveInvoice}
+              onDelete={data.deleteInvoice}
+              onStatusChange={data.updateInvoiceStatus}
+              onNavigateToInvoice={() => setActiveTab('invoice')}
+              showToast={showToast}
+            />
+          )}
+        </div>
       </div>
 
-      {/* CONTENT */}
-      <div className={styles.content}>
-        {activeTab === 'dress' && (
-  <MeasurementsTab
-    measurements={data.measurements}
-    onSave={data.saveMeasurement}   // ✅ FIXED
-    onDelete={data.deleteMeasurement}
-    showToast={showToast}
-  />
-)}
-
-
-        {activeTab === 'orders' && (
-  <OrdersTab
-    orders={data.orders}
-    measurements={data.measurements}       // if Orders needs it
-    onSave={data.saveOrder}                // ✅ this is key
-    onDelete={data.deleteOrder}
-    onStatusChange={data.updateOrderStatus}
-    showToast={showToast}
-  />
-)}
-
-        {activeTab === 'invoice' && (
-  <InvoiceTab
-    invoices={data.invoices}               // the invoice list
-    orders={data.orders}                   // maybe needed inside invoice
-    measurements={data.measurements}      // optional if invoice uses measurements
-    customer={customer}
-    onSave={data.saveInvoice}              // ✅ key
-    onDelete={data.deleteInvoice}          // ✅ key
-    onStatusChange={data.updateInvoiceStatus} // ✅ key
-    onNavigateToInvoice={() => setActiveTab('invoice')} // optional navigation
-    showToast={showToast}
-  />
-)}
-
-      {/* ✅ FIXED FAB */}
+      {/* ✅ FAB */}
       {(activeTab === 'dress' || activeTab === 'orders') && (
         <button
           className={styles.fab}
