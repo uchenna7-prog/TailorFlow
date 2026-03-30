@@ -36,11 +36,70 @@ export default function CustomerDetail({ onMenuClick }) {
   const data = useCustomerData(id)
 
   const [activeTab, setActiveTab] = useState('dress')
-  const [bodyPanelOpen, setBodyPanelOpen] = useState(false)
   const [toastMsg, setToastMsg] = useState('')
   const toastTimer = useRef(null)
-
   const fixedRef = useRef(null)
+
+  // --- SYNC LOCAL STATE ---
+  const [invoicesState, setInvoicesState] = useState([])
+  useEffect(() => {
+    if (data.invoices) setInvoicesState(data.invoices)
+  }, [data.invoices])
+
+  const showToast = useCallback((msg) => {
+    setToastMsg(msg)
+    clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
+  }, [])
+
+  // --- GLOBAL EVENT LISTENERS ---
+  useEffect(() => {
+    const handleSwitch = () => setActiveTab('invoice')
+    
+    const handleGenerate = (e) => {
+      const { orderId } = e.detail
+      const existing = data.invoices.find(inv => String(inv.orderId) === String(orderId))
+      
+      if (existing) {
+        showToast('Invoice already exists')
+        setActiveTab('invoice')
+        return
+      }
+
+      const order = data.orders.find(o => String(o.id) === String(orderId))
+      if (!order) return
+
+      const invNumber = `INV-${String(data.invoices.length + 1).padStart(3, '0')}`
+      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      const ids = order.measurementIds?.length ? order.measurementIds : (order.measurementId ? [order.measurementId] : [])
+      const linkedNames = ids.map(mid => data.measurements.find(m => String(m.id) === String(mid))?.name).filter(Boolean)
+
+      const newInvoice = {
+        id: Date.now() + Math.random(),
+        orderId,
+        number: invNumber,
+        orderDesc: order.desc,
+        price: order.price,
+        qty: order.qty,
+        linkedNames,
+        due: order.due,
+        notes: order.notes,
+        status: 'unpaid',
+        date: today,
+      }
+
+      data.saveInvoice(newInvoice)
+      showToast(`${invNumber} generated ✓`)
+      setActiveTab('invoice')
+    }
+
+    document.addEventListener('switchToInvoiceTab', handleSwitch)
+    document.addEventListener('generateInvoice', handleGenerate)
+    return () => {
+      document.removeEventListener('switchToInvoiceTab', handleSwitch)
+      document.removeEventListener('generateInvoice', handleGenerate)
+    }
+  }, [data, showToast])
 
   useEffect(() => {
     if (fixedRef.current) {
@@ -49,44 +108,11 @@ export default function CustomerDetail({ onMenuClick }) {
     }
   }, [activeTab, data])
 
-  const showToast = useCallback((msg) => {
-    setToastMsg(msg)
-    clearTimeout(toastTimer.current)
-    toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
-  }, [])
-
-  useEffect(() => {
-    const handler = () => setActiveTab('invoice')
-    document.addEventListener('switchToInvoiceTab', handler)
-    return () => document.removeEventListener('switchToInvoiceTab', handler)
-  }, [])
-
   const customer = getCustomer(id)
   if (!customer) return null
 
   const initials = getInitials(customer.name)
   const birthday = getBirthday(customer.birthday)
-
-  // --- FIX: Sync local state with hook data ---
-  const [invoicesState, setInvoicesState] = useState([])
-
-  useEffect(() => {
-    if (data.invoices) {
-      setInvoicesState(data.invoices)
-    }
-  }, [data.invoices])
-
-  const handleSaveInvoice = (invoice) => {
-    data.saveInvoice(invoice)
-  }
-
-  const handleDeleteInvoice = (id) => {
-    data.deleteInvoice(id)
-  }
-
-  const handleStatusChangeInvoice = (id, status) => {
-    data.updateInvoiceStatus(id, status)
-  }
 
   return (
     <div className={styles.page}>
@@ -95,13 +121,7 @@ export default function CustomerDetail({ onMenuClick }) {
         title="Customer Details"
         customActions={[
           { icon: 'edit', label: 'Edit Customer', onClick: () => navigate(`/customers/edit/${id}`) },
-          {
-            icon: 'delete',
-            label: 'Delete Customer',
-            onClick: () => deleteCustomer(id),
-            outlined: true,
-            color: 'var(--danger)'
-          },
+          { icon: 'delete', label: 'Delete Customer', onClick: () => deleteCustomer(id), outlined: true, color: 'var(--danger)' },
         ]}
       />
 
@@ -113,123 +133,44 @@ export default function CustomerDetail({ onMenuClick }) {
             </div>
             {birthday && <div className={styles.birthday}>🎈 {birthday}</div>}
           </div>
-
           <div className={styles.rightColumn}>
-            <div className={styles.name}>
-              {customer.name} {customer.sex && `(${customer.sex})`}
-            </div>
-
-            <div className={styles.meta}>
-              <span className="mi">call</span>
-              {customer.phone}
-            </div>
-
-            {customer.email && (
-              <div className={styles.meta}>
-                <span className="mi">mail_outline</span>
-                {customer.email}
-              </div>
-            )}
-
-            {customer.address && (
-              <div className={styles.meta}>
-                <span className="mi">place</span>
-                {customer.address}
-              </div>
-            )}
+            <div className={styles.name}>{customer.name} {customer.sex && `(${customer.sex})`}</div>
+            <div className={styles.meta}><span className="mi">call</span>{customer.phone}</div>
+            {customer.email && <div className={styles.meta}><span className="mi">mail_outline</span>{customer.email}</div>}
+            {customer.address && <div className={styles.meta}><span className="mi">place</span>{customer.address}</div>}
           </div>
         </div>
 
         <div className={styles.actions}>
-          <button
-            className={`${styles.btn} ${styles.light}`}
-            onClick={() => window.location = `tel:${customer.phone}`}
-          >
-            <span className="mi">call</span>
-            Call
-          </button>
-
-          <button
-            className={`${styles.btn} ${styles.light}`}
-            onClick={() => window.location = `mailto:${customer.email}`}
-          >
-            <span className="mi">mail_outline</span>
-            Email
-          </button>
-
-          <button
-            className={`${styles.btn} ${styles.primary}`}
-            onClick={() => setBodyPanelOpen(true)}
-          >
-            <span className="mi">straighten</span>
-            Full Body Measurements
-          </button>
+          <button className={`${styles.btn} ${styles.light}`} onClick={() => window.location = `tel:${customer.phone}`}><span className="mi">call</span>Call</button>
+          <button className={`${styles.btn} ${styles.light}`} onClick={() => window.location = `mailto:${customer.email}`}><span className="mi">mail_outline</span>Email</button>
+          <button className={`${styles.btn} ${styles.primary}`} onClick={() => document.dispatchEvent(new CustomEvent('openMeasureModal'))}><span className="mi">straighten</span>Measurements</button>
         </div>
 
         <div className={styles.tabs}>
           {TABS.map(tab => (
-            <div
-              key={tab.id}
-              className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </div>
+            <div key={tab.id} className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`} onClick={() => setActiveTab(tab.id)}>{tab.label}</div>
           ))}
         </div>
       </div>
 
       <div className={styles.scrollContent}>
         {activeTab === 'dress' && (
-          <MeasurementsTab
-            measurements={data.measurements}
-            onSave={data.saveMeasurement}
-            onDelete={data.deleteMeasurement}
-            showToast={showToast}
-          />
+          <MeasurementsTab measurements={data.measurements} onSave={data.saveMeasurement} onDelete={data.deleteMeasurement} showToast={showToast} />
         )}
-
         {activeTab === 'orders' && (
-          <OrdersTab
-            orders={data.orders}
-            measurements={data.measurements}
-            onSave={data.saveOrder}
-            onDelete={data.deleteOrder}
-            onStatusChange={data.updateOrderStatus}
-            showToast={showToast}
-          />
+          <OrdersTab orders={data.orders} measurements={data.measurements} onSave={data.saveOrder} onDelete={data.deleteOrder} onStatusChange={data.updateOrderStatus} showToast={showToast} />
         )}
-
         {activeTab === 'invoice' && (
-          <InvoiceTab
-            invoices={invoicesState}
-            orders={data.orders}
-            measurements={data.measurements}
-            customer={customer}
-            onSave={handleSaveInvoice}
-            onDelete={handleDeleteInvoice}
-            onStatusChange={handleStatusChangeInvoice}
-            showToast={showToast}
-          />
+          <InvoiceTab invoices={invoicesState} orders={data.orders} measurements={data.measurements} customer={customer} onSave={data.saveInvoice} onDelete={data.deleteInvoice} onStatusChange={data.updateInvoiceStatus} showToast={showToast} />
         )}
       </div>
 
       {(activeTab === 'dress' || activeTab === 'orders') && (
-        <button
-          className={styles.fab}
-          onClick={() => {
-            if (activeTab === 'dress') {
-              document.dispatchEvent(new CustomEvent('openMeasureModal'))
-            }
-            if (activeTab === 'orders') {
-              document.dispatchEvent(new CustomEvent('openOrderModal'))
-            }
-          }}
-        >
+        <button className={styles.fab} onClick={() => document.dispatchEvent(new CustomEvent(activeTab === 'dress' ? 'openMeasureModal' : 'openOrderModal'))}>
           <span className="mi">add</span>
         </button>
       )}
-
       <Toast message={toastMsg} />
     </div>
   )
