@@ -1,52 +1,57 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 const SETTINGS_KEY = 'tailorbook_settings'
+const LOGO_KEY     = 'tailorbook_brand_logo'
 
 export const DEFAULTS = {
   // ── Appearance ──
-  theme: 'light',                   // 'dark' | 'light' | 'system'
+  theme: 'light',                    // 'dark' | 'light' | 'system'
+  dateFormat: 'DD/MM/YYYY',          // 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD'
 
   // ── Measurements ──
-  measureUnit: 'in',                // 'in' | 'cm' | 'yd'
-  measureFormat: 'decimal',         // 'decimal' | 'fraction'
+  measureUnit: 'in',                 // 'in' | 'cm' | 'yd'
+  measureFormat: 'decimal',          // 'decimal' | 'fraction'
 
   // ── Brand / Business ──
-  brandName: '',                    // e.g. "Stitched by Amara"
-  brandColour: '#D4AF37',          // hex — used on coloured invoice templates
-  brandLogo: null,                  // base64 data-URL string or null
-  brandTagline: '',                 // e.g. "Crafted with love, fitted for you"
+  brandName: '',
+  brandTagline: '',
+  brandColour: '#D4AF37',
+  brandLogo: null,                   // base64 data-URL or null (stored separately)
   brandPhone: '',
-  brandAddress: '',
   brandEmail: '',
+  brandAddress: '',
   brandWebsite: '',
 
   // ── Invoice ──
   invoicePrefix: 'INV',
   invoiceCurrency: '₦',
-  invoiceTemplate: 'classic',       // 'classic' | 'bold' | 'branded' | 'minimal'
-  invoiceTaxRate: 0,                // percentage, e.g. 7.5
+  invoiceTemplate: 'editable',
+  invoiceDueDays: 7,
   invoiceShowTax: false,
+  invoiceTaxRate: 0,
   invoiceFooter: 'Thank you for your patronage 🙏',
-  invoiceDueDays: 7,               // default payment due window in days
+
+  // ── Orders ──
+  defaultDepositPercent: 50,
+  autoArchiveCompletedOrders: false,
 
   // ── Notifications ──
   notifyOverdueTasks: true,
   notifyUpcomingBirthdays: true,
   notifyUnpaidInvoices: true,
-
-  // ── Orders ──
-  defaultDepositPercent: 50,        // % deposit collected upfront
-  autoArchiveCompletedOrders: false,
-
-  // ── Data ──
-  dateFormat: 'DD/MM/YYYY',        // 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD'
 }
 
 function loadSettings() {
   try {
-    const raw = localStorage.getItem(SETTINGS_KEY)
-    return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
-  } catch { return { ...DEFAULTS } }
+    const raw  = localStorage.getItem(SETTINGS_KEY)
+    const data = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
+    // Logo lives in its own key to avoid quota issues with large base64 strings
+    const logo = localStorage.getItem(LOGO_KEY)
+    if (logo) data.brandLogo = logo
+    return data
+  } catch {
+    return { ...DEFAULTS }
+  }
 }
 
 const SettingsContext = createContext(null)
@@ -64,26 +69,26 @@ function applyTheme(theme) {
 export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState(loadSettings)
 
+  // Apply theme on mount and whenever it changes
   useEffect(() => {
     applyTheme(settings.theme)
     if (settings.theme === 'system') {
-      const mq = window.matchMedia('(prefers-color-scheme: dark)')
+      const mq      = window.matchMedia('(prefers-color-scheme: dark)')
       const handler = () => applyTheme('system')
       mq.addEventListener('change', handler)
       return () => mq.removeEventListener('change', handler)
     }
   }, [settings.theme])
 
+  // Persist on every change (logo stored separately)
   useEffect(() => {
     try {
-      // Don't serialize the logo into settings key — it can be large
       const { brandLogo, ...rest } = settings
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(rest))
-      // Store logo separately
       if (brandLogo) {
-        localStorage.setItem('tailorbook_brand_logo', brandLogo)
+        localStorage.setItem(LOGO_KEY, brandLogo)
       } else {
-        localStorage.removeItem('tailorbook_brand_logo')
+        localStorage.removeItem(LOGO_KEY)
       }
     } catch { /* ignore quota errors */ }
   }, [settings])
@@ -92,6 +97,7 @@ export function SettingsProvider({ children }) {
     setSettings(prev => ({ ...prev, [key]: value }))
   }, [])
 
+  // Update multiple keys at once — used by sub-modals on Save
   const updateMany = useCallback((partial) => {
     setSettings(prev => ({ ...prev, ...partial }))
   }, [])
