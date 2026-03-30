@@ -67,7 +67,6 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
       </div>
       <div className={styles.modalBody} style={{ paddingBottom: 0 }}>
         <div style={{ padding: '20px' }}>
-          {/* Cloth type picker */}
           <p className={styles.sectionHeading}>Cloth Types</p>
           {measurements.length > 5 && (
             <div className={styles.pickerSearchWrap}>
@@ -97,7 +96,6 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
             })}
           </div>
 
-          {/* Order details */}
           <p className={styles.sectionHeading} style={{ marginTop: 24 }}>Order Details</p>
           <div className={styles.orderFormCard}>
             <label className={styles.labelTiny}>Description / Cloth Type</label>
@@ -194,11 +192,9 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
         <div className={styles.detailDate}>Placed on {order.date}</div>
 
         <button className={styles.generateInvoiceBtn} onClick={() => onGenerateInvoice(order.id)}>
-  <span className="mi" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: '4px' }}>
-    request_quote
-  </span>
-  Generate Invoice
-</button>
+          <span className="mi" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: '4px' }}>request_quote</span>
+          Generate Invoice
+        </button>
       </div>
     </div>
   )
@@ -235,11 +231,11 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
   }
 
   const handleGenerateInvoice = (orderId) => {
-  document.dispatchEvent(new CustomEvent('generateInvoice', { detail: { orderId } }))
-  document.dispatchEvent(new CustomEvent('switchToInvoiceTab')) // 👈 ADDED
-  setDetailOrder(null)
-  showToast('Generating invoice…')
-}
+    document.dispatchEvent(new CustomEvent('generateInvoice', { detail: { orderId } }))
+    document.dispatchEvent(new CustomEvent('switchToInvoiceTab'))
+    setDetailOrder(null)
+    showToast('Generating invoice…')
+  }
 
   return (
     <>
