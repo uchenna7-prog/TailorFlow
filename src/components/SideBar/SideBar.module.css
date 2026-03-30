@@ -177,11 +177,13 @@
 /* ── LEGAL LINKS ── */
 .footer {
   padding: 6px 16px 20px;
+  border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-top: auto;
 }
+
 
 .footerLink {
   background: none;
