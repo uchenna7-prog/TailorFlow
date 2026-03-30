@@ -10,7 +10,7 @@
 .premiumBadge {
   display: inline-flex; align-items: center; gap: 3px;
   background: linear-gradient(135deg, var(--accent), #b8942a);
-  color: var(--bg); /* Use theme background color (white in light mode) for text */
+  color: var(--bg);
   font-size: 0.55rem; font-weight: 900;
   letter-spacing: 0.06em; padding: 2px 7px 2px 5px;
   border-radius: 20px; margin-left: 2px;
@@ -32,10 +32,35 @@
 .rowValue { font-size: 0.78rem; font-weight: 700; color: var(--accent); }
 
 /* ── TOGGLE ── */
-.toggle { width: 44px; height: 26px; border-radius: 13px; background: var(--border); border: none; position: relative; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
-.toggleOn { background: var(--accent); }
-.toggleThumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
-.toggleOn .toggleThumb { transform: translateX(18px); }
+.toggle { 
+  width: 44px; 
+  height: 26px; 
+  border-radius: 13px; 
+  background: var(--surface2); /* Darker track for visibility */
+  border: 1px solid var(--border); 
+  position: relative; 
+  cursor: pointer; 
+  flex-shrink: 0; 
+  transition: all 0.2s ease; 
+}
+.toggleOn { 
+  background: var(--accent); 
+  border-color: var(--accent);
+}
+.toggleThumb { 
+  position: absolute; 
+  top: 2px; 
+  left: 2px; 
+  width: 20px; 
+  height: 20px; 
+  border-radius: 50%; 
+  background: var(--accent); /* White in light mode, White in dark mode */
+  transition: transform 0.2s, background 0.2s; 
+}
+.toggleOn .toggleThumb { 
+  transform: translateX(18px); 
+  background: var(--bg); /* Becomes black when track is white */
+}
 
 /* ── PREMIUM UPSELL CARD ── */
 .premiumCard {
@@ -81,7 +106,7 @@
 .premiumBannerBtn {
   background: var(--accent); border: none; border-radius: 12px;
   padding: 12px 28px; font-size: 0.88rem; font-weight: 900;
-  color: var(--bg); /* Set text to white/light via variable */
+  color: var(--bg);
   cursor: pointer; font-family: inherit;
   width: 100%; transition: opacity 0.15s;
 }
@@ -93,7 +118,7 @@
 
 .fullHeader { display: flex; align-items: center; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
 .backBtn { background: none; border: none; color: var(--text); padding: 8px; margin-right: 12px; cursor: pointer; display: flex; align-items: center; }
-.backBtn .mi { font-size: 1.5rem !important; } /* Increased back arrow size */
+.backBtn .mi { font-size: 1.5rem !important; }
 
 .fullTitle { flex: 1; font-weight: 800; font-size: 1rem; color: var(--text); }
 .fullSave { background: var(--accent); border: none; padding: 8px 16px; border-radius: 8px; font-weight: 800; color: var(--bg); cursor: pointer; font-family: inherit; }
