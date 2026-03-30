@@ -34,11 +34,11 @@
 /* Desktop */
 @media (min-width: 769px) {
   .sidebar {
-    transform: translateX(0) !important;
+    transform: translateX(0);
   }
 
   .overlay {
-    display: none !important;
+    display: none;
   }
 }
 
