@@ -12,10 +12,13 @@
   right: 0;
   z-index: 100;
   background: var(--bg);
+  /* Add this line below */
+  border-top: 1px solid var(--border); 
   border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 }
+
 
 /* ── PROFILE SECTION ── */
 .profileSection {
