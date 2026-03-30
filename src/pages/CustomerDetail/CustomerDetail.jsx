@@ -55,7 +55,13 @@ export default function CustomerDetail({ onMenuClick }) {
     clearTimeout(toastTimer.current)
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
-
+  
+  
+  useEffect(() => {
+  const handler = () => setActiveTab('invoice')
+  document.addEventListener('switchToInvoiceTab', handler)
+  return () => document.removeEventListener('switchToInvoiceTab', handler)
+}, [])
   const customer = getCustomer(id)
   if (!customer) return null
 
