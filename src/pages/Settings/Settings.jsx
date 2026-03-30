@@ -35,10 +35,7 @@ function SettingRow({ icon, label, sub, children, onClick, chevron }) {
 
 function Toggle({ value, onChange }) {
   return (
-    <button
-      className={`${styles.toggle} ${value ? styles.toggleOn : ''}`}
-      onClick={() => onChange(!value)}
-    >
+    <button className={`${styles.toggle} ${value ? styles.toggleOn : ''}`} onClick={() => onChange(!value)}>
       <span className={styles.toggleThumb} />
     </button>
   )
@@ -61,44 +58,77 @@ function SegmentControl({ options, value, onChange }) {
   )
 }
 
-// ── EDIT MODAL — for text fields ──
+// ── TEMPLATE SELECTION MODAL ──
+function TemplateModal({ isOpen, current, onClose, onSelect }) {
+  if (!isOpen) return null
+
+  const templates = [
+    { id: 'standard', name: 'Standard (A5)', img: '/templates/standard.png', desc: 'Itemized list with delivery dates' },
+    { id: 'consolidated', name: 'Consolidated (A5)', img: '/templates/consolidated.png', desc: 'Grouped items by category' },
+    { id: 'breakup', name: 'Price Breakup (A5)', img: '/templates/breakup.png', desc: 'Detailed labor and material costs' }
+  ]
+
+  return (
+    <div className={styles.editOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className={styles.editSheet} style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+        <div className={styles.editHeader}>
+          <span className={styles.editTitle}>Select Invoice Template</span>
+          <button className={styles.editClose} onClick={onClose}>
+            <span className="mi">close</span>
+          </button>
+        </div>
+        <div className={styles.templateList}>
+          {templates.map(t => (
+            <div 
+              key={t.id} 
+              className={`${styles.templateCard} ${current === t.id ? styles.templateActive : ''}`}
+              onClick={() => onSelect(t.id)}
+            >
+              <div className={styles.templatePreview}>
+                {/* Placeholder for the actual visual style */}
+                <div className={styles.previewHeader}>BILL</div>
+                <div className={styles.previewLine} style={{ width: '40%' }} />
+                <div className={styles.previewTable}>
+                  <div className={styles.previewRow} />
+                  <div className={styles.previewRow} />
+                </div>
+                <div className={styles.previewBadge}>{t.name}</div>
+              </div>
+              <div className={styles.templateInfo}>
+                <div className={styles.radioCircle}>
+                    {current === t.id && <div className={styles.radioInner} />}
+                </div>
+                <span>{t.name}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className={styles.editFooter}>
+          <button className={styles.editSave} onClick={onClose}>Done</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── EDIT MODAL ──
 function EditModal({ isOpen, title, value, placeholder, multiline, onClose, onSave }) {
   const [val, setVal] = useState(value)
-
   const handleSave = () => { onSave(val); onClose() }
-  const handleClose = () => { setVal(value); onClose() }
-
   if (!isOpen) return null
 
   return (
-    <div className={styles.editOverlay} onClick={e => e.target === e.currentTarget && handleClose()}>
+    <div className={styles.editOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={styles.editSheet}>
-        <div className={styles.editHandle} />
         <div className={styles.editHeader}>
           <span className={styles.editTitle}>{title}</span>
-          <button className={styles.editClose} onClick={handleClose}>
-            <span className="mi" style={{ fontSize: '1.4rem' }}>close</span>
-          </button>
+          <button className={styles.editClose} onClick={onClose}><span className="mi">close</span></button>
         </div>
         <div className={styles.editBody}>
           {multiline ? (
-            <textarea
-              className={styles.editInput}
-              value={val}
-              onChange={e => setVal(e.target.value)}
-              placeholder={placeholder}
-              rows={3}
-              autoFocus
-            />
+            <textarea className={styles.editInput} value={val} onChange={e => setVal(e.target.value)} placeholder={placeholder} rows={3} autoFocus />
           ) : (
-            <input
-              type="text"
-              className={styles.editInput}
-              value={val}
-              onChange={e => setVal(e.target.value)}
-              placeholder={placeholder}
-              autoFocus
-            />
+            <input type="text" className={styles.editInput} value={val} onChange={e => setVal(e.target.value)} placeholder={placeholder} autoFocus />
           )}
         </div>
         <div className={styles.editFooter}>
@@ -109,72 +139,12 @@ function EditModal({ isOpen, title, value, placeholder, multiline, onClose, onSa
   )
 }
 
-// ── TEMPLATE MODAL ──
-function TemplateModal({ isOpen, selected, onClose, onSelect }) {
-  const TEMPLATES = [
-    {
-      id: 'classic',
-      name: 'Classic',
-      preview: `INVOICE #001
-Client: John Doe
-Date: 30/03/2026
-Amount: $100
-Thank you!`
-    },
-    {
-      id: 'modern',
-      name: 'Modern',
-      preview: `💼 Modern Invoice #001
-Client: John Doe
-Date: 30/03/2026
-Amount: $100
-Payment Due: 7 days`
-    },
-    {
-      id: 'minimal',
-      name: 'Minimal',
-      preview: `Invoice #001 | John Doe | $100
-Date: 30/03/2026
-Thank you for your business!`
-    },
-  ]
-
-  if (!isOpen) return null
-
-  return (
-    <div className={styles.editOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className={styles.editSheet}>
-        <div className={styles.editHandle} />
-        <div className={styles.editHeader}>
-          <span className={styles.editTitle}>Choose Invoice Template</span>
-          <button className={styles.editClose} onClick={onClose}>
-            <span className="mi" style={{ fontSize: '1.4rem' }}>close</span>
-          </button>
-        </div>
-        <div className={styles.editBody} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {TEMPLATES.map(t => (
-            <div
-              key={t.id}
-              className={`${styles.row} ${selected === t.id ? styles.segActive : ''}`}
-              style={{ flexDirection: 'column', alignItems: 'flex-start', cursor: 'pointer' }}
-              onClick={() => onSelect(t.id)}
-            >
-              <strong>{t.name}</strong>
-              <pre style={{ fontFamily: 'monospace', margin: '4px 0 0', fontSize: '0.8rem' }}>{t.preview}</pre>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── MAIN SETTINGS PAGE ──
+// ── MAIN PAGE ──
 export default function Settings({ onMenuClick }) {
   const { settings, updateSetting, resetSettings } = useSettings()
   const [toastMsg, setToastMsg] = useState('')
   const [editModal, setEditModal] = useState(null)
-  const [templateModal, setTemplateModal] = useState(false)
+  const [templateOpen, setTemplateOpen] = useState(false)
   const [clearConfirm, setClearConfirm] = useState(false)
   const [resetConfirm, setResetConfirm] = useState(false)
   const toastTimer = useRef(null)
@@ -185,29 +155,6 @@ export default function Settings({ onMenuClick }) {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
 
-  const openEdit = (key, title, placeholder, multiline = false) => {
-    setEditModal({ key, title, placeholder, multiline })
-  }
-
-  const handleEditSave = (val) => {
-    if (!editModal) return
-    updateSetting(editModal.key, val)
-    showToast('Saved ✓')
-  }
-
-  const handleClearData = () => {
-    const keys = Object.keys(localStorage).filter(k => k !== 'tailorbook_settings')
-    keys.forEach(k => localStorage.removeItem(k))
-    setClearConfirm(false)
-    showToast('All data cleared')
-  }
-
-  const handleResetSettings = () => {
-    resetSettings()
-    setResetConfirm(false)
-    showToast('Settings reset to defaults')
-  }
-
   const handleExportData = () => {
     try {
       const data = {}
@@ -215,16 +162,14 @@ export default function Settings({ onMenuClick }) {
         if (k.startsWith('tailorbook')) data[k] = JSON.parse(localStorage.getItem(k))
       })
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-      const url  = URL.createObjectURL(blob)
-      const a    = document.createElement('a')
-      a.href     = url
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
       a.download = `tailorbook-backup-${new Date().toISOString().slice(0,10)}.json`
       a.click()
       URL.revokeObjectURL(url)
       showToast('Data exported ✓')
-    } catch {
-      showToast('Export failed')
-    }
+    } catch { showToast('Export failed') }
   }
 
   const THEME_OPTIONS = [
@@ -234,153 +179,93 @@ export default function Settings({ onMenuClick }) {
   ]
 
   const CURRENCY_OPTIONS = [
-    { value: '₦', label: '₦ NGN' },
-    { value: '$', label: '$ USD' },
-    { value: '£', label: '£ GBP' },
-    { value: '€', label: '€ EUR' },
-    { value: 'GH₵', label: 'GH₵ GHS' },
+    { value: '₦', label: '₦' },
+    { value: '$', label: '$' },
+    { value: '£', label: '£' },
+    { value: '€', label: '€' },
   ]
 
   return (
     <div className={styles.page}>
-      <Header onMenuClick={onMenuClick} />
+      <Header title="Settings" leftIcon="menu" onLeftClick={onMenuClick} />
+      
       <div className={styles.scrollArea}>
-
         {/* ── APPEARANCE ── */}
         <SectionHeader icon="palette" label="Appearance" />
         <div className={styles.card}>
           <SettingRow icon="dark_mode" label="Theme" sub="Choose your preferred appearance">
-            <SegmentControl
-              options={THEME_OPTIONS}
-              value={settings.theme}
-              onChange={v => { updateSetting('theme', v); showToast(`${v.charAt(0).toUpperCase() + v.slice(1)} mode`) }}
+            <SegmentControl 
+              options={THEME_OPTIONS} 
+              value={settings.theme} 
+              onChange={v => { updateSetting('theme', v); showToast(`${v} mode`) }} 
             />
           </SettingRow>
         </div>
 
         {/* ── INVOICE ── */}
-        <SectionHeader icon="receipt_long" label="Invoice" />
+        <SectionHeader icon="receipt_long" label="Invoice Configuration" />
         <div className={styles.card}>
-          <SettingRow
-            icon="tag"
-            label="Invoice Prefix"
-            sub={`Invoices will be numbered ${settings.invoicePrefix}-001, ${settings.invoicePrefix}-002…`}
-            chevron
-            onClick={() => openEdit('invoicePrefix', 'Invoice Prefix', 'e.g. INV')}
+          <SettingRow 
+            icon="description" 
+            label="Invoice Template" 
+            sub={settings.invoiceTemplate === 'breakup' ? 'Price Breakup' : settings.invoiceTemplate === 'consolidated' ? 'Consolidated' : 'Standard'} 
+            chevron 
+            onClick={() => setTemplateOpen(true)} 
+          />
+          <div className={styles.divider} />
+          <SettingRow 
+            icon="tag" 
+            label="Invoice Prefix" 
+            sub={`Current: ${settings.invoicePrefix}`} 
+            chevron 
+            onClick={() => setEditModal({ key: 'invoicePrefix', title: 'Invoice Prefix', placeholder: 'e.g. INV' })}
           >
             <span className={styles.rowValue}>{settings.invoicePrefix}</span>
           </SettingRow>
-
           <div className={styles.divider} />
-
-          <SettingRow
-            icon="layers"
-            label="Invoice Template"
-            sub={`Current: ${settings.invoiceTemplate ?? 'Classic'}`}
-            chevron
-            onClick={() => setTemplateModal(true)}
-          >
-            <span className={styles.rowValue}>{settings.invoiceTemplate ?? 'Classic'}</span>
-          </SettingRow>
-
-          <div className={styles.divider} />
-
           <SettingRow icon="currency_exchange" label="Currency">
             <div className={styles.currencyPicker}>
               {CURRENCY_OPTIONS.map(c => (
-                <button
-                  key={c.value}
+                <button 
+                  key={c.value} 
                   className={`${styles.currencyBtn} ${settings.invoiceCurrency === c.value ? styles.currencyActive : ''}`}
-                  onClick={() => { updateSetting('invoiceCurrency', c.value); showToast('Currency updated ✓') }}
+                  onClick={() => { updateSetting('invoiceCurrency', c.value); showToast('Currency updated') }}
                 >
                   {c.label}
                 </button>
               ))}
             </div>
           </SettingRow>
-
           <div className={styles.divider} />
-
-          <SettingRow
-            icon="chat"
-            label="Footer Message"
-            sub={settings.invoiceFooter || 'No footer set'}
-            chevron
-            onClick={() => openEdit('invoiceFooter', 'Invoice Footer Message', 'e.g. Thank you for your patronage!', true)}
+          <SettingRow 
+            icon="chat" 
+            label="Footer Message" 
+            sub={settings.invoiceFooter || 'Thank you for your patronage!'} 
+            chevron 
+            onClick={() => setEditModal({ key: 'invoiceFooter', title: 'Invoice Footer', placeholder: 'Footer message...', multiline: true })} 
           />
         </div>
 
         {/* ── NOTIFICATIONS ── */}
         <SectionHeader icon="notifications" label="Notifications" />
         <div className={styles.card}>
-          <SettingRow
-            icon="schedule"
-            label="Overdue Tasks"
-            sub="Alert when tasks are past due"
-          >
-            <Toggle
-              value={settings.notifyOverdueTasks}
-              onChange={v => updateSetting('notifyOverdueTasks', v)}
-            />
+          <SettingRow icon="schedule" label="Overdue Tasks" sub="Alert when tasks are past due">
+            <Toggle value={settings.notifyOverdueTasks} onChange={v => updateSetting('notifyOverdueTasks', v)} />
           </SettingRow>
-
           <div className={styles.divider} />
-
-          <SettingRow
-            icon="cake"
-            label="Client Birthdays"
-            sub="Remind before a client's birthday"
-          >
-            <Toggle
-              value={settings.notifyUpcomingBirthdays}
-              onChange={v => updateSetting('notifyUpcomingBirthdays', v)}
-            />
-          </SettingRow>
-
-          <div className={styles.divider} />
-
-          <SettingRow
-            icon="money_off"
-            label="Unpaid Invoices"
-            sub="Highlight invoices awaiting payment"
-          >
-            <Toggle
-              value={settings.notifyUnpaidInvoices}
-              onChange={v => updateSetting('notifyUnpaidInvoices', v)}
-            />
+          <SettingRow icon="money_off" label="Unpaid Invoices" sub="Highlight invoices awaiting payment">
+            <Toggle value={settings.notifyUnpaidInvoices} onChange={v => updateSetting('notifyUnpaidInvoices', v)} />
           </SettingRow>
         </div>
 
         {/* ── DATA ── */}
         <SectionHeader icon="storage" label="Data Management" />
         <div className={styles.card}>
-          <SettingRow
-            icon="download"
-            label="Export Data"
-            sub="Download a JSON backup of all your data"
-            chevron
-            onClick={handleExportData}
-          />
-
+          <SettingRow icon="download" label="Export Data" sub="Download JSON backup" chevron onClick={handleExportData} />
           <div className={styles.divider} />
-
-          <SettingRow
-            icon="restart_alt"
-            label="Reset Settings"
-            sub="Restore all settings to defaults"
-            chevron
-            onClick={() => setResetConfirm(true)}
-          />
-
+          <SettingRow icon="restart_alt" label="Reset Settings" chevron onClick={() => setResetConfirm(true)} />
           <div className={styles.divider} />
-
-          <SettingRow
-            icon="delete_forever"
-            label="Clear All Data"
-            sub="Permanently delete all clients, tasks, and photos"
-            chevron
-            onClick={() => setClearConfirm(true)}
-          >
+          <SettingRow icon="delete_forever" label="Clear All Data" chevron onClick={() => setClearConfirm(true)}>
             <span style={{ color: 'var(--danger)', fontSize: '0.75rem', fontWeight: 700 }}>Danger</span>
           </SettingRow>
         </div>
@@ -388,47 +273,23 @@ export default function Settings({ onMenuClick }) {
         <div style={{ height: 40 }} />
       </div>
 
-      {/* Edit modal */}
-      <EditModal
-        isOpen={!!editModal}
-        title={editModal?.title ?? ''}
-        value={editModal ? settings[editModal.key] ?? '' : ''}
-        placeholder={editModal?.placeholder ?? ''}
-        multiline={editModal?.multiline ?? false}
-        onClose={() => setEditModal(null)}
-        onSave={handleEditSave}
+      <TemplateModal 
+        isOpen={templateOpen} 
+        current={settings.invoiceTemplate || 'standard'} 
+        onClose={() => setTemplateOpen(false)}
+        onSelect={(id) => { updateSetting('invoiceTemplate', id); showToast('Template updated') }}
       />
 
-      {/* Template modal */}
-      <TemplateModal
-        isOpen={templateModal}
-        selected={settings.invoiceTemplate}
-        onClose={() => setTemplateModal(false)}
-        onSelect={id => {
-          updateSetting('invoiceTemplate', id)
-          showToast(`Template set to ${id.charAt(0).toUpperCase() + id.slice(1)}`)
-          setTemplateModal(false)
-        }}
+      <EditModal 
+        isOpen={!!editModal} 
+        {...editModal}
+        value={editModal ? settings[editModal.key] : ''}
+        onClose={() => setEditModal(null)} 
+        onSave={(val) => { updateSetting(editModal.key, val); showToast('Saved ✓') }} 
       />
 
-      {/* Confirm clear data */}
-      <ConfirmSheet
-        open={clearConfirm}
-        title="Clear All Data?"
-        message="This will permanently delete all clients, orders, tasks, gallery photos, and invoices. This cannot be undone."
-        onConfirm={handleClearData}
-        onCancel={() => setClearConfirm(false)}
-      />
-
-      {/* Confirm reset settings */}
-      <ConfirmSheet
-        open={resetConfirm}
-        title="Reset Settings?"
-        message="All settings will return to their default values."
-        onConfirm={handleResetSettings}
-        onCancel={() => setResetConfirm(false)}
-      />
-
+      <ConfirmSheet open={clearConfirm} title="Clear All Data?" message="This cannot be undone." onConfirm={() => { localStorage.clear(); setClearConfirm(false); showToast('Cleared'); }} onCancel={() => setClearConfirm(false)} />
+      <ConfirmSheet open={resetConfirm} title="Reset Settings?" message="Return to defaults?" onConfirm={() => { resetSettings(); setResetConfirm(false); showToast('Reset'); }} onCancel={() => setResetConfirm(false)} />
       <Toast message={toastMsg} />
     </div>
   )
