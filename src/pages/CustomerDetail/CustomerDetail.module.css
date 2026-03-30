@@ -5,10 +5,9 @@
   flex-direction: column;
 }
 
-
 .fixedTopContainer {
   position: fixed;
-  top: var(--header-height, 60px); /* height of your Header */
+  top: var(--header-height, 60px);
   left: 0;
   right: 0;
   z-index: 100;
@@ -26,7 +25,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* Left & Right columns */
 .leftColumn { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--surface2); display: grid; place-items: center; font-weight: 700; font-size: 28px; border: 2px solid var(--accent); color: var(--accent); overflow: hidden; }
 .avatarImg { width: 100%; height: 100%; object-fit: cover; }
@@ -50,15 +48,14 @@
 .tab.active { color: var(--accent); font-weight: 800; }
 .tab.active::after { content: ''; position: absolute; bottom: 0; left: 10%; right: 10%; height: 2px; background: var(--accent); border-radius: 1px; }
 
-/* ── SCROLLABLE CONTENT ── */
+/* ✅ FIXED HERE */
 .scrollContent {
-  margin-top: calc(18px + 80px + 12px + 48px + 22px); /* profile + actions + tabs spacing approx */
   padding: 12px 20px 120px;
+  padding-top: calc(var(--fixed-top-height, 220px) + 12px);
   overflow-y: auto;
   flex: 1;
 }
 
-/* Add small top margin to first scrollable child */
 .scrollContent > *:first-child {
   margin-top: 6px;
 }
