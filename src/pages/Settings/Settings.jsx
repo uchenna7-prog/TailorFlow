@@ -58,57 +58,57 @@ function SegmentControl({ options, value, onChange }) {
   )
 }
 
-// ── TEMPLATE SELECTION MODAL ──
+// ── INVOICE TEMPLATE MODAL ──
 function TemplateModal({ isOpen, current, onClose, onSelect }) {
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const templates = [
-    { id: 'standard', name: 'Standard (A5)', img: '/templates/standard.png', desc: 'Itemized list with delivery dates' },
-    { id: 'consolidated', name: 'Consolidated (A5)', img: '/templates/consolidated.png', desc: 'Grouped items by category' },
-    { id: 'breakup', name: 'Price Breakup (A5)', img: '/templates/breakup.png', desc: 'Detailed labor and material costs' }
-  ]
+    { id: 'standard', name: 'Standard (A5)', detail: 'Individual item rows' },
+    { id: 'consolidated', name: 'Consolidated (A5)', detail: 'Grouped by item type' },
+    { id: 'breakup', name: 'Price Breakup (A5)', detail: 'Shows Labor/Dye/Lining' },
+  ];
 
   return (
     <div className={styles.editOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className={styles.editSheet} style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+      <div className={styles.editSheet} style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+        <div className={styles.editHandle} />
         <div className={styles.editHeader}>
           <span className={styles.editTitle}>Select Invoice Template</span>
-          <button className={styles.editClose} onClick={onClose}>
-            <span className="mi">close</span>
-          </button>
+          <button className={styles.editClose} onClick={onClose}><span className="mi">close</span></button>
         </div>
-        <div className={styles.templateList}>
+        
+        <div className={styles.templateGrid}>
           {templates.map(t => (
             <div 
               key={t.id} 
               className={`${styles.templateCard} ${current === t.id ? styles.templateActive : ''}`}
-              onClick={() => onSelect(t.id)}
+              onClick={() => { onSelect(t.id); onClose(); }}
             >
               <div className={styles.templatePreview}>
-                {/* Placeholder for the actual visual style */}
-                <div className={styles.previewHeader}>BILL</div>
-                <div className={styles.previewLine} style={{ width: '40%' }} />
-                <div className={styles.previewTable}>
-                  <div className={styles.previewRow} />
-                  <div className={styles.previewRow} />
+                <div className={styles.previewBillHead}>BILL</div>
+                <div className={styles.previewCircle} />
+                <div className={styles.previewTableBody}>
+                    <div className={styles.previewLine} style={{width: '80%'}} />
+                    <div className={styles.previewLine} style={{width: '60%'}} />
                 </div>
-                <div className={styles.previewBadge}>{t.name}</div>
+                <div className={styles.previewLabelTag}>{t.name}</div>
               </div>
-              <div className={styles.templateInfo}>
-                <div className={styles.radioCircle}>
+              <div className={styles.templateMeta}>
+                 <div className={styles.radioOutter}>
                     {current === t.id && <div className={styles.radioInner} />}
-                </div>
-                <span>{t.name}</span>
+                 </div>
+                 <span className={styles.templateNameText}>{t.name}</span>
               </div>
             </div>
           ))}
         </div>
+        
         <div className={styles.editFooter}>
-          <button className={styles.editSave} onClick={onClose}>Done</button>
+          <button className={styles.editSave} onClick={onClose}>Cancel</button>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ── EDIT MODAL ──
@@ -120,6 +120,7 @@ function EditModal({ isOpen, title, value, placeholder, multiline, onClose, onSa
   return (
     <div className={styles.editOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={styles.editSheet}>
+        <div className={styles.editHandle} />
         <div className={styles.editHeader}>
           <span className={styles.editTitle}>{title}</span>
           <button className={styles.editClose} onClick={onClose}><span className="mi">close</span></button>
@@ -144,7 +145,7 @@ export default function Settings({ onMenuClick }) {
   const { settings, updateSetting, resetSettings } = useSettings()
   const [toastMsg, setToastMsg] = useState('')
   const [editModal, setEditModal] = useState(null)
-  const [templateOpen, setTemplateOpen] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
   const [clearConfirm, setClearConfirm] = useState(false)
   const [resetConfirm, setResetConfirm] = useState(false)
   const toastTimer = useRef(null)
@@ -193,7 +194,7 @@ export default function Settings({ onMenuClick }) {
         {/* ── APPEARANCE ── */}
         <SectionHeader icon="palette" label="Appearance" />
         <div className={styles.card}>
-          <SettingRow icon="dark_mode" label="Theme" sub="Choose your preferred appearance">
+          <SettingRow icon="dark_mode" label="Theme" sub="Set your color preference">
             <SegmentControl 
               options={THEME_OPTIONS} 
               value={settings.theme} 
@@ -203,20 +204,22 @@ export default function Settings({ onMenuClick }) {
         </div>
 
         {/* ── INVOICE ── */}
-        <SectionHeader icon="receipt_long" label="Invoice Configuration" />
+        <SectionHeader icon="receipt_long" label="Invoice Settings" />
         <div className={styles.card}>
           <SettingRow 
-            icon="description" 
+            icon="dashboard" 
             label="Invoice Template" 
-            sub={settings.invoiceTemplate === 'breakup' ? 'Price Breakup' : settings.invoiceTemplate === 'consolidated' ? 'Consolidated' : 'Standard'} 
+            sub="Choose your layout style" 
             chevron 
-            onClick={() => setTemplateOpen(true)} 
-          />
+            onClick={() => setShowTemplates(true)}
+          >
+             <span className={styles.rowValue}>{settings.invoiceTemplate || 'Standard'}</span>
+          </SettingRow>
           <div className={styles.divider} />
           <SettingRow 
             icon="tag" 
             label="Invoice Prefix" 
-            sub={`Current: ${settings.invoicePrefix}`} 
+            sub={`Numbering: ${settings.invoicePrefix}-001`} 
             chevron 
             onClick={() => setEditModal({ key: 'invoicePrefix', title: 'Invoice Prefix', placeholder: 'e.g. INV' })}
           >
@@ -240,9 +243,9 @@ export default function Settings({ onMenuClick }) {
           <SettingRow 
             icon="chat" 
             label="Footer Message" 
-            sub={settings.invoiceFooter || 'Thank you for your patronage!'} 
+            sub={settings.invoiceFooter || 'Thank you for your business!'} 
             chevron 
-            onClick={() => setEditModal({ key: 'invoiceFooter', title: 'Invoice Footer', placeholder: 'Footer message...', multiline: true })} 
+            onClick={() => setEditModal({ key: 'invoiceFooter', title: 'Footer Message', placeholder: 'Footer text...', multiline: true })} 
           />
         </div>
 
@@ -274,10 +277,10 @@ export default function Settings({ onMenuClick }) {
       </div>
 
       <TemplateModal 
-        isOpen={templateOpen} 
+        isOpen={showTemplates} 
         current={settings.invoiceTemplate || 'standard'} 
-        onClose={() => setTemplateOpen(false)}
-        onSelect={(id) => { updateSetting('invoiceTemplate', id); showToast('Template updated') }}
+        onClose={() => setShowTemplates(false)}
+        onSelect={(id) => { updateSetting('invoiceTemplate', id); showToast('Template Selected'); }}
       />
 
       <EditModal 
@@ -288,8 +291,9 @@ export default function Settings({ onMenuClick }) {
         onSave={(val) => { updateSetting(editModal.key, val); showToast('Saved ✓') }} 
       />
 
-      <ConfirmSheet open={clearConfirm} title="Clear All Data?" message="This cannot be undone." onConfirm={() => { localStorage.clear(); setClearConfirm(false); showToast('Cleared'); }} onCancel={() => setClearConfirm(false)} />
-      <ConfirmSheet open={resetConfirm} title="Reset Settings?" message="Return to defaults?" onConfirm={() => { resetSettings(); setResetConfirm(false); showToast('Reset'); }} onCancel={() => setResetConfirm(false)} />
+      <ConfirmSheet open={clearConfirm} title="Clear All Data?" message="This cannot be undone." onConfirm={() => { localStorage.clear(); window.location.reload(); }} onCancel={() => setClearConfirm(false)} />
+      <ConfirmSheet open={resetConfirm} title="Reset Settings?" message="Restore default values?" onConfirm={() => { resetSettings(); setResetConfirm(false); }} onCancel={() => setResetConfirm(false)} />
+      
       <Toast message={toastMsg} />
     </div>
   )
