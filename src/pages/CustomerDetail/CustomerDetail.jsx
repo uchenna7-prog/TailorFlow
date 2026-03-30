@@ -71,45 +71,42 @@ export default function CustomerDetail({ onMenuClick }) {
         ]}
       />
 
-      {/* PROFILE */}
-      <div className={styles.profileSection}>
-        <div className={styles.leftColumn}>
-          <div className={styles.avatar}>
-            {customer.photo
-              ? <img src={customer.photo} className={styles.avatarImg} />
-              : initials}
+      {/* PROFILE + ACTIONS + TABS FIXED */}
+      <div className={styles.fixedTopContainer}>
+        <div className={styles.profileSection}>
+          <div className={styles.leftColumn}>
+            <div className={styles.avatar}>
+              {customer.photo ? <img src={customer.photo} className={styles.avatarImg} /> : initials}
+            </div>
+            {birthday && <div className={styles.birthday}>🎈 {birthday}</div>}
           </div>
-          {birthday && <div className={styles.birthday}>🎈 {birthday}</div>}
+
+          <div className={styles.rightColumn}>
+            <div className={styles.name}>
+              {customer.name} {customer.sex && `(${customer.sex})`}
+            </div>
+
+            <div className={styles.meta}>
+              <span className="mi">call</span>
+              {customer.phone}
+            </div>
+
+            {customer.email && (
+              <div className={styles.meta}>
+                <span className="mi">mail_outline</span>
+                {customer.email}
+              </div>
+            )}
+
+            {customer.address && (
+              <div className={styles.meta}>
+                <span className="mi">place</span>
+                {customer.address}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className={styles.rightColumn}>
-          <div className={styles.name}>
-            {customer.name} {customer.sex && `(${customer.sex})`}
-          </div>
-
-          <div className={styles.meta}>
-            <span className="mi">call</span>
-            {customer.phone}
-          </div>
-
-          {customer.email && (
-            <div className={styles.meta}>
-              <span className="mi">mail_outline</span>
-              {customer.email}
-            </div>
-          )}
-
-          {customer.address && (
-            <div className={styles.meta}>
-              <span className="mi">place</span>
-              {customer.address}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* SCROLLABLE TABS + CONTENT */}
-      <div className={styles.scrollContent}>
         {/* ACTIONS */}
         <div className={styles.actions}>
           <button
@@ -149,43 +146,43 @@ export default function CustomerDetail({ onMenuClick }) {
             </div>
           ))}
         </div>
+      </div>
 
-        {/* CONTENT */}
-        <div className={styles.content}>
-          {activeTab === 'dress' && (
-            <MeasurementsTab
-              measurements={data.measurements}
-              onSave={data.saveMeasurement}
-              onDelete={data.deleteMeasurement}
-              showToast={showToast}
-            />
-          )}
+      {/* SCROLLABLE CONTENT ONLY */}
+      <div className={styles.scrollContent}>
+        {activeTab === 'dress' && (
+          <MeasurementsTab
+            measurements={data.measurements}
+            onSave={data.saveMeasurement}
+            onDelete={data.deleteMeasurement}
+            showToast={showToast}
+          />
+        )}
 
-          {activeTab === 'orders' && (
-            <OrdersTab
-              orders={data.orders}
-              measurements={data.measurements}
-              onSave={data.saveOrder}
-              onDelete={data.deleteOrder}
-              onStatusChange={data.updateOrderStatus}
-              showToast={showToast}
-            />
-          )}
+        {activeTab === 'orders' && (
+          <OrdersTab
+            orders={data.orders}
+            measurements={data.measurements}
+            onSave={data.saveOrder}
+            onDelete={data.deleteOrder}
+            onStatusChange={data.updateOrderStatus}
+            showToast={showToast}
+          />
+        )}
 
-          {activeTab === 'invoice' && (
-            <InvoiceTab
-              invoices={data.invoices}
-              orders={data.orders}
-              measurements={data.measurements}
-              customer={customer}
-              onSave={data.saveInvoice}
-              onDelete={data.deleteInvoice}
-              onStatusChange={data.updateInvoiceStatus}
-              onNavigateToInvoice={() => setActiveTab('invoice')}
-              showToast={showToast}
-            />
-          )}
-        </div>
+        {activeTab === 'invoice' && (
+          <InvoiceTab
+            invoices={data.invoices}
+            orders={data.orders}
+            measurements={data.measurements}
+            customer={customer}
+            onSave={data.saveInvoice}
+            onDelete={data.deleteInvoice}
+            onStatusChange={data.updateInvoiceStatus}
+            onNavigateToInvoice={() => setActiveTab('invoice')}
+            showToast={showToast}
+          />
+        )}
       </div>
 
       {/* ✅ FAB */}
