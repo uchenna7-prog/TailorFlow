@@ -51,7 +51,16 @@ font-style: italic; }
 .tabs { display: flex; justify-content: space-around; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .tab { padding: 10px 0; font-size: 0.75rem; font-weight: 700; color: var(--text3); text-transform: uppercase; cursor: pointer; position: relative; text-align: center; }
 .tab.active { color: var(--accent); font-weight: 800; }
-.tab.active::after { content: ''; position: absolute; bottom: 0; left: 10%; right: 10%; height: 2px; background: var(--accent); border-radius: 1px; }
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; /* pull it down onto the border */
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}
 
 
 .scrollContent {
