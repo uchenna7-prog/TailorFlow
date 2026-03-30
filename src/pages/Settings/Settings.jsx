@@ -208,10 +208,6 @@ function Toggle({ value, onChange }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Segment control — used inside InvoiceSettingsModal
-// ─────────────────────────────────────────────────────────────
-
 function SegmentControl({ options, value, onChange }) {
   return (
     <div className={styles.segment}>
@@ -227,10 +223,6 @@ function SegmentControl({ options, value, onChange }) {
     </div>
   )
 }
-
-// ─────────────────────────────────────────────────────────────
-// Field wrappers
-// ─────────────────────────────────────────────────────────────
 
 function FieldGroup({ children }) {
   return <div className={styles.fieldGroup}>{children}</div>
@@ -357,9 +349,7 @@ function InvoiceSettingsModal({ onBack, showToast }) {
 
   return (
     <FullModal title="Invoice Settings" onBack={onBack} onSave={save}>
-
       <div>
-
         <FieldGroup>
           <Field label="Invoice Number Prefix" hint="Shown before the number, e.g. INV-0042.">
             <TextInput value={local.invoicePrefix} onChange={set('invoicePrefix')} placeholder="INV" />
@@ -429,7 +419,6 @@ function InvoiceSettingsModal({ onBack, showToast }) {
             />
           </Field>
         </FieldGroup>
-
       </div>
     </FullModal>
   )
@@ -546,7 +535,6 @@ export default function Settings({ onMenuClick, isPremium = false, onUpgrade = (
         <div style={{ height: 32 }} />
       </div>
 
-      {/* ── Modals ── */}
       <TemplateModal
         isOpen={templateModal}
         currentTemplate={settings.invoiceTemplate}
@@ -561,7 +549,6 @@ export default function Settings({ onMenuClick, isPremium = false, onUpgrade = (
         />
       )}
 
-      {/* ── Confirmation sheets ── */}
       <ConfirmSheet
         open={clearConfirm}
         title="Delete All Data?"
