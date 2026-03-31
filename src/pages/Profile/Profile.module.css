@@ -1,1 +1,178 @@
-div{}
+/* ── PAGE ── */
+.page { background: var(--bg); min-height: 100dvh; display: flex; flex-direction: column; }
+.scrollArea { flex: 1; overflow-y: auto; padding: 8px 16px 40px; }
+
+/* ── SECTION HEADER ── */
+.sectionHeader { display: flex; align-items: center; gap: 7px; padding: 20px 4px 8px; }
+.sectionLabel { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
+
+/* ── CARD ── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+/* ── HERO CARD ── */
+.heroCard {
+  position: relative; overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 12px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.heroCardGlow {
+  position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.heroTop { display: flex; align-items: center; gap: 14px; }
+.heroInfo { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.heroName { font-size: 1.15rem; font-weight: 900; color: var(--text); line-height: 1.2; }
+.heroLocation { display: flex; align-items: center; gap: 3px; font-size: 0.75rem; color: var(--text3); }
+.heroMeta { display: flex; flex-direction: column; gap: 5px; padding-top: 4px; border-top: 1px solid var(--border); }
+.heroMetaItem { display: flex; align-items: center; gap: 6px; }
+.heroMetaLabel { font-size: 0.75rem; color: var(--text3); }
+
+/* ── AVATAR ── */
+.avatarImg { border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); flex-shrink: 0; }
+.avatarInitials {
+  border-radius: 50%; background: var(--surface2); border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; color: var(--accent); flex-shrink: 0;
+}
+
+/* ── PLAN BADGES ── */
+.badgePro {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: linear-gradient(135deg, var(--accent), #b8942a);
+  color: #000; font-size: 0.6rem; font-weight: 900;
+  letter-spacing: 0.05em; padding: 3px 8px 3px 6px;
+  border-radius: 20px; width: fit-content;
+}
+.badgeFree {
+  display: inline-flex; align-items: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text3); font-size: 0.6rem; font-weight: 800;
+  letter-spacing: 0.06em; padding: 3px 8px;
+  border-radius: 20px; width: fit-content;
+}
+
+/* ── INFO ROW ── */
+.row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+.rowIcon { width: 32px; height: 32px; border-radius: 9px; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); flex-shrink: 0; }
+.rowText { flex: 1; min-width: 0; }
+.rowLabel { font-size: 0.72rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; }
+.rowValue { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rowPlaceholder { font-size: 0.85rem; color: var(--text3); margin-top: 1px; }
+.rowSub { font-size: 0.72rem; color: var(--text3); margin-top: 2px; line-height: 1.4; }
+.rowRight { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.rowBadge { font-size: 0.72rem; font-weight: 700; color: var(--accent); }
+
+/* ── TAPPABLE ROW (edit / nav rows) ── */
+.rowTappable {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+.rowTappable:active { background: var(--surface2); }
+.rowLabelDanger { color: #ef4444 !important; }
+
+/* ── BRAND PREVIEW STRIP ── */
+.brandPreview {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.brandPreviewLogo { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; background: #fff; border: 1px solid var(--border); flex-shrink: 0; }
+.brandPreviewInfo { flex: 1; min-width: 0; }
+.brandPreviewName { font-size: 0.95rem; font-weight: 800; color: var(--text); }
+.brandPreviewTagline { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
+.brandColourDot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
+
+.brandEmpty { display: flex; align-items: center; gap: 10px; padding: 16px; border-bottom: 1px solid var(--border); color: var(--text3); }
+.brandEmptyText { font-size: 0.82rem; font-style: italic; }
+
+/* ── PLAN ROW ── */
+.planRow { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-bottom: 1px solid var(--border); }
+.planLeft { flex: 1; }
+.planName { font-size: 0.95rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.planSub { font-size: 0.72rem; color: var(--text3); line-height: 1.5; }
+
+/* ── UPGRADE STRIP ── */
+.upgradeStrip {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer; position: relative; overflow: hidden;
+}
+.upgradeStrip:active { opacity: 0.8; }
+.upgradeStripGlow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at left, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%);
+  pointer-events: none;
+}
+.upgradeStripText { flex: 1; }
+.upgradeStripTitle { font-size: 0.9rem; font-weight: 800; color: var(--text); }
+.upgradeStripSub { font-size: 0.7rem; color: var(--text3); margin-top: 2px; }
+
+/* ── TOGGLE ── */
+.toggle { width: 44px; height: 26px; border-radius: 13px; background: var(--border); border: none; position: relative; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
+.toggleOn { background: var(--accent); }
+.toggleThumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+.toggleOn .toggleThumb { transform: translateX(18px); }
+
+/* ── FULL SCREEN MODAL ── */
+.fullOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; flex-direction: column; animation: slideIn 0.25s ease; }
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.fullHeader { display: flex; align-items: center; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.backBtn { background: none; border: none; color: var(--text); padding: 8px; margin-right: 12px; cursor: pointer; display: flex; align-items: center; }
+.fullTitle { flex: 1; font-weight: 800; font-size: 1rem; color: var(--text); }
+.fullSave { background: var(--accent); border: none; padding: 8px 16px; border-radius: 8px; font-weight: 800; color: #000; cursor: pointer; font-family: inherit; }
+.fullContent { flex: 1; overflow-y: auto; padding: 20px 16px 48px; display: flex; flex-direction: column; gap: 12px; }
+
+/* ── FIELD GROUP ── */
+.fieldGroup { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.field { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+.field:last-child { border-bottom: none; }
+.fieldLabel { font-size: 0.68rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+.fieldHint { font-size: 0.72rem; color: var(--text3); margin: 0; line-height: 1.4; }
+
+/* ── TEXT INPUTS ── */
+.textInput {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; color: var(--text);
+  font-family: inherit; box-sizing: border-box; outline: none; transition: border-color 0.15s;
+}
+.textInput:focus { border-color: var(--accent); }
+.textarea {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; color: var(--text);
+  font-family: inherit; box-sizing: border-box; resize: vertical; outline: none;
+  line-height: 1.5; transition: border-color 0.15s;
+}
+.textarea:focus { border-color: var(--accent); }
+
+/* ── SEGMENT CONTROL ── */
+.segment { display: flex; background: var(--surface2); border-radius: 10px; padding: 3px; gap: 2px; }
+.segBtn { flex: 1; border: none; background: none; border-radius: 8px; padding: 8px 4px; font-size: 0.73rem; font-weight: 700; color: var(--text3); cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+.segActive { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+
+/* ── COLOUR PICKER ── */
+.colourRow { display: flex; align-items: center; gap: 10px; }
+.colourPicker { width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 10px; padding: 3px; cursor: pointer; background: var(--surface2); flex-shrink: 0; }
+
+/* ── LOGO UPLOAD ── */
+.logoUploadBtn {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  background: var(--surface2); border: 1.5px dashed var(--border);
+  border-radius: 12px; padding: 16px; width: 100%; color: var(--text2);
+  font-size: 0.85rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; box-sizing: border-box; transition: border-color 0.15s;
+}
+.logoUploadBtn:active { border-color: var(--accent); }
+.logoPreviewWrap { display: flex; align-items: center; gap: 12px; }
+.logoPreview { width: 72px; height: 72px; object-fit: contain; border-radius: 10px; border: 1px solid var(--border); background: #fff; }
+.logoRemove { display: flex; align-items: center; gap: 4px; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; color: var(--text3); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: inherit; }
