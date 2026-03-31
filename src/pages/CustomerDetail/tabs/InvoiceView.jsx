@@ -376,8 +376,8 @@ export default function InvoiceView({
             {STATUS_LABELS[invoice.status] || invoice.status}
           </div>
         </div>
-        {/* PDF download / share */}
-        <button className={styles.topBtn} onClick={handleShare} disabled={pdfLoading}>
+        {/* PDF download — filled accent button as the primary action */}
+        <button className={styles.topBtnPrimary} onClick={handleShare} disabled={pdfLoading}>
           <span className="mi">{pdfLoading ? 'hourglass_top' : 'download'}</span>
         </button>
       </div>
