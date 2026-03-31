@@ -94,16 +94,34 @@
 .printFooter { margin-top: auto; padding-top: 10px; border-top: 1px solid #eee; }
 
 /* ── CUSTOM ── */
-.customBanner { display: flex; justify-content: space-between; align-items: center; padding: 20px; margin: -24px -24px 0; }
-.customBannerLogo { display: flex; align-items: center; }
-.bannerLogoImg { max-width: 60px; max-height: 40px; object-fit: contain; border-radius: 4px; }
-.bannerLogoText { font-size: 14px; font-weight: 900; color: #fff; }
+/* tplBase padding:0 is set inline on CustomTemplate so the banner
+   bleeds edge-to-edge with no negative margins needed */
+.customBanner {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 20px;
+  /* no negative margins — tplBase has padding:0 for this template */
+}
+.customBannerLogo {
+  display: flex; align-items: center;
+  background: rgba(0,0,0,0.25);
+  border: 1.5px dashed rgba(255,255,255,0.5);
+  border-radius: 6px;
+  padding: 8px 12px;
+  min-width: 60px; min-height: 36px;
+  justify-content: center;
+}
+.bannerLogoImg { max-width: 64px; max-height: 40px; object-fit: contain; border-radius: 3px; }
+.bannerLogoText { font-size: 13px; font-weight: 900; color: #fff; white-space: nowrap; }
 .customBannerRight { text-align: right; }
-.customBannerTitle { font-size: 18px; font-weight: 900; color: #fff; }
-.customBannerNum { font-size: 10px; color: rgba(255,255,255,0.8); margin-top: 2px; }
-.customFooter { margin: 0 -24px -24px; padding: 14px 20px; }
-.customFooterText { font-size: 9px; color: rgba(255,255,255,0.9); font-weight: 600; }
-.customFooterSub { font-size: 8px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+.customBannerTitle { font-size: 22px; font-weight: 900; color: #fff; letter-spacing: -0.5px; }
+.customBannerNum { font-size: 10px; color: rgba(255,255,255,0.85); margin-top: 3px; }
+
+/* body section — sits between banner and footer, has its own padding */
+.customBody { flex: 1; padding: 18px 20px; }
+
+.customFooter { padding: 14px 20px; }
+.customFooterText { font-size: 9px; color: rgba(255,255,255,0.95); font-weight: 700; }
+.customFooterSub { font-size: 8px; color: rgba(255,255,255,0.7); margin-top: 3px; }
 
 /* ── FREE ── */
 .freeHeader { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
