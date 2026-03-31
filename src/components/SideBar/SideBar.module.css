@@ -135,8 +135,7 @@
 }
 
 .navItem {
-    font-family: 'Montserrat', sans-serif;
-
+  font-family: 'Montserrat', sans-serif;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -166,8 +165,9 @@
   color: var(--accent);
 }
 
+/* Increased icon size for better visibility */
 .navItem .mi {
-  font-size: 1.25rem;
+  font-size: 1.6rem; 
 }
 
 /* ✅ Logout styling */
