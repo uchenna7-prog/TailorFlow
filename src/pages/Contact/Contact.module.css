@@ -4,7 +4,7 @@
 
 /* ── PAGE TITLE ── */
 .pageTitle { font-size: 1.6rem; font-weight: 900; color: var(--text); margin: 16px 4px 6px; }
-.pageSub { font-size: 0.82rem; color: var(--text3); margin: 0 4px 20px; line-height: 1.5; }
+.pageSub { font-size: 0.82rem; color: var(--text3); margin: 16px 4px 20px; line-height: 1.5; }
 
 /* ── SECTION HEADER ── */
 .sectionHeader { display: flex; align-items: center; gap: 7px; padding: 20px 4px 8px; }
