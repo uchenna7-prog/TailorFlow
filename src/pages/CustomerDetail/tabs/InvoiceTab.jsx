@@ -9,7 +9,6 @@ function fmt(currency = '₦', amount) {
 }
 
 const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
-const STATUS_NEXT   = { unpaid: 'paid', paid: 'unpaid', overdue: 'paid' }
 
 // ─────────────────────────────────────────────────────────────
 // Invoice card
@@ -75,16 +74,12 @@ export default function InvoiceTab({
   const [viewingInvoice, setViewingInvoice] = useState(null)
   const [deleteTarget,   setDeleteTarget]   = useState(null)
 
-  // Read currency from settings via localStorage directly
-  // (avoids prop drilling — BrandContext handles the full brand for InvoiceView)
   const currency = (() => {
     try {
       const s = JSON.parse(localStorage.getItem('tailorbook_settings') || '{}')
       return s.invoiceCurrency || '₦'
     } catch { return '₦' }
   })()
-
-  const handleDelete = (id) => setDeleteTarget(id)
 
   const confirmDelete = () => {
     onDelete(deleteTarget)
@@ -116,18 +111,17 @@ export default function InvoiceTab({
         ))}
       </div>
 
-      {/* Full-screen invoice renderer */}
       {viewingInvoice && (
         <InvoiceView
           invoice={viewingInvoice}
           customer={customer}
           onClose={() => setViewingInvoice(null)}
           onStatusChange={handleStatusChange}
-          onDelete={handleDelete}
+          onDelete={(id) => setDeleteTarget(id)}
+          showToast={showToast}
         />
       )}
 
-      {/* Delete confirmation */}
       <ConfirmSheet
         open={!!deleteTarget}
         title="Delete this invoice?"
