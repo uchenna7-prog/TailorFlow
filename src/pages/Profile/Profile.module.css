@@ -7,7 +7,12 @@
 .sectionLabel { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
 
 /* ── CARD ── */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.card { 
+  background: var(--surface); 
+  border: 1px solid var(--border); 
+  border-radius: 16px; 
+  overflow: visible; /* Changed from hidden to prevent clipping */
+}
 
 /* ── HERO CARD ── */
 .heroCard {
@@ -58,7 +63,7 @@
 }
 
 /* ── INFO ROW ── */
-.row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+.row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
 .rowIcon { width: 32px; height: 32px; border-radius: 9px; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); flex-shrink: 0; }
 .rowText { flex: 1; min-width: 0; }
 .rowLabel { font-size: 0.72rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; }
@@ -70,14 +75,17 @@
 
 /* ── TAPPABLE ROW ── */
 .rowTappable {
-  display: flex; align-items: center; gap: 12px;
-  padding: 13px 16px;
-  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px; /* Increased padding */
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   margin-top: 8px;
   cursor: pointer;
+  min-height: 64px; /* Ensure enough height for subtext */
+  box-sizing: border-box;
 }
 .rowTappable:active { background: var(--surface2); }
 .rowLabelDanger { color: #ef4444 !important; }
@@ -136,7 +144,7 @@
 
 /* ── FIELD GROUP ── */
 .fieldGroup { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: visible; display: flex; flex-direction: column; }
-.field { padding: 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; height: auto; min-height: min-content; }
+.field { padding: 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; height: auto; }
 .field:last-child { border-bottom: none; }
 .fieldLabel { font-size: 0.68rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
 .fieldHint { font-size: 0.72rem; color: var(--text3); margin: 0 0 4px 0; line-height: 1.4; }
@@ -170,7 +178,7 @@
   border-radius: 12px; padding: 20px; width: 100%; color: var(--text2);
   font-size: 0.88rem; font-weight: 700; font-family: inherit;
   cursor: pointer; box-sizing: border-box; transition: all 0.15s;
-  min-height: 60px;
+  min-height: 64px;
 }
 .logoUploadBtn:active { border-color: var(--accent); background: var(--surface); }
 .logoPreviewWrap { display: flex; align-items: center; gap: 16px; padding: 4px 0; }
