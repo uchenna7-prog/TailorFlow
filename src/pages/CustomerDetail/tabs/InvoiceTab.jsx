@@ -3,9 +3,7 @@ import InvoiceView from './InvoiceView'
 import ConfirmSheet from '../../../components/ConfirmSheet/ConfirmSheet'
 import styles from './InvoiceTab.module.css'
 
-// ─────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────
+
 
 function fmt(currency = '₦', amount) {
   const n = parseFloat(amount) || 0
