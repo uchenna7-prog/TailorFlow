@@ -121,7 +121,7 @@ export default function CustomerDetail({ onMenuClick }) {
     <div className={styles.page}>
       <Header
         type="back"
-        title="Customer Details"
+        title="Details"
         customActions={[
           { icon: 'edit', label: 'Edit Customer', onClick: () => navigate(`/customers/edit/${id}`) },
           { icon: 'delete', label: 'Delete Customer', onClick: () => deleteCustomer(id), outlined: true, color: 'var(--danger)' },
