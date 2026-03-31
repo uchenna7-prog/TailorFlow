@@ -13,8 +13,8 @@
 .cardInfo p { font-size: 0.65rem; color: var(--text3); text-transform: uppercase; margin-top: 3px; font-weight: 600; }
 .unitBadge { display: inline-block; font-size: 0.6rem; color: var(--text3); border: 1px solid var(--border2); border-radius: 5px; padding: 1px 5px; margin-top: 4px; font-weight: 700; }
 .cardActions { display: flex; align-items: center; gap: 4px; }
-.cardDelete { color: var(--text3); background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
-.cardDelete:active { color: var(--danger); }
+.cardDelete { color: var(--danger); background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
+.cardDelete:active { opacity: 0.6; }
 
 /* ── ORDER CARD ── */
 .orderCard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px 14px 14px 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; animation: fadeIn 0.35s ease; cursor: pointer; transition: border-color 0.2s; position: relative; overflow: hidden; }
@@ -71,11 +71,11 @@
 .fieldCol label { font-size: 0.58rem; font-weight: 800; color: var(--text3); text-transform: uppercase; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
 .fieldInput { background: transparent; border: none; color: var(--text); font-size: 0.95rem; font-weight: 600; outline: none; width: 100%; font-family: 'DM Sans', sans-serif; }
 .fieldInput::placeholder { color: var(--text3); }
-.deleteBtn { color: var(--text3); background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; }
-.deleteBtn:active { color: var(--danger); }
+.deleteBtn { color: var(--danger); background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; }
+.deleteBtn:active { opacity: 0.6; }
 .addFieldBtn { background: transparent; border: 1px solid var(--border2); color: var(--text2); padding: 9px 16px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; gap: 6px; font-size: 0.68rem; margin-top: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
 .addClothBtnWrap { padding: 12px 20px 20px; }
-.addClothBtn { width: 100%; background: var(--surface2); border: 1px dashed var(--border2); color: var(--text2); padding: 16px; border-radius: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; }
+.addClothBtn { width: 100%; background: var(--surface2); border: 1px dashed var(--border2); color: var(--text2); padding: 166px; border-radius: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; }
 
 /* ── DETAIL MODAL (slides from right) ── */
 .detailModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 3000; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; overflow: hidden; }
