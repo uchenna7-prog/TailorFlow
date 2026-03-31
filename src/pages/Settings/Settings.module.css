@@ -52,16 +52,33 @@
 }
 
 /* THE UPDATED BACK BUTTON STYLES */
+/* THE UPDATED BACK BUTTON STYLES */
 .backBtn { 
-  background: none; border: none; color: var(--text); 
-  padding: 0; margin-right: 12px; cursor: pointer; 
-  display: flex; align-items: center; justify-content: center;
-  min-width: 44px; min-height: 44px; /* Standard mobile touch target */
+  background: none; 
+  border: none; 
+  color: var(--text); 
+  padding: 8px; /* Added padding to make it easier to tap */
+  margin-right: 12px; 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  border-radius: 50%; /* Optional: makes the tap ripple circular */
+  transition: background 0.2s;
 }
+
+.backBtn:active {
+  background: var(--surface2); /* Visual feedback when pressed */
+}
+
 .backBtn .mi { 
-  font-size: 1.8rem !important; /* Your requested size */
-  display: block; line-height: 1;
+  /* Increase this value to match the visual weight in the photo */
+  font-size: 1.8rem; 
+  display: block; 
+  line-height: 1;
+  font-weight: bold; /* Some icon fonts support weight for a "thicker" arrow */
 }
+
 
 .fullTitle { flex: 1; font-weight: 800; font-size: 1rem; color: var(--text); }
 .fullSave { background: var(--accent); border: none; padding: 8px 16px; border-radius: 8px; font-weight: 800; color: var(--bg); cursor: pointer; font-family: inherit; }
