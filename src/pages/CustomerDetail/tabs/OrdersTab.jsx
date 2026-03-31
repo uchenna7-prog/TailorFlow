@@ -66,7 +66,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
           <button className="mi" onClick={handleClose} style={{ background: 'none', border: 'none', color: 'var(--text)', fontSize: '1.6rem', cursor: 'pointer' }}>arrow_back</button>
           <span className={styles.modalTitle}>New Order</span>
         </div>
-        <button className={styles.headerActionBtn} onClick={handleSave}>Save</button>
+        <button className={styles.headerActionBtn} onClick={handleSave}>Place Order</button>
       </div>
       <div className={styles.modalBody}>
         <div style={{ padding: '20px' }}>
