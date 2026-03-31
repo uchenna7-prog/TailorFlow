@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
-import { useBrand } from "../../../contexts/BrandContext";
-
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
+import { useBrand } from '../../contexts/BrandContext'
 import styles from './InvoiceView.module.css'
 
 // ─────────────────────────────────────────────────────────────
@@ -285,27 +286,21 @@ const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
 const STATUS_NEXT   = { unpaid: 'paid', paid: 'unpaid', overdue: 'paid' }
 
 // ─────────────────────────────────────────────────────────────
-// PDF generator using html2canvas + jsPDF (loaded from CDN)
+// PDF generator — html2canvas screenshots the invoice div, jsPDF wraps it
 // ─────────────────────────────────────────────────────────────
 
 async function generatePDF(paperEl, filename) {
-  // Dynamically load libraries so they don't bloat the main bundle
-  const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-    import('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js'),
-    import('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.esm.min.js'),
-  ])
-
   const canvas = await html2canvas(paperEl, {
-    scale: 2,           // retina quality
-    useCORS: true,      // allow logo images from other origins
+    scale: 2,            // retina quality
+    useCORS: true,       // allow logo images from other origins
     backgroundColor: '#ffffff',
     logging: false,
   })
 
-  const imgData  = canvas.toDataURL('image/png')
-  const pdf      = new jsPDF({ orientation: 'portrait', unit: 'px', format: 'a4' })
-  const pdfW     = pdf.internal.pageSize.getWidth()
-  const pdfH     = (canvas.height * pdfW) / canvas.width
+  const imgData = canvas.toDataURL('image/png')
+  const pdf     = new jsPDF({ orientation: 'portrait', unit: 'px', format: 'a4' })
+  const pdfW    = pdf.internal.pageSize.getWidth()
+  const pdfH    = (canvas.height * pdfW) / canvas.width
 
   pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH)
   pdf.save(filename)
