@@ -113,14 +113,16 @@
   background: rgba(239,68,68,0.04);
 }
 
-/* Priority left bar */
+/* Priority left bar - Updated to ash color */
 .priorityBar {
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 4px;
+  background: var(--text3) !important; /* Ash/Gray color */
   border-radius: 16px 0 0 16px;
+  opacity: 0.6;
 }
 
 /* Checkbox */
@@ -189,20 +191,20 @@
   color: #ef4444;
 }
 
-/* Delete button on card */
+/* Delete button on card - Updated to danger color */
 .taskDeleteBtn {
   background: none;
   border: none;
-  color: var(--text3);
+  color: var(--danger); /* Using global danger variable */
   cursor: pointer;
   padding: 4px;
   display: flex;
   align-items: center;
   flex-shrink: 0;
   border-radius: 8px;
-  transition: color 0.15s;
+  transition: opacity 0.15s;
 }
-.taskDeleteBtn:active { color: var(--danger); }
+.taskDeleteBtn:active { opacity: 0.6; }
 
 /* ── EMPTY STATE ── */
 .emptyState {
