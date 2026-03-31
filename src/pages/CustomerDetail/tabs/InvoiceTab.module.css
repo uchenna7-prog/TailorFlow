@@ -49,7 +49,7 @@
 }
 .cardQty { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
 
-/* ── EMPTY ── */
+
 .empty {
   display: flex; flex-direction: column; align-items: center;
   gap: 8px; padding: 48px 20px; text-align: center;
