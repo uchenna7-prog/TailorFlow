@@ -1,4 +1,4 @@
-/* ── EMPTY STATE ── */
+
 .emptyState { text-align: center; padding-top: 60px; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .emptyState p { font-size: 0.8rem; color: var(--text3); }
 .hint { font-size: 0.7rem; color: var(--text3); opacity: 0.6; }
