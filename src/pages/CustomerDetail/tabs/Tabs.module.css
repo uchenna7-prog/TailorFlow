@@ -75,7 +75,7 @@
 .deleteBtn:active { opacity: 0.6; }
 .addFieldBtn { background: transparent; border: 1px solid var(--border2); color: var(--text2); padding: 9px 16px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; gap: 6px; font-size: 0.68rem; margin-top: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
 .addClothBtnWrap { padding: 12px 20px 20px; }
-.addClothBtn { width: 100%; background: var(--surface2); border: 1px dashed var(--border2); color: var(--text2); padding: 166px; border-radius: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; }
+.addClothBtn { width: 100%; background: var(--surface2); border: 1px dashed var(--border2); color: var(--text2); padding: 16px; border-radius: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; }
 
 /* ── DETAIL MODAL (slides from right) ── */
 .detailModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 3000; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; overflow: hidden; }
@@ -159,5 +159,8 @@
 .totalLabel { font-size: 0.65rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
 .totalValue { font-size: 1.3rem; font-weight: 800; color: var(--text); }
 .invoiceFooter { text-align: center; font-size: 0.7rem; color: var(--text3); margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* Custom Overrides for FAB icon and Add button size */
+.fab .mi { font-size: 2rem !important; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
