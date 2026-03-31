@@ -62,10 +62,13 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
   return (
     <div className={`${styles.modalOverlay} ${isOpen ? styles.modalOpen : ''}`}>
       <div className={styles.modalHeaderClean}>
-        <span className={styles.modalTitle}>New Order</span>
-        <button className="mi" onClick={handleClose} style={{ background: 'none', border: 'none', color: 'var(--text)', fontSize: '1.8rem', cursor: 'pointer' }}>close</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button className="mi" onClick={handleClose} style={{ background: 'none', border: 'none', color: 'var(--text)', fontSize: '1.6rem', cursor: 'pointer' }}>arrow_back</button>
+          <span className={styles.modalTitle}>New Order</span>
+        </div>
+        <button className={styles.headerActionBtn} onClick={handleSave}>Save</button>
       </div>
-      <div className={styles.modalBody} style={{ paddingBottom: 0 }}>
+      <div className={styles.modalBody}>
         <div style={{ padding: '20px' }}>
           <p className={styles.sectionHeading}>Cloth Types</p>
           {measurements.length > 5 && (
@@ -128,9 +131,6 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
             <textarea className={styles.orderTextarea} placeholder="Fabric colour, special instructions…" value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
         </div>
-      </div>
-      <div className={styles.saveBar}>
-        <button className={styles.btnSave} onClick={handleSave}>Place Order</button>
       </div>
     </div>
   )
