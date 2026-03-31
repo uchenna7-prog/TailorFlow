@@ -1,12 +1,7 @@
-// src/firebase.js
-// ─────────────────────────────────────────────────────────────
-// All environment variables are set in .env (local) and
-// Vercel project settings (production). Never hardcode these.
-// ─────────────────────────────────────────────────────────────
-import { initializeApp } from 'firebase/app'
-import { getFirestore }  from 'firebase/firestore'
-import { getAuth }       from 'firebase/auth'
-import { getAnalytics, isSupported } from 'firebase/analytics'
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,12 +11,16 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId:             import.meta.env.VITE_FIREBASE_APP_ID,
   measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-}
+};
 
-const app = initializeApp(firebaseConfig)
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-export const db   = getFirestore(app)
-export const auth = getAuth(app)
+export const db        = getFirestore(app);
+export const auth      = getAuth(app);
 
-// Analytics only runs in the browser (not SSR / Node)
-export const analytics = isSupported().then(yes => yes ? getAnalytics(app) : null)
+// Analytics is not supported in all environments (e.g. some mobile browsers,
+// Firefox with tracking protection). isSupported() prevents a runtime crash.
+export const analytics = isSupported().then(yes => yes ? getAnalytics(app) : null);
+
+export default app;
