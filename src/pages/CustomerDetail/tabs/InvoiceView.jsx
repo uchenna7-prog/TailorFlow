@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
-import { useBrand } from '../../contexts/BrandContext'
+import { useBrand } from '../../../contexts/BrandContext'
 import styles from './InvoiceView.module.css'
 
 // ─────────────────────────────────────────────────────────────
@@ -183,7 +183,10 @@ function CustomTemplate({ invoice, customer, brand }) {
   const dueDate  = getDueDate(invoice, brand.dueDays)
   const bannerBg = brand.colour || '#7c3aed'
   return (
+    // padding:0 on tplBase so the coloured banner and footer bleed full-width
     <div className={styles.tplBase} style={{ padding: 0 }}>
+
+      {/* ── Coloured top banner ── */}
       <div className={styles.customBanner} style={{ background: bannerBg }}>
         <div className={styles.customBannerLogo}>
           {brand.logo
@@ -196,17 +199,21 @@ function CustomTemplate({ invoice, customer, brand }) {
           <div className={styles.customBannerNum}>{invoice.number}</div>
         </div>
       </div>
-      <div style={{ padding: '16px 20px' }}>
+
+      {/* ── Body (white section) ── */}
+      <div className={styles.customBody}>
         <div className={styles.metaRow} style={{ marginBottom: 16 }}>
           <div>
             <div className={styles.metaLabel}>BILL FROM</div>
             <div className={styles.metaVal}>{brand.name || brand.ownerName}</div>
-            {brand.phone && <div className={styles.metaSub}>{brand.phone}</div>}
+            {brand.address && <div className={styles.metaSub}>{brand.address}</div>}
+            {brand.phone   && <div className={styles.metaSub}>{brand.phone}</div>}
           </div>
           <div>
             <div className={styles.metaLabel}>BILL TO</div>
             <div className={styles.metaVal}>{customer.name}</div>
-            {customer.phone && <div className={styles.metaSub}>{customer.phone}</div>}
+            {customer.phone   && <div className={styles.metaSub}>{customer.phone}</div>}
+            {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
           </div>
           <div style={{ textAlign: 'right' }}>
             <div className={styles.metaLabel}>DATE</div>
@@ -217,6 +224,8 @@ function CustomTemplate({ invoice, customer, brand }) {
         </div>
         <ItemsTable invoice={invoice} brand={brand} subtotal={subtotal} />
       </div>
+
+      {/* ── Coloured bottom footer ── */}
       <div className={styles.customFooter} style={{ background: bannerBg }}>
         <div className={styles.customFooterText}>{brand.footer || 'Thank you for your patronage'}</div>
         {brand.email && <div className={styles.customFooterSub}>{brand.email}</div>}
