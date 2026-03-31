@@ -1,79 +1,328 @@
-/* ── SHARED UI COMPONENTS ── */
-.emptyState { text-align: center; padding-top: 60px; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+/* ── SHARED & EMPTY STATES ── */
+.emptyState { 
+  text-align: center; 
+  padding-top: 60px; 
+  padding-bottom: 20px; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 10px; 
+}
 .emptyState p { font-size: 0.8rem; color: var(--text3); }
 .hint { font-size: 0.7rem; color: var(--text3); opacity: 0.6; }
 
-/* ── MODAL SYSTEM (Includes Invoice section logic) ── */
-.modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
+/* ── MODAL OVERLAY & HEADERS ── */
+.modalOverlay { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  background: var(--bg); 
+  z-index: 2000; 
+  transform: translateY(100%); 
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1); 
+  display: flex; 
+  flex-direction: column; 
+}
 .modalOpen { transform: translateY(0); }
-.modalHeaderClean { padding: calc(10px + var(--st)) 20px 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--bg); }
-.modalTitle { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text2); }
-.headerActionBtn { background: var(--text); color: var(--bg); border: none; padding: 6px 20px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
-.headerActionBtn:active { opacity: 0.7; }
-.modalBody { flex: 1; overflow-y: auto; padding-bottom: 40px; -webkit-overflow-scrolling: touch; background: var(--bg); }
 
-/* ── MEASUREMENTS TAB ── */
-.itemCard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 12px 14px; display: flex; align-items: center; gap: 15px; margin-bottom: 12px; cursor: pointer; transition: background 0.2s; }
+.modalHeaderClean { 
+  padding: calc(10px + var(--st)) 20px 10px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  border-bottom: 1px solid var(--border); 
+  flex-shrink: 0; 
+  background: var(--bg); 
+}
+.modalTitle { 
+  font-size: 0.7rem; 
+  font-weight: 800; 
+  text-transform: uppercase; 
+  letter-spacing: 1.5px; 
+  color: var(--text2); 
+}
+
+/* The Save/Place Order button in the header */
+.headerActionBtn { 
+  background: var(--text); 
+  color: var(--bg); 
+  border: none; 
+  padding: 8px 18px; 
+  border-radius: 20px; 
+  font-weight: 800; 
+  font-size: 0.75rem; 
+  cursor: pointer; 
+  font-family: 'DM Sans', sans-serif; 
+  transition: opacity 0.2s; 
+  text-transform: uppercase; 
+  letter-spacing: 0.5px; 
+}
+.headerActionBtn:active { opacity: 0.7; }
+
+.modalBody { 
+  flex: 1; 
+  overflow-y: auto; 
+  padding-bottom: 40px; 
+  -webkit-overflow-scrolling: touch; 
+  background: var(--bg); 
+}
+
+/* ── DETAIL MODAL (Slides from Right) ── */
+.detailModal { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  background: var(--bg); 
+  z-index: 3000; 
+  transform: translateX(100%); 
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); 
+  display: flex; 
+  flex-direction: column; 
+  overflow: hidden; 
+}
+.detailOpen { transform: translateX(0); }
+
+.detailHeader { 
+  padding: calc(10px + var(--st)) 20px 16px; 
+  display: flex; 
+  align-items: center; 
+  gap: 14px; 
+  border-bottom: 1px solid var(--border); 
+  flex-shrink: 0; 
+  background: var(--bg); 
+}
+.detailHeader h3 { font-size: 1rem; font-weight: 800; color: var(--text); }
+.detailBody { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
+
+/* ── MEASUREMENT ITEM CARDS ── */
+.itemCard { 
+  background: var(--surface); 
+  border: 1px solid var(--border); 
+  border-radius: 20px; 
+  padding: 12px 14px; 
+  display: flex; 
+  align-items: center; 
+  gap: 15px; 
+  margin-bottom: 12px; 
+  cursor: pointer; 
+  transition: border-color 0.2s; 
+}
 .itemCard:active { background: var(--surface2); }
-.designThumb { width: 60px; height: 60px; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.designThumb { 
+  width: 60px; 
+  height: 60px; 
+  border-radius: 12px; 
+  background: var(--surface2); 
+  border: 1px solid var(--border); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  color: var(--text3); 
+  overflow: hidden; 
+}
 .designThumb img { width: 100%; height: 100%; object-fit: cover; }
-.cardInfo { flex: 1; min-width: 0; }
 .cardInfo h4 { font-size: 0.95rem; font-weight: 700; color: var(--text); }
-.unitBadge { display: inline-block; font-size: 0.6rem; color: var(--text3); border: 1px solid var(--border2); border-radius: 5px; padding: 1px 5px; margin-top: 4px; font-weight: 700; }
-.cardActions { display: flex; align-items: center; gap: 4px; }
+.unitBadge { 
+  display: inline-block; 
+  font-size: 0.6rem; 
+  color: var(--text3); 
+  border: 1px solid var(--border2); 
+  border-radius: 5px; 
+  padding: 1px 5px; 
+  margin-top: 4px; 
+  font-weight: 700; 
+}
 .cardDelete { color: var(--danger); background: none; border: none; padding: 6px; cursor: pointer; }
 
-/* ── ORDERS TAB ── */
-.orderCard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; position: relative; overflow: hidden; cursor: pointer; }
-.priorityBar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-.orderCardIcon { width: 44px; height: 44px; border-radius: 12px; background: var(--surface2); display: flex; align-items: center; justify-content: center; }
-.orderPrice { font-size: 1rem; font-weight: 800; }
-.statusBadge { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; border-radius: 5px; padding: 2px 6px; border: 1px solid; }
-.statusPending { color: #fb923c; border-color: rgba(251,146,60,0.3); }
-.statusDone { color: var(--success); border-color: rgba(34,197,94,0.3); }
+/* ── ORDER ITEM CARDS ── */
+.orderCard { 
+  background: var(--surface); 
+  border: 1px solid var(--border); 
+  border-radius: 20px; 
+  padding: 14px 16px; 
+  display: flex; 
+  align-items: center; 
+  gap: 14px; 
+  margin-bottom: 12px; 
+  position: relative; 
+  overflow: hidden; 
+  cursor: pointer; 
+}
+.priorityBar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 20px 0 0 20px; }
+.orderCardIcon { 
+  width: 44px; 
+  height: 44px; 
+  border-radius: 12px; 
+  background: var(--surface2); 
+  border: 1px solid var(--border2); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  color: var(--text2); 
+}
+.orderPrice { font-size: 1rem; font-weight: 800; color: var(--text); }
+.statusBadge { 
+  display: inline-block; 
+  font-size: 0.58rem; 
+  font-weight: 800; 
+  text-transform: uppercase; 
+  border-radius: 5px; 
+  padding: 2px 6px; 
+  border: 1px solid; 
+}
+.statusPending { color: #fb923c; border-color: rgba(251,146,60,0.3); background: rgba(251,146,60,0.05); }
+.statusDone { color: var(--success); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
 
-/* ── INVOICE TAB ── */
-.invoiceCard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
-.invoiceMain { flex: 1; display: flex; align-items: center; gap: 12px; }
-.invoiceIcon { width: 40px; height: 40px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; color: var(--text3); }
-.invTitle { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.invDate { font-size: 0.65rem; color: var(--text3); text-transform: uppercase; margin-top: 2px; }
-.invTotal { font-size: 0.95rem; font-weight: 800; color: var(--text); }
-.invStatus { display: inline-block; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; margin-top: 4px; border: 1px solid; }
-.invPaid { color: var(--success); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
-.invPartial { color: #3b82f6; border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.05); }
-.invDelete { background: none; border: none; color: var(--danger); opacity: 0.6; cursor: pointer; padding: 8px; }
+/* ── INVOICE ITEM CARDS ── */
+.invoiceCard { 
+  background: var(--surface); 
+  border: 1px solid var(--border); 
+  border-radius: 20px; 
+  padding: 14px 16px; 
+  display: flex; 
+  align-items: center; 
+  gap: 14px; 
+  margin-bottom: 12px; 
+  cursor: pointer; 
+}
+.invoiceCardIcon { 
+  width: 44px; 
+  height: 44px; 
+  border-radius: 12px; 
+  background: var(--surface2); 
+  border: 1px solid var(--border2); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  color: var(--text2); 
+}
+.invoiceCardInfo { flex: 1; min-width: 0; }
+.invoiceCardInfo h4 { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.invoiceNumber { font-size: 0.7rem; font-weight: 800; color: var(--text3); text-transform: uppercase; }
 
 /* ── FORM ELEMENTS ── */
-.formCard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin: 16px 20px 0; }
-.formCardHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.labelTiny { font-size: 0.62rem; font-weight: 800; color: var(--text2); text-transform: uppercase; margin-bottom: 6px; display: block; }
-.clothInput { width: 100%; background: transparent; border: none; color: var(--text); font-size: 1.05rem; font-weight: 700; outline: none; border-bottom: 1px solid var(--border2); padding-bottom: 10px; margin-bottom: 20px; font-family: 'DM Sans', sans-serif; }
-.orderTextarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border2); color: var(--text); font-size: 0.9rem; font-weight: 500; outline: none; resize: none; min-height: 70px; font-family: 'DM Sans', sans-serif; padding-bottom: 8px; }
-.unitsSection { height: 60px; padding: 0 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
-.unitChip { padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border2); font-size: 0.7rem; font-weight: 800; color: var(--text3); background: var(--bg); cursor: pointer; }
+.unitsSection { 
+  height: 60px; 
+  padding: 0 20px; 
+  background: var(--surface); 
+  border-bottom: 1px solid var(--border); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px; 
+  position: sticky; 
+  top: 0; 
+  z-index: 10; 
+}
+.unitChip { 
+  padding: 7px 14px; 
+  border-radius: 20px; 
+  border: 1px solid var(--border2); 
+  font-size: 0.7rem; 
+  font-weight: 800; 
+  color: var(--text3); 
+  background: var(--bg); 
+}
 .unitChipActive { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
-/* ── PICKERS ── */
-.pickerList { display: flex; flex-direction: column; gap: 8px; }
-.pickerItem { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; cursor: pointer; }
-.pickerSelected { border-color: var(--accent); }
-.pickerThumb { width: 38px; height: 38px; border-radius: 9px; background: var(--surface2); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.pickerThumb img { width: 100%; height: 100%; object-fit: cover; }
-.pickerCheck { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; }
-.pickerCheckSelected { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.formCard { 
+  background: var(--surface); 
+  border: 1px solid var(--border); 
+  border-radius: 20px; 
+  padding: 20px; 
+  margin: 16px 20px 0; 
+}
+.formCardHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.labelTiny { 
+  font-size: 0.62rem; 
+  font-weight: 800; 
+  color: var(--text2); 
+  text-transform: uppercase; 
+  margin-bottom: 6px; 
+  display: block; 
+}
+.clothInput { 
+  width: 100%; 
+  background: transparent; 
+  border: none; 
+  color: var(--text); 
+  font-size: 1.05rem; 
+  font-weight: 700; 
+  outline: none; 
+  border-bottom: 1px solid var(--border2); 
+  padding-bottom: 10px; 
+  margin-bottom: 20px; 
+}
+.designUploadArea { 
+  width: 100%; 
+  height: 100px; 
+  border: 1.5px dashed var(--border2); 
+  border-radius: 14px; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  background: var(--surface2); 
+  position: relative; 
+  overflow: hidden; 
+  margin-bottom: 20px; 
+}
+.designPreview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
-/* ── DETAIL MODAL ── */
-.detailModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 3000; transform: translateX(100%); transition: transform 0.35s ease; display: flex; flex-direction: column; }
-.detailOpen { transform: translateX(0); }
-.detailHeader { padding: calc(10px + var(--st)) 20px 16px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--border); }
-.detailBody { flex: 1; overflow-y: auto; padding: 20px; }
+/* ── INVOICE DOCUMENT STYLES ── */
+.invoiceStatusRow { display: flex; gap: 8px; margin-bottom: 16px; }
+.invoiceStatusBtn { 
+  flex: 1; 
+  padding: 12px; 
+  border-radius: 10px; 
+  border: 1px solid var(--border2); 
+  font-size: 0.72rem; 
+  font-weight: 800; 
+  background: transparent; 
+  color: var(--text3); 
+}
+.invoicePaid { border-color: var(--success); color: var(--success); background: rgba(34,197,94,0.08); }
+.invoiceUnpaid { border-color: #fb923c; color: #fb923c; background: rgba(251,146,60,0.08); }
 
-/* ── PRIORITY & STATUS ── */
-.priorityRow { display: flex; gap: 8px; }
-.priorityChip { flex: 1; text-align: center; padding: 9px; border-radius: 10px; border: 1px solid var(--border2); font-size: 0.7rem; font-weight: 800; cursor: pointer; background: var(--bg); }
-.priority_normal { background: var(--surface2); color: var(--text); }
-.priority_urgent { background: rgba(251,146,60,0.15); border-color: #fb923c; color: #fb923c; }
-.priority_vip    { background: rgba(168,85,247,0.15); border-color: #a855f7; color: #a855f7; }
+.invoiceDoc { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 16px; }
+.invoiceBrand { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+.invoiceBrand span { color: var(--text3); font-weight: 400; }
+.invoiceTable { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.invoiceTable th { 
+  font-size: 0.58rem; 
+  font-weight: 800; 
+  color: var(--text3); 
+  text-transform: uppercase; 
+  padding-bottom: 10px; 
+  text-align: left; 
+  border-bottom: 1px solid var(--border); 
+}
+.invoiceTable td { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; color: var(--text); }
+.invoiceTotalRow { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; }
+.totalValue { font-size: 1.3rem; font-weight: 800; color: var(--text); }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+/* ── ORDER DETAIL SPECIFICS ── */
+.priorityBanner { 
+  font-size: 0.65rem; 
+  font-weight: 800; 
+  text-transform: uppercase; 
+  padding: 7px 12px; 
+  border-radius: 8px; 
+  display: inline-block; 
+  margin-bottom: 18px; 
+}
+.bannerNormal { color: var(--text2); background: var(--surface); border: 1px solid var(--border2); }
+.bannerUrgent { color: #fb923c; background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.3); }
+.bannerVip { color: #a855f7; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); }
+
+.orderMetaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.orderMetaCell { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
+
+@keyframes fadeIn { 
+  from { opacity: 0; transform: translateY(8px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
