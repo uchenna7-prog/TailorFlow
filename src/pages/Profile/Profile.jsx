@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+Import { useState, useRef, useCallback } from 'react'
 import { useSettings } from '../../contexts/SettingsContext'
 import Header from '../../components/Header/Header'
 import Toast from '../../components/Toast/Toast'
@@ -222,7 +222,6 @@ function BrandModal({ onBack, showToast }) {
     brandEmail:   settings.brandEmail,
     brandAddress: settings.brandAddress,
     brandWebsite: settings.brandWebsite,
-    invoiceTemplate: settings.invoiceTemplate || 'modern',
   })
 
   const set = key => val => setLocal(p => ({ ...p, [key]: val }))
@@ -291,21 +290,6 @@ function BrandModal({ onBack, showToast }) {
             />
             <TextInput value={local.brandColour} onChange={set('brandColour')} placeholder="#D4AF37" />
           </div>
-        </Field>
-      </FieldGroup>
-
-      {/* Invoice Template Selection */}
-      <FieldGroup>
-        <Field label="Invoice Template" hint="Choose the layout for your generated PDFs.">
-          <SegmentControl
-            options={[
-              { label: 'Template #1', value: 'modern' },
-              { label: 'Template #2', value: 'classic' },
-              { label: 'Template #3', value: 'minimal' },
-            ]}
-            value={local.invoiceTemplate}
-            onChange={set('invoiceTemplate')}
-          />
         </Field>
       </FieldGroup>
 
@@ -406,7 +390,7 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
 
   return (
     <div className={styles.page}>
-      <Header onMenuClick={onMenuClick} title="Settings" />
+      <Header onMenuClick={onMenuClick} />
 
       <div className={styles.scrollArea}>
 
@@ -590,3 +574,4 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
     </div>
   )
 }
+
