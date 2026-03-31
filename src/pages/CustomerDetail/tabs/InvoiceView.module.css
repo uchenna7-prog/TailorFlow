@@ -19,12 +19,26 @@
 .topBtn {
   width: 40px; height: 40px;
   display: flex; align-items: center; justify-content: center;
-  background: var(--surface2); border: none; border-radius: 10px;
-  color: var(--text); cursor: pointer; flex-shrink: 0;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text);
+  cursor: pointer; flex-shrink: 0;
   transition: opacity 0.15s;
 }
 .topBtn:active { opacity: 0.7; }
 .topBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Download button — filled accent so it stands out as the primary action */
+.topBtnPrimary {
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent); border: none;
+  border-radius: 10px; color: var(--bg);
+  cursor: pointer; flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.topBtnPrimary:active { opacity: 0.7; }
+.topBtnPrimary:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .topCenter { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .topInvNum { font-size: 0.9rem; font-weight: 800; color: var(--text); }
 
@@ -163,7 +177,7 @@
 
 .statusBtnPaid {
   background: var(--accent);
-  color: #000;
+  color: var(--bg);   /* --bg flips white in dark mode, black in light */
 }
 .statusBtnUnpaid {
   background: var(--surface2);
@@ -171,12 +185,14 @@
   border: 1px solid var(--border);
 }
 
-/* Delete — icon only */
+/* Delete — icon only, uses semantic danger colour from your CSS vars */
 .deleteBtn {
   width: 48px; height: 48px;
   display: flex; align-items: center; justify-content: center;
-  background: #fee2e2; border: none; border-radius: 12px;
-  color: #ef4444; cursor: pointer; flex-shrink: 0;
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-radius: 12px;
+  color: var(--danger); cursor: pointer; flex-shrink: 0;
   transition: opacity 0.15s;
 }
 .deleteBtn:active { opacity: 0.75; }
