@@ -289,10 +289,10 @@ function TemplateModal({ isOpen, currentTemplate, onClose, onSelect }) {
   const [selected, setSelected] = useState(currentTemplate || 'editable')
 
   const TEMPLATES = [
-    { id: 'editable',  label: 'Editable Clothing Store',  Component: EditableTemplate },
-    { id: 'printable', label: 'Printable Clothing Store', Component: PrintableTemplate },
-    { id: 'custom',    label: 'Custom Clothing Store',    Component: CustomTemplate },
-    { id: 'free',      label: 'Free Clothing Store',      Component: FreeTemplate },
+    { id: 'editable',  label: 'Template #1',  Component: EditableTemplate },
+    { id: 'printable', label: 'Template #2', Component: PrintableTemplate },
+    { id: 'custom',    label: 'Template #3',    Component: CustomTemplate },
+    { id: 'free',      label: 'Template #4',      Component: FreeTemplate },
   ]
 
   if (!isOpen) return null
