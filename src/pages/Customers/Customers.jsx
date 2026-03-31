@@ -55,29 +55,21 @@ const FEMALE_MEASUREMENTS = [
   'Trouser Waist', 'Inseam', 'Blouse Length', 'Under Bust', 'Armhole'
 ]
 
-// Simple SVG body silhouette
 function BodySVG({ sex }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
       <svg width="80" height="160" viewBox="0 0 80 160" fill="none">
-        {/* Head */}
         <ellipse cx="40" cy="18" rx="13" ry="15" fill="var(--surface2)" stroke="var(--border2)" strokeWidth="1.5"/>
-        {/* Neck */}
         <rect x="35" y="31" width="10" height="10" rx="3" fill="var(--surface2)" stroke="var(--border2)" strokeWidth="1.5"/>
-        {/* Body */}
         {sex === 'Female'
           ? <path d="M20 41 Q16 70 18 100 L62 100 Q64 70 60 41 Q50 46 40 46 Q30 46 20 41Z" fill="var(--surface2)" stroke="var(--border2)" strokeWidth="1.5"/>
           : <path d="M18 41 Q15 68 17 100 L63 100 Q65 68 62 41 L18 41Z" fill="var(--surface2)" stroke="var(--border2)" strokeWidth="1.5"/>
         }
-        {/* Arms */}
         <path d="M18 43 Q8 65 10 90" stroke="var(--border2)" strokeWidth="6" strokeLinecap="round"/>
         <path d="M62 43 Q72 65 70 90" stroke="var(--border2)" strokeWidth="6" strokeLinecap="round"/>
-        {/* Legs */}
         <path d="M28 100 Q26 130 27 155" stroke="var(--border2)" strokeWidth="8" strokeLinecap="round"/>
         <path d="M52 100 Q54 130 53 155" stroke="var(--border2)" strokeWidth="8" strokeLinecap="round"/>
-        {/* Bust line for female */}
         {sex === 'Female' && <ellipse cx="40" cy="58" rx="14" ry="5" stroke="var(--accent)" strokeWidth="1" fill="none" opacity="0.3"/>}
-        {/* Waist line */}
         <line x1="22" y1="78" x2="58" y2="78" stroke="var(--accent)" strokeWidth="1" opacity="0.3" strokeDasharray="3,3"/>
       </svg>
     </div>
@@ -86,8 +78,6 @@ function BodySVG({ sex }) {
 
 function AddCustomerForm({ isOpen, onClose, onSave }) {
   const [formTab, setFormTab] = useState('personal')
-
-  // Personal info
   const [name, setName]           = useState('')
   const [phone, setPhone]         = useState('')
   const [phoneType, setPhoneType] = useState('Mobile')
@@ -100,7 +90,6 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
   const [photo, setPhoto]         = useState(null)
   const fileInputRef = useRef(null)
 
-  // Body measurements — keyed by label
   const [bodyMeasurements, setBodyMeasurements] = useState({})
   const [customFields, setCustomFields]         = useState([])
 
@@ -140,7 +129,6 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
   }
 
   const handleSave = () => {
-    // Merge standard + custom fields into bodyMeasurements
     const allBody = { ...bodyMeasurements }
     customFields.forEach(f => { if (f.label.trim()) allBody[f.label.trim()] = f.value })
     const birthday = bdayMonth && bdayDay ? `${bdayMonth}-${bdayDay}` : ''
@@ -152,10 +140,11 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
       <div className={styles.formHeader}>
         <button className="mi" onClick={handleClose} style={{ background:'none', border:'none', color:'var(--text)', fontSize:'1.8rem', cursor:'pointer' }}>arrow_back</button>
         <div className={styles.formHeaderTitle}>New Customer</div>
-        <div style={{ width: 36 }} />
+        <button className={styles.headerSaveBtn} onClick={handleSave}>
+          {formTab === 'personal' ? 'Save' : 'Save'}
+        </button>
       </div>
 
-      {/* Form tabs */}
       <div className={styles.formTabs}>
         <button className={`${styles.formTab} ${formTab === 'personal' ? styles.formTabActive : ''}`} onClick={() => setFormTab('personal')}>Personal Info</button>
         <button className={`${styles.formTab} ${formTab === 'body' ? styles.formTabActive : ''}`} onClick={() => setFormTab('body')}>Body Measurements</button>
@@ -164,7 +153,6 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
       <div className={styles.formBody}>
         {formTab === 'personal' && (
           <>
-            {/* Photo */}
             <div className={styles.photoPicker} onClick={() => fileInputRef.current?.click()}>
               {photo ? <img src={photo} alt="Profile" className={styles.photoPreview} /> : <div className={styles.photoInitials}>{initials}</div>}
               <div className={styles.camBadge}><span className="mi" style={{ fontSize:'0.9rem' }}>photo_camera</span></div>
@@ -176,7 +164,6 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
               <input type="text" className={styles.formInput} placeholder="e.g. Uchendu Daniel" value={name} onChange={e => setName(e.target.value)} />
             </div>
 
-            {/* Sex */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Sex</label>
               <div className={styles.sexRow}>
@@ -186,7 +173,6 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
               </div>
             </div>
 
-            {/* Birthday */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Birthday (Day & Month)</label>
               <div className={styles.inputRow}>
@@ -258,7 +244,6 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
                   </div>
                 ))}
 
-                {/* Custom fields */}
                 {customFields.map(f => (
                   <div key={f.id} className={styles.customFieldRow}>
                     <div className={styles.customFieldInputs}>
@@ -291,10 +276,6 @@ function AddCustomerForm({ isOpen, onClose, onSave }) {
             )}
           </>
         )}
-      </div>
-
-      <div className={styles.formSaveBar}>
-        <button className={styles.btnSave} onClick={handleSave}>Add Customer</button>
       </div>
     </div>
   )
