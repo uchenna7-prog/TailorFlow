@@ -162,7 +162,7 @@
   height: 58px;
   border-radius: 50%;
   background: var(--accent);
-  color: var(--bg); /* Contrast color: White in Light mode, Black in Dark mode */
+  color: var(--bg); 
   border: none;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   display: flex;
@@ -192,33 +192,59 @@
 }
 
 .modalHeader {
-  padding: calc(14px + var(--st)) 20px 14px;
+  padding: calc(14px + var(--st)) 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.modalTitle {
-  font-size: 0.7rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text2);
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.modalClose {
+
+.modalBack {
   background: none;
   border: none;
   color: var(--text);
   cursor: pointer;
   display: flex;
   align-items: center;
+  padding: 4px;
+}
+
+.modalTitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text);
+}
+
+.headerSaveBtn {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.headerSaveBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .modalBody {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 20px 110px;
+  padding: 20px 20px 50px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -477,32 +503,6 @@
   display: flex;
   align-items: center;
 }
-
-/* Save bar */
-.modalSaveBar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16px 20px calc(16px + var(--sb));
-  background: linear-gradient(to top, var(--bg) 70%, transparent);
-}
-.btnSave {
-  background: var(--accent);
-  color: var(--bg); /* Contrast color: White in Light mode, Black in Dark mode */
-  width: 100%;
-  padding: 17px;
-  border-radius: 14px;
-  font-weight: 800;
-  border: none;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.85rem;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-.btnSave:active { opacity: 0.85; }
 
 /* ── LIGHTBOX ── */
 .lightboxOverlay {
