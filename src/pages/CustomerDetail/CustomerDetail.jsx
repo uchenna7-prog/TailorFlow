@@ -8,6 +8,12 @@ import MeasurementsTab from './tabs/MeasurementsTab'
 import OrdersTab from './tabs/OrdersTab'
 import InvoiceTab from './tabs/InvoiceTab'
 import styles from './CustomerDetail.module.css'
+import { useInvoice } from '../../contexts/InvoiceContext'
+import { useNavigate } from 'react-router-dom'
+
+
+
+
 
 function getInitials(name) {
   if (!name) return ''
@@ -39,6 +45,14 @@ export default function CustomerDetail({ onMenuClick }) {
   const [toastMsg, setToastMsg] = useState('')
   const toastTimer = useRef(null)
   const fixedRef = useRef(null)
+
+  const { setCurrentInvoice } = useInvoice()
+const navigate = useNavigate()
+
+const handleOpenInvoice = (invoice) => {
+  setCurrentInvoice(invoice)
+  navigate(`/invoice/${invoice.id}`)
+}
 
   // --- SYNC LOCAL STATE ---
   const [invoicesState, setInvoicesState] = useState([])
