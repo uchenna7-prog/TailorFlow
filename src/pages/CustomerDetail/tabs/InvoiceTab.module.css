@@ -2,32 +2,58 @@
   display: flex; 
   flex-direction: column; 
   gap: 12px; 
-  padding: 16px; 
+  padding: 10px 0;
 }
 
-/* ── CARD ── */
+/* ── CARD (Matched to Orders Tab) ── */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 24px; /* Matches the smoother curvature in the Orders tab */
-  padding: 18px;
+  border-radius: 24px; /* Matches the rounded look of Orders */
+  padding: 16px 20px;
   cursor: pointer;
   transition: background 0.15s;
-  position: relative;
 }
-.card:active { background: var(--surface2); }
 
-.cardTop { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-bottom: 4px; 
+.card:active { 
+  background: var(--surface2); 
 }
+
+.cardContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .cardNum { 
-  font-size: 0.8rem; 
-  font-weight: 700; 
+  font-size: 0.75rem; 
+  font-weight: 800; 
   color: var(--text3); 
   text-transform: uppercase;
+}
+
+.cardDesc { 
+  font-size: 1.1rem; 
+  font-weight: 700; 
+  color: var(--text); 
+}
+
+.cardMeta { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.cardDate { 
+  font-size: 0.8rem; 
+  color: var(--text3); 
 }
 
 /* ── STATUS BADGE ── */
@@ -36,68 +62,25 @@
   font-weight: 800; 
   text-transform: uppercase;
   letter-spacing: 0.05em; 
-  padding: 4px 10px; 
+  padding: 2px 10px; 
   border-radius: 12px;
 }
+
 .status_unpaid  { background: #fef3c7; color: #92400e; }
 .status_paid    { background: #d1fae5; color: #065f46; }
 .status_overdue { background: #fee2e2; color: #991b1b; }
 
-.cardDesc { 
-  font-size: 1.1rem; 
-  font-weight: 800; 
-  color: var(--text); 
-  margin-bottom: 12px; 
+.cardRight {
+  text-align: right;
 }
 
-.cardMeta { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: baseline; 
-}
-.cardDate { 
-  font-size: 0.85rem; 
-  color: var(--text3); 
-  font-weight: 500;
-}
 .cardAmount { 
   font-size: 1.2rem; 
   font-weight: 900; 
-  color: #000; 
-}
-
-/* ── CARD ACTIONS ── */
-.cardActions {
-  display: flex; 
-  gap: 10px;
-  margin-top: 16px; 
-  padding-top: 14px;
-  border-top: 1px solid #f0f0f0;
-}
-.actionBtn {
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-  gap: 6px;
-  flex: 1;
-  background: #f3f4f6; /* Subtle grey background like the Order buttons */
-  border: none; 
-  border-radius: 10px;
-  padding: 10px; 
-  font-size: 0.85rem; 
-  font-weight: 700;
   color: var(--text); 
-  cursor: pointer; 
-  font-family: inherit;
 }
-.actionBtn:active { background: #e5e7eb; }
-.actionDanger { 
-  color: #ef4444; 
-  background: #fee2e2; 
-}
-.actionDanger:active { background: #fecaca; }
 
-/* ── EMPTY ── */
+/* ── EMPTY STATE ── */
 .empty {
   display: flex; 
   flex-direction: column; 
@@ -106,5 +89,17 @@
   padding: 48px 20px; 
   text-align: center;
 }
-.emptyTitle { font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 0; }
-.emptySub { font-size: 0.8rem; color: var(--text3); margin: 0; line-height: 1.5; }
+
+.emptyTitle { 
+  font-size: 0.95rem; 
+  font-weight: 800; 
+  color: var(--text); 
+  margin: 0; 
+}
+
+.emptySub { 
+  font-size: 0.8rem; 
+  color: var(--text3); 
+  margin: 0; 
+  line-height: 1.5; 
+}
