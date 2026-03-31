@@ -8,7 +8,7 @@ const CONTACT = {
   website:      'www.tailorflow.app',
   businessName: 'Tailor Flow',
   billingName:  'Tailor Flow Technologies',
-  address:      '12 Tailor Street, 2nd Floor,\nIkeja, Lagos, Nigeria',
+  address:      'Choba Uniport',
 }
 
 function ContactRow({ icon, label, value, href, divider = true }) {
@@ -52,7 +52,7 @@ function InfoRow({ label, value, divider = true }) {
 export default function Contact({ onMenuClick }) {
   return (
     <div className={styles.page}>
-      <Header onMenuClick={onMenuClick} />
+      <Header onMenuClick={onMenuClick} title="Contact Us" />
 
       <div className={styles.scrollArea}>
 
