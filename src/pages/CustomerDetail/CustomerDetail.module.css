@@ -80,8 +80,6 @@ font-size:1.8rem;}
 
 
 
-
-/* Free user profile — no avatar, left-aligned */
 .profileSectionFree {
   display: flex;
   flex-direction: column;
