@@ -97,7 +97,6 @@ export function CustomerProvider({ children }) {
     </CustomerContext.Provider>
   )
 }
-
 export function useCustomers() {
   const ctx = useContext(CustomerContext)
   if (!ctx) throw new Error('useCustomers must be used inside CustomerProvider')
