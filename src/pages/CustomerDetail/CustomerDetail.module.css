@@ -33,8 +33,8 @@
 .birthday { font-weight: 600; font-size: 0.8rem; color: var(--warning); white-space: nowrap; }
 .rightColumn { flex: 1; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
 .name { font-size: 1.1rem; font-weight: 700;
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
+  font-family: 'Italianno',serif;
+ 
 }
 .meta { display: flex; gap: 4px; color: var(--text2); font-size: 0.75rem; align-items: flex-start; }
 .meta .mi { font-size: 0.9rem; line-height: 1; display: inline-flex; align-items: flex-start; justify-content: center; margin-top: 2px; color: inherit; }
