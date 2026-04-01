@@ -1,26 +1,21 @@
+// src/pages/Tasks/Tasks.jsx
+// ─────────────────────────────────────────────────────────────
+// Uses TaskContext (Firestore) instead of localStorage.
+// Orders for a selected customer are loaded via orderService.
+// ─────────────────────────────────────────────────────────────
+
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useAuth }      from '../../contexts/AuthContext'
+import { useTasks }     from '../../contexts/TaskContext'
 import { useCustomers } from '../../contexts/CustomerContext'
-import Header from '../../components/Header/Header'
+import { subscribeToOrders } from '../../services/orderService'
+import Header       from '../../components/Header/Header'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
-import Toast from '../../components/Toast/Toast'
+import Toast        from '../../components/Toast/Toast'
 import styles from './Tasks.module.css'
 
-// ── STORAGE ──
-const TASKS_KEY = 'tailorbook_tasks'
+// ── Helpers ───────────────────────────────────────────────────
 
-function loadTasks() {
-  try {
-    const raw = localStorage.getItem(TASKS_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch { return [] }
-}
-
-function saveTasks(tasks) {
-  try { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)) }
-  catch { /* ignore */ }
-}
-
-// ── HELPERS ──
 const PRIORITY_LABELS = { low: 'Low', normal: 'Normal', high: 'High', urgent: 'Urgent' }
 const PRIORITY_COLORS = {
   low:    { bg: 'rgba(148,163,184,0.12)', border: 'rgba(148,163,184,0.4)', text: '#94a3b8' },
@@ -29,52 +24,70 @@ const PRIORITY_COLORS = {
   urgent: { bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.4)',   text: '#ef4444' },
 }
 
+const CATEGORY_ICONS = {
+  general: 'assignment', sewing: 'content_cut', delivery: 'local_shipping',
+  payment: 'payments',   fitting: 'checkroom',  shopping: 'shopping_cart',
+}
+
+const CATEGORIES = [
+  { id: 'general',  label: 'General',  icon: 'assignment'     },
+  { id: 'sewing',   label: 'Sewing',   icon: 'content_cut'    },
+  { id: 'delivery', label: 'Delivery', icon: 'local_shipping'  },
+  { id: 'payment',  label: 'Payment',  icon: 'payments'       },
+  { id: 'fitting',  label: 'Fitting',  icon: 'checkroom'      },
+  { id: 'shopping', label: 'Shopping', icon: 'shopping_cart'  },
+]
+
 function isOverdue(task) {
-  if (!task.dueDate || task.status === 'done') return false
+  if (!task.dueDate || task.done) return false
   return new Date(task.dueDate + 'T23:59:59') < new Date()
 }
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
-  const d = new Date(dateStr + 'T00:00:00')
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 function daysUntil(dateStr) {
   if (!dateStr) return null
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const due = new Date(dateStr + 'T00:00:00')
-  const diff = Math.round((due - today) / (1000 * 60 * 60 * 24))
-  if (diff < 0) return `${Math.abs(diff)}d overdue`
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const due   = new Date(dateStr + 'T00:00:00')
+  const diff  = Math.round((due - today) / (1000 * 60 * 60 * 24))
+  if (diff < 0)  return `${Math.abs(diff)}d overdue`
   if (diff === 0) return 'Due today'
   if (diff === 1) return 'Due tomorrow'
   return `${diff}d left`
 }
 
-// ── ADD TASK MODAL ──
+// ── Add Task Modal ────────────────────────────────────────────
+
 function AddTaskModal({ isOpen, onClose, onSave, customers }) {
-  const [desc, setDesc]           = useState('')
-  const [notes, setNotes]         = useState('')
-  const [priority, setPriority]   = useState('normal')
-  const [dueDate, setDueDate]     = useState('')
-  const [dueTime, setDueTime]     = useState('')
-  const [reminder, setReminder]   = useState(false)
-  const [custQuery, setCustQuery] = useState('')
+  const { user } = useAuth()
+
+  const [desc,         setDesc]         = useState('')
+  const [notes,        setNotes]        = useState('')
+  const [priority,     setPriority]     = useState('normal')
+  const [dueDate,      setDueDate]      = useState('')
+  const [dueTime,      setDueTime]      = useState('')
+  const [reminder,     setReminder]     = useState(false)
+  const [custQuery,    setCustQuery]    = useState('')
   const [selectedCust, setSelectedCust] = useState(null)
   const [custDropOpen, setCustDropOpen] = useState(false)
-  const [selectedOrder, setSelectedOrder] = useState(null)
-  const [orderDropOpen, setOrderDropOpen] = useState(false)
-  const [category, setCategory]   = useState('general')
+  const [selectedOrder,setSelectedOrder]= useState(null)
+  const [orderDropOpen,setOrderDropOpen]= useState(false)
+  const [category,     setCategory]     = useState('general')
+  const [custOrders,   setCustOrders]   = useState([])
 
-  const ORDERS_FOR_CUST = selectedCust
-    ? (() => {
-        try {
-          const raw = localStorage.getItem(`tailorbook_orders_${selectedCust.id}`)
-          return raw ? JSON.parse(raw) : []
-        } catch { return [] }
-      })()
-    : []
+  // Load orders for selected customer from Firestore
+  useEffect(() => {
+    if (!user || !selectedCust) { setCustOrders([]); return }
+    const unsub = subscribeToOrders(
+      user.uid, selectedCust.id,
+      (orders) => setCustOrders(orders),
+      (err)    => console.error('[Tasks] custOrders:', err)
+    )
+    return unsub
+  }, [user, selectedCust])
 
   const filteredCusts = custQuery.trim()
     ? customers.filter(c => c.name.toLowerCase().includes(custQuery.toLowerCase()) || c.phone?.includes(custQuery))
@@ -83,42 +96,30 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
   const reset = () => {
     setDesc(''); setNotes(''); setPriority('normal'); setDueDate(''); setDueTime('')
     setReminder(false); setCustQuery(''); setSelectedCust(null); setCustDropOpen(false)
-    setSelectedOrder(null); setOrderDropOpen(false); setCategory('general')
+    setSelectedOrder(null); setOrderDropOpen(false); setCategory('general'); setCustOrders([])
   }
 
   const handleClose = () => { reset(); onClose() }
 
   const handleSave = () => {
     if (!desc.trim()) return
-    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     onSave({
-      id: Date.now() + Math.random(),
-      desc: desc.trim(),
-      notes: notes.trim(),
+      desc:         desc.trim(),
+      notes:        notes.trim(),
       priority,
       dueDate,
       dueTime,
       reminder,
       category,
-      customerId:    selectedCust  ? String(selectedCust.id)   : null,
-      customerName:  selectedCust  ? selectedCust.name         : null,
-      orderId:       selectedOrder ? String(selectedOrder.id)  : null,
-      orderDesc:     selectedOrder ? selectedOrder.desc        : null,
-      status: 'pending',
-      createdAt: today,
+      customerId:   selectedCust  ? String(selectedCust.id)  : null,
+      customerName: selectedCust  ? selectedCust.name        : null,
+      orderId:      selectedOrder ? String(selectedOrder.id) : null,
+      orderDesc:    selectedOrder ? selectedOrder.desc       : null,
+      done:         false,
     })
     reset()
     onClose()
   }
-
-  const CATEGORIES = [
-    { id: 'general',     label: 'General',     icon: 'assignment' },
-    { id: 'sewing',      label: 'Sewing',       icon: 'content_cut' },
-    { id: 'delivery',    label: 'Delivery',     icon: 'local_shipping' },
-    { id: 'payment',     label: 'Payment',      icon: 'payments' },
-    { id: 'fitting',     label: 'Fitting',      icon: 'checkroom' },
-    { id: 'shopping',    label: 'Shopping',     icon: 'shopping_cart' },
-  ]
 
   return (
     <div className={`${styles.modalOverlay} ${isOpen ? styles.modalOpen : ''}`}>
@@ -129,11 +130,7 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
           </button>
           <span className={styles.modalTitle}>New Task</span>
         </div>
-        <button 
-          className={styles.headerAddBtn} 
-          onClick={handleSave}
-          disabled={!desc.trim()}
-        >
+        <button className={styles.headerAddBtn} onClick={handleSave} disabled={!desc.trim()}>
           Add
         </button>
       </div>
@@ -177,9 +174,9 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
                 key={key}
                 className={`${styles.priorityChip} ${priority === key ? styles.priorityActive : ''}`}
                 style={priority === key ? {
-                  background: PRIORITY_COLORS[key].bg,
+                  background:  PRIORITY_COLORS[key].bg,
                   borderColor: PRIORITY_COLORS[key].border,
-                  color: PRIORITY_COLORS[key].text,
+                  color:       PRIORITY_COLORS[key].text,
                 } : {}}
                 onClick={() => setPriority(key)}
               >
@@ -193,25 +190,15 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
         <div className={styles.fieldRow}>
           <div className={styles.fieldGroup} style={{ flex: 1 }}>
             <label className={styles.fieldLabel}>Due Date</label>
-            <input
-              type="date"
-              className={styles.input}
-              value={dueDate}
-              onChange={e => setDueDate(e.target.value)}
-            />
+            <input type="date" className={styles.input} value={dueDate} onChange={e => setDueDate(e.target.value)} />
           </div>
           <div className={styles.fieldGroup} style={{ flex: 1 }}>
             <label className={styles.fieldLabel}>Due Time</label>
-            <input
-              type="time"
-              className={styles.input}
-              value={dueTime}
-              onChange={e => setDueTime(e.target.value)}
-            />
+            <input type="time" className={styles.input} value={dueTime} onChange={e => setDueTime(e.target.value)} />
           </div>
         </div>
 
-        {/* Reminder toggle */}
+        {/* Reminder */}
         <div className={styles.fieldGroup}>
           <div className={styles.toggleRow}>
             <div>
@@ -258,8 +245,7 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
                   ) : (
                     filteredCusts.slice(0, 6).map(c => (
                       <button key={c.id} className={styles.dropItem} onClick={() => {
-                        setSelectedCust(c); setCustQuery(''); setCustDropOpen(false)
-                        setSelectedOrder(null)
+                        setSelectedCust(c); setCustQuery(''); setCustDropOpen(false); setSelectedOrder(null)
                       }}>
                         <div className={styles.dropAvatar}>
                           {c.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}
@@ -277,13 +263,16 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
           )}
         </div>
 
-        {/* Related Order — only shown if customer selected */}
+        {/* Related Order */}
         {selectedCust && (
           <div className={styles.fieldGroup}>
             <label className={styles.fieldLabel}>Related Order <span className={styles.optional}>(optional)</span></label>
             {selectedOrder ? (
               <div className={styles.selectedChip}>
-                <span className={styles.chipName}><span className="mi" style={{ fontSize: '1rem', verticalAlign: 'middle', marginRight: '4px' }}>content_cut</span>{selectedOrder.desc}</span>
+                <span className={styles.chipName}>
+                  <span className="mi" style={{ fontSize: '1rem', verticalAlign: 'middle', marginRight: '4px' }}>content_cut</span>
+                  {selectedOrder.desc}
+                </span>
                 <button className={styles.chipRemove} onClick={() => setSelectedOrder(null)}>
                   <span className="mi" style={{ fontSize: '1rem' }}>close</span>
                 </button>
@@ -292,15 +281,13 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
               <div className={styles.orderDropWrap}>
                 <button className={styles.orderDropBtn} onClick={() => setOrderDropOpen(p => !p)}>
                   <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)' }}>assignment</span>
-                  <span>{ORDERS_FOR_CUST.length === 0 ? 'No orders for this client' : 'Select an order…'}</span>
+                  <span>{custOrders.length === 0 ? 'No orders for this client' : 'Select an order…'}</span>
                   <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)', marginLeft: 'auto' }}>expand_more</span>
                 </button>
-                {orderDropOpen && ORDERS_FOR_CUST.length > 0 && (
+                {orderDropOpen && custOrders.length > 0 && (
                   <div className={styles.dropdown}>
-                    {ORDERS_FOR_CUST.map(o => (
-                      <button key={o.id} className={styles.dropItem} onClick={() => {
-                        setSelectedOrder(o); setOrderDropOpen(false)
-                      }}>
+                    {custOrders.map(o => (
+                      <button key={o.id} className={styles.dropItem} onClick={() => { setSelectedOrder(o); setOrderDropOpen(false) }}>
                         <span className="mi" style={{ fontSize: '1.1rem' }}>content_cut</span>
                         <div>
                           <div className={styles.dropName}>{o.desc}</div>
@@ -331,28 +318,24 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
   )
 }
 
-// ── TASK CARD ──
+// ── Task Card ─────────────────────────────────────────────────
+
 function TaskCard({ task, onToggle, onDelete, onOpen }) {
   const overdue = isOverdue(task)
-  const pc = PRIORITY_COLORS[task.priority] ?? PRIORITY_COLORS.normal
+  const pc  = PRIORITY_COLORS[task.priority] ?? PRIORITY_COLORS.normal
   const due = daysUntil(task.dueDate)
-
-  const CATEGORY_ICONS = {
-    general: 'assignment', sewing: 'content_cut', delivery: 'local_shipping',
-    payment: 'payments', fitting: 'checkroom', shopping: 'shopping_cart',
-  }
 
   return (
     <div
-      className={`${styles.taskCard} ${task.status === 'done' ? styles.taskDone : ''} ${overdue ? styles.taskOverdue : ''}`}
+      className={`${styles.taskCard} ${task.done ? styles.taskDone : ''} ${overdue ? styles.taskOverdue : ''}`}
       onClick={onOpen}
     >
       <div className={styles.priorityBar} style={{ background: pc.text }} />
       <button
-        className={`${styles.checkbox} ${task.status === 'done' ? styles.checkboxDone : ''}`}
-        onClick={e => { e.stopPropagation(); onToggle(task.id) }}
+        className={`${styles.checkbox} ${task.done ? styles.checkboxDone : ''}`}
+        onClick={e => { e.stopPropagation(); onToggle(task.id, task.done) }}
       >
-        {task.status === 'done' && <span className="mi" style={{ fontSize: '1rem' }}>check</span>}
+        {task.done && <span className="mi" style={{ fontSize: '1rem' }}>check</span>}
       </button>
 
       <div className={styles.taskContent}>
@@ -378,17 +361,15 @@ function TaskCard({ task, onToggle, onDelete, onOpen }) {
         </div>
       </div>
 
-      <button
-        className={styles.taskDeleteBtn}
-        onClick={e => { e.stopPropagation(); onDelete(task) }}
-      >
+      <button className={styles.taskDeleteBtn} onClick={e => { e.stopPropagation(); onDelete(task) }}>
         <span className="mi" style={{ fontSize: '1.1rem' }}>delete_outline</span>
       </button>
     </div>
   )
 }
 
-// ── TASK DETAIL PANEL ──
+// ── Task Detail Panel ─────────────────────────────────────────
+
 function TaskDetail({ task, onClose, onToggle, onDelete }) {
   if (!task) return null
   const overdue = isOverdue(task)
@@ -408,14 +389,14 @@ function TaskDetail({ task, onClose, onToggle, onDelete }) {
         <div className={styles.detailBody}>
           <div className={styles.statusRow}>
             <button
-              className={`${styles.statusBtn} ${task.status !== 'done' ? styles.statusPending : ''}`}
-              onClick={() => onToggle(task.id, 'pending')}
+              className={`${styles.statusBtn} ${!task.done ? styles.statusPending : ''}`}
+              onClick={() => onToggle(task.id, true)}  // toggle to not-done
             >
               Pending
             </button>
             <button
-              className={`${styles.statusBtn} ${task.status === 'done' ? styles.statusDoneBtn : ''}`}
-              onClick={() => onToggle(task.id, 'done')}
+              className={`${styles.statusBtn} ${task.done ? styles.statusDoneBtn : ''}`}
+              onClick={() => onToggle(task.id, false)} // toggle to done
             >
               ✓ Done
             </button>
@@ -442,10 +423,6 @@ function TaskDetail({ task, onClose, onToggle, onDelete }) {
                 </div>
               </div>
             )}
-            <div className={styles.detailCell}>
-              <div className={styles.detailCellLabel}>Created</div>
-              <div className={styles.detailCellVal}>{task.createdAt}</div>
-            </div>
           </div>
 
           {(task.customerName || task.orderDesc) && (
@@ -483,23 +460,26 @@ function TaskDetail({ task, onClose, onToggle, onDelete }) {
   )
 }
 
-// ── TABS CONFIG ──
+// ── Tabs Config ───────────────────────────────────────────────
+
 const TABS = [
-  { id: 'all',      label: 'All' },
-  { id: 'pending',  label: 'Pending' },
-  { id: 'done',     label: 'Done' },
-  { id: 'overdue',  label: 'Overdue' },
+  { id: 'all',     label: 'All'     },
+  { id: 'pending', label: 'Pending' },
+  { id: 'done',    label: 'Done'    },
+  { id: 'overdue', label: 'Overdue' },
 ]
 
-// ── MAIN PAGE ──
+// ── Main Page ─────────────────────────────────────────────────
+
 export default function Tasks({ onMenuClick }) {
-  const { customers } = useCustomers()
-  const [tasks, setTasks]             = useState(() => loadTasks())
-  const [activeTab, setActiveTab]     = useState('all')
-  const [modalOpen, setModalOpen]     = useState(false)
-  const [detailTask, setDetailTask]   = useState(null)
-  const [confirmDel, setConfirmDel]   = useState(null)
-  const [toastMsg, setToastMsg]       = useState('')
+  const { customers }                               = useCustomers()
+  const { tasks, addTask, toggleTask, deleteTask }  = useTasks()
+
+  const [activeTab,  setActiveTab]  = useState('all')
+  const [modalOpen,  setModalOpen]  = useState(false)
+  const [detailTask, setDetailTask] = useState(null)
+  const [confirmDel, setConfirmDel] = useState(null)
+  const [toastMsg,   setToastMsg]   = useState('')
   const toastTimer = useRef(null)
 
   const showToast = useCallback((msg) => {
@@ -508,45 +488,52 @@ export default function Tasks({ onMenuClick }) {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
 
-  useEffect(() => { saveTasks(tasks) }, [tasks])
-
-  const addTask = (task) => {
-    setTasks(prev => [task, ...prev])
-    showToast('Task added ✓')
+  const handleAdd = async (taskData) => {
+    try {
+      await addTask(taskData)
+      showToast('Task added ✓')
+    } catch {
+      showToast('Failed to add task. Try again.')
+    }
   }
 
-  const toggleTask = (id, forceTo) => {
-    setTasks(prev => prev.map(t => {
-      if (String(t.id) !== String(id)) return t
-      const next = forceTo ?? (t.status === 'done' ? 'pending' : 'done')
-      return { ...t, status: next }
-    }))
-    setDetailTask(prev => prev && String(prev.id) === String(id)
-      ? { ...prev, status: forceTo ?? (prev.status === 'done' ? 'pending' : 'done') }
-      : prev
-    )
+  const handleToggle = async (id, currentDone) => {
+    try {
+      await toggleTask(id, currentDone)
+      // Update detail panel if open
+      setDetailTask(prev => prev && String(prev.id) === String(id)
+        ? { ...prev, done: !currentDone }
+        : prev
+      )
+    } catch {
+      showToast('Failed to update task.')
+    }
   }
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!confirmDel) return
-    setTasks(prev => prev.filter(t => String(t.id) !== String(confirmDel.id)))
-    showToast('Task deleted')
+    try {
+      await deleteTask(confirmDel.id)
+      showToast('Task deleted')
+    } catch {
+      showToast('Failed to delete task.')
+    }
     setConfirmDel(null)
     setDetailTask(null)
   }
 
   const filtered = tasks.filter(t => {
     if (activeTab === 'all')     return true
-    if (activeTab === 'pending') return t.status !== 'done' && !isOverdue(t)
-    if (activeTab === 'done')    return t.status === 'done'
+    if (activeTab === 'pending') return !t.done && !isOverdue(t)
+    if (activeTab === 'done')    return t.done
     if (activeTab === 'overdue') return isOverdue(t)
     return true
   })
 
   const counts = {
     all:     tasks.length,
-    pending: tasks.filter(t => t.status !== 'done' && !isOverdue(t)).length,
-    done:    tasks.filter(t => t.status === 'done').length,
+    pending: tasks.filter(t => !t.done && !isOverdue(t)).length,
+    done:    tasks.filter(t => t.done).length,
     overdue: tasks.filter(t => isOverdue(t)).length,
   }
 
@@ -581,7 +568,7 @@ export default function Tasks({ onMenuClick }) {
               {activeTab === 'all'     && 'No tasks yet.'}
               {activeTab === 'pending' && 'No pending tasks.'}
               {activeTab === 'done'    && 'No completed tasks yet.'}
-              {activeTab === 'overdue' && 'No overdue tasks. You\'re on track!'}
+              {activeTab === 'overdue' && "No overdue tasks. You're on track!"}
             </p>
             {activeTab === 'all' && <span className={styles.emptyHint}>Tap + to add your first task</span>}
           </div>
@@ -591,7 +578,7 @@ export default function Tasks({ onMenuClick }) {
           <TaskCard
             key={task.id}
             task={task}
-            onToggle={toggleTask}
+            onToggle={handleToggle}
             onDelete={(t) => setConfirmDel(t)}
             onOpen={() => setDetailTask(task)}
           />
@@ -605,7 +592,7 @@ export default function Tasks({ onMenuClick }) {
       <AddTaskModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSave={addTask}
+        onSave={handleAdd}
         customers={customers}
       />
 
@@ -613,7 +600,7 @@ export default function Tasks({ onMenuClick }) {
         <TaskDetail
           task={detailTask}
           onClose={() => setDetailTask(null)}
-          onToggle={toggleTask}
+          onToggle={handleToggle}
           onDelete={(t) => { setDetailTask(null); setConfirmDel(t) }}
         />
       )}
