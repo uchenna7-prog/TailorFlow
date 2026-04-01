@@ -59,7 +59,7 @@ export default function CustomerDetail({ onMenuClick }) {
   useEffect(() => {
     const handleSwitch = () => setActiveTab('invoice')
 
-    const handleGenerate = (e) => {
+    const handleGenerate = async (e) => {
       const { orderId } = e.detail
       const existing = data.invoices.find(inv => String(inv.orderId) === String(orderId))
 
@@ -91,9 +91,13 @@ export default function CustomerDetail({ onMenuClick }) {
         date: today,
       }
 
-      data.saveInvoice(newInvoice)
-      showToast(`${invNumber} generated ✓`)
-      setActiveTab('invoice')
+      try {
+        await data.saveInvoice(newInvoice)
+        showToast(`${invNumber} generated ✓`)
+        setActiveTab('invoice')
+      } catch {
+        showToast('Failed to save invoice. Try again.')
+      }
     }
 
     document.addEventListener('switchToInvoiceTab', handleSwitch)
