@@ -109,9 +109,9 @@
 
 /* User name */
 .userName {
-  font-family: 'Italianno', serif;
+   font-family: 'Libre Baskerville', serif;
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: var(--text);
 }
 
