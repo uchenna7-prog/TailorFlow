@@ -5,10 +5,8 @@
 // each customer's orders subcollection in real-time.
 // ─────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useRef } from 'react'
-import { useAuth }      from '../../contexts/AuthContext'
-import { useCustomers } from '../../contexts/CustomerContext'
-import { subscribeToOrders } from '../../services/orderService'
+import { useState, useRef } from 'react'
+import { useOrders } from '../../contexts/OrdersContext'
 import Header from '../../components/Header/Header'
 import styles from './Orders.module.css'
 
@@ -88,60 +86,11 @@ function OrderCard({ order }) {
 // ── Main Page ─────────────────────────────────────────────────
 
 export default function Orders({ onMenuClick }) {
-  const { user }      = useAuth()
-  const { customers } = useCustomers()
+  const { allOrders } = useOrders()
 
-  const [allOrders,  setAllOrders]  = useState([])
   const [activeTab,  setActiveTab]  = useState('all')
   const tabsRef      = useRef(null)
   const prevIndexRef = useRef(0)
-  const unsubsRef    = useRef([])
-
-  // ── Subscribe to every customer's orders subcollection ────
-  useEffect(() => {
-    // Clean up previous listeners
-    unsubsRef.current.forEach(u => u())
-    unsubsRef.current = []
-
-    if (!user || !customers.length) {
-      setAllOrders([])
-      return
-    }
-
-    // Map: customerId → orders array
-    const orderMap = {}
-
-    customers.forEach(customer => {
-      const unsub = subscribeToOrders(
-        user.uid,
-        customer.id,
-        (orders) => {
-          // Tag each order with customer name for display
-          orderMap[customer.id] = orders.map(o => ({
-            ...o,
-            customerName: o.customerName || customer.name,
-            customerId:   customer.id,
-          }))
-          // Flatten all customers' orders into one sorted array
-          const flat = Object.values(orderMap).flat()
-          flat.sort((a, b) => {
-            // Sort by createdAt descending (Firestore Timestamp or string)
-            const aTime = a.createdAt?.toMillis?.() ?? 0
-            const bTime = b.createdAt?.toMillis?.() ?? 0
-            return bTime - aTime
-          })
-          setAllOrders([...flat])
-        },
-        (err) => console.error('[Orders] subscribeToOrders:', err)
-      )
-      unsubsRef.current.push(unsub)
-    })
-
-    return () => {
-      unsubsRef.current.forEach(u => u())
-      unsubsRef.current = []
-    }
-  }, [user, customers])
 
   // ── Tab scroll helper ────────────────────────────────────
   const handleTabClick = (e, tabId) => {
