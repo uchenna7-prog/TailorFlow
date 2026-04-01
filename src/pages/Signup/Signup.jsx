@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { updateProfile } from 'firebase/auth'
 import styles from './Signup.module.css'
 
 const STEPS = [
@@ -248,7 +249,12 @@ export default function Signup() {
     setLoading(true)
     setAuthError('')
     try {
-      await signup(data.email.trim(), data.password)
+      const cred = await signup(data.email.trim(), data.password)
+
+      // Save first name as displayName so Home.jsx shows it correctly
+      const firstName = data.fullName.trim().split(' ')[0]
+      await updateProfile(cred.user, { displayName: firstName })
+
       // TODO: save profile/brand data to Firestore here if needed
       navigate('/', { replace: true })
     } catch (err) {
