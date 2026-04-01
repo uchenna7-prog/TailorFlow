@@ -41,7 +41,7 @@ function ConfirmSheet({ customer, onConfirm, onCancel }) {
   )
 }
 
-// ── Premium Gate Bottom Sheet ─────────────────────────────────
+
 function PremiumSheet({ onClose }) {
   return (
     <div className={styles.confirmOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
