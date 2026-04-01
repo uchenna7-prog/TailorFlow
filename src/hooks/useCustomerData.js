@@ -1,9 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import {
+  subscribeToInvoices,
+  addInvoice        as fsAddInvoice,
+  updateInvoiceStatus as fsUpdateInvoiceStatus,
+  deleteInvoice     as fsDeleteInvoice,
+} from '../services/invoiceService'
 
-// Per-customer localStorage keys
-const measKey    = (id) => `tailorbook_measurements_${id}`
-const ordersKey  = (id) => `tailorbook_orders_${id}`
-const invoiceKey = (id) => `tailorbook_invoices_${id}`
+// Per-customer localStorage keys (measurements + orders — unchanged)
+const measKey   = (id) => `tailorbook_measurements_${id}`
+const ordersKey = (id) => `tailorbook_orders_${id}`
 
 function load(key) {
   try {
@@ -18,19 +24,40 @@ function persist(key, data) {
 }
 
 export function useCustomerData(customerId) {
+  const { user } = useAuth()
+
   const [measurements, setMeasurements] = useState([])
   const [orders, setOrders]             = useState([])
   const [invoices, setInvoices]         = useState([])
 
-  // Load all three when customerId changes
+  // ── Load measurements + orders from localStorage (unchanged) ──
   useEffect(() => {
     if (!customerId) return
     setMeasurements(load(measKey(customerId)))
     setOrders(load(ordersKey(customerId)))
-    setInvoices(load(invoiceKey(customerId)))
   }, [customerId])
 
-  // ── MEASUREMENTS ──
+  // ── Subscribe to invoices from Firestore ──────────────────
+  // Real-time listener: fires immediately with cached data,
+  // updates live whenever another device writes.
+  // Cleans up when customerId or user changes.
+  useEffect(() => {
+    if (!user || !customerId) {
+      setInvoices([])
+      return
+    }
+
+    const unsub = subscribeToInvoices(
+      user.uid,
+      customerId,
+      (data) => setInvoices(data),
+      (err)  => console.error('[useCustomerData] invoices:', err)
+    )
+
+    return unsub
+  }, [user, customerId])
+
+  // ── MEASUREMENTS (localStorage — unchanged) ───────────────
   const saveMeasurement = useCallback((entry) => {
     setMeasurements(prev => {
       const next = [entry, ...prev]
@@ -47,7 +74,7 @@ export function useCustomerData(customerId) {
     })
   }, [customerId])
 
-  // ── ORDERS ──
+  // ── ORDERS (localStorage — unchanged) ────────────────────
   const saveOrder = useCallback((order) => {
     setOrders(prev => {
       const next = [order, ...prev]
@@ -72,30 +99,42 @@ export function useCustomerData(customerId) {
     })
   }, [customerId])
 
-  // ── INVOICES ──
-  const saveInvoice = useCallback((invoice) => {
-    setInvoices(prev => {
-      const next = [invoice, ...prev]
-      persist(invoiceKey(customerId), next)
-      return next
-    })
-  }, [customerId])
+  // ── INVOICES (Firestore) ──────────────────────────────────
 
-  const updateInvoiceStatus = useCallback((id, status) => {
-    setInvoices(prev => {
-      const next = prev.map(inv => String(inv.id) === String(id) ? { ...inv, status } : inv)
-      persist(invoiceKey(customerId), next)
-      return next
-    })
-  }, [customerId])
+  // saveInvoice — called from CustomerDetail's generateInvoice handler.
+  // Writes to Firestore; the live listener updates `invoices` state automatically.
+  const saveInvoice = useCallback(async (invoice) => {
+    if (!user || !customerId) return
+    try {
+      await fsAddInvoice(user.uid, customerId, invoice)
+    } catch (err) {
+      console.error('[useCustomerData] saveInvoice:', err)
+      throw err
+    }
+  }, [user, customerId])
 
-  const deleteInvoice = useCallback((id) => {
-    setInvoices(prev => {
-      const next = prev.filter(inv => String(inv.id) !== String(id))
-      persist(invoiceKey(customerId), next)
-      return next
-    })
-  }, [customerId])
+  // updateInvoiceStatus — called when user marks paid/unpaid from InvoiceView.
+  // Optimistic update is NOT needed here — the Firestore listener is fast enough.
+  const updateInvoiceStatus = useCallback(async (id, status) => {
+    if (!user || !customerId) return
+    try {
+      await fsUpdateInvoiceStatus(user.uid, customerId, String(id), status)
+    } catch (err) {
+      console.error('[useCustomerData] updateInvoiceStatus:', err)
+      throw err
+    }
+  }, [user, customerId])
+
+  // deleteInvoice — called from InvoiceView's delete button.
+  const deleteInvoice = useCallback(async (id) => {
+    if (!user || !customerId) return
+    try {
+      await fsDeleteInvoice(user.uid, customerId, String(id))
+    } catch (err) {
+      console.error('[useCustomerData] deleteInvoice:', err)
+      throw err
+    }
+  }, [user, customerId])
 
   return {
     measurements, saveMeasurement, deleteMeasurement,
