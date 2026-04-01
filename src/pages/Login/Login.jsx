@@ -36,7 +36,7 @@ export default function Login() {
 
         <div className={styles.logo}>
           <span className="mi" style={{ fontSize: '2rem', color: 'var(--accent)' }}>content_cut</span>
-          <span className={styles.logoText}>TailorBook</span>
+          <span className={styles.logoText}>TailorFlow</span>
         </div>
 
         <h1 className={styles.title}>Welcome back</h1>
