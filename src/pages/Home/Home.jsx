@@ -20,10 +20,16 @@ function Home({ onMenuClick }) {
   const { orders }    = useOrders()
   const { tasks }     = useTasks()
 
-  // Get first name from display name or email
-  const firstName = user?.displayName
-    ? user.displayName.split(' ')[0]
-    : user?.email?.split('@')[0] ?? 'there'
+  // Nigerian naming convention: Surname NativeName EnglishName
+  // We pick the middle name (native name) for the greeting.
+  // If only 1 part → use it. If 2 parts → use first. If 3+ parts → use index [1].
+  const greetName = (() => {
+    const raw = user?.displayName || user?.email?.split('@')[0] || 'there'
+    const parts = raw.trim().split(' ').filter(Boolean)
+    if (parts.length >= 3) return parts[1]   // native name (middle)
+    if (parts.length === 2) return parts[0]  // first of two
+    return parts[0]                          // single name
+  })()
 
   // Recent orders — last 3
   const recentOrders = [...(orders ?? [])].slice(0, 3)
@@ -37,7 +43,7 @@ function Home({ onMenuClick }) {
         <section className={styles.heroSection}>
           <div className={styles.greetHeader}>
             <span className={styles.greetText}>Welcome back 👋,</span>
-            <span className={styles.signatureName}>{firstName}</span>
+            <span className={styles.signatureName}>{greetName}</span>
           </div>
           <p className={styles.greetSubText}>
             Here's what's happening in your tailoring shop today
