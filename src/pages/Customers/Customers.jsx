@@ -179,73 +179,81 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
       <div className={`${styles.formOverlay} ${isOpen ? styles.formOverlayOpen : ''}`}>
         <div className={styles.formHeader}>
           <button className="mi" onClick={handleClose} style={{ background:'none', border:'none', color:'var(--text)', fontSize:'1.8rem', cursor:'pointer' }}>arrow_back</button>
-          <div className={styles.formHeaderTitle}>New Customer</div>
-          <button className={styles.headerSaveBtn} onClick={handleSave}>Save</button>
+          <span className={styles.formTitle}>New Customer</span>
+          <button className={styles.formSaveBtn} onClick={handleSave}>Save</button>
         </div>
 
+        {/* Tab switcher */}
         <div className={styles.formTabs}>
-          <button className={`${styles.formTab} ${formTab === 'personal' ? styles.formTabActive : ''}`} onClick={() => setFormTab('personal')}>Personal Info</button>
-          <button className={`${styles.formTab} ${formTab === 'body' ? styles.formTabActive : ''}`} onClick={() => setFormTab('body')}>Body Measurements</button>
+          <button
+            className={`${styles.formTab} ${formTab === 'personal' ? styles.formTabActive : ''}`}
+            onClick={() => setFormTab('personal')}
+          >Personal Info</button>
+          <button
+            className={`${styles.formTab} ${formTab === 'body' ? styles.formTabActive : ''}`}
+            onClick={() => setFormTab('body')}
+          >Body Measurements</button>
         </div>
 
         <div className={styles.formBody}>
           {formTab === 'personal' && (
             <>
-              {/* Photo picker — always visible, locked for free users */}
-              <div className={styles.photoPicker} onClick={handlePhotoPicker} style={{ position: 'relative' }}>
+              {/* Avatar / photo picker */}
+              <div className={styles.avatarPicker} onClick={handlePhotoPicker}>
                 {photo
-                  ? <img src={photo} alt="Profile" className={styles.photoPreview} />
-                  : <div className={styles.photoInitials}>{initials}</div>
+                  ? <img src={photo} alt="Preview" className={styles.avatarPreview} />
+                  : <div className={styles.avatarPlaceholder}>{initials}</div>
                 }
-                <div className={styles.camBadge}>
-                  {isPremium
-                    ? <span className="mi" style={{ fontSize:'0.9rem' }}>photo_camera</span>
-                    : <span className="mi" style={{ fontSize:'0.9rem' }}>lock</span>
-                  }
+                <div className={styles.avatarHint}>
+                  <span className="mi" style={{ fontSize:'1rem' }}>add_a_photo</span>
+                  {isPremium ? 'Add photo' : 'Photo (Pro)'}
                 </div>
-                {/* Hidden file input — only usable by premium */}
-                {isPremium && (
-                  <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handlePhotoChange} />
-                )}
               </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handlePhotoChange}
+              />
 
               <div className={styles.inputGroup}>
                 <label className={styles.inputLabel}>Full Name *</label>
-                <input type="text" className={styles.formInput} placeholder="e.g. Uchendu Daniel" value={name} onChange={e => setName(e.target.value)} />
+                <input type="text" className={styles.formInput} placeholder="e.g. Amara Okonkwo" value={name} onChange={e => setName(e.target.value)} />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Phone Number *</label>
+                <div className={styles.phoneRow}>
+                  <select className={styles.phoneTypeSelect} value={phoneType} onChange={e => setPhoneType(e.target.value)}>
+                    <option>Mobile</option>
+                    <option>WhatsApp</option>
+                    <option>Home</option>
+                    <option>Work</option>
+                  </select>
+                  <input type="tel" className={styles.formInput} placeholder="+234 800 000 0000" value={phone} onChange={e => setPhone(e.target.value)} />
+                </div>
               </div>
 
               <div className={styles.inputGroup}>
                 <label className={styles.inputLabel}>Sex</label>
                 <div className={styles.sexRow}>
-                  {['Male', 'Female'].map(s => (
-                    <button key={s} className={`${styles.sexChip} ${sex === s ? styles.sexChipActive : ''}`} onClick={() => setSex(s)}>{s}</button>
+                  {['Male', 'Female', 'Other'].map(s => (
+                    <button key={s} className={`${styles.sexBtn} ${sex === s ? styles.sexBtnActive : ''}`} onClick={() => setSex(s)}>{s}</button>
                   ))}
                 </div>
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Birthday (Day & Month)</label>
-                <div className={styles.inputRow}>
-                  <select className={styles.formInput} value={bdayDay} onChange={e => setBdayDay(e.target.value)}>
-                    <option value="">Day</option>
-                    {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                  <select className={styles.formInput} value={bdayMonth} onChange={e => setBdayMonth(e.target.value)}>
+                <label className={styles.inputLabel}>Birthday</label>
+                <div className={styles.bdayRow}>
+                  <select className={styles.bdaySelect} value={bdayMonth} onChange={e => setBdayMonth(e.target.value)}>
                     <option value="">Month</option>
                     {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
                   </select>
-                </div>
-              </div>
-
-              <div className={styles.inputRow}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Phone Number *</label>
-                  <input type="tel" className={styles.formInput} placeholder="080xxxxxxxx" inputMode="tel" value={phone} onChange={e => setPhone(e.target.value)} />
-                </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Phone Type</label>
-                  <select className={styles.formInput} value={phoneType} onChange={e => setPhoneType(e.target.value)}>
-                    <option>Mobile</option><option>Home</option><option>Work</option>
+                  <select className={styles.bdaySelect} value={bdayDay} onChange={e => setBdayDay(e.target.value)}>
+                    <option value="">Day</option>
+                    {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
                 </div>
               </div>
@@ -362,14 +370,21 @@ export default function Customers({ onMenuClick }) {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }
 
-  const handleSave = ({ name, phone, phoneType, sex, birthday, email, address, notes, photo, bodyMeasurements }) => {
+  // ── handleSave — await addCustomer so the real Firestore ID
+  // is used for everything downstream (orders, measurements,
+  // invoices). The old Date.now() id was never stored in
+  // Firestore, so all subcollection data was orphaned on refresh.
+  const handleSave = async ({ name, phone, phoneType, sex, birthday, email, address, notes, photo, bodyMeasurements }) => {
     if (!name)  { showToast('Name is required'); return }
     if (!phone) { showToast('Phone number is required'); return }
-    const today    = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
-    const customer = { id: Date.now(), name, phone, phoneType, sex, birthday, email, address, notes, photo, bodyMeasurements, date: today }
-    addCustomer(customer)
-    setFormOpen(false)
-    showToast(`${name} added ✓`)
+    const today = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+    try {
+      await addCustomer({ name, phone, phoneType, sex, birthday, email, address, notes, photo, bodyMeasurements, date: today })
+      setFormOpen(false)
+      showToast(`${name} added ✓`)
+    } catch {
+      showToast('Failed to save. Try again.')
+    }
   }
 
   const handleDeleteConfirm = () => {
