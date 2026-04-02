@@ -2,23 +2,19 @@
 .emptyState p { font-size: 0.8rem; color: var(--text3); }
 .hint { font-size: 0.7rem; color: var(--text3); opacity: 0.6; }
 
-/* ── MEASUREMENT ITEM CARD ── */
-.itemCard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 12px 14px; display: flex; align-items: center; gap: 15px; margin-bottom: 12px; animation: fadeIn 0.35s ease; cursor: pointer; transition: border-color 0.2s; user-select: none; }
-.itemCard:active { border-color: var(--border2); background: var(--surface2); }
-.designThumb { width: 60px; height: 60px; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text3); flex-shrink: 0; overflow: hidden; }
-.designThumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 11px; }
-.cardInfo { flex: 1; min-width: 0; }
-.cardInfo h4 { font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
-.cardInfo p { font-size: 0.65rem; color: var(--text3); text-transform: uppercase; margin-top: 3px; font-weight: 600; }
-.unitBadge { display: inline-block; font-size: 0.6rem; color: var(--text3); border: 1px solid var(--border2); border-radius: 5px; padding: 1px 5px; margin-top: 4px; font-weight: 700; }
-.cardActions { display: flex; align-items: center; gap: 4px; }
+/* ── MEASUREMENT ITEM CARD (now list-style, same as orders) ── */
+.itemCard { display: none; }
+.designThumb { display: none; }
+.cardInfo { display: none; }
+.unitBadge { display: none; }
+.cardActions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .cardDelete { color: var(--danger); background: none; border: none; cursor: pointer; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
 .cardDelete:active { opacity: 0.6; }
 
 /* ── ORDER LIST (image 2 style) ── */
 .orderGroup { margin-bottom: 16px; }
 .orderGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 16px 8px; }
-.orderGroupDivider { height: 1px; background: var(--border); width: 100%; }
+.orderGroupDivider { height: 1px; background: var(--border); width: calc(100% + 32px); margin-left: -16px; }
 
 /* Each row: no border on last item, 97% width divider line otherwise */
 .orderListItem { display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; transition: background 0.15s; background: var(--bg); position: relative; }
