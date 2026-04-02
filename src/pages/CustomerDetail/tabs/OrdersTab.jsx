@@ -297,48 +297,52 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
 
       {Object.entries(grouped).map(([date, dateOrders]) => (
         <div key={date} className={styles.orderGroup}>
+          {/* Date header with full-width separator line */}
           <div className={styles.orderGroupDate}>{date}</div>
-          <div className={styles.orderListSection}>
-            {dateOrders.map((o, idx) => {
-              const priceStr    = o.price !== null && o.price !== undefined ? `₦${Number(o.price).toLocaleString()}` : '—'
-              const statusLabel = STATUSES.find(s => s.value === o.status)?.label ?? o.status ?? 'Pending'
-              const statusClass = o.status === 'completed' || o.status === 'delivered'
-                ? styles.statusDone : styles.statusPending
-              const isLast = idx === dateOrders.length - 1
+          <div className={styles.orderGroupDivider} />
 
-              return (
-                <div
-                  key={o.id}
-                  className={`${styles.orderListItem} ${isLast ? styles.orderListItemLast : ''}`}
-                  onClick={() => setDetailOrder(o)}
-                >
-                  {/* Left: priority accent dot */}
-                  <div className={styles.orderListDot} style={{ background: PRIORITY_COLOR[o.priority] ?? PRIORITY_COLOR.normal }} />
+          {dateOrders.map((o, idx) => {
+            const priceStr    = o.price !== null && o.price !== undefined ? `₦${Number(o.price).toLocaleString()}` : '—'
+            const statusLabel = STATUSES.find(s => s.value === o.status)?.label ?? o.status ?? 'Pending'
+            const statusClass = o.status === 'completed' || o.status === 'delivered'
+              ? styles.statusDone : styles.statusPending
+            // Find linked measurement for thumbnail
+            const ids    = o.measurementIds?.length ? o.measurementIds : (o.measurementId ? [o.measurementId] : [])
+            const linked = ids.map(id => measurements.find(m => String(m.id) === String(id))).filter(Boolean)
+            const thumb  = linked[0]
 
-                  {/* Center: order info */}
-                  <div className={styles.orderListInfo}>
-                    <div className={styles.orderListDesc}>{o.desc}</div>
-                    <div className={styles.orderListMeta}>
-                      <span className={styles.orderListOrdNum}>Ord# {o.id?.toString().slice(-5).toUpperCase() ?? '—'}</span>
-                      <span className={`${styles.statusBadge} ${statusClass}`}>{statusLabel}</span>
-                    </div>
-                    {o.due && (
-                      <div className={styles.orderListDue}>Due On {o.due}</div>
-                    )}
-                  </div>
-
-                  {/* Right: price + qty */}
-                  <div className={styles.orderListRight}>
-                    <div className={styles.orderListPrice}>{priceStr}</div>
-                    <div className={styles.orderListQty}>({o.qty} item{o.qty !== 1 ? 's' : ''})</div>
-                  </div>
-
-                  {/* Chevron */}
-                  <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)', flexShrink: 0 }}>chevron_right</span>
+            return (
+              <div
+                key={o.id}
+                className={styles.orderListItem}
+                onClick={() => setDetailOrder(o)}
+              >
+                {/* Left: thumbnail image box */}
+                <div className={styles.orderListThumb} style={{ borderColor: PRIORITY_COLOR[o.priority] ?? PRIORITY_COLOR.normal }}>
+                  {thumb?.imgSrc
+                    ? <img src={thumb.imgSrc} alt={thumb.name} className={styles.orderListThumbImg} />
+                    : <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text3)' }}>content_cut</span>
+                  }
                 </div>
-              )
-            })}
-          </div>
+
+                {/* Center: order info */}
+                <div className={styles.orderListInfo}>
+                  <div className={styles.orderListDesc}>{o.desc}</div>
+                  <div className={styles.orderListMeta}>
+                    <span className={styles.orderListOrdNum}>Ord# {o.id?.toString().slice(-5).toUpperCase() ?? '—'}</span>
+                    <span className={`${styles.statusBadge} ${statusClass}`}>{statusLabel}</span>
+                  </div>
+                  <div className={styles.orderListPriceLine}>
+                    <span className={styles.orderListPrice}>{priceStr}</span>
+                    <span className={styles.orderListQty}> ({o.qty} item{o.qty !== 1 ? 's' : ''})</span>
+                  </div>
+                  {o.due && (
+                    <div className={styles.orderListDue}>Due On {o.due}</div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
       ))}
 
