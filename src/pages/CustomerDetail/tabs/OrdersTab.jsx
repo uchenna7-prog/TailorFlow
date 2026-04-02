@@ -9,8 +9,6 @@ const PRIORITY_BANNER = {
   vip:    { cls: styles.bannerVip,    text: 'VIP ★' },
 }
 
-// ── Status config — single source of truth ────────────────────
-// These values must match the filter in Orders.jsx exactly
 const STATUSES = [
   { value: 'pending',   label: 'Pending'   },
   { value: 'completed', label: 'Completed' },
@@ -18,7 +16,6 @@ const STATUSES = [
   { value: 'cancelled', label: 'Cancelled' },
 ]
 
-// ── ORDER FORM MODAL ──────────────────────────────────────────
 function OrderModal({ isOpen, onClose, measurements, onSave }) {
   const [selectedIds,  setSelectedIds]  = useState([])
   const [pickerQuery,  setPickerQuery]  = useState('')
@@ -49,7 +46,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
     let dueDisplay = ''
     if (due) {
       const d = new Date(due + 'T00:00:00')
-      dueDisplay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      dueDisplay = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     }
     onSave({
       id:             Date.now() + Math.random(),
@@ -62,7 +59,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
       priority,
       measurementIds: [...selectedIds],
       measurementId:  selectedIds[0] ?? null,
-      status:         'pending',   // ← always starts as pending
+      status:         'pending',
       date:           today,
     })
     reset()
@@ -91,8 +88,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
             </div>
           )}
           <div className={styles.pickerList}>
-            {measurements.length === 0 && <p style={{ fontSize: '0.75rem', color: 'var(--text3)', paddingBottom: 6 }}>No measurements yet. You can still place an order.</p>}
-            {filteredMeasurements.length === 0 && measurements.length > 0 && <p style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>No matches found.</p>}
+            {measurements.length === 0 && <p style={{ fontSize: '0.75rem', color: 'var(--text3)', paddingBottom: 6 }}>No measurements yet.</p>}
             {filteredMeasurements.map(m => {
               const selected = selectedIds.includes(String(m.id))
               return (
@@ -102,7 +98,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
                   </div>
                   <div className={styles.pickerInfo}>
                     <h5>{m.name}</h5>
-                    <span>{m.fields.length} field{m.fields.length !== 1 ? 's' : ''}</span>
+                    <span>{m.fields.length} fields</span>
                   </div>
                   <div className={`${styles.pickerCheck} ${selected ? styles.pickerCheckSelected : ''}`}>
                     {selected && <span className="mi" style={{ fontSize: '0.9rem' }}>check</span>}
@@ -116,21 +112,18 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
           <div className={styles.orderFormCard}>
             <label className={styles.labelTiny}>Description / Cloth Type</label>
             <input type="text" className={styles.clothInput} placeholder="e.g. Senator Suit" value={desc} onChange={e => setDesc(e.target.value)} />
-
             <div style={{ display: 'flex', gap: 14, marginBottom: 20 }}>
               <div style={{ flex: 1 }}>
                 <label className={styles.labelTiny}>Price (₦)</label>
-                <input type="number" className={styles.clothInput} style={{ marginBottom: 0 }} placeholder="0.00" inputMode="decimal" value={price} onChange={e => setPrice(e.target.value)} />
+                <input type="number" className={styles.clothInput} style={{ marginBottom: 0 }} placeholder="0.00" value={price} onChange={e => setPrice(e.target.value)} />
               </div>
               <div style={{ flex: 1 }}>
                 <label className={styles.labelTiny}>Qty</label>
-                <input type="number" className={styles.clothInput} style={{ marginBottom: 0 }} placeholder="1" inputMode="numeric" min="1" value={qty} onChange={e => setQty(e.target.value)} />
+                <input type="number" className={styles.clothInput} style={{ marginBottom: 0 }} placeholder="1" value={qty} onChange={e => setQty(e.target.value)} />
               </div>
             </div>
-
             <label className={styles.labelTiny}>Due Date</label>
             <input type="date" className={styles.clothInput} value={due} onChange={e => setDue(e.target.value)} />
-
             <label className={styles.labelTiny}>Priority</label>
             <div className={styles.priorityRow}>
               {['normal', 'urgent', 'vip'].map(p => (
@@ -139,9 +132,6 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
                 </button>
               ))}
             </div>
-
-            <label className={styles.labelTiny} style={{ marginTop: 20 }}>Notes</label>
-            <textarea className={styles.orderTextarea} placeholder="Fabric colour, special instructions…" value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
         </div>
       </div>
@@ -149,13 +139,11 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
   )
 }
 
-// ── ORDER DETAIL ──────────────────────────────────────────────
 function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, onGenerateInvoice }) {
   if (!order) return null
-  const banner   = PRIORITY_BANNER[order.priority] ?? PRIORITY_BANNER.normal
-  const priceStr = order.price !== null && order.price !== undefined
-    ? `₦${Number(order.price).toLocaleString()}` : '—'
-  const ids    = order.measurementIds?.length ? order.measurementIds : (order.measurementId ? [order.measurementId] : [])
+  const banner = PRIORITY_BANNER[order.priority] ?? PRIORITY_BANNER.normal
+  const priceStr = order.price !== null ? `₦${Number(order.price).toLocaleString()}` : '—'
+  const ids = order.measurementIds?.length ? order.measurementIds : (order.measurementId ? [order.measurementId] : [])
   const linked = ids.map(id => measurements.find(m => String(m.id) === String(id))).filter(Boolean)
 
   return (
@@ -165,80 +153,26 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
         <h3 style={{ flex: 1 }}>{order.desc}</h3>
         <button className="mi" onClick={onDelete} style={{ background: 'none', border: 'none', color: 'var(--danger)', fontSize: '1.3rem', cursor: 'pointer' }}>delete_outline</button>
       </div>
-
       <div className={styles.detailBody}>
         <span className={`${styles.priorityBanner} ${banner.cls}`}>{banner.text}</span>
-
         <div className={styles.orderMetaGrid}>
-          <div className={styles.orderMetaCell}>
-            <div className={styles.cellLabel}>Price</div>
-            <div className={styles.cellValue}>{priceStr}</div>
-          </div>
-          <div className={styles.orderMetaCell}>
-            <div className={styles.cellLabel}>Qty</div>
-            <div className={styles.cellValue}>{order.qty}</div>
-          </div>
-          <div className={styles.orderMetaCell}>
-            <div className={styles.cellLabel}>Due Date</div>
-            <div className={styles.cellValue} style={{ fontSize: '0.85rem' }}>{order.due || '—'}</div>
-          </div>
-
-          {/* ── STATUS SELECTOR — values match Orders.jsx filters ── */}
+          <div className={styles.orderMetaCell}><div className={styles.cellLabel}>Price</div><div className={styles.cellValue}>{priceStr}</div></div>
+          <div className={styles.orderMetaCell}><div className={styles.cellLabel}>Qty</div><div className={styles.cellValue}>{order.qty}</div></div>
           <div className={styles.orderMetaCell} style={{ gridColumn: '1 / -1' }}>
             <div className={styles.cellLabel}>Status</div>
-            <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
               {STATUSES.map(s => (
-                <button
-                  key={s.value}
-                  className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`}
-                  onClick={() => onStatusChange(order.id, s.value)}
-                >
-                  {s.label}
-                </button>
+                <button key={s.value} className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`} onClick={() => onStatusChange(order.id, s.value)}>{s.label}</button>
               ))}
             </div>
           </div>
         </div>
-
-        {linked.length > 0 && (
-          <div className={styles.linkedSection}>
-            <div className={styles.linkLabel}>Linked Measurement{linked.length > 1 ? 's' : ''}</div>
-            {linked.map(m => (
-              <div key={m.id} className={styles.linkedRow}>
-                <div className={styles.linkedThumb}>
-                  {m.imgSrc
-                    ? <img src={m.imgSrc} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 7 }} />
-                    : <span className="mi">checkroom</span>
-                  }
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{m.name}</div>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text3)', marginTop: 2 }}>{m.fields.length} field{m.fields.length !== 1 ? 's' : ''}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {order.notes && (
-          <div className={styles.notesSection}>
-            <div className={styles.linkLabel}>Notes</div>
-            <p>{order.notes}</p>
-          </div>
-        )}
-
-        <div className={styles.detailDate}>Placed on {order.date}</div>
-
-        <button className={styles.generateInvoiceBtn} onClick={() => onGenerateInvoice(order.id)}>
-          <span className="material-icons" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: '4px' }}>receipt_long</span>
-          Generate Invoice
-        </button>
+        <button className={styles.generateInvoiceBtn} onClick={() => onGenerateInvoice(order.id)}>Generate Invoice</button>
       </div>
     </div>
   )
 }
 
-// ── MAIN TAB ──────────────────────────────────────────────────
 export default function OrdersTab({ orders, measurements, onSave, onDelete, onStatusChange, showToast }) {
   const [modalOpen,    setModalOpen]    = useState(false)
   const [detailOrder,  setDetailOrder]  = useState(null)
@@ -250,95 +184,44 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
     return () => document.removeEventListener('openOrderModal', handler)
   }, [])
 
-  const handleSave = (order) => {
-    onSave(order)
-    showToast('Order placed ✓')
-  }
-
-  const handleDeleteConfirm = () => {
-    if (!confirmDel) return
-    onDelete(confirmDel.id)
-    showToast('Order deleted')
-    setConfirmDel(null)
-    setDetailOrder(null)
-  }
-
-  const handleStatusChange = (id, status) => {
-    onStatusChange(id, status)
-    setDetailOrder(prev =>
-      prev && String(prev.id) === String(id) ? { ...prev, status } : prev
-    )
-  }
-
-  const handleGenerateInvoice = (orderId) => {
-    document.dispatchEvent(new CustomEvent('generateInvoice', { detail: { orderId } }))
-    document.dispatchEvent(new CustomEvent('switchToInvoiceTab'))
-    setDetailOrder(null)
-    showToast('Generating invoice…')
-  }
-
   return (
     <>
       {orders.length === 0 && (
         <div className={styles.emptyState}>
           <span className="mi" style={{ fontSize: '2.8rem', opacity: 0.4 }}>shopping_basket</span>
           <p>No active orders yet.</p>
-          <span className={styles.hint}>Tap + to place an order</span>
         </div>
       )}
 
-      {orders.map(o => {
-        const priceStr    = o.price !== null && o.price !== undefined ? `₦${Number(o.price).toLocaleString()}` : '—'
-        const ids         = o.measurementIds?.length ? o.measurementIds : (o.measurementId ? [o.measurementId] : [])
-        const linkedCount = ids.filter(id => measurements.find(m => String(m.id) === String(id))).length
-        const linkedStr   = linkedCount > 0 ? ` · ${linkedCount} cloth${linkedCount > 1 ? 'es' : ''}` : ''
-        const dueStr      = o.due ? `Due ${o.due}` : 'No due date'
-        const statusLabel = STATUSES.find(s => s.value === o.status)?.label ?? o.status ?? 'Pending'
-        const statusClass = o.status === 'completed' || o.status === 'delivered'
-          ? styles.statusDone : styles.statusPending
-
-        return (
-          <div key={o.id} className={styles.orderCard} onClick={() => setDetailOrder(o)}>
-            <div className={styles.priorityBar} style={{ background: PRIORITY_COLOR[o.priority] ?? PRIORITY_COLOR.normal }} />
-            <div className={styles.orderCardIcon}><span className="mi">content_cut</span></div>
-            <div className={styles.orderCardInfo}>
-              <h4>{o.desc}</h4>
-              <p>{dueStr}{linkedStr}</p>
-              <span className={`${styles.statusBadge} ${statusClass}`}>{statusLabel}</span>
+      <div className={styles.ordersContainer}>
+        {orders.map(o => {
+          const priceStr = o.price !== null ? `₦${Number(o.price).toLocaleString()}` : '—'
+          const dueStr = o.due ? `Due On ${o.due}` : 'No due date'
+          
+          return (
+            <div key={o.id} className={styles.orderListItem} onClick={() => setDetailOrder(o)}>
+              <div className={styles.orderListIconWrap}>
+                 <div className={styles.orderListIcon}><span className="mi">content_cut</span></div>
+              </div>
+              <div className={styles.orderListMain}>
+                <div className={styles.orderListTitle}>{o.desc}</div>
+                <div className={styles.orderListSub}>Ord# {o.id.toString().slice(-5).toUpperCase()}</div>
+                <div className={styles.orderListStatus}>
+                   <span className="mi" style={{fontSize: '1rem'}}>task_alt</span> Received
+                </div>
+                <div className={styles.orderListPricing}>{priceStr} ({o.qty} item{o.qty > 1 ? 's' : ''})</div>
+                <div className={styles.orderListDueDate}>{dueStr}</div>
+              </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <div className={styles.orderPrice}>{priceStr}</div>
-              {o.qty > 1 && <div style={{ fontSize: '0.65rem', color: 'var(--text3)', marginTop: 2 }}>×{o.qty}</div>}
-            </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
 
-      <OrderModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        measurements={measurements}
-        onSave={handleSave}
-      />
+      <OrderModal isOpen={modalOpen} onClose={() => setModalOpen(false)} measurements={measurements} onSave={(o) => { onSave(o); showToast('Order placed ✓') }} />
 
-      {detailOrder && (
-        <OrderDetail
-          order={detailOrder}
-          measurements={measurements}
-          onClose={() => setDetailOrder(null)}
-          onDelete={() => setConfirmDel(detailOrder)}
-          onStatusChange={handleStatusChange}
-          onGenerateInvoice={handleGenerateInvoice}
-        />
-      )}
+      {detailOrder && <OrderDetail order={detailOrder} measurements={measurements} onClose={() => setDetailOrder(null)} onDelete={() => setConfirmDel(detailOrder)} onStatusChange={(id, s) => { onStatusChange(id, s); setDetailOrder(prev => ({...prev, status: s})) }} onGenerateInvoice={(id) => { document.dispatchEvent(new CustomEvent('generateInvoice', { detail: { orderId: id } })); setDetailOrder(null) }} />}
 
-      <ConfirmSheet
-        open={!!confirmDel}
-        title="Delete Order?"
-        message="This can't be undone."
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setConfirmDel(null)}
-      />
+      <ConfirmSheet open={!!confirmDel} title="Delete Order?" onConfirm={() => { onDelete(confirmDel.id); setConfirmDel(null); setDetailOrder(null); showToast('Deleted') }} onCancel={() => setConfirmDel(null)} />
     </>
   )
 }
