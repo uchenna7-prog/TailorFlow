@@ -115,3 +115,68 @@
   color: var(--warning);
   font-weight: 600;
 }
+
+
+/* ... (Keep previous styles until Free Mode section) ... */
+
+/* ── FREE MODE LAYOUT UPDATES ── */
+.profileSectionFree {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.profileSectionFree .name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.metaInline {
+  display: flex;
+  flex-wrap: wrap; 
+  column-gap: 12px; /* Increased gap for better breathing room */
+  row-gap: 6px;
+  align-items: center;
+}
+
+.metaItem {
+  display: flex;
+  align-items: flex-start; /* Better alignment for multi-line text */
+  gap: 6px;
+  color: var(--text2);
+  font-size: 0.8rem; /* Slightly larger font */
+  line-height: 1.4;
+  /* Allow text to wrap if it's a long address/email */
+  white-space: normal; 
+  word-break: break-word;
+}
+
+/* Divider: Phone | Birthday | Email */
+/* We use a dot or pipe that hides if the item wraps to a new line effectively */
+.metaItem:not(:last-child)::after {
+  content: '|';
+  margin-left: 10px;
+  color: var(--border);
+  opacity: 0.5;
+  align-self: center;
+}
+
+/* Larger, more prominent icons */
+.metaItem .mi { 
+  font-size: 1.1rem; /* Increased from 0.85rem */
+  color: var(--accent); /* Adding a hint of color makes it feel more premium */
+  margin-top: 1px;
+}
+
+/* Specific styling for birthday */
+.metaItem.birthday {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.metaItem.birthday .mi {
+  color: var(--warning);
+}
+
