@@ -115,7 +115,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
           <p className={styles.sectionHeading} style={{ marginTop: 24 }}>Order Details</p>
           <div className={styles.orderFormCard}>
             <label className={styles.labelTiny}>Description / Cloth Type</label>
-            <input type="text" className={styles.clothInput} placeholder="e.g. Senator Suit" value={desc} onChange={e => setDesc(e.target.value)} />
+            <input type="text" className={styles.clothInput} placeholder="e.g. Complete Suit" value={desc} onChange={e => setDesc(e.target.value)} />
 
             <div style={{ display: 'flex', gap: 14, marginBottom: 20 }}>
               <div style={{ flex: 1 }}>
