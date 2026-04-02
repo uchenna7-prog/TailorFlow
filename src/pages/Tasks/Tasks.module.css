@@ -11,7 +11,7 @@
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   position: sticky;
-  top: 56px; /* below header */
+  top: 56px;
   z-index: 50;
   flex-shrink: 0;
 }
@@ -34,10 +34,7 @@
   gap: 5px;
 }
 
-.tabActive {
-  color: var(--accent);
-  font-weight: 800;
-}
+.tabActive { color: var(--accent); font-weight: 800; }
 
 .tabActive::after {
   content: '';
@@ -79,50 +76,77 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* ── TASK CARD ── */
-.taskCard {
+/* ── TASK GROUP (date-grouped, same pattern as all other pages) ── */
+.taskGroup { margin-bottom: 16px; }
+.taskGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 0 8px; }
+.taskGroupDivider { height: 1px; background: var(--border); width: calc(100% + 32px); margin-left: -16px; }
+
+/* Each row */
+.taskListItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  cursor: pointer;
+  transition: background 0.15s;
+  background: var(--bg);
+  position: relative;
+}
+
+.taskListItem::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: -16px;
+  height: 1px;
+  background: var(--border);
+}
+
+.taskListItemLast::after { display: none; }
+.taskListItem:active { background: var(--surface); }
+.taskListItemDone { opacity: 0.5; }
+
+/* Outer grey box */
+.taskListOuter {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 12px 14px 16px;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  position: relative;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Inner white box */
+.taskListInner {
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  transition: background 0.15s, opacity 0.2s;
-  animation: fadeUp 0.3s ease both;
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+/* Text */
+.taskListInfo { flex: 1; min-width: 0; }
+.taskListDesc { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.taskListDescDone { text-decoration: line-through; color: var(--text3); }
+.taskListMeta { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.taskListMetaText { font-size: 0.78rem; font-weight: 400; color: var(--text2); }
+.taskListMetaDone { color: var(--success, #22c55e); }
+.taskListMetaOverdue { color: #ef4444; }
+.taskListDue { font-size: 0.78rem; font-weight: 500; color: var(--text2); margin-top: 1px; }
+.taskListDueOverdue { color: #ef4444; font-weight: 600; }
 
-.taskCard:active { background: var(--surface2); }
+/* Right actions */
+.taskListActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
-.taskDone {
-  opacity: 0.5;
-}
-
-.taskOverdue {
-  border-color: rgba(239,68,68,0.3);
-  background: rgba(239,68,68,0.04);
-}
-
-.priorityBar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--text3) !important;
-  border-radius: 16px 0 0 16px;
-  opacity: 0.6;
-}
-
+/* Checkbox (kept from original) */
 .checkbox {
   width: 22px;
   height: 22px;
@@ -134,7 +158,6 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-top: 1px;
   transition: all 0.2s;
 }
 
@@ -144,49 +167,7 @@
   color: var(--bg);
 }
 
-.taskContent {
-  flex: 1;
-  min-width: 0;
-}
-
-.taskDesc {
-  font-size: 0.92rem;
-  font-weight: 600;
-  line-height: 1.4;
-  margin-bottom: 6px;
-  word-break: break-word;
-}
-
-.taskDone .taskDesc {
-  text-decoration: line-through;
-  color: var(--text3);
-}
-
-.taskMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.metaChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px 7px;
-  font-size: 0.65rem;
-  color: var(--text3);
-  font-weight: 600;
-}
-
-.metaOverdue {
-  background: rgba(239,68,68,0.1);
-  border-color: rgba(239,68,68,0.3);
-  color: #ef4444;
-}
-
+/* Delete button */
 .taskDeleteBtn {
   background: none;
   border: none;
@@ -210,15 +191,8 @@
   gap: 10px;
   text-align: center;
 }
-.emptyState p {
-  font-size: 0.85rem;
-  color: var(--text3);
-}
-.emptyHint {
-  font-size: 0.75rem;
-  color: var(--text3);
-  opacity: 0.6;
-}
+.emptyState p { font-size: 0.85rem; color: var(--text3); }
+.emptyHint { font-size: 0.75rem; color: var(--text3); opacity: 0.6; }
 
 /* ── FAB ── */
 .fab {
@@ -265,52 +239,24 @@
   background: var(--bg);
 }
 
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.modalTitle {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.modalClose {
-  background: none;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  padding: 4px;
-}
+.headerLeft { display: flex; align-items: center; gap: 12px; }
+.modalTitle { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.modalClose { background: none; border: none; color: var(--text); cursor: pointer; display: flex; align-items: center; padding: 4px; }
 
 .headerAddBtn {
   background: var(--accent);
   border: none;
   color: var(--bg);
-  /* Adjusted for the screenshot look */
   font-size: 0.9rem;
   font-weight: 700;
   padding: 10px 24px;
-  border-radius: 10px; 
+  border-radius: 10px;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
   transition: opacity 0.2s, transform 0.1s;
 }
-
-.headerAddBtn:active {
-  opacity: 0.8;
-  transform: scale(0.96);
-}
-
-.headerAddBtn:disabled {
-  opacity: 0.2;
-  cursor: not-allowed;
-}
-
+.headerAddBtn:active { opacity: 0.8; transform: scale(0.96); }
+.headerAddBtn:disabled { opacity: 0.2; cursor: not-allowed; }
 
 .modalBody {
   flex: 1;
@@ -321,22 +267,8 @@
 
 /* Fields */
 .fieldGroup { margin-bottom: 18px; }
-.fieldLabel {
-  font-size: 0.6rem;
-  font-weight: 800;
-  color: var(--text2);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: block;
-  margin-bottom: 8px;
-}
-.optional {
-  color: var(--text3);
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.6rem;
-}
+.fieldLabel { font-size: 0.6rem; font-weight: 800; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px; }
+.optional { color: var(--text3); font-weight: 600; text-transform: none; letter-spacing: 0; font-size: 0.6rem; }
 .fieldRow { display: flex; gap: 12px; margin-bottom: 18px; }
 .input, .textarea {
   width: 100%;
@@ -355,59 +287,21 @@
 
 /* Category grid */
 .categoryGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.categoryChip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 10px 6px;
-  border-radius: 12px;
-  border: 1px solid var(--border2);
-  background: var(--surface);
-  color: var(--text3);
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-}
+.categoryChip { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 12px; border: 1px solid var(--border2); background: var(--surface); color: var(--text3); font-size: 0.72rem; font-weight: 700; cursor: pointer; }
 .categoryActive { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
 
 /* Priority row */
 .priorityRow { display: flex; gap: 8px; }
-.priorityChip {
-  flex: 1;
-  padding: 9px 4px;
-  border-radius: 10px;
-  border: 1px solid var(--border2);
-  background: var(--surface);
-  color: var(--text3);
-  font-size: 0.72rem;
-  font-weight: 800;
-  cursor: pointer;
-  text-align: center;
-}
+.priorityChip { flex: 1; padding: 9px 4px; border-radius: 10px; border: 1px solid var(--border2); background: var(--surface); color: var(--text3); font-size: 0.72rem; font-weight: 800; cursor: pointer; text-align: center; }
 .priorityActive { border-width: 1.5px; }
 
 /* Toggle */
-.toggleRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  padding: 14px 16px;
-}
+.toggleRow { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 14px 16px; }
 .toggleLabel { font-size: 0.88rem; font-weight: 700; }
 .toggleSub { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
-.toggle {
-  width: 44px; height: 26px; border-radius: 13px;
-  background: var(--border2); border: none; position: relative;
-}
+.toggle { width: 44px; height: 26px; border-radius: 13px; background: var(--border2); border: none; position: relative; }
 .toggleOn { background: var(--accent); }
-.toggleThumb {
-  position: absolute; top: 3px; left: 3px; width: 20px; height: 20px;
-  border-radius: 50%; background: var(--bg); transition: transform 0.2s;
-}
+.toggleThumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg); transition: transform 0.2s; }
 .toggleOn .toggleThumb { transform: translateX(18px); }
 
 /* Search & Dropdown */
@@ -418,6 +312,7 @@
 .dropAvatar { width: 32px; height: 32px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; flex-shrink: 0; }
 .dropName { font-size: 0.88rem; font-weight: 700; color: var(--text); }
 .dropMeta { font-size: 0.7rem; color: var(--text3); }
+.dropEmpty { padding: 14px; font-size: 0.82rem; color: var(--text3); text-align: center; }
 
 /* Chips */
 .selectedChip { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--accent); border-radius: 12px; padding: 10px 12px; }
