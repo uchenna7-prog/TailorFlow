@@ -96,7 +96,7 @@ function MeasureModal({ isOpen, onClose, onSave }) {
             </div>
 
             <label className={styles.labelTiny}>Name</label>
-            <input type="text" className={styles.clothInput} placeholder="e.g. Kaftan Top" value={card.name} onChange={e => updateCard(card.id, 'name', e.target.value)} />
+            <input type="text" className={styles.clothInput} placeholder="e.g. shirt" value={card.name} onChange={e => updateCard(card.id, 'name', e.target.value)} />
 
             <label className={styles.labelTiny}>Design Reference</label>
             <label className={styles.designUploadArea}>
