@@ -27,7 +27,7 @@ function InvoiceCard({ invoice, currency, onTap }) {
       <div className={styles.cardBody}>
         <h4 className={styles.cardDesc}>{invoice.orderDesc || 'Order'}</h4>
         <p className={styles.cardSub}>
-          Issued on {invoice.date}
+          Generated on {invoice.date}
         </p>
         <div className={styles.statusWrapper}>
           <span className={`${styles.statusBadge} ${styles[`status_${invoice.status}`]}`}>
