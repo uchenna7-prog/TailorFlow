@@ -5,7 +5,7 @@ import styles from './InvoiceTab.module.css'
 
 function fmt(currency = '₦', amount) {
   const n = parseFloat(amount) || 0
-  return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`
+  return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`
 }
 
 const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
@@ -27,7 +27,9 @@ function InvoiceCard({ invoice, currency, onTap }) {
       <div className={styles.cardBody}>
         <div className={styles.cardDesc}>{invoice.orderDesc || 'Order'}</div>
         <div className={styles.cardSub}>
-          {invoice.date}
+          Due {invoice.date} • {invoice.qty} cloth
+        </div>
+        <div className={styles.statusWrapper}>
           <span className={`${styles.statusBadge} ${styles[`status_${invoice.status}`]}`}>
             {STATUS_LABELS[invoice.status] || invoice.status}
           </span>
@@ -35,9 +37,6 @@ function InvoiceCard({ invoice, currency, onTap }) {
       </div>
       <div className={styles.cardRight}>
         <div className={styles.cardAmount}>{fmt(currency, total)}</div>
-        {invoice.qty > 1 && (
-          <div className={styles.cardQty}>×{invoice.qty}</div>
-        )}
       </div>
     </div>
   )
