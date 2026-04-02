@@ -107,7 +107,7 @@
 .metaItem:not(:last-child)::after {
   content: '|';
   margin-left: 10px;
-  color: var(--border);
+  color: var(--text2);
   opacity: 0.5;
 }
 
