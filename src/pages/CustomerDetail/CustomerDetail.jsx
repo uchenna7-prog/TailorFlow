@@ -127,9 +127,7 @@ export default function CustomerDetail({ onMenuClick }) {
 
       <div className={styles.fixedTopContainer} ref={fixedRef}>
 
-        {/* ── PROFILE SECTION ── */}
         {isPremium ? (
-          /* PREMIUM MODE: Left Avatar, Vertical Info (UNTOUCHED) */
           <div className={styles.profileSection}>
             <div className={styles.leftColumn}>
               <div className={styles.avatar}>
@@ -148,40 +146,42 @@ export default function CustomerDetail({ onMenuClick }) {
             </div>
           </div>
         ) : (
-          /* FREE MODE: Inline / Wrapping Layout (UPDATED) */
           <div className={styles.profileSectionFree}>
             <div className={styles.name}>{customer.name}{customer.sex && ` (${customer.sex})`}</div>
             <div className={styles.metaInline}>
               {/* Phone first */}
               <div className={styles.metaItem}>
-                <span className="mi">call</span>{customer.phone}
+                <span className="mi">call</span>
+                <span>{customer.phone}</span>
               </div>
 
               {/* Birthday second */}
               {birthday && (
                 <div className={`${styles.metaItem} ${styles.birthday}`}>
-                   <span>🎈 {birthday}</span>
+                   <span className="mi">cake</span>
+                   <span>{birthday}</span>
                 </div>
               )}
 
               {/* Email third */}
               {customer.email && (
                 <div className={styles.metaItem}>
-                  <span className="mi">mail_outline</span>{customer.email}
+                  <span className="mi">mail_outline</span>
+                  <span>{customer.email}</span>
                 </div>
               )}
 
               {/* Address last */}
               {customer.address && (
                 <div className={styles.metaItem}>
-                  <span className="mi">place</span>{customer.address}
+                  <span className="mi">place</span>
+                  <span>{customer.address}</span>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        {/* ── ACTION BUTTONS ── */}
         <div className={styles.actions}>
           <button className={`${styles.btn} ${styles.light}`} onClick={() => window.location = `tel:${customer.phone}`}>
             <span className="mi">call</span>Call
@@ -194,7 +194,6 @@ export default function CustomerDetail({ onMenuClick }) {
           </button>
         </div>
 
-        {/* ── TABS ── */}
         <div className={styles.tabs}>
           {TABS.map(tab => (
             <div
@@ -208,7 +207,6 @@ export default function CustomerDetail({ onMenuClick }) {
         </div>
       </div>
 
-      {/* ── SCROLL CONTENT ── */}
       <div className={styles.scrollContent}>
         {activeTab === 'dress' && (
           <MeasurementsTab
