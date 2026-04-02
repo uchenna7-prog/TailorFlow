@@ -16,70 +16,14 @@
 .cardDelete:active { opacity: 0.6; }
 
 /* ── ORDER CARD ── */
-.orderCard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; animation: fadeIn 0.35s ease; cursor: pointer; transition: border-color 0.2s; position: relative; overflow: hidden; }
+.orderCard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 14px 14px 14px 16px; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; animation: fadeIn 0.35s ease; cursor: pointer; transition: border-color 0.2s; position: relative; overflow: hidden; }
 .orderCard:active { background: var(--surface2); }
-
-.orderThumbnail { 
-  width: 72px; 
-  height: 72px; 
-  border-radius: 12px; 
-  background: var(--surface2); 
-  border: 1px solid var(--border2); 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  font-size: 1.8rem; 
-  flex-shrink: 0; 
-  color: var(--text2); 
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1); 
-  overflow: hidden; 
-}
-
+.priorityBar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 20px 0 0 20px; }
+.orderCardIcon { width: 44px; height: 44px; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; color: var(--text2); }
 .orderCardInfo { flex: 1; min-width: 0; }
-.orderCardInfo h4 { 
-  font-size: 0.95rem; 
-  font-weight: 700; 
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  color: var(--text); 
-  margin-bottom: 6px; 
-}
-
-.orderStatusLine { 
-  display: flex; 
-  align-items: center; 
-  gap: 4px; 
-  font-size: 0.75rem; 
-  color: var(--text3); 
-  font-weight: 600; 
-  margin-bottom: 8px; 
-}
-
-.orderPriceLine { 
-  display: flex; 
-  align-items: baseline; 
-  gap: 4px; 
-  margin-bottom: 4px; 
-}
-.orderPrice { 
-  font-size: 1rem; 
-  font-weight: 800; 
-  color: var(--text); 
-  white-space: nowrap; 
-}
-.orderQty { 
-  font-size: 0.75rem; 
-  color: var(--text3); 
-  font-weight: 500; 
-}
-.orderDue { 
-  font-size: 0.75rem; 
-  color: var(--danger); 
-  font-weight: 600; 
-}
-
-/* kept original status styles (unused now but untouched) */
+.orderCardInfo h4 { font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+.orderCardInfo p { font-size: 0.65rem; color: var(--text3); margin-top: 2px; font-weight: 600; }
+.orderPrice { font-size: 1rem; font-weight: 800; color: var(--text); white-space: nowrap; }
 .statusBadge { display: inline-block; font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 5px; padding: 2px 6px; margin-top: 4px; border: 1px solid; }
 .statusPending { color: var(--warning); border-color: rgba(251,146,60,0.4); background: rgba(251,146,60,0.08); }
 .statusDone { color: var(--success); border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.08); }
