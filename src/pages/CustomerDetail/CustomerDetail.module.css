@@ -18,8 +18,6 @@
   flex-direction: column;
 }
 
-
-
 .profileSection {
   display: flex;
   gap: 12px;
@@ -32,9 +30,7 @@
 .avatarImg { width: 100%; height: 100%; object-fit: cover; }
 .birthday { font-weight: 600; font-size: 0.8rem; color: var(--warning); white-space: nowrap; }
 .rightColumn { flex: 1; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
-.name { font-size: 1.1rem; font-weight: 700;
-  
-}
+.name { font-size: 1.1rem; font-weight: 700; }
 .meta { display: flex; gap: 4px; color: var(--text2); font-size: 0.75rem; align-items: flex-start; }
 .meta .mi { font-size: 0.9rem; line-height: 1; display: inline-flex; align-items: flex-start; justify-content: center; margin-top: 2px; color: inherit; }
 
@@ -46,21 +42,19 @@
 .btn.primary { background: var(--text); color: var(--bg); }
 .btn.primary .mi { color: var(--bg); }
 
-
 .tabs { display: flex; justify-content: space-around; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .tab { padding: 10px 0; font-size: 0.75rem; font-weight: 700; color: var(--text3); text-transform: uppercase; cursor: pointer; position: relative; text-align: center; }
 .tab.active { color: var(--accent); font-weight: 800; }
 .tab.active::after { 
   content: ''; 
   position: absolute; 
-  bottom: -1px; /* ✅ FIX: align with border */
+  bottom: -1px; 
   left: 10%; 
   right: 10%; 
   height: 2px; 
   background: var(--accent); 
   border-radius: 1px; 
 }
-
 
 .scrollContent {
   padding: 12px 20px 120px;
@@ -73,17 +67,13 @@
   margin-top: 0;
 }
 
-
-.fab { position: fixed; bottom: calc(30px + var(--sb)); right: 22px; width: 58px; height: 58px; border-radius: 50%; background: var(--text); color: var(--bg); border: none; display: flex; align-items: center; justify-content: center; z-index: 200; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.2); 
-font-size:1.8rem;}
+.fab { position: fixed; bottom: calc(30px + var(--sb)); right: 22px; width: 58px; height: 58px; border-radius: 50%; background: var(--text); color: var(--bg); border: none; display: flex; align-items: center; justify-content: center; z-index: 200; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-size:1.8rem;}
 .fab .mi { color: var(--bg); }
 
-
-
+/* ── FREE MODE UPDATES ── */
 .profileSectionFree {
   display: flex;
   flex-direction: column;
-  gap: 5px;
   padding: 16px 18px;
   border-bottom: 1px solid var(--border);
 }
@@ -91,19 +81,40 @@ font-size:1.8rem;}
 .profileSectionFree .name {
   font-size: 1.15rem;
   font-weight: 700;
-  margin-bottom: 2px;
-}
-
-.profileSectionFree .meta {
-  display: flex;
-  gap: 4px;
-  color: var(--text2);
-  font-size: 0.75rem;
-  align-items: flex-start;
+  margin-bottom: 4px;
 }
 
 .profileSectionFree .birthday {
   font-weight: 600;
   font-size: 0.8rem;
   color: var(--warning);
+  margin-bottom: 8px;
+}
+
+.metaInline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text2);
+  font-size: 0.75rem;
+}
+
+/* Inline Divider style: Item 1 | Item 2 */
+.metaItem:not(:last-child)::after {
+  content: '|';
+  margin-left: 8px;
+  color: var(--border);
+  font-weight: 300;
+}
+
+.metaItem .mi {
+  font-size: 0.9rem;
+  color: inherit;
 }
