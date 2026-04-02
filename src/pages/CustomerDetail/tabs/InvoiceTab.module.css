@@ -1,54 +1,70 @@
-
 .list { display: flex; flex-direction: column; gap: 10px; }
-
 
 .card {
   display: flex; align-items: center; gap: 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 16px;          /* matches order card height */
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 20px;
+  padding: 20px;
   cursor: pointer;
   transition: background 0.15s;
 }
-.card:active { background: var(--surface2); }
+.card:active { background: var(--surface2, #f9fafb); }
 
 .cardLeft { flex-shrink: 0; }
 .cardIcon {
-  width: 44px; height: 44px;   /* same as order card icon box */
-  border-radius: 10px;
-  background: var(--surface2);
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--surface2, #f3f4f6);
   display: flex; align-items: center; justify-content: center;
-  color: var(--text2);
+  color: var(--text2, #4b5563);
   font-size: 1.2rem;
 }
 
 .cardBody { flex: 1; min-width: 0; }
 .cardDesc {
-  font-size: 0.95rem; font-weight: 700;
-  color: var(--text); margin-bottom: 5px;
+  font-size: 1.1rem; font-weight: 700;
+  color: #111827; margin-bottom: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .cardSub {
   display: flex; align-items: center; gap: 8px;
-  font-size: 0.75rem; color: var(--text3);
+  font-size: 0.85rem; color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.statusWrapper {
+  display: flex;
 }
 
 .statusBadge {
-  font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.05em; padding: 2px 8px; border-radius: 20px;
+  font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.05em; padding: 3px 10px; border-radius: 6px;
+  border: 1px solid transparent;
 }
-.status_unpaid  { background: #fef3c7; color: #92400e; }
-.status_paid    { background: #d1fae5; color: #065f46; }
-.status_overdue { background: #fee2e2; color: #991b1b; }
+
+/* Matching the orange pending style from your image */
+.status_unpaid  { 
+  background: #fff7ed; 
+  color: #c2410c; 
+  border-color: #ffedd5;
+}
+.status_paid    { 
+  background: #f0fdf4; 
+  color: #15803d; 
+  border-color: #dcfce7;
+}
+.status_overdue { 
+  background: #fef2f2; 
+  color: #b91c1c; 
+  border-color: #fee2e2;
+}
 
 .cardRight { flex-shrink: 0; text-align: right; }
 .cardAmount {
-  font-size: 1rem; font-weight: 900;
-  color: var(--text);
+  font-size: 1.1rem; font-weight: 800;
+  color: #111827;
 }
-.cardQty { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
-
 
 .empty {
   display: flex; flex-direction: column; align-items: center;
