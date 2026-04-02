@@ -1,4 +1,3 @@
-
 .page {
   position: relative;
   height: 100dvh;
@@ -59,75 +58,33 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* ── CUSTOMER LIST (date-grouped, same pattern as orders) ── */
+.custGroup { margin-bottom: 16px; }
+.custGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 0 8px; }
+.custGroupDivider { height: 1px; background: var(--border); width: calc(100% + 40px); margin-left: -20px; }
 
-.customerCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-  animation: fadeUp 0.3s ease both;
-}
+/* Each row */
+.custListItem { display: flex; align-items: center; gap: 14px; padding: 14px 0; cursor: pointer; transition: background 0.15s; background: var(--bg); position: relative; }
+.custListItem::after { content: ''; position: absolute; bottom: 0; left: 0; right: -20px; height: 1px; background: var(--border); }
+.custListItemLast::after { display: none; }
+.custListItem:active { background: var(--surface); }
 
-.customerCard:active {
-  background: var(--surface2);
-  border-color: var(--border2);
-}
+/* Outer grey box */
+.custListOuter { width: 80px; height: 80px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+/* Inner white box */
+.custListInner { width: 58px; height: 58px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.custListPhoto { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+.custListInitials { font-size: 1.1rem; font-weight: 800; color: var(--text2); letter-spacing: 0.5px; }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* Text */
+.custListInfo { flex: 1; min-width: 0; }
+.custListName { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.custListMeta { font-size: 0.78rem; font-weight: 400; color: var(--text2); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.custAvatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: var(--text2);
-  flex-shrink: 0;
-  letter-spacing: 0.5px;
-  overflow: hidden;
-}
+/* Right actions */
+.custListActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
-.custInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.custName {
-  font-size: 0.95rem;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.custMeta {
-  font-size: 0.7rem;
-  color: var(--text3);
-  font-weight: 600;
-  margin-top: 2px;
-}
-
-.custRight {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
+/* Legacy — kept for delete button reuse */
 .custDeleteBtn {
   width: 34px;
   height: 34px;
@@ -141,14 +98,8 @@
   transition: background 0.15s, border-color 0.15s;
 }
 
-.custDeleteBtn span {
-  color: var(--danger) !important;
-}
-
-.custDeleteBtn:active {
-  background: rgba(255, 77, 77, 0.12);
-  border-color: var(--danger);
-}
+.custDeleteBtn span { color: var(--danger) !important; }
+.custDeleteBtn:active { background: rgba(255, 77, 77, 0.12); border-color: var(--danger); }
 
 /* ── EMPTY STATE ── */
 .emptyState {
@@ -160,21 +111,9 @@
   text-align: center;
 }
 
-.emptyIcon {
-  font-size: 3rem;
-  opacity: 0.15;
-}
-
-.emptyState p {
-  font-size: 0.85rem;
-  color: var(--text3);
-}
-
-.emptyState span {
-  font-size: 0.75rem;
-  color: var(--text3);
-  opacity: 0.6;
-}
+.emptyIcon { font-size: 3rem; opacity: 0.15; }
+.emptyState p { font-size: 0.85rem; color: var(--text3); }
+.emptyState span { font-size: 0.75rem; color: var(--text3); opacity: 0.6; }
 
 /* ── FAB ── */
 .fab {
@@ -197,9 +136,7 @@
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.fab:active {
-  transform: scale(0.93);
-}
+.fab:active { transform: scale(0.93); }
 
 /* ── ADD CUSTOMER FORM OVERLAY ── */
 .formOverlay {
@@ -213,9 +150,7 @@
   flex-direction: column;
 }
 
-.formOverlayOpen {
-  transform: translateY(0);
-}
+.formOverlayOpen { transform: translateY(0); }
 
 .formHeader {
   padding: calc(12px + var(--st)) 20px 12px;
@@ -248,9 +183,7 @@
   transition: opacity 0.2s;
 }
 
-.headerSaveBtn:active {
-  opacity: 0.7;
-}
+.headerSaveBtn:active { opacity: 0.7; }
 
 .formBody {
   flex: 1;
@@ -273,11 +206,7 @@
   justify-content: center;
 }
 
-.photoInitials {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text3);
-}
+.photoInitials { font-size: 1.5rem; font-weight: 800; color: var(--text3); }
 
 .photoPreview {
   position: absolute;
@@ -304,9 +233,7 @@
   z-index: 2;
 }
 
-.inputGroup {
-  margin-bottom: 14px;
-}
+.inputGroup { margin-bottom: 14px; }
 
 .inputLabel {
   font-size: 0.6rem;
@@ -332,13 +259,8 @@
   -webkit-appearance: none;
 }
 
-.formInput:focus {
-  border-color: var(--text2);
-}
-
-.formInput::placeholder {
-  color: var(--text3);
-}
+.formInput:focus { border-color: var(--text2); }
+.formInput::placeholder { color: var(--text3); }
 
 .inputRow {
   display: grid;
@@ -365,23 +287,10 @@
   border-top: 1px solid var(--border);
 }
 
-.confirmSheet h4 {
-  font-size: 1rem;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
+.confirmSheet h4 { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
+.confirmSheet p { font-size: 0.8rem; color: var(--text2); margin-bottom: 20px; }
 
-.confirmSheet p {
-  font-size: 0.8rem;
-  color: var(--text2);
-  margin-bottom: 20px;
-}
-
-.confirmActions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+.confirmActions { display: flex; flex-direction: column; gap: 10px; }
 
 .btnConfirmDel {
   background: var(--danger);
@@ -427,17 +336,10 @@
   pointer-events: none;
 }
 
-.toastShow {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.toastShow { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── FORM TABS ── */
-.formTabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
+.formTabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
 
 .formTab {
   flex: 1;
@@ -455,23 +357,11 @@
   transition: color 0.2s;
 }
 
-.formTabActive {
-  color: var(--accent);
-}
-
-.formTabActive::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--accent);
-}
+.formTabActive { color: var(--accent); }
+.formTabActive::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
 
 /* ── SEX CHIPS ── */
-.sexRow {
-  display: flex;
-  gap: 10px;
-}
+.sexRow { display: flex; gap: 10px; }
 
 .sexChip {
   flex: 1;
@@ -487,26 +377,11 @@
   transition: all 0.2s;
 }
 
-.sexChipActive {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-}
+.sexChipActive { background: var(--accent); color: #ffffff; border-color: var(--accent); }
 
 /* ── CUSTOM BODY FIELDS ── */
-.customFieldRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.customFieldInputs {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 8px;
-}
+.customFieldRow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.customFieldInputs { flex: 1; display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
 
 .removeCustomBtn {
   background: none;
