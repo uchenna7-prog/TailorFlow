@@ -1,94 +1,28 @@
-.list { display: flex; flex-direction: column; gap: 10px; }
+/* ── INVOICE GROUP (date-grouped list, same pattern as orders) ── */
+.invoiceGroup { margin-bottom: 16px; }
+.invoiceGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 16px 8px; }
+.invoiceGroupDivider { height: 1px; background: var(--border); width: calc(100% + 32px); margin-left: -16px; }
 
-.card {
-  display: flex; 
-  align-items: center; 
-  gap: 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.card:active { background: var(--surface2); }
+/* Each row */
+.invoiceListItem { display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; transition: background 0.15s; background: var(--bg); position: relative; }
+.invoiceListItem::after { content: ''; position: absolute; bottom: 0; left: 3.5%; right: 0; height: 1px; background: var(--border); }
+.invoiceListItemLast::after { display: none; }
+.invoiceListItem:active { background: var(--surface); }
 
-.cardLeft { flex-shrink: 0; }
-.cardIcon {
-  width: 44px; 
-  height: 44px;
-  border-radius: 10px;
-  background: var(--surface2);
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-  color: var(--text2);
-  font-size: 1.2rem;
-}
+/* Outer grey box */
+.invoiceListOuter { width: 80px; height: 80px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+/* Inner white box */
+.invoiceListInner { width: 58px; height: 58px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
-.cardBody { flex: 1; min-width: 0; }
+/* Text */
+.invoiceListInfo { flex: 1; min-width: 0; }
+.invoiceListDesc { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.invoiceListSub { font-size: 0.78rem; font-weight: 400; color: var(--text2); margin-bottom: 3px; }
+.invoiceListStatusRow { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; }
+.invoiceListStatusText { font-size: 0.78rem; font-weight: 400; color: var(--text2); }
+.invoiceListAmount { font-size: 0.78rem; font-weight: 500; color: var(--text); }
 
-.cardDesc {
-  font-size: 0.95rem; 
-  font-weight: 700; 
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  color: var(--text);
-  margin: 0;
-}
-
-.cardSub { 
-  font-size: 0.65rem; 
-  color: var(--text3); 
-  margin-top: 2px; 
-  font-weight: 600; 
-  margin-bottom: 4px;
-}
-
-.statusWrapper { display: flex; }
-
-.statusBadge { 
-  display: inline-block; 
-  font-size: 0.58rem; 
-  font-weight: 800; 
-  text-transform: uppercase; 
-  letter-spacing: 0.5px; 
-  border-radius: 5px; 
-  padding: 2px 6px; 
-  margin-top: 2px; /* reduced from 4px to tighten height */
-  border: 1px solid; 
-}
-
-.status_unpaid { 
-  color: var(--warning); 
-  border-color: rgba(251,146,60,0.4); 
-  background: rgba(251,146,60,0.08); 
-}
-
-.status_paid { 
-  color: var(--success); 
-  border-color: rgba(34,197,94,0.4); 
-  background: rgba(34,197,94,0.08); 
-}
-
-.status_overdue { 
-  color: #ef4444; 
-  border-color: rgba(239, 68, 68, 0.4); 
-  background: rgba(239, 68, 68, 0.08); 
-}
-
-.cardRight { flex-shrink: 0; text-align: right; }
-.cardAmount { 
-  font-size: 1rem; 
-  font-weight: 800; 
-  color: var(--text); 
-  white-space: nowrap; 
-}
-
-.empty {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 8px; padding: 48px 20px; text-align: center;
-}
+/* Empty state */
+.empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 48px 20px; text-align: center; }
 .emptyTitle { font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 0; }
 .emptySub { font-size: 0.8rem; color: var(--text3); margin: 0; line-height: 1.5; }
