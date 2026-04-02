@@ -70,7 +70,7 @@
 .fab { position: fixed; bottom: calc(30px + var(--sb)); right: 22px; width: 58px; height: 58px; border-radius: 50%; background: var(--text); color: var(--bg); border: none; display: flex; align-items: center; justify-content: center; z-index: 200; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.2); font-size:1.8rem;}
 .fab .mi { color: var(--bg); }
 
-/* ── FREE MODE UPDATES ── */
+/* ── FREE MODE WRAPPING LAYOUT ── */
 .profileSectionFree {
   display: flex;
   flex-direction: column;
@@ -81,20 +81,14 @@
 .profileSectionFree .name {
   font-size: 1.15rem;
   font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.profileSectionFree .birthday {
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: var(--warning);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .metaInline {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-wrap: wrap; /* Allows wrapping if items are too wide */
+  column-gap: 8px;
+  row-gap: 4px;
   align-items: center;
 }
 
@@ -104,17 +98,24 @@
   gap: 4px;
   color: var(--text2);
   font-size: 0.75rem;
+  white-space: nowrap; /* Prevents an individual item like an email from breaking mid-text */
 }
 
-/* Inline Divider style: Item 1 | Item 2 */
+/* Divider only between items */
 .metaItem:not(:last-child)::after {
   content: '|';
   margin-left: 8px;
   color: var(--border);
-  font-weight: 300;
+  opacity: 0.6;
 }
 
 .metaItem .mi {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: inherit;
+}
+
+/* Specific styling for birthday inside the free list */
+.metaItem.birthday {
+  color: var(--warning);
+  font-weight: 600;
 }
