@@ -277,6 +277,14 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
     showToast('Generating invoice…')
   }
 
+  // Group orders by date
+  const grouped = orders.reduce((acc, o) => {
+    const key = o.date || 'Unknown Date'
+    if (!acc[key]) acc[key] = []
+    acc[key].push(o)
+    return acc
+  }, {})
+
   return (
     <>
       {orders.length === 0 && (
@@ -287,32 +295,52 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
         </div>
       )}
 
-      {orders.map(o => {
-        const priceStr    = o.price !== null && o.price !== undefined ? `₦${Number(o.price).toLocaleString()}` : '—'
-        const ids         = o.measurementIds?.length ? o.measurementIds : (o.measurementId ? [o.measurementId] : [])
-        const linkedCount = ids.filter(id => measurements.find(m => String(m.id) === String(id))).length
-        const linkedStr   = linkedCount > 0 ? ` · ${linkedCount} cloth${linkedCount > 1 ? 'es' : ''}` : ''
-        const dueStr      = o.due ? `Due ${o.due}` : 'No due date'
-        const statusLabel = STATUSES.find(s => s.value === o.status)?.label ?? o.status ?? 'Pending'
-        const statusClass = o.status === 'completed' || o.status === 'delivered'
-          ? styles.statusDone : styles.statusPending
+      {Object.entries(grouped).map(([date, dateOrders]) => (
+        <div key={date} className={styles.orderGroup}>
+          <div className={styles.orderGroupDate}>{date}</div>
+          <div className={styles.orderListSection}>
+            {dateOrders.map((o, idx) => {
+              const priceStr    = o.price !== null && o.price !== undefined ? `₦${Number(o.price).toLocaleString()}` : '—'
+              const statusLabel = STATUSES.find(s => s.value === o.status)?.label ?? o.status ?? 'Pending'
+              const statusClass = o.status === 'completed' || o.status === 'delivered'
+                ? styles.statusDone : styles.statusPending
+              const isLast = idx === dateOrders.length - 1
 
-        return (
-          <div key={o.id} className={styles.orderCard} onClick={() => setDetailOrder(o)}>
-            <div className={styles.priorityBar} style={{ background: PRIORITY_COLOR[o.priority] ?? PRIORITY_COLOR.normal }} />
-            <div className={styles.orderCardIcon}><span className="mi">content_cut</span></div>
-            <div className={styles.orderCardInfo}>
-              <h4>{o.desc}</h4>
-              <p>{dueStr}{linkedStr}</p>
-              <span className={`${styles.statusBadge} ${statusClass}`}>{statusLabel}</span>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div className={styles.orderPrice}>{priceStr}</div>
-              {o.qty > 1 && <div style={{ fontSize: '0.65rem', color: 'var(--text3)', marginTop: 2 }}>×{o.qty}</div>}
-            </div>
+              return (
+                <div
+                  key={o.id}
+                  className={`${styles.orderListItem} ${isLast ? styles.orderListItemLast : ''}`}
+                  onClick={() => setDetailOrder(o)}
+                >
+                  {/* Left: priority accent dot */}
+                  <div className={styles.orderListDot} style={{ background: PRIORITY_COLOR[o.priority] ?? PRIORITY_COLOR.normal }} />
+
+                  {/* Center: order info */}
+                  <div className={styles.orderListInfo}>
+                    <div className={styles.orderListDesc}>{o.desc}</div>
+                    <div className={styles.orderListMeta}>
+                      <span className={styles.orderListOrdNum}>Ord# {o.id?.toString().slice(-5).toUpperCase() ?? '—'}</span>
+                      <span className={`${styles.statusBadge} ${statusClass}`}>{statusLabel}</span>
+                    </div>
+                    {o.due && (
+                      <div className={styles.orderListDue}>Due On {o.due}</div>
+                    )}
+                  </div>
+
+                  {/* Right: price + qty */}
+                  <div className={styles.orderListRight}>
+                    <div className={styles.orderListPrice}>{priceStr}</div>
+                    <div className={styles.orderListQty}>({o.qty} item{o.qty !== 1 ? 's' : ''})</div>
+                  </div>
+
+                  {/* Chevron */}
+                  <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)', flexShrink: 0 }}>chevron_right</span>
+                </div>
+              )
+            })}
           </div>
-        )
-      })}
+        </div>
+      ))}
 
       <OrderModal
         isOpen={modalOpen}
@@ -342,4 +370,3 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
     </>
   )
 }
-
