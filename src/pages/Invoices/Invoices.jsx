@@ -25,6 +25,13 @@ function isOverdue(invoice) {
   return new Date(invoice.due + 'T23:59:59') < new Date()
 }
 
+function formatDate(dateStr) {
+  if (!dateStr) return 'Unknown Date'
+  const d = new Date(dateStr)
+  if (isNaN(d)) return dateStr
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
 // ── Tabs ──────────────────────────────────────────────────────
 
 const TABS = [
@@ -36,44 +43,42 @@ const TABS = [
 
 const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
 
-// ── Invoice Card ──────────────────────────────────────────────
+// ── Invoice List Item ─────────────────────────────────────────
 
-function InvoiceCard({ invoice, currency, onTap }) {
+function InvoiceCard({ invoice, currency, onTap, isLast }) {
   const total   = (parseFloat(invoice.price) || 0) * (parseFloat(invoice.qty) || 1)
   const overdue = isOverdue(invoice)
   const status  = overdue && invoice.status !== 'paid' ? 'overdue' : invoice.status
 
   return (
     <div
-      className={`${styles.card} ${overdue ? styles.cardOverdue : ''}`}
+      className={`${styles.invoiceListItem} ${isLast ? styles.invoiceListItemLast : ''} ${overdue ? styles.invoiceListItemOverdue : ''}`}
       onClick={onTap}
     >
-      <div className={styles.cardIcon}>
-        <span className="mi">receipt_long</span>
+      {/* Left: grey outer box with white inner box */}
+      <div className={styles.invoiceListOuter}>
+        <div className={styles.invoiceListInner}>
+          <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : 'var(--text3)' }}>
+            receipt_long
+          </span>
+        </div>
       </div>
 
-      <div className={styles.cardBody}>
-        <div className={styles.cardTop}>
-          <span className={styles.cardNumber}>{invoice.number}</span>
-          <span className={`${styles.statusBadge} ${styles[`status_${status}`]}`}>
+      {/* Info */}
+      <div className={styles.invoiceListInfo}>
+        <div className={styles.invoiceListDesc}>{invoice.orderDesc || 'Order'}</div>
+        <div className={styles.invoiceListOrdRow}>{invoice.number}</div>
+        <div className={styles.invoiceListMeta}>
+          <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', verticalAlign: 'middle' }}>person</span>
+          <span className={styles.invoiceListMetaText}>{invoice.customerName || '—'}</span>
+        </div>
+        <div className={styles.invoiceListMeta}>
+          <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', verticalAlign: 'middle' }}>autorenew</span>
+          <span className={`${styles.invoiceListMetaText} ${styles[`statusText_${status}`]}`}>
             {STATUS_LABELS[status] ?? status}
           </span>
         </div>
-        <div className={styles.cardDesc}>{invoice.orderDesc || 'Order'}</div>
-        <div className={styles.cardMeta}>
-          <span className={styles.metaChip}>
-            <span className="mi">person</span>
-            {invoice.customerName || '—'}
-          </span>
-          <span className={styles.metaChip}>
-            <span className="mi">calendar_today</span>
-            {invoice.date}
-          </span>
-        </div>
-      </div>
-
-      <div className={styles.cardAmount}>
-        {fmt(currency, total)}
+        <div className={`${styles.invoiceListAmount}`}>{fmt(currency, total)}</div>
       </div>
     </div>
   )
@@ -98,7 +103,6 @@ function InvoiceFullView({ invoice, currency, onClose }) {
       </div>
 
       <div className={styles.viewBody}>
-        {/* Invoice header */}
         <div className={styles.invoiceDoc}>
           <div className={styles.docHeader}>
             <div className={styles.docBrand}>
@@ -113,13 +117,11 @@ function InvoiceFullView({ invoice, currency, onClose }) {
 
           <div className={styles.docDivider} />
 
-          {/* Bill to */}
           <div className={styles.docSection}>
             <div className={styles.docSectionLabel}>BILL TO</div>
             <div className={styles.docSectionValue}>{invoice.customerName || '—'}</div>
           </div>
 
-          {/* Invoice meta */}
           <div className={styles.docMetaGrid}>
             <div className={styles.docMetaCell}>
               <div className={styles.docMetaLabel}>Date Issued</div>
@@ -139,7 +141,6 @@ function InvoiceFullView({ invoice, currency, onClose }) {
 
           <div className={styles.docDivider} />
 
-          {/* Line items */}
           <div className={styles.docTableHeader}>
             <span>Description</span>
             <span>Qty</span>
@@ -154,25 +155,20 @@ function InvoiceFullView({ invoice, currency, onClose }) {
             <span>{fmt(currency, total)}</span>
           </div>
 
-          {/* Linked measurements */}
           {invoice.linkedNames?.length > 0 && (
             <div className={styles.docLinked}>
               <div className={styles.docMetaLabel}>Cloth Types</div>
-              <div className={styles.docLinkedNames}>
-                {invoice.linkedNames.join(', ')}
-              </div>
+              <div className={styles.docLinkedNames}>{invoice.linkedNames.join(', ')}</div>
             </div>
           )}
 
           <div className={styles.docDivider} />
 
-          {/* Total */}
           <div className={styles.docTotalRow}>
             <span className={styles.docTotalLabel}>Total Due</span>
             <span className={styles.docTotalAmount}>{fmt(currency, total)}</span>
           </div>
 
-          {/* Notes */}
           {invoice.notes && (
             <div className={styles.docNotes}>
               <div className={styles.docMetaLabel}>Notes</div>
@@ -180,10 +176,7 @@ function InvoiceFullView({ invoice, currency, onClose }) {
             </div>
           )}
 
-          {/* Footer */}
-          <div className={styles.docFooter}>
-            Thank you for your patronage 🙏
-          </div>
+          <div className={styles.docFooter}>Thank you for your patronage 🙏</div>
         </div>
       </div>
     </div>
@@ -269,6 +262,14 @@ export default function Invoices({ onMenuClick }) {
     overdue: 'No overdue invoices. All good!',
   }
 
+  // ── Group by date ─────────────────────────────────────────
+  const grouped = filtered.reduce((acc, inv) => {
+    const key = inv.date || 'Unknown Date'
+    if (!acc[key]) acc[key] = []
+    acc[key].push(inv)
+    return acc
+  }, {})
+
   return (
     <div className={styles.page}>
       <Header title="Invoices" onMenuClick={onMenuClick} />
@@ -307,13 +308,20 @@ export default function Invoices({ onMenuClick }) {
             )}
           </div>
         ) : (
-          filtered.map(inv => (
-            <InvoiceCard
-              key={`${inv.customerId}-${inv.id}`}
-              invoice={inv}
-              currency={currency}
-              onTap={() => setViewing(inv)}
-            />
+          Object.entries(grouped).map(([date, dateInvoices]) => (
+            <div key={date} className={styles.invoiceGroup}>
+              <div className={styles.invoiceGroupDate}>{date}</div>
+              <div className={styles.invoiceGroupDivider} />
+              {dateInvoices.map((inv, idx) => (
+                <InvoiceCard
+                  key={`${inv.customerId}-${inv.id}`}
+                  invoice={inv}
+                  currency={currency}
+                  isLast={idx === dateInvoices.length - 1}
+                  onTap={() => setViewing(inv)}
+                />
+              ))}
+            </div>
           ))
         )}
       </div>
