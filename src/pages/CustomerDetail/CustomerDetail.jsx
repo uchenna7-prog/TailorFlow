@@ -123,7 +123,7 @@ export default function CustomerDetail({ onMenuClick }) {
           type="back"
           title="Details"
           customActions={[
-            { icon: 'edit',   label: 'Edit Customer',   onClick: () => navigate(`/customers/edit/${id}`,outlined:true },
+            { icon: 'edit',   label: 'Edit Customer',   onClick: () => navigate(`/customers/edit/${id}`),outlined:true },
             { icon: 'delete', label: 'Delete Customer', onClick: () => deleteCustomer(id), outlined: true, color: 'var(--danger)' },
           ]}
         />
