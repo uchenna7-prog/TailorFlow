@@ -8,6 +8,7 @@
 import { useState, useRef } from 'react'
 import Header from '../../components/Header/Header'
 import styles from './Orders.module.css'
+import {useOrders} from '../../contexts/OrdersContext'
 
 // ── Helpers ───────────────────────────────────────────────────
 
