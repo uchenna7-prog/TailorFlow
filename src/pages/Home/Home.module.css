@@ -36,7 +36,7 @@
   font-weight: 400;
 }
 
-/* ── STATS GRID ── */
+/* ── STATS & ACTIONS GRID ── */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -51,7 +51,7 @@
   padding: 11px 10px;
   display: flex;
   gap: 8px;
-  align-items: flex-start;
+  align-items: center; /* Centered for Actions */
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -68,7 +68,6 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-top: 1px;
 }
 
 .statValue {
@@ -101,7 +100,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0;
 }
 
 .sectionTitle {
@@ -124,33 +122,6 @@
   padding: 0;
   margin-bottom: 10px;
 }
-
-/* ── QUICK ACTIONS ── */
-.actionList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.actionList button {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 14px 16px;
-  border-radius: 12px;
-  text-align: left;
-  font-size: 0.88rem;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text);
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.actionList button:active { background: var(--surface2); }
-.actionList button .mi { color: var(--accent); font-size: 1.2rem; }
 
 /* ── LIST SECTIONS ── */
 .listSection { position: relative; }
@@ -186,7 +157,6 @@
 .listItemLast::after { display: none; }
 .listItem:active { background: var(--surface); }
 
-/* Outer box */
 .listOuter {
   width: 68px;
   height: 68px;
@@ -199,7 +169,6 @@
   flex-shrink: 0;
 }
 
-/* Inner box */
 .listInner {
   width: 50px;
   height: 50px;
@@ -211,14 +180,12 @@
   overflow: hidden;
 }
 
-/* Text */
 .listInfo { flex: 1; min-width: 0; }
 .listDesc { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .listMeta { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
 .listMetaText { font-size: 0.75rem; font-weight: 400; color: var(--text2); }
 .listDue { font-size: 0.75rem; font-weight: 500; color: #ef4444; margin-top: 1px; }
 
-/* Today badge */
 .listApptToday {
   display: inline-block;
   font-size: 0.58rem;
@@ -233,7 +200,6 @@
   margin-top: 3px;
 }
 
-/* Status pill */
 .listApptStatus {
   display: inline-block;
   font-size: 0.58rem;
@@ -246,7 +212,6 @@
   margin-top: 3px;
 }
 
-/* Price */
 .listRight { text-align: right; flex-shrink: 0; }
 .listPrice { font-size: 0.88rem; font-weight: 700; color: var(--text); white-space: nowrap; }
 .listQty { font-size: 0.65rem; color: var(--text3); margin-top: 2px; }
