@@ -118,7 +118,6 @@ function Home({ onMenuClick }) {
   const tasksDueThisWeek = pendingTasks.filter(t => dueThisWeek(t.dueDate)).length
 
   // ── Appointment stat ──────────────────────────────────────
-  // Show today's count; sub-label is upcoming this week or missed
   const todayCount = todayAppointments.length
 
   // ── Recent lists ──────────────────────────────────────────
@@ -140,7 +139,7 @@ function Home({ onMenuClick }) {
           <p className={styles.subtitle}>Here's what's happening in your shop today.</p>
         </section>
 
-        {/* STATS — 2-column grid, now 6 cards (3 rows) */}
+        {/* STATS — 2-column grid */}
         <section className={styles.statsGrid}>
 
           {/* Customers */}
@@ -211,7 +210,7 @@ function Home({ onMenuClick }) {
             </div>
           </div>
 
-          {/* Upcoming this week — fills row 3 slot 2 */}
+          {/* Upcoming this week */}
           <div className={styles.statCard} onClick={() => navigate('/appointments')}>
             <div className={styles.statIconWrap}>
               <span className="mi" style={{ fontSize: '1.3rem', color: '#a855f7' }}>calendar_month</span>
@@ -227,26 +226,7 @@ function Home({ onMenuClick }) {
 
         </section>
 
-        {/* QUICK ACTIONS */}
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>Quick Actions</h3>
-          <div className={styles.actionList}>
-            <button onClick={() => navigate('/customers')}>
-              <span className="mi">person_add</span> Add Customer
-            </button>
-            <button onClick={() => navigate('/appointments')}>
-              <span className="mi">event</span> Book Appointment
-            </button>
-            <button onClick={() => navigate('/tasks')}>
-              <span className="mi">add_task</span> Manage Tasks
-            </button>
-            <button onClick={() => navigate('/customers')}>
-              <span className="mi">arrow_forward</span> View All Customers
-            </button>
-          </div>
-        </section>
-
-        {/* UPCOMING APPOINTMENTS */}
+        {/* UPCOMING APPOINTMENTS — MOVED UP */}
         {recentAppointments.length > 0 && (
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
@@ -293,7 +273,7 @@ function Home({ onMenuClick }) {
           </section>
         )}
 
-        {/* RECENT APPOINTMENTS */}
+        {/* RECENT APPOINTMENTS — MOVED UP */}
         {pastAppointments.length > 0 && (
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
@@ -305,7 +285,6 @@ function Home({ onMenuClick }) {
               {pastAppointments.map((appt, idx) => {
                 const isLast    = idx === pastAppointments.length - 1
                 const icon      = APPT_TYPE_ICONS[appt.type] || 'event'
-                const isMissedAppt = appt.status === 'missed' || (!appt.status || appt.status === 'scheduled' || appt.status === 'confirmed')
                 const iconColor = appt.status === 'completed' ? '#22c55e'
                   : appt.status === 'cancelled' ? '#94a3b8'
                   : '#ef4444'
@@ -349,6 +328,25 @@ function Home({ onMenuClick }) {
             </div>
           </section>
         )}
+
+        {/* QUICK ACTIONS */}
+        <section className={styles.section}>
+          <h3 className={styles.sectionTitle}>Quick Actions</h3>
+          <div className={styles.actionList}>
+            <button onClick={() => navigate('/customers')}>
+              <span className="mi">person_add</span> Add Customer
+            </button>
+            <button onClick={() => navigate('/appointments')}>
+              <span className="mi">event</span> Book Appointment
+            </button>
+            <button onClick={() => navigate('/tasks')}>
+              <span className="mi">add_task</span> Manage Tasks
+            </button>
+            <button onClick={() => navigate('/customers')}>
+              <span className="mi">arrow_forward</span> View All Customers
+            </button>
+          </div>
+        </section>
 
         {/* RECENT ORDERS */}
         {recentOrders.length > 0 && (
