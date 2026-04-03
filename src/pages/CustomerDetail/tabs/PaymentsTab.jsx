@@ -62,6 +62,7 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
     if ((status === 'part' || status === 'paid') && amountPaid) {
       initialInstallments.push({
         amount: parseFloat(amountPaid),
+        method,
         date:   today(),
         id:     Date.now(),
       })
@@ -79,7 +80,6 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
       orderDesc:    selectedOrder.desc,
       orderPrice:   selectedOrder.price ?? null,
       status:       finalStatus,
-      method,
       notes:        notes.trim(),
       installments: initialInstallments,
       date:         today(),
@@ -180,21 +180,23 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
           </div>
         )}
 
-        {/* Payment method */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Payment Method</label>
-          <div className={styles.methodRow}>
-            {['cash', 'transfer', 'card', 'other'].map(m => (
-              <button
-                key={m}
-                className={`${styles.methodChip} ${method === m ? styles.methodActive : ''}`}
-                onClick={() => setMethod(m)}
-              >
-                {m.charAt(0).toUpperCase() + m.slice(1)}
-              </button>
-            ))}
+        {/* Payment method — shown when amount is entered */}
+        {(status === 'part' || status === 'paid') && (
+          <div className={styles.fieldGroup}>
+            <label className={styles.fieldLabel}>Payment Method</label>
+            <div className={styles.methodRow}>
+              {['cash', 'transfer', 'card', 'other'].map(m => (
+                <button
+                  key={m}
+                  className={`${styles.methodChip} ${method === m ? styles.methodActive : ''}`}
+                  onClick={() => setMethod(m)}
+                >
+                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Notes */}
         <div className={styles.fieldGroup}>
@@ -217,13 +219,14 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
 
 function AddInstallmentModal({ payment, onClose, onSave }) {
   const [amount, setAmount] = useState('')
+  const [method, setMethod] = useState('cash')
 
   const totalPaid = (payment.installments || []).reduce((s, i) => s + i.amount, 0)
   const remaining = (parseFloat(payment.orderPrice) || 0) - totalPaid
 
   const handleSave = () => {
     if (!amount || parseFloat(amount) <= 0) return
-    onSave(parseFloat(amount))
+    onSave(parseFloat(amount), method)
     onClose()
   }
 
@@ -254,6 +257,20 @@ function AddInstallmentModal({ payment, onClose, onSave }) {
               onChange={e => setAmount(e.target.value)}
               autoFocus
             />
+          </div>
+          <div className={styles.fieldGroup}>
+            <label className={styles.fieldLabel}>Payment Method</label>
+            <div className={styles.methodRow}>
+              {['cash', 'transfer', 'card', 'other'].map(m => (
+                <button
+                  key={m}
+                  className={`${styles.methodChip} ${method === m ? styles.methodActive : ''}`}
+                  onClick={() => setMethod(m)}
+                >
+                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
           <button className={styles.confirmBtn} onClick={handleSave} disabled={!amount || parseFloat(amount) <= 0}>
             Record Payment
@@ -302,10 +319,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>Date Created</span>
             <span className={styles.detailVal}>{payment.date}</span>
-          </div>
-          <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>Method</span>
-            <span className={styles.detailVal} style={{ textTransform: 'capitalize' }}>{payment.method || '—'}</span>
           </div>
           {payment.notes && (
             <div className={styles.detailRow}>
@@ -377,7 +390,14 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
                     <div className={styles.installmentAmount}>{fmt(inst.amount)}</div>
                     <div className={styles.installmentDate}>{inst.date}</div>
                   </div>
-                  <span className={styles.installmentBadge}>Received</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                    <span className={styles.installmentBadge}>Received</span>
+                    {inst.method && (
+                      <span className={styles.installmentMethodBadge} style={{ textTransform: 'capitalize' }}>
+                        {inst.method}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -394,7 +414,7 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
 
         {/* Generate Invoice */}
         <button className={styles.generateInvoiceBtn} onClick={() => onGenerateInvoice(payment)}>
-          <span className="material-icons" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: 4 }}>receipt_long</span>
+          <span className="mi" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: 4 }}>receipt_long</span>
           Generate Invoice
         </button>
 
@@ -405,7 +425,7 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
         <AddInstallmentModal
           payment={payment}
           onClose={() => setShowInstallmentModal(false)}
-          onSave={(amount) => onAddInstallment(payment.id, amount)}
+          onSave={(amount, method) => onAddInstallment(payment.id, amount, method)}
         />
       )}
     </div>
@@ -462,12 +482,12 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
   }
 
   // ── Add installment ───────────────────────────────────────
-  const handleAddInstallment = async (paymentId, amount) => {
+  const handleAddInstallment = async (paymentId, amount, method) => {
     if (!user) return
     const payment = payments.find(p => p.id === paymentId)
     if (!payment) return
 
-    const newInstallment = { amount, date: today(), id: Date.now() }
+    const newInstallment = { amount, method, date: today(), id: Date.now() }
     const updatedInstallments = [...(payment.installments || []), newInstallment]
     const totalPaid  = updatedInstallments.reduce((s, i) => s + i.amount, 0)
     const fullPrice  = parseFloat(payment.orderPrice) || 0
@@ -603,13 +623,13 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
 
       {/* FAB trigger — parent CustomerDetail passes openPaymentModal event */}
       <div style={{ display: 'none' }} id="__payment_modal_trigger__"
-  ref={() => {
-    const handler = () => setModalOpen(true)
-    document.addEventListener('openPaymentModal', handler)
-    return () => document.removeEventListener('openPaymentModal', handler)
-  }}
-/>
-
+        ref={el => {
+          if (!el) return
+          const handler = () => setModalOpen(true)
+          el.addEventListener('open', handler)
+          return () => el.removeEventListener('open', handler)
+        }}
+      />
     </>
   )
 }
