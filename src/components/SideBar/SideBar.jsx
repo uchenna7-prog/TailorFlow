@@ -3,17 +3,19 @@ import { useAuth } from '../../contexts/AuthContext'
 import styles from './SideBar.module.css'
 
 const NAV_ITEMS = [
-  { path: '/',         label: 'Dashboard',  icon: 'dashboard'      },
-  { path: '/customers',label: 'Customers',  icon: 'groups'          },
-  { path: '/orders',   label: 'Orders',     icon: 'shopping_cart'  },
-  { path: '/invoices', label: 'Invoices',   icon: 'receipt_long'   },
-  { path: '/tasks',    label: 'Tasks',      icon: 'assignment'     },
-  { path: '/gallery',  label: 'Gallery',    icon: 'photo_library'  },
-  { path: '/settings', label: 'Settings',   icon: 'settings'       },
-  { path: '/profile',  label: 'My Account', icon: 'person'         },
-  { path: '/contact',  label: 'Contact Us', icon: 'call'           },
-  { path: '/faq',      label: 'FAQs',       icon: 'help_outline'   },
-  { path: '/logout',   label: 'Log out',    icon: 'logout'         },
+  { path: '/',              label: 'Dashboard',    icon: 'dashboard'      },
+  { path: '/customers',     label: 'Customers',    icon: 'groups'         },
+  { path: '/orders',        label: 'Orders',       icon: 'shopping_cart'  },
+  { path: '/appointments',  label: 'Appointments', icon: 'event'          },
+  { path: '/tasks',         label: 'Tasks',        icon: 'assignment'     },
+  { path: '/invoices',      label: 'Invoices',     icon: 'receipt_long'   },
+  { path: '/reports',       label: 'Reports',      icon: 'bar_chart'      },
+  { path: '/gallery',       label: 'Gallery',      icon: 'photo_library'  },
+  { path: '/settings',      label: 'Settings',     icon: 'settings'       },
+  { path: '/profile',       label: 'My Account',   icon: 'person'         },
+  { path: '/contact',       label: 'Contact Us',   icon: 'call'           },
+  { path: '/faq',           label: 'FAQs',         icon: 'help_outline'   },
+  { path: '/logout',        label: 'Log out',      icon: 'logout'         },
 ]
 
 function SideBar({ isOpen, onClose }) {
