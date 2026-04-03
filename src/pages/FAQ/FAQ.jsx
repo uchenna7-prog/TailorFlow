@@ -139,12 +139,9 @@ const FAQS = [
 // Accordion item
 // ─────────────────────────────────────────────────────────────
 
-function AccordionItem({ q, a, isOpen, onToggle, divider }) {
+function AccordionItem({ q, a, isOpen, onToggle, divider = true }) {
   return (
-    <div
-      className={styles.item}
-      style={!divider ? { borderBottom: 'none' } : {}}
-    >
+    <div className={`${styles.item} ${!divider ? styles.noDivider : ''}`}>
       <button className={styles.itemHeader} onClick={onToggle}>
         <span className={styles.itemQ}>{q}</span>
         <span className={`mi ${styles.itemChevron} ${isOpen ? styles.itemChevronOpen : ''}`}>
@@ -165,12 +162,10 @@ function AccordionItem({ q, a, isOpen, onToggle, divider }) {
 // ─────────────────────────────────────────────────────────────
 
 export default function FAQ({ onMenuClick }) {
-  // openKey = "categoryIndex-itemIndex" | null
   const [openKey, setOpenKey] = useState(null)
   const [search,  setSearch]  = useState('')
 
   const toggle = key => setOpenKey(prev => prev === key ? null : key)
-
   const query = search.trim().toLowerCase()
 
   const filtered = FAQS.map(cat => ({
@@ -188,24 +183,25 @@ export default function FAQ({ onMenuClick }) {
 
       <div className={styles.scrollArea}>
 
-        {/* ── SUBTITLE (Title removed as requested) ── */}
         <p className={styles.pageSub}>Frequently asked questions about TailorFlow.</p>
 
         {/* ── SEARCH ── */}
-        <div className={styles.searchWrap}>
-          <span className={`mi ${styles.searchIcon}`}>search</span>
-          <input
-            className={styles.searchInput}
-            type="text"
-            placeholder="Search questions…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          {search && (
-            <button className={styles.searchClear} onClick={() => setSearch('')}>
-              <span className="mi" style={{ fontSize: '1rem' }}>close</span>
-            </button>
-          )}
+        <div className={styles.searchPadding}>
+          <div className={styles.searchWrap}>
+            <span className={`mi ${styles.searchIcon}`}>search</span>
+            <input
+              className={styles.searchInput}
+              type="text"
+              placeholder="Search questions…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            {search && (
+              <button className={styles.searchClear} onClick={() => setSearch('')}>
+                <span className="mi" style={{ fontSize: '1rem' }}>close</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* ── CATEGORIES ── */}
@@ -224,32 +220,32 @@ export default function FAQ({ onMenuClick }) {
                 <span className={styles.sectionLabel}>{cat.category}</span>
               </div>
 
-              <div className={styles.card}>
-                {cat.items.map((item, ii) => {
-                  const key = `${ci}-${ii}`
-                  return (
-                    <AccordionItem
-                      key={key}
-                      q={item.q}
-                      a={item.a}
-                      isOpen={openKey === key}
-                      onToggle={() => toggle(key)}
-                      divider={ii < cat.items.length - 1}
-                    />
-                  )
-                })}
-              </div>
+              {cat.items.map((item, ii) => {
+                const key = `${ci}-${ii}`
+                return (
+                  <AccordionItem
+                    key={key}
+                    q={item.q}
+                    a={item.a}
+                    isOpen={openKey === key}
+                    onToggle={() => toggle(key)}
+                    divider={ii < cat.items.length - 1}
+                  />
+                )
+              })}
             </div>
           ))
         )}
 
         {/* ── FOOTER CTA ── */}
         {!query && (
-          <div className={styles.footerCta}>
-            <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--accent)' }}>support_agent</span>
-            <div className={styles.footerCtaText}>
-              <div className={styles.footerCtaTitle}>Still have questions?</div>
-              <div className={styles.footerCtaSub}>Reach out via the Contact page — we're happy to help.</div>
+          <div className={styles.footerPadding}>
+            <div className={styles.footerCta}>
+              <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--accent)' }}>support_agent</span>
+              <div className={styles.footerCtaText}>
+                <div className={styles.footerCtaTitle}>Still have questions?</div>
+                <div className={styles.footerCtaSub}>Reach out via the Contact page — we're happy to help.</div>
+              </div>
             </div>
           </div>
         )}
