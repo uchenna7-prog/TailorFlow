@@ -61,6 +61,7 @@ const AppointmentContext = createContext({
   upcoming:          [],
   todayAppointments: [],
   missed:            [],
+  recent:            [],
   missedCount:       0,
   upcomingThisWeek:  0,
 })
@@ -98,6 +99,18 @@ export function AppointmentProvider({ children }) {
   const missedCount       = missed.length
   const upcomingThisWeek  = allAppointments.filter(a => isUpcoming(a) && isThisWeek(a)).length
 
+  // Past appointments (completed or whose datetime has passed), newest first
+  const recent = allAppointments
+    .filter(a => {
+      const dt = parseApptDate(a)
+      return a.status === 'completed' || (dt && dt < new Date())
+    })
+    .sort((a, b) => {
+      const da = parseApptDate(a) ?? new Date(0)
+      const db = parseApptDate(b) ?? new Date(0)
+      return db - da   // newest first
+    })
+
   return (
     <AppointmentContext.Provider
       value={{
@@ -105,6 +118,7 @@ export function AppointmentProvider({ children }) {
         upcoming,
         todayAppointments,
         missed,
+        recent,
         missedCount,
         upcomingThisWeek,
       }}
