@@ -112,7 +112,7 @@ function Home({ onMenuClick }) {
               <div className={styles.statValue}>{customers.length}</div>
               <div className={styles.statLabel}>Total Clients</div>
               <div className={styles.statSub}>
-                {newCustomersThisMonth > 0 ? `+${newCustomersThisMonth} this month` : 'No new this month'}
+                {`+${newCustomersThisMonth} this month`}
               </div>
             </div>
           </div>
@@ -125,7 +125,7 @@ function Home({ onMenuClick }) {
               <div className={styles.statValue}>{pendingOrders.length}</div>
               <div className={styles.statLabel}>Pending Orders</div>
               <div className={styles.statSub} style={{ color: ordersDueThisWeek > 0 ? '#fb923c' : undefined }}>
-                {ordersDueThisWeek > 0 ? `${ordersDueThisWeek} due this week` : 'None due this week'}
+                {`${ordersDueThisWeek} due this wk`}
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@ function Home({ onMenuClick }) {
               <div className={styles.statValue}>{totalUnpaid}</div>
               <div className={styles.statLabel}>Unpaid Invoices</div>
               <div className={styles.statSub} style={{ color: totalOverdueInvoice > 0 ? '#ef4444' : undefined }}>
-                {totalOverdueInvoice > 0 ? `${totalOverdueInvoice} overdue` : 'None overdue'}
+                {`${totalOverdueInvoice} overdue`}
               </div>
             </div>
           </div>
@@ -151,7 +151,7 @@ function Home({ onMenuClick }) {
               <div className={styles.statValue}>{pendingTasks.length}</div>
               <div className={styles.statLabel}>Pending Tasks</div>
               <div className={styles.statSub} style={{ color: tasksDueThisWeek > 0 ? '#fb923c' : undefined }}>
-                {tasksDueThisWeek > 0 ? `${tasksDueThisWeek} due this week` : 'None due this week'}
+                {`${tasksDueThisWeek} due this wk`}
               </div>
             </div>
           </div>
