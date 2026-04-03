@@ -45,7 +45,6 @@ function LogoOrName({ brand, darkBg = false }) {
 function ItemsTable({ invoice, brand }) {
   const { currency, showTax, taxRate } = brand
   
-  // Calculate subtotal from itemized prices if they exist, otherwise fallback to main price
   const subtotal = invoice.items?.length > 0 
     ? invoice.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
     : (parseFloat(invoice.price) || 0) * (parseFloat(invoice.qty) || 1)
@@ -54,19 +53,19 @@ function ItemsTable({ invoice, brand }) {
   const total = subtotal + tax
 
   return (
-    <>
+    <div className={styles.tableWrapper}>
       <div className={styles.tHead}>
         <span className={styles.tColDesc}>Description</span>
         <span className={styles.tColNum}>Price</span>
       </div>
 
-      {/* Main Category Header */}
+      {/* Main Order Row */}
       <div className={styles.tRowMain}>
-        <span className={styles.tColDesc}>{invoice.orderDesc || 'Garment Order'}</span>
-        <span className={styles.tColNum}>{fmt(currency, subtotal)}</span>
+        <div className={styles.tColDesc}>{invoice.orderDesc || 'Garment Order'}</div>
+        <div className={styles.tColNum}>{fmt(currency, subtotal)}</div>
       </div>
 
-      {/* Itemized breakdown (The "Cloths Involved") */}
+      {/* Itemized breakdown (Cloths Involved) */}
       {invoice.items?.length > 0 && (
         <div className={styles.itemizedSection}>
           <div className={styles.itemizedLabel}>Garments Included:</div>
@@ -95,16 +94,16 @@ function ItemsTable({ invoice, brand }) {
           <span>{fmt(currency, total)}</span>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// TEMPLATES
+// TEMPLATES (Editable, Printable, Custom, Free)
 // ─────────────────────────────────────────────────────────────
 
 function EditableTemplate({ invoice, customer, brand }) {
-  const dueDate  = getDueDate(invoice, brand.dueDays)
+  const dueDate = getDueDate(invoice, brand.dueDays)
   return (
     <div className={styles.tplBase}>
       <div className={styles.editHeader}>
@@ -130,15 +129,12 @@ function EditableTemplate({ invoice, customer, brand }) {
       <ItemsTable invoice={invoice} brand={brand} />
       {(brand.phone || brand.email || brand.footer) && (
         <div className={styles.editFooter}>
-          {(brand.phone || brand.email || brand.website) && (
-            <div className={styles.footSection}>
-              <strong>Payment / Contact</strong><br />
-              {brand.phone   && <span>{brand.phone}<br /></span>}
-              {brand.email   && <span>{brand.email}<br /></span>}
-              {brand.website && <span>{brand.website}</span>}
-            </div>
-          )}
-          {brand.footer && <div className={styles.footSection}>{brand.footer}</div>}
+          <div className={styles.footSection}>
+            <strong>Payment / Contact</strong><br />
+            {brand.phone && <span>{brand.phone}<br /></span>}
+            {brand.email && <span>{brand.email}<br /></span>}
+            {brand.footer && <span>{brand.footer}</span>}
+          </div>
         </div>
       )}
     </div>
@@ -146,7 +142,7 @@ function EditableTemplate({ invoice, customer, brand }) {
 }
 
 function PrintableTemplate({ invoice, customer, brand }) {
-  const dueDate  = getDueDate(invoice, brand.dueDays)
+  const dueDate = getDueDate(invoice, brand.dueDays)
   const barColor = brand.colour || '#eab308'
   return (
     <div className={styles.tplBase}>
@@ -164,14 +160,12 @@ function PrintableTemplate({ invoice, customer, brand }) {
           <div className={styles.metaLabel}>BILL FROM</div>
           <div className={styles.metaVal}>{brand.name || brand.ownerName}</div>
           {brand.address && <div className={styles.metaSub}>{brand.address}</div>}
-          {brand.phone   && <div className={styles.metaSub}>{brand.phone}</div>}
-          {brand.email   && <div className={styles.metaSub}>{brand.email}</div>}
+          {brand.phone && <div className={styles.metaSub}>{brand.phone}</div>}
         </div>
         <div style={{ textAlign: 'right' }}>
           <div className={styles.metaLabel}>BILL TO</div>
           <div className={styles.metaVal}>{customer.name}</div>
-          {customer.phone   && <div className={styles.metaSub}>{customer.phone}</div>}
-          {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
+          {customer.phone && <div className={styles.metaSub}>{customer.phone}</div>}
         </div>
       </div>
       <ItemsTable invoice={invoice} brand={brand} />
@@ -183,17 +177,12 @@ function PrintableTemplate({ invoice, customer, brand }) {
 }
 
 function CustomTemplate({ invoice, customer, brand }) {
-  const dueDate  = getDueDate(invoice, brand.dueDays)
+  const dueDate = getDueDate(invoice, brand.dueDays)
   const bannerBg = brand.colour || '#7c3aed'
   return (
     <div className={styles.tplBase} style={{ padding: 0 }}>
       <div className={styles.customBanner} style={{ background: bannerBg }}>
-        <div className={styles.customBannerLogo}>
-          {brand.logo
-            ? <img src={brand.logo} alt={brand.name} className={styles.bannerLogoImg} />
-            : <div className={styles.bannerLogoText}>{brand.name || 'Brand'}</div>
-          }
-        </div>
+        <div className={styles.customBannerLogo}><LogoOrName brand={brand} darkBg /></div>
         <div className={styles.customBannerRight}>
           <div className={styles.customBannerTitle}>INVOICE</div>
           <div className={styles.customBannerNum}>{invoice.number}</div>
@@ -203,70 +192,42 @@ function CustomTemplate({ invoice, customer, brand }) {
         <div className={styles.metaRow} style={{ marginBottom: 16 }}>
           <div>
             <div className={styles.metaLabel}>BILL FROM</div>
-            <div className={styles.metaVal}>{brand.name || brand.ownerName}</div>
-            {brand.address && <div className={styles.metaSub}>{brand.address}</div>}
-            {brand.phone   && <div className={styles.metaSub}>{brand.phone}</div>}
+            <div className={styles.metaVal}>{brand.name}</div>
+            {brand.phone && <div className={styles.metaSub}>{brand.phone}</div>}
           </div>
           <div>
             <div className={styles.metaLabel}>BILL TO</div>
             <div className={styles.metaVal}>{customer.name}</div>
-            {customer.phone   && <div className={styles.metaSub}>{customer.phone}</div>}
-            {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
           </div>
           <div style={{ textAlign: 'right' }}>
             <div className={styles.metaLabel}>DATE</div>
             <div className={styles.metaSub}>{invoice.date}</div>
-            <div className={styles.metaLabel} style={{ marginTop: 4 }}>DUE</div>
-            <div className={styles.metaSub}>{dueDate}</div>
           </div>
         </div>
         <ItemsTable invoice={invoice} brand={brand} />
       </div>
       <div className={styles.customFooter} style={{ background: bannerBg }}>
         <div className={styles.customFooterText}>{brand.footer || 'Thank you for your patronage'}</div>
-        {brand.email && <div className={styles.customFooterSub}>{brand.email}</div>}
       </div>
     </div>
   )
 }
 
 function FreeTemplate({ invoice, customer, brand }) {
-  const dueDate  = getDueDate(invoice, brand.dueDays)
+  const dueDate = getDueDate(invoice, brand.dueDays)
   return (
     <div className={styles.tplBase}>
       <div className={styles.freeHeader}>
-        <div>
-          <div className={styles.printTitle}>INVOICE</div>
-          <div className={styles.freeNum}>{invoice.number}</div>
-        </div>
-        <div className={styles.freeLogoBox}>
-          {brand.logo
-            ? <img src={brand.logo} alt={brand.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            : <span className={styles.freeLogoPlaceholder}>{brand.name || 'LOGO'}</span>
-          }
-        </div>
+        <div><div className={styles.printTitle}>INVOICE</div><div className={styles.freeNum}>{invoice.number}</div></div>
+        <div className={styles.freeLogoBox}><LogoOrName brand={brand} /></div>
       </div>
       <div className={styles.freeGrid}>
-        <div className={styles.freeBox}>
-          <strong>BILL FROM</strong><br />
-          {brand.name || brand.ownerName}<br />
-          {brand.address && <>{brand.address}<br /></>}
-          {brand.phone}
-        </div>
-        <div className={styles.freeBox}>
-          <strong>BILL TO</strong><br />
-          {customer.name}<br />
-          {customer.phone && <>{customer.phone}<br /></>}
-          {customer.address}
-        </div>
-        <div className={styles.freeBox}>
-          <strong>DETAILS</strong><br />
-          Issue: {invoice.date}<br />
-          Due: {dueDate}
-        </div>
+        <div className={styles.freeBox}><strong>BILL FROM</strong><br />{brand.name}<br />{brand.phone}</div>
+        <div className={styles.freeBox}><strong>BILL TO</strong><br />{customer.name}<br />{customer.phone}</div>
+        <div className={styles.freeBox}><strong>DETAILS</strong><br />Date: {invoice.date}<br />Due: {dueDate}</div>
       </div>
       <ItemsTable invoice={invoice} brand={brand} />
-      <div className={styles.freeFooter}>{brand.footer || 'Thank you for your business!'}</div>
+      <div className={styles.freeFooter}>{brand.footer || 'Thank you!'}</div>
     </div>
   )
 }
@@ -282,35 +243,23 @@ const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
 const STATUS_NEXT   = { unpaid: 'paid', paid: 'unpaid', overdue: 'paid' }
 
 async function generatePDF(paperEl, filename) {
-  const canvas = await html2canvas(paperEl, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#ffffff',
-    logging: false,
-  })
+  const canvas = await html2canvas(paperEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false })
   const imgData = canvas.toDataURL('image/png')
-  const pdf     = new jsPDF({ orientation: 'portrait', unit: 'px', format: 'a4' })
-  const pdfW    = pdf.internal.pageSize.getWidth()
-  const pdfH    = (canvas.height * pdfW) / canvas.width
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: 'a4' })
+  const pdfW = pdf.internal.pageSize.getWidth()
+  const pdfH = (canvas.height * pdfW) / canvas.width
   pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH)
   pdf.save(filename)
 }
 
-export default function InvoiceView({
-  invoice: initialInvoice,
-  customer,
-  onClose,
-  onStatusChange,
-  onDelete,
-  showToast,
-}) {
-  const { brand }  = useBrand()
-  const paperRef   = useRef(null)
-  const [invoice, setInvoice]       = useState(initialInvoice)
+export default function InvoiceView({ invoice: initialInvoice, customer, onClose, onStatusChange, onDelete, showToast }) {
+  const { brand } = useBrand()
+  const paperRef = useRef(null)
+  const [invoice, setInvoice] = useState(initialInvoice)
   const [pdfLoading, setPdfLoading] = useState(false)
 
   const templateKey = brand.template || 'editable'
-  const Template    = TEMPLATE_MAP[templateKey] || EditableTemplate
+  const Template = TEMPLATE_MAP[templateKey] || EditableTemplate
 
   const handleToggleStatus = () => {
     const newStatus = STATUS_NEXT[invoice.status] || 'paid'
@@ -328,14 +277,11 @@ export default function InvoiceView({
       await generatePDF(paperRef.current, filename)
       showToast?.('PDF downloaded ✓')
     } catch (err) {
-      console.error('PDF error:', err)
-      showToast?.('PDF failed. Try again.')
+      showToast?.('PDF failed.')
     } finally {
       setPdfLoading(false)
     }
   }
-
-  const isPaid = invoice.status === 'paid'
 
   return (
     <div className={styles.overlay}>
@@ -356,7 +302,6 @@ export default function InvoiceView({
         <div className={styles.paperWrap} ref={paperRef}>
           <Template invoice={invoice} customer={customer} brand={brand} />
         </div>
-
         {invoice.notes && (
           <div className={styles.notesBox}>
             <div className={styles.notesLabel}>Notes</div>
@@ -367,13 +312,11 @@ export default function InvoiceView({
       </div>
 
       <div className={styles.bottomBar}>
-        <button className={`${styles.statusBtn} ${isPaid ? styles.statusBtnUnpaid : styles.statusBtnPaid}`} onClick={handleToggleStatus}>
-          <span className="mi" style={{ fontSize: '1rem' }}>{isPaid ? 'undo' : 'check_circle'}</span>
-          {isPaid ? 'Mark as Unpaid' : 'Mark as Paid'}
+        <button className={`${styles.statusBtn} ${invoice.status === 'paid' ? styles.statusBtnUnpaid : styles.statusBtnPaid}`} onClick={handleToggleStatus}>
+          <span className="mi" style={{ fontSize: '1rem' }}>{invoice.status === 'paid' ? 'undo' : 'check_circle'}</span>
+          {invoice.status === 'paid' ? 'Mark as Unpaid' : 'Mark as Paid'}
         </button>
-        <button className={styles.deleteBtn} onClick={() => onDelete(invoice.id)}>
-          <span className="mi" style={{ fontSize: '1rem' }}>delete</span>
-        </button>
+        <button className={styles.deleteBtn} onClick={() => onDelete(invoice.id)}><span className="mi">delete</span></button>
       </div>
     </div>
   )
