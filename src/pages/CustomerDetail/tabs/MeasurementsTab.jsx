@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import ConfirmSheet from '../../../components/ConfirmSheet/ConfirmSheet'
-import Header from '../../Header/Header'
+import Header from '../../../components/Header/Header'
 import styles from './Tabs.module.css'
 
 const UNIT_LABELS = { in: '"', cm: 'cm', yd: 'yd' }
