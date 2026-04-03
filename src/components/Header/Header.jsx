@@ -13,6 +13,7 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
     '/customers': 'Customers',
     '/tasks': 'Tasks',
     '/settings': 'Settings',
+     '/tasks': 'Tasks'
   }
   const pageTitle = title ?? PAGE_TITLES[location.pathname] ?? 'TailorBook'
 
