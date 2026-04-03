@@ -1,9 +1,3 @@
-// src/pages/Invoices/Invoices.jsx
-// ─────────────────────────────────────────────────────────────
-// Displays ALL invoices across ALL customers.
-// Subscribes to each customer's invoices subcollection live.
-// ─────────────────────────────────────────────────────────────
-
 import { useState, useEffect, useRef } from 'react'
 import { useAuth }      from '../../contexts/AuthContext'
 import { useCustomers } from '../../contexts/CustomerContext'
@@ -14,6 +8,13 @@ import styles from './Invoices.module.css'
 
 // ── Helpers ───────────────────────────────────────────────────
 
+function calculateInvoiceTotal(invoice) {
+  if (invoice.items && invoice.items.length > 0) {
+    return invoice.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+  }
+  return (parseFloat(invoice.price) || 0) * (parseFloat(invoice.qty) || 1);
+}
+
 function fmt(currency = '₦', amount) {
   const n = parseFloat(amount) || 0
   return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`
@@ -23,13 +24,6 @@ function isOverdue(invoice) {
   if (invoice.status === 'paid') return false
   if (!invoice.due) return false
   return new Date(invoice.due + 'T23:59:59') < new Date()
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return 'Unknown Date'
-  const d = new Date(dateStr)
-  if (isNaN(d)) return dateStr
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 // ── Tabs ──────────────────────────────────────────────────────
@@ -46,7 +40,7 @@ const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
 // ── Invoice List Item ─────────────────────────────────────────
 
 function InvoiceCard({ invoice, currency, onTap, isLast }) {
-  const total   = (parseFloat(invoice.price) || 0) * (parseFloat(invoice.qty) || 1)
+  const total   = calculateInvoiceTotal(invoice)
   const overdue = isOverdue(invoice)
   const status  = overdue && invoice.status !== 'paid' ? 'overdue' : invoice.status
 
@@ -55,7 +49,6 @@ function InvoiceCard({ invoice, currency, onTap, isLast }) {
       className={`${styles.invoiceListItem} ${isLast ? styles.invoiceListItemLast : ''} ${overdue ? styles.invoiceListItemOverdue : ''}`}
       onClick={onTap}
     >
-      {/* Left: grey outer box with white inner box */}
       <div className={styles.invoiceListOuter}>
         <div className={styles.invoiceListInner}>
           <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : 'var(--text3)' }}>
@@ -64,19 +57,12 @@ function InvoiceCard({ invoice, currency, onTap, isLast }) {
         </div>
       </div>
 
-      {/* Info */}
       <div className={styles.invoiceListInfo}>
         <div className={styles.invoiceListDesc}>{invoice.orderDesc || 'Order'}</div>
         <div className={styles.invoiceListOrdRow}>{invoice.number}</div>
         <div className={styles.invoiceListMeta}>
           <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', verticalAlign: 'middle' }}>person</span>
           <span className={styles.invoiceListMetaText}>{invoice.customerName || '—'}</span>
-        </div>
-        <div className={styles.invoiceListMeta}>
-          <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', verticalAlign: 'middle' }}>autorenew</span>
-          <span className={`${styles.invoiceListMetaText} ${styles[`statusText_${status}`]}`}>
-            {STATUS_LABELS[status] ?? status}
-          </span>
         </div>
         <div className={`${styles.invoiceListAmount}`}>{fmt(currency, total)}</div>
       </div>
@@ -88,7 +74,7 @@ function InvoiceCard({ invoice, currency, onTap, isLast }) {
 
 function InvoiceFullView({ invoice, currency, onClose }) {
   if (!invoice) return null
-  const total    = (parseFloat(invoice.price) || 0) * (parseFloat(invoice.qty) || 1)
+  const total    = calculateInvoiceTotal(invoice)
   const overdue  = isOverdue(invoice)
   const status   = overdue && invoice.status !== 'paid' ? 'overdue' : invoice.status
 
@@ -98,7 +84,7 @@ function InvoiceFullView({ invoice, currency, onClose }) {
         <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
           <span className="mi" style={{ fontSize: '1.6rem', color: 'var(--text)' }}>arrow_back</span>
         </button>
-        <span className={styles.viewTitle}>Invoice</span>
+        <span className={styles.viewTitle}>Invoice Details</span>
         <div style={{ width: 32 }} />
       </div>
 
@@ -128,10 +114,6 @@ function InvoiceFullView({ invoice, currency, onClose }) {
               <div className={styles.docMetaValue}>{invoice.date}</div>
             </div>
             <div className={styles.docMetaCell}>
-              <div className={styles.docMetaLabel}>Due Date</div>
-              <div className={styles.docMetaValue}>{invoice.due || '—'}</div>
-            </div>
-            <div className={styles.docMetaCell}>
               <div className={styles.docMetaLabel}>Status</div>
               <span className={`${styles.statusBadge} ${styles[`status_${status}`]}`}>
                 {STATUS_LABELS[status] ?? status}
@@ -143,22 +125,22 @@ function InvoiceFullView({ invoice, currency, onClose }) {
 
           <div className={styles.docTableHeader}>
             <span>Description</span>
-            <span>Qty</span>
             <span>Price</span>
-            <span>Total</span>
           </div>
 
-          <div className={styles.docTableRow}>
+          <div className={styles.docTableRowMain}>
             <span>{invoice.orderDesc || 'Order'}</span>
-            <span>{invoice.qty || 1}</span>
-            <span>{fmt(currency, invoice.price)}</span>
             <span>{fmt(currency, total)}</span>
           </div>
 
-          {invoice.linkedNames?.length > 0 && (
-            <div className={styles.docLinked}>
-              <div className={styles.docMetaLabel}>Cloth Types</div>
-              <div className={styles.docLinkedNames}>{invoice.linkedNames.join(', ')}</div>
+          {invoice.items && invoice.items.length > 0 && (
+            <div className={styles.docItemsBreakdown}>
+              {invoice.items.map((item, idx) => (
+                <div key={idx} className={styles.docSubRow}>
+                  <span>• {item.name}</span>
+                  <span>{fmt(currency, item.price)}</span>
+                </div>
+              ))}
             </div>
           )}
 
@@ -196,7 +178,6 @@ export default function Invoices({ onMenuClick }) {
   const [viewing,     setViewing]     = useState(null)
   const unsubsRef = useRef({})
 
-  // ── Subscribe to every customer's invoices ────────────────
   useEffect(() => {
     Object.values(unsubsRef.current).forEach(u => u())
     unsubsRef.current = {}
@@ -207,7 +188,6 @@ export default function Invoices({ onMenuClick }) {
     }
 
     const invoiceMap = {}
-
     customers.forEach(customer => {
       const unsub = subscribeToInvoices(
         user.uid,
@@ -238,7 +218,6 @@ export default function Invoices({ onMenuClick }) {
     }
   }, [user, customers])
 
-  // ── Filter ───────────────────────────────────────────────
   const filtered = allInvoices.filter(inv => {
     if (activeTab === 'all')     return true
     if (activeTab === 'paid')    return inv.status === 'paid'
@@ -247,7 +226,6 @@ export default function Invoices({ onMenuClick }) {
     return true
   })
 
-  // ── Counts ───────────────────────────────────────────────
   const counts = {
     all:     allInvoices.length,
     unpaid:  allInvoices.filter(i => i.status !== 'paid' && !isOverdue(i)).length,
@@ -255,14 +233,6 @@ export default function Invoices({ onMenuClick }) {
     overdue: allInvoices.filter(i => isOverdue(i)).length,
   }
 
-  const EMPTY_TEXT = {
-    all:     'No invoices yet.',
-    unpaid:  'No unpaid invoices.',
-    paid:    'No paid invoices yet.',
-    overdue: 'No overdue invoices. All good!',
-  }
-
-  // ── Group by date ─────────────────────────────────────────
   const grouped = filtered.reduce((acc, inv) => {
     const key = inv.date || 'Unknown Date'
     if (!acc[key]) acc[key] = []
@@ -274,7 +244,6 @@ export default function Invoices({ onMenuClick }) {
     <div className={styles.page}>
       <Header title="Invoices" onMenuClick={onMenuClick} />
 
-      {/* Tabs */}
       <div className={styles.tabs}>
         {TABS.map(tab => (
           <div
@@ -295,17 +264,11 @@ export default function Invoices({ onMenuClick }) {
         ))}
       </div>
 
-      {/* List */}
       <div className={styles.listArea}>
         {filtered.length === 0 ? (
           <div className={styles.emptyState}>
             <span className="mi" style={{ fontSize: '2.8rem', opacity: 0.2 }}>receipt_long</span>
-            <p>{EMPTY_TEXT[activeTab]}</p>
-            {activeTab === 'all' && (
-              <span className={styles.emptyHint}>
-                Go to a customer → Orders → Generate Invoice
-              </span>
-            )}
+            <p>No invoices found.</p>
           </div>
         ) : (
           Object.entries(grouped).map(([date, dateInvoices]) => (
@@ -326,7 +289,6 @@ export default function Invoices({ onMenuClick }) {
         )}
       </div>
 
-      {/* Full invoice view */}
       {viewing && (
         <InvoiceFullView
           invoice={viewing}
