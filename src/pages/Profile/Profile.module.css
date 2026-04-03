@@ -75,14 +75,29 @@
 /* ── BADGES ── */
 .badgePro {
   background: linear-gradient(135deg, var(--accent), #b8942a);
-  color: #000; font-size: 0.6rem; font-weight: 900;
-  padding: 3px 8px; border-radius: 20px;
+  color: #000; 
+  font-size: 0.6rem; 
+  font-weight: 900;
+  padding: 3px 8px; 
+  border-radius: 20px;
+  /* Add these two lines */
+  width: fit-content;
+  display: inline-flex;
 }
+
 .badgeFree {
-  background: var(--surface); border: 1px solid var(--border);
-  color: var(--text3); font-size: 0.6rem; font-weight: 800;
-  padding: 3px 8px; border-radius: 20px;
+  background: var(--surface); 
+  border: 1px solid var(--border);
+  color: var(--text3); 
+  font-size: 0.6rem; 
+  font-weight: 800;
+  padding: 3px 8px; 
+  border-radius: 20px;
+  /* Add these two lines */
+  width: fit-content;
+  display: inline-flex;
 }
+
 
 /* ── BRAND PREVIEW ── */
 .brandPreviewLogo { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: #fff; }
