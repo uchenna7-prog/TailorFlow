@@ -30,17 +30,16 @@ function formatDate(ts) {
 
 // ── ORDER FORM MODAL ──────────────────────────────────────────
 function OrderModal({ isOpen, onClose, measurements, onSave }) {
-  const [selectedItems, setSelectedItems] = useState([]) // Array of { id, price }
+  const [selectedItems, setSelectedItems] = useState([]) 
   const [pickerQuery, setPickerQuery] = useState('')
   const [desc, setDesc] = useState('')
-  const [qty, setQty] = useState('1')
   const [due, setDue] = useState('')
   const [priority, setPriority] = useState('normal')
   const [notes, setNotes] = useState('')
 
   const reset = () => {
     setSelectedItems([]); setPickerQuery(''); setDesc(''); 
-    setQty('1'); setDue(''); setPriority('normal'); setNotes('')
+    setDue(''); setPriority('normal'); setNotes('')
   }
 
   const toggleId = (m) => {
@@ -59,13 +58,15 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
   }
 
   const totalPrice = selectedItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
+  // Dynamic Qty based on selection length
+  const dynamicQty = selectedItems.length || 1
 
   const filteredMeasurements = pickerQuery.trim()
     ? measurements.filter(m => m.name.toLowerCase().includes(pickerQuery.toLowerCase()))
     : measurements
 
   const handleSave = () => {
-    if (!desc.trim() && selectedItems.length === 0) return
+    if (selectedItems.length === 0 && !desc.trim()) return
     
     let dueDisplay = ''
     if (due) {
@@ -74,10 +75,10 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
     }
 
     onSave({
-      desc: desc.trim() || (selectedItems.length > 0 ? selectedItems.map(i => i.name).join(', ') : 'Untitled Order'),
+      desc: desc.trim() || (selectedItems.length > 0 ? selectedItems.map(i => i.name).join(', ') : 'New Order'),
       price: totalPrice,
-      items: selectedItems.map(i => ({ id: i.id, price: parseFloat(i.price) || 0, name: i.name })),
-      qty: parseInt(qty) || 1,
+      items: selectedItems.map(i => ({ id: i.id, price: parseFloat(i.price) || 0, name: i.name, imgSrc: i.imgSrc || null })),
+      qty: dynamicQty,
       due: dueDisplay,
       dueRaw: due,
       notes: notes.trim(),
@@ -103,7 +104,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
 
       <div className={styles.modalBody}>
         <div style={{ padding: '20px' }}>
-          <p className={styles.sectionHeading}>1. Select Cloth Types</p>
+          <p className={styles.sectionHeading}>1. Select Clothes</p>
           {measurements.length > 5 && (
             <div className={styles.pickerSearchWrap}>
               <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)' }}>search</span>
@@ -112,7 +113,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
           )}
           
           <div className={styles.pickerList}>
-            {measurements.map(m => {
+            {filteredMeasurements.map(m => {
               const selected = selectedItems.find(i => i.id === String(m.id))
               return (
                 <div key={m.id} className={`${styles.pickerItem} ${selected ? styles.pickerSelected : ''}`} onClick={() => toggleId(m)}>
@@ -121,7 +122,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
                   </div>
                   <div className={styles.pickerInfo}>
                     <h5>{m.name}</h5>
-                    <span>{m.fields?.length || 0} fields</span>
+                    <span>{m.fields?.length || 0} measurements</span>
                   </div>
                   <div className={`${styles.pickerCheck} ${selected ? styles.pickerCheckSelected : ''}`}>
                     {selected && <span className="mi" style={{ fontSize: '0.9rem' }}>check</span>}
@@ -133,7 +134,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
 
           {selectedItems.length > 0 && (
             <>
-              <p className={styles.sectionHeading} style={{ marginTop: 24 }}>2. Set Item Pricing</p>
+              <p className={styles.sectionHeading} style={{ marginTop: 24 }}>2. Pricing Per Item</p>
               <div className={styles.pricingList}>
                 {selectedItems.map(item => (
                   <div key={item.id} className={styles.priceInputRow}>
@@ -141,10 +142,10 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
                       {item.imgSrc ? <img src={item.imgSrc} alt="" /> : <span className="mi">checkroom</span>}
                     </div>
                     <div style={{ flex: 1 }}>
-                       <label className={styles.labelTiny} style={{ marginBottom: 2 }}>{item.name} Price</label>
+                       <label className={styles.labelTiny} style={{ marginBottom: 2 }}>{item.name} Price (₦)</label>
                        <input 
                         type="number" 
-                        placeholder="₦ 0.00" 
+                        placeholder="0.00" 
                         className={styles.itemPriceInput}
                         value={item.price}
                         onChange={(e) => updateItemPrice(item.id, e.target.value)}
@@ -153,17 +154,17 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
                   </div>
                 ))}
                 <div className={styles.totalIndicator}>
-                  <span>Total Order Value:</span>
+                  <span>Total (Qty: {dynamicQty})</span>
                   <span style={{ color: 'var(--accent)' }}>₦{totalPrice.toLocaleString()}</span>
                 </div>
               </div>
             </>
           )}
 
-          <p className={styles.sectionHeading} style={{ marginTop: 24 }}>3. Additional Details</p>
+          <p className={styles.sectionHeading} style={{ marginTop: 24 }}>3. Final Details</p>
           <div className={styles.orderFormCard}>
             <label className={styles.labelTiny}>Order Description</label>
-            <input type="text" className={styles.clothInput} placeholder="e.g. Traditional Wedding Set" value={desc} onChange={e => setDesc(e.target.value)} />
+            <input type="text" className={styles.clothInput} placeholder="e.g. Full Native Set" value={desc} onChange={e => setDesc(e.target.value)} />
             
             <div style={{ display: 'flex', gap: 14, marginBottom: 20 }}>
               <div style={{ flex: 1 }}>
@@ -171,8 +172,8 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
                 <input type="date" className={styles.clothInput} style={{ marginBottom: 0 }} value={due} onChange={e => setDue(e.target.value)} />
               </div>
               <div style={{ flex: 1 }}>
-                <label className={styles.labelTiny}>Qty</label>
-                <input type="number" className={styles.clothInput} style={{ marginBottom: 0 }} placeholder="1" value={qty} onChange={e => setQty(e.target.value)} />
+                <label className={styles.labelTiny}>Calculated Qty</label>
+                <div className={styles.clothInput} style={{ borderBottomColor: 'var(--border)', opacity: 0.8 }}>{dynamicQty}</div>
               </div>
             </div>
 
@@ -185,8 +186,8 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
               ))}
             </div>
 
-            <label className={styles.labelTiny} style={{ marginTop: 20 }}>Special Instructions / Notes</label>
-            <textarea className={styles.orderTextarea} placeholder="Fabric colour, thread preference..." value={notes} onChange={e => setNotes(e.target.value)} />
+            <label className={styles.labelTiny} style={{ marginTop: 20 }}>Notes</label>
+            <textarea className={styles.orderTextarea} placeholder="Fabric color, styles, etc..." value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
         </div>
       </div>
@@ -198,8 +199,6 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
 function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange }) {
   if (!order) return null
   const banner = PRIORITY_BANNER[order.priority] ?? PRIORITY_BANNER.normal
-  const ids = order.measurementIds?.length ? order.measurementIds : (order.measurementId ? [order.measurementId] : [])
-  const linked = ids.map(id => measurements.find(m => String(m.id) === String(id))).filter(Boolean)
   const placedOn = order.date || formatDate(order.createdAt)
 
   return (
@@ -215,7 +214,7 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange })
         
         <div className={styles.orderMetaGrid}>
           <div className={styles.orderMetaCell}>
-            <div className={styles.cellLabel}>Total Price</div>
+            <div className={styles.cellLabel}>Total Order Price</div>
             <div className={styles.cellValue}>₦{Number(order.price || 0).toLocaleString()}</div>
           </div>
           <div className={styles.orderMetaCell}>
@@ -224,9 +223,28 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange })
           </div>
         </div>
 
+        {order.items && order.items.length > 0 && (
+          <div className={styles.linkedSection}>
+            <div className={styles.linkLabel}>Selected Garments & Prices</div>
+            {order.items.map((item, idx) => (
+              <div key={idx} className={styles.linkedRow} style={{ justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div className={styles.linkedThumb}>
+                    {item.imgSrc ? <img src={item.imgSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span className="mi">checkroom</span>}
+                  </div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{item.name}</div>
+                </div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent)' }}>
+                  ₦{Number(item.price || 0).toLocaleString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className={styles.linkedSection}>
-          <div className={styles.linkLabel}>Status Progress</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+          <div className={styles.linkLabel}>Change Status</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {STATUSES.map(s => (
               <button key={s.value} className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`} onClick={() => onStatusChange(order.id, s.value)}>
                 {s.label}
@@ -235,23 +253,6 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange })
           </div>
         </div>
 
-        {linked.length > 0 && (
-          <div className={styles.linkedSection}>
-            <div className={styles.linkLabel}>Garments & Items</div>
-            {linked.map(m => (
-              <div key={m.id} className={styles.linkedRow}>
-                <div className={styles.linkedThumb}>
-                  {m.imgSrc ? <img src={m.imgSrc} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span className="mi">checkroom</span>}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{m.name}</div>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--text3)' }}>{m.fields?.length || 0} measurements</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
         {order.notes && (
           <div className={styles.notesSection}>
             <div className={styles.linkLabel}>Notes</div>
@@ -259,7 +260,7 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange })
           </div>
         )}
 
-        <div className={styles.detailDate}>Order Placed: {placedOn}</div>
+        <div className={styles.detailDate}>Order Placed: {placedOn} • Qty: {order.qty}</div>
       </div>
     </div>
   )
@@ -320,7 +321,6 @@ export default function OrdersTab({ customerId, orders, measurements, showToast 
         <div className={styles.emptyState}>
           <span className="mi" style={{ fontSize: '2.8rem', opacity: 0.4 }}>shopping_basket</span>
           <p>No active orders yet.</p>
-          <span className={styles.hint}>Tap + to place an order</span>
         </div>
       )}
 
@@ -331,15 +331,14 @@ export default function OrdersTab({ customerId, orders, measurements, showToast 
           {dateOrders.map((o, idx) => {
             const priceStr = o.price ? `₦${Number(o.price).toLocaleString()}` : '₦0'
             const statusLabel = STATUSES.find(s => s.value === o.status)?.label ?? 'Pending'
-            const ids = o.measurementIds?.length ? o.measurementIds : (o.measurementId ? [o.measurementId] : [])
-            const linked = ids.map(id => measurements.find(m => String(m.id) === String(id))).filter(Boolean)
-            const thumb = linked[0]
+            const itemsList = o.items || []
+            const thumb = itemsList[0]?.imgSrc
 
             return (
               <div key={o.id} className={`${styles.orderListItem} ${idx === dateOrders.length - 1 ? styles.orderListItemLast : ''}`} onClick={() => setDetailOrder(o)}>
                 <div className={styles.orderListOuter}>
                   <div className={styles.orderListInner}>
-                    {thumb?.imgSrc ? <img src={thumb.imgSrc} alt="" className={styles.orderListThumbImg} /> : <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>content_cut</span>}
+                    {thumb ? <img src={thumb} alt="" className={styles.orderListThumbImg} /> : <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>content_cut</span>}
                   </div>
                 </div>
                 <div className={styles.orderListInfo}>
