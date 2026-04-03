@@ -3,7 +3,6 @@ import { useCustomers } from '../../contexts/CustomerContext'
 import { useOrders }    from '../../contexts/OrdersContext'
 import { useTasks }     from '../../contexts/TaskContext'
 import { useAuth }      from '../../contexts/AuthContext'
-import { useInvoices }  from '../../contexts/InvoiceContext' // ✅ added
 import Header from '../../components/Header/Header'
 import styles from './Home.module.css'
 
@@ -20,7 +19,6 @@ function Home({ onMenuClick }) {
   const { customers } = useCustomers()
   const { allOrders } = useOrders()
   const { tasks }     = useTasks()
-  const { invoices }  = useInvoices() // ✅ added
 
   const firstName = user?.displayName
     ? user.displayName.split(' ')[0]
@@ -29,7 +27,9 @@ function Home({ onMenuClick }) {
   // ✅ FILTERS
   const pendingOrders = allOrders.filter(o => o.status !== 'Ready')
   const pendingTasks  = tasks.filter(t => t.status !== 'Done')
-  const unpaidInvoices = invoices?.filter(inv => inv.status !== 'Paid') ?? []
+
+  // ✅ invoices derived from orders
+  const unpaidInvoices = allOrders.filter(o => o.paymentStatus !== 'Paid')
 
   const recentOrders = pendingOrders.slice(0, 3)
   const recentTasks  = pendingTasks.slice(0, 3)
@@ -53,7 +53,7 @@ function Home({ onMenuClick }) {
 
         <div className={styles.sectionDivider} />
 
-        {/* Overview — live counts */}
+        {/* Overview */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Overview</h2>
           <div className={styles.statsGrid}>
@@ -72,8 +72,8 @@ function Home({ onMenuClick }) {
               <span className={styles.statVal}>{pendingTasks.length}</span>
             </div>
 
-            {/* ✅ NEW */}
-            <div className={styles.statCard} onClick={() => navigate('/invoices')} style={{ cursor: 'pointer' }}>
+            {/* ✅ now based on orders */}
+            <div className={styles.statCard} onClick={() => navigate('/orders')} style={{ cursor: 'pointer' }}>
               <span className={styles.statLabel}>Unpaid Invoices</span>
               <span className={styles.statVal}>{unpaidInvoices.length}</span>
             </div>
@@ -133,7 +133,7 @@ function Home({ onMenuClick }) {
 
         <div className={styles.sectionDivider} />
 
-        {/* ✅ NEW — Recent Tasks */}
+        {/* Recent Tasks */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Recent Tasks</h2>
