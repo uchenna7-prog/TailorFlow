@@ -15,20 +15,23 @@
   padding-top: 8px;
 }
 
-.title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  margin: 4px 0 6px;
-  color: var(--text);
+.welcomeLabel {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text3);
+  margin: 0 0 2px;
 }
 
-.title span {
-  font-style: italic;
-  color: var(--accent);
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 6px;
+  line-height: 1.1;
 }
 
 .subtitle {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text3);
   font-weight: 400;
 }
@@ -47,8 +50,8 @@
   border-radius: 16px;
   padding: 14px;
   display: flex;
-  gap: 12px;
-  align-items: center;
+  gap: 10px;
+  align-items: flex-start;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -56,36 +59,37 @@
 .statCard:active { background: var(--surface2); }
 
 .statIconWrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   background: var(--surface2);
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .statValue {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: var(--text);
   line-height: 1.1;
 }
 
 .statLabel {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: var(--text3);
   font-weight: 600;
   margin-top: 2px;
 }
 
 .statSub {
-  font-size: 0.62rem;
-  color: var(--accent);
-  font-weight: 700;
-  margin-top: 3px;
+  font-size: 0.6rem;
+  color: var(--text3);
+  font-weight: 600;
+  margin-top: 4px;
 }
 
 /* ── SECTION ── */
@@ -97,15 +101,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 0;
 }
 
 .sectionTitle {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 800;
-  color: var(--text);
+  color: var(--text2);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   margin-bottom: 10px;
 }
 
@@ -214,7 +218,7 @@
 .listMetaText { font-size: 0.75rem; font-weight: 400; color: var(--text2); }
 .listDue { font-size: 0.75rem; font-weight: 500; color: #ef4444; margin-top: 1px; }
 
-/* Right price column (orders only) */
+/* Right price (orders) */
 .listRight { text-align: right; flex-shrink: 0; }
 .listPrice { font-size: 0.88rem; font-weight: 700; color: var(--text); white-space: nowrap; }
 .listQty { font-size: 0.65rem; color: var(--text3); margin-top: 2px; }
