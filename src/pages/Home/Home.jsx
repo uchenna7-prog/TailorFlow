@@ -317,7 +317,7 @@ function Home({ onMenuClick }) {
           </section>
         )}
 
-        {/* QUICK ACTIONS — Column Layout */}
+        {/* QUICK ACTIONS */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>Quick Actions</h3>
           <div className={styles.statsGrid}>
@@ -343,7 +343,7 @@ function Home({ onMenuClick }) {
 
             <div className={styles.actionCard} onClick={() => navigate('/tasks')}>
               <div className={styles.statIconWrap}>
-                <span className="mi" style={{ fontSize: '1.3rem', color: 'var(--accent)' }}>add_task</span>
+                <span className="mi" style={{ fontSize: '1.3rem', color: 'var(--accent)' }}>add_circle_outline</span>
               </div>
               <div className={styles.actionCardText}>
                 <div className={styles.statValue} style={{ fontSize: '0.82rem' }}>New</div>
