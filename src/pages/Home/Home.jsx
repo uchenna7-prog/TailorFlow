@@ -6,6 +6,16 @@ import { useAuth }      from '../../contexts/AuthContext'
 import Header from '../../components/Header/Header'
 import styles from './Home.module.css'
 
+const STATUS_COLORS = {
+  'In Progress': '#f59e0b',
+  Pending: '#3b82f6',
+  Completed: '#22c55e',
+  Delivered: '#8b5cf6',
+  Unpaid: '#ef4444',
+  Paid: '#22c55e',
+  Overdue: '#f97316'
+}
+
 function Home({ onMenuClick }) {
   const navigate = useNavigate()
   const { user }      = useAuth()
@@ -28,15 +38,13 @@ function Home({ onMenuClick }) {
       <Header onMenuClick={onMenuClick} />
 
       <main className={styles.main}>
-
         {/* HERO */}
         <section className={styles.hero}>
-          <span className={styles.dashboardLabel}>Dashboard</span>
           <h1 className={styles.title}>
             Welcome, <span>{firstName}</span>
           </h1>
           <p className={styles.subtitle}>
-            Your atelier at a glance
+            this is what is ....
           </p>
         </section>
 
@@ -75,25 +83,16 @@ function Home({ onMenuClick }) {
           </div>
         </section>
 
-        {/* REVENUE */}
-        <section className={styles.revenueCard}>
-          <span>Total Revenue (Paid)</span>
-          <h2>$1,400</h2>
-        </section>
-
         {/* QUICK ACTIONS */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>Quick Actions</h3>
-
           <div className={styles.actionList}>
             <button onClick={() => navigate('/customers')}>
               <span className="mi">person_add</span> Add Customer
             </button>
-
             <button onClick={() => navigate('/tasks')}>
               <span className="mi">add_task</span> Manage Tasks
             </button>
-
             <button onClick={() => navigate('/customers')}>
               <span className="mi">arrow_forward</span> View All Customers
             </button>
@@ -103,24 +102,19 @@ function Home({ onMenuClick }) {
         {/* RECENT ORDERS */}
         <section className={styles.section}>
           <h3 className={styles.sectionTitle}>Recent Orders</h3>
-
           <div className={styles.ordersCard}>
             {recentOrders.map(order => (
               <div key={order.id} className={styles.orderRow}>
                 <div>
-                  <div className={styles.orderTitle}>
-                    {order.desc ?? 'Order'}
-                  </div>
-                  <div className={styles.orderCustomer}>
-                    {order.customerName}
-                  </div>
+                  <div className={styles.orderTitle}>{order.desc ?? 'Order'}</div>
+                  <div className={styles.orderCustomer}>{order.customerName}</div>
                 </div>
-
                 <div className={styles.orderRight}>
-                  <span className={styles.orderPrice}>
-                    ₦{order.price ?? 0}
-                  </span>
-                  <span className={`${styles.badge} ${styles[order.status?.toLowerCase()]}`}>
+                  <span className={styles.orderPrice}>₦{order.price ?? 0}</span>
+                  <span
+                    className={styles.badge}
+                    style={{ backgroundColor: STATUS_COLORS[order.status] || '#777', color: '#fff' }}
+                  >
                     {order.status}
                   </span>
                 </div>
@@ -128,7 +122,6 @@ function Home({ onMenuClick }) {
             ))}
           </div>
         </section>
-
       </main>
     </div>
   )
