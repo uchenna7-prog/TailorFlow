@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 import { useBrand } from '../../../contexts/BrandContext'
-import Header from '../../components/Header/Header'
+import Header from '../../../components/Header/Header'
 import styles from './InvoiceView.module.css'
 
 // ─────────────────────────────────────────────────────────────
