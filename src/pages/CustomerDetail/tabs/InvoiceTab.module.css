@@ -26,3 +26,58 @@
 .empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 48px 20px; text-align: center; }
 .emptyTitle { font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 0; }
 .emptySub { font-size: 0.8rem; color: var(--text3); margin: 0; line-height: 1.5; }
+
+
+
+/* ... Keep all existing styles ... */
+
+/* ── UPDATED TABLE STYLES ── */
+.tHead { 
+  display: flex; 
+  font-weight: 800; 
+  font-size: 8px; 
+  border-bottom: 2px solid #1a1a1a; 
+  padding-bottom: 5px; 
+  margin-bottom: 6px; 
+  text-transform: uppercase; 
+  letter-spacing: 0.04em; 
+}
+
+/* The main "Category" row - Bold and distinct */
+.tRowMain {
+  display: flex;
+  padding: 8px 0;
+  font-size: 10px;
+  font-weight: 900;
+  color: #000;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Itemized container */
+.itemizedSection {
+  padding: 4px 0 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.itemizedLabel {
+  font-size: 7px;
+  font-weight: 800;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* The sub-items (Cloths involved) */
+.tRowSub {
+  display: flex;
+  padding: 3px 0;
+  font-size: 8.5px;
+  color: #444;
+  font-style: normal;
+}
+
+.tColDesc { flex: 2; }
+.tColNum  { flex: 1; text-align: right; }
+
+/* ... Keep summary, footers, and other styles exactly as they were ... */
+
