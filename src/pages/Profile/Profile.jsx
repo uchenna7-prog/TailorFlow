@@ -58,19 +58,6 @@ function TappableRow({ icon, label, sub, value, onClick, chevron = true, divider
   )
 }
 
-function Toggle({ value, onChange }) {
-  return (
-    <button
-      className={`${styles.toggle} ${value ? styles.toggleOn : ''}`}
-      onClick={() => onChange(!value)}
-      role="switch"
-      aria-checked={value}
-    >
-      <span className={styles.toggleThumb} />
-    </button>
-  )
-}
-
 // ─────────────────────────────────────────────────────────────
 // Full-screen slide-in modal shell
 // ─────────────────────────────────────────────────────────────
@@ -84,13 +71,17 @@ function FullModal({ title, onBack, onSave, children }) {
         onBackClick={onBack} 
         customActions={onSave ? [{ label: 'Save', onClick: onSave }] : []} 
       />
-      <div className={styles.fullContent}>{children}</div>
+      <div className={styles.fullContent}>
+        <div className={styles.fullContentInner}>
+          {children}
+        </div>
+      </div>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────
-// Field helpers used inside modals
+// Field helpers
 // ─────────────────────────────────────────────────────────────
 
 function FieldGroup({ children }) {
@@ -131,27 +122,11 @@ function Textarea({ value, onChange, placeholder, rows = 3 }) {
   )
 }
 
-function SegmentControl({ options, value, onChange }) {
-  return (
-    <div className={styles.segment}>
-      {options.map(opt => (
-        <button
-          key={opt.value}
-          className={`${styles.segBtn} ${value === opt.value ? styles.segActive : ''}`}
-          onClick={() => onChange(opt.value)}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  )
-}
-
 // ─────────────────────────────────────────────────────────────
 // MODAL: Edit Personal Info
 // ─────────────────────────────────────────────────────────────
 
-const PERSONAL_KEY = 'tailorbook_personal'
+const PERSONAL_KEY = 'tailorflow_personal'
 
 function loadPersonal(authUser) {
   try {
@@ -296,7 +271,7 @@ function BrandModal({ onBack, showToast }) {
         <Field label="Tagline" hint="Short line shown under your name on coloured invoice templates.">
           <TextInput value={local.brandTagline} onChange={set('brandTagline')} placeholder="e.g. Crafted with love, fitted for you" />
         </Field>
-        <Field label="Brand Colour" hint="Used for headers and accents on coloured invoice templates.">
+        <Field label="Brand Colour">
           <div className={styles.colourRow}>
             <input
               type="color"
@@ -362,7 +337,7 @@ function Avatar({ name, logo, size = 72 }) {
 }
 
 function getOrSetJoinDate() {
-  const key = 'tailorbook_joined'
+  const key = 'tailorflow_joined'
   const existing = localStorage.getItem(key)
   if (existing) return existing
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -402,7 +377,6 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
       <Header title="Account" onMenuClick={onMenuClick} />
 
       <div className={styles.scrollArea}>
-        {/* ── HERO CARD (Still a card for visual emphasis) ── */}
         <div className={styles.heroCard}>
           <div className={styles.heroCardGlow} />
           <div className={styles.heroTop}>
@@ -438,7 +412,6 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
           </div>
         </div>
 
-        {/* ── PERSONAL INFO ── */}
         <SectionHeader icon="person" label="Personal Info" />
         <InfoRow icon="badge"  label="Full Name" value={personal.fullName}  placeholder="Not set" />
         <InfoRow icon="mail"   label="Email"     value={personal.email || user?.email} placeholder="Not set" />
@@ -451,7 +424,6 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
           divider={false}
         />
 
-        {/* ── BRAND IDENTITY ── */}
         <SectionHeader icon="storefront" label="Brand Identity" />
         {hasBrand ? (
           <div className={`${styles.row} ${styles.brandPreview}`}>
@@ -484,7 +456,6 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
           divider={false}
         />
 
-        {/* ── MY PLAN ── */}
         <SectionHeader icon="workspace_premium" label="My Plan" />
         <div className={styles.row}>
           <div className={styles.planLeft}>
@@ -510,7 +481,6 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
           </div>
         )}
 
-        {/* ── ACCOUNT ── */}
         <SectionHeader icon="manage_accounts" label="Account" />
         <TappableRow
           icon="logout"
