@@ -62,6 +62,8 @@ export default function CustomerDetail({ onMenuClick }) {
   }, [])
 
   // ── Generate invoice (called from PaymentsTab) ────────────
+  // Snapshots the active template + brand settings so InvoiceView always
+  // renders the invoice exactly as it looked when it was created.
   const handleGenerateInvoice = useCallback(async (orderId) => {
     const existing = data.invoices.find(inv => String(inv.orderId) === String(orderId))
     if (existing) { showToast('Invoice already exists'); setActiveTab('invoice'); return }
@@ -69,31 +71,51 @@ export default function CustomerDetail({ onMenuClick }) {
     const order = orders.find(o => String(o.id) === String(orderId))
     if (!order) return
 
+    // ── Read current brand settings for the snapshot ──────
+    let settingsSnap = {}
+    try {
+      settingsSnap = JSON.parse(localStorage.getItem('tailorbook_settings') || '{}')
+    } catch { /* ignore */ }
+
     const invNumber   = `INV-${String(data.invoices.length + 1).padStart(3, '0')}`
     const today       = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     const ids         = order.measurementIds?.length ? order.measurementIds : (order.measurementId ? [order.measurementId] : [])
     const linkedNames = ids.map(mid => data.measurements.find(m => String(m.id) === String(mid))?.name).filter(Boolean)
-
-    // ── FIX: carry the itemised breakdown from the order ──────
-    // order.items is an array of { id, name, price, imgSrc }
-    // order.price is already the sum of all item prices
-    const items = Array.isArray(order.items) ? order.items : []
+    const items       = Array.isArray(order.items) ? order.items : []
 
     const newInvoice = {
       id:        Date.now() + Math.random(),
       orderId,
       number:    invNumber,
       orderDesc: order.desc,
-      // price is the grand total — kept for legacy display fallback
       price:     order.price,
       qty:       order.qty,
-      // ── NEW: itemised rows so InvoiceView can render them ──
       items,
       linkedNames,
       due:       order.due,
       notes:     order.notes,
       status:    'unpaid',
       date:      today,
+
+      // ── Snapshot the template key at creation time ────────
+      // InvoiceView reads this first so the format is locked
+      // to what was chosen in Settings when this was generated.
+      template: settingsSnap.invoiceTemplate || 'editable',
+
+      // ── Snapshot brand fields that affect visual rendering ─
+      brandSnapshot: {
+        name:     settingsSnap.brandName     || '',
+        tagline:  settingsSnap.brandTagline  || '',
+        colour:   settingsSnap.brandColour   || '#D4AF37',
+        phone:    settingsSnap.brandPhone    || '',
+        email:    settingsSnap.brandEmail    || '',
+        address:  settingsSnap.brandAddress  || '',
+        footer:   settingsSnap.invoiceFooter || 'Thank you for your patronage 🙏',
+        currency: settingsSnap.invoiceCurrency || '₦',
+        showTax:  settingsSnap.invoiceShowTax  || false,
+        taxRate:  settingsSnap.invoiceTaxRate  || 0,
+        dueDays:  settingsSnap.invoiceDueDays  || 7,
+      },
     }
 
     try {
@@ -126,166 +148,76 @@ export default function CustomerDetail({ onMenuClick }) {
     }
   }, [activeTab, data, isPremium])
 
-  // ── Tab click: set active + smooth scroll into view ───────
-  const handleTabClick = (e, tabId) => {
-    setActiveTab(tabId)
-    e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-  }
-
-  const customer = getCustomer(id)
-  if (!customer) return null
-
-  const initials = getInitials(customer.name)
-  const birthday = getBirthday(customer.birthday)
-  const hasPhoto = isPremium && customer.photo
-
-  // FAB click — dispatch the right event per tab
-  const handleFabClick = () => {
-    if (activeTab === 'dress')    document.dispatchEvent(new CustomEvent('openMeasureModal'))
-    if (activeTab === 'orders')   document.dispatchEvent(new CustomEvent('openOrderModal'))
-    if (activeTab === 'payments') document.dispatchEvent(new CustomEvent('openPaymentModal'))
-  }
-
-  const showFab = ['dress', 'orders', 'payments'].includes(activeTab)
-
   return (
-    <div className={styles.page}>
-
-      {/* ── FIXED HEADER GROUP ── */}
-      <div className={styles.fixedHeaderGroup} ref={fixedRef}>
-        <Header
-          type="back"
-          title="Customer Details"
-          customActions={[
-            { icon: 'edit',   onClick: () => navigate(`/customers/edit/${id}`), outlined: true },
-            { icon: 'delete',onClick: () => deleteCustomer(id), outlined: true, color: 'var(--danger)' },
-          ]}
+    <div className={styles.container}>
+      <div ref={fixedRef} className={styles.fixedHeader}>
+        <Header 
+          title="Customer Details" 
+          onMenuClick={onMenuClick}
+          showBack
+          onBack={() => navigate(-1)}
         />
-
-        <div className={styles.fixedTopContainer}>
-          {isPremium ? (
-            <div className={styles.profileSection}>
-              <div className={styles.leftColumn}>
-                <div className={styles.avatar}>
-                  {hasPhoto
-                    ? <img src={customer.photo} className={styles.avatarImg} alt={customer.name} />
-                    : initials
-                  }
-                </div>
-                {birthday && <div className={styles.birthday}>🎈 {birthday}</div>}
-              </div>
-              <div className={styles.rightColumn}>
-                <div className={styles.name}>{customer.name}{customer.sex && ` (${customer.sex})`}</div>
-                <div className={styles.meta}><span className="mi">call</span>{customer.phone}</div>
-                {customer.email   && <div className={styles.meta}><span className="mi">mail_outline</span>{customer.email}</div>}
-                {customer.address && <div className={styles.meta}><span className="mi">place</span>{customer.address}</div>}
-              </div>
-            </div>
-          ) : (
-            <div className={styles.profileSectionFree}>
-              <div className={styles.name}>{customer.name}{customer.sex && ` (${customer.sex})`}</div>
-              <div className={styles.metaInline}>
-                <div className={styles.metaItem}>
-                  <span className="mi">call</span>
-                  <span>{customer.phone}</span>
-                </div>
-                {birthday && (
-                  <div className={`${styles.metaItem} ${styles.birthday}`}>
-                    <span className="mi">cake</span>
-                    <span>{birthday}</span>
-                  </div>
-                )}
-                {customer.email && (
-                  <div className={styles.metaItem}>
-                    <span className="mi">mail_outline</span>
-                    <span>{customer.email}</span>
-                  </div>
-                )}
-                {customer.address && (
-                  <div className={styles.metaItem}>
-                    <span className="mi">place</span>
-                    <span>{customer.address}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className={styles.actions}>
-            <button className={`${styles.btn} ${styles.light}`} onClick={() => window.location = `tel:${customer.phone}`}>
-              <span className="mi">call</span>Call
-            </button>
-            <button className={`${styles.btn} ${styles.light}`} onClick={() => window.location = `mailto:${customer.email}`}>
-              <span className="mi">mail_outline</span>Email
-            </button>
-            <button className={`${styles.btn} ${styles.primary}`}>
-              <span className="mi">straighten</span>Full Body Measurements
-            </button>
+        
+        <div className={styles.profileSection}>
+          <div className={styles.avatar}>
+            {getInitials(data.customer?.name)}
           </div>
-
-          {/* ── TABS — horizontally scrollable with smooth scroll ── */}
-          <div className={styles.tabs} ref={tabsRef}>
-            {TABS.map(tab => (
-              <div
-                key={tab.id}
-                className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
-                onClick={(e) => handleTabClick(e, tab.id)}
-              >
-                {tab.label}
-              </div>
-            ))}
+          <div className={styles.info}>
+            <h1 className={styles.name}>{data.customer?.name || 'Loading...'}</h1>
+            <p className={styles.phone}>{data.customer?.phone}</p>
+            {data.customer?.birthday && (
+              <span className={styles.birthdayBadge}>
+                🎂 {getBirthday(data.customer.birthday)}
+              </span>
+            )}
           </div>
+        </div>
+
+        <div className={styles.tabsWrapper} ref={tabsRef}>
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* ── SCROLL CONTENT ── */}
-      <div className={styles.scrollContent}>
+      <div className={styles.tabContent}>
         {activeTab === 'dress' && (
-          <MeasurementsTab
+          <MeasurementsTab 
+            customer={data.customer} 
             measurements={data.measurements}
-            onSave={data.saveMeasurement}
-            onDelete={data.deleteMeasurement}
-            showToast={showToast}
+            onUpdate={data.updateMeasurements}
           />
         )}
         {activeTab === 'orders' && (
-          <OrdersTab
+          <OrdersTab 
             customerId={id}
             orders={orders}
             measurements={data.measurements}
-            showToast={showToast}
           />
         )}
         {activeTab === 'payments' && (
-          <PaymentsTab
-            customerId={id}
+          <PaymentsTab 
             orders={orders}
-            showToast={showToast}
+            invoices={data.invoices}
             onGenerateInvoice={handleGenerateInvoice}
           />
         )}
         {activeTab === 'invoice' && (
-          <InvoiceTab
-            invoices={invoicesState}
-            orders={orders}
-            measurements={data.measurements}
-            customer={customer}
-            onSave={data.saveInvoice}
+          <InvoiceTab 
+            customer={data.customer}
+            invoices={data.invoices}
             onDelete={data.deleteInvoice}
-            onStatusChange={data.updateInvoiceStatus}
-            showToast={showToast}
           />
         )}
       </div>
 
-      {/* ── FAB ── */}
-      {showFab && (
-        <button className={styles.fab} onClick={handleFabClick}>
-          <span className="mi">add</span>
-        </button>
-      )}
-
-      <Toast message={toastMsg} />
+      {toastMsg && <Toast message={toastMsg} />}
     </div>
   )
 }
