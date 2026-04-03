@@ -46,7 +46,6 @@ function LogoOrName({ brand, darkBg = false }) {
 function ItemsTable({ invoice, brand }) {
   const { currency, showTax, taxRate } = brand
 
-  // ───── UPDATED: correct subtotal calculation ─────
   const subtotal = invoice.items?.length > 0
     ? invoice.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
     : 0
@@ -61,13 +60,11 @@ function ItemsTable({ invoice, brand }) {
         <span className={styles.tColNum}>Price</span>
       </div>
 
-      {/* Main Order Row */}
       <div className={styles.tRowMain}>
         <div className={styles.tColDesc}>{invoice.orderDesc || 'Garment Order'}</div>
         <div className={styles.tColNum}>{fmt(currency, subtotal)}</div>
       </div>
 
-      {/* Itemized breakdown (Cloths Involved) */}
       {invoice.items?.length > 0 && (
         <div className={styles.itemizedSection}>
           <div className={styles.itemizedLabel}>Garments Included:</div>
@@ -101,7 +98,7 @@ function ItemsTable({ invoice, brand }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// TEMPLATES (Editable, Printable, Custom, Free)
+// TEMPLATES
 // ─────────────────────────────────────────────────────────────
 
 function EditableTemplate({ invoice, customer, brand }) {
@@ -129,6 +126,7 @@ function EditableTemplate({ invoice, customer, brand }) {
         </div>
       </div>
       <ItemsTable invoice={invoice} brand={brand} />
+      <div className={styles.tplFooterPush} />
       {(brand.phone || brand.email || brand.footer) && (
         <div className={styles.editFooter}>
           <div className={styles.footSection}>
@@ -171,7 +169,8 @@ function PrintableTemplate({ invoice, customer, brand }) {
         </div>
       </div>
       <ItemsTable invoice={invoice} brand={brand} />
-      <div className={styles.printFooter}>
+      <div className={styles.tplFooterPush} />
+      <div className={styles.printFooterCentered}>
         {brand.footer && <div className={styles.footSection}>{brand.footer}</div>}
       </div>
     </div>
@@ -208,8 +207,8 @@ function CustomTemplate({ invoice, customer, brand }) {
         </div>
         <ItemsTable invoice={invoice} brand={brand} />
       </div>
-      <div className={styles.customFooter} style={{ background: bannerBg }}>
-        <div className={styles.customFooterText}>{brand.footer || 'Thank you for your patronage'}</div>
+      <div className={styles.customFooter}>
+        <div className={styles.customFooterText} style={{ color: bannerBg }}>{brand.footer || 'Thank you for your patronage'}</div>
       </div>
     </div>
   )
@@ -229,7 +228,8 @@ function FreeTemplate({ invoice, customer, brand }) {
         <div className={styles.freeBox}><strong>DETAILS</strong><br />Date: {invoice.date}<br />Due: {dueDate}</div>
       </div>
       <ItemsTable invoice={invoice} brand={brand} />
-      <div className={styles.freeFooter}>{brand.footer || 'Thank you!'}</div>
+      <div className={styles.tplFooterPush} />
+      <div className={styles.freeFooterCentered}>{brand.footer || 'Thank you!'}</div>
     </div>
   )
 }
@@ -329,4 +329,3 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
     </div>
   )
 }
-
