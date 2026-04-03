@@ -76,10 +76,10 @@
 .tab.active::after { 
   content: ''; 
   position: absolute; 
-  bottom: -1px; 
+  bottom: 0; 
   left: 10%; 
   right: 10%; 
-  height: 4px; 
+  height: 3px; 
   background: var(--accent); 
   border-radius: 1px; 
 }
