@@ -14,13 +14,6 @@
   margin-bottom: 24px;
 }
 
-.dashboardLabel {
-  font-size: 0.7rem;
-  letter-spacing: 2px;
-  color: #888;
-  text-transform: uppercase;
-}
-
 .title {
   font-size: 1.8rem;
   font-weight: 800;
@@ -32,8 +25,8 @@
 }
 
 .subtitle {
-  font-size: 0.8rem;
-  color: #777;
+  font-size: 0.85rem;
+  color: #555;
 }
 
 /* STATS */
@@ -47,7 +40,7 @@
 .statCard {
   background: #fff;
   border-radius: 14px;
-  padding: 14px;
+  padding: 16px;
   display: flex;
   gap: 12px;
   align-items: center;
@@ -67,25 +60,6 @@
 .statLabel {
   font-size: 0.7rem;
   color: #777;
-}
-
-/* REVENUE */
-.revenueCard {
-  background: #fff;
-  padding: 18px;
-  border-radius: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.revenueCard span {
-  font-size: 0.8rem;
-  color: #777;
-}
-
-.revenueCard h2 {
-  margin-top: 6px;
-  font-size: 1.8rem;
 }
 
 /* SECTION */
@@ -163,23 +137,4 @@
   border-radius: 10px;
   display: inline-block;
   margin-top: 4px;
-}
-
-/* STATUS COLORS */
-.in-progress {
-  background: #eee;
-}
-
-.pending {
-  background: #f3f3f3;
-}
-
-.completed {
-  background: #000;
-  color: #fff;
-}
-
-.delivered {
-  background: #111;
-  color: #fff;
 }
