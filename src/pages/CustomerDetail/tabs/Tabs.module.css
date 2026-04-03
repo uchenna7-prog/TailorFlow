@@ -177,3 +177,78 @@
 .fab .mi { font-size: 2rem !important; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ... Keep existing styles ... */
+
+/* ── PER-ITEM PRICING IN MODAL ── */
+.pricingList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.priceInputRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.priceInputRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.itemPriceInput {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.itemPriceInput:focus {
+  border-color: var(--accent);
+}
+
+.totalIndicator {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text2);
+}
+
+/* ── MODAL BODY OVERRIDES ── */
+.sectionHeading {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text3); /* Slightly subtler */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* Remove Generate Invoice Button from this specific tab as requested */
+.generateInvoiceBtn {
+  display: none !important;
+}
+
