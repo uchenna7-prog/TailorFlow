@@ -44,10 +44,11 @@ function LogoOrName({ brand, darkBg = false }) {
 
 function ItemsTable({ invoice, brand }) {
   const { currency, showTax, taxRate } = brand
-  
-  const subtotal = invoice.items?.length > 0 
+
+  // ───── UPDATED: correct subtotal calculation ─────
+  const subtotal = invoice.items?.length > 0
     ? invoice.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
-    : (parseFloat(invoice.price) || 0) * (parseFloat(invoice.qty) || 1)
+    : 0
 
   const tax   = calcTax(subtotal, taxRate, showTax)
   const total = subtotal + tax
