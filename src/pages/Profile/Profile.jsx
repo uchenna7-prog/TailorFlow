@@ -23,7 +23,7 @@ function SectionHeader({ icon, label }) {
 
 function InfoRow({ icon, label, value, placeholder, divider = true }) {
   return (
-    <div className={styles.row} style={!divider ? { borderBottom: 'none' } : {}}>
+    <div className={`${styles.row} ${!divider ? styles.noDivider : ''}`}>
       <div className={styles.rowIcon}>
         <span className="mi" style={{ fontSize: '1.15rem' }}>{icon}</span>
       </div>
@@ -40,9 +40,8 @@ function InfoRow({ icon, label, value, placeholder, divider = true }) {
 function TappableRow({ icon, label, sub, value, onClick, chevron = true, divider = true, danger = false }) {
   return (
     <div
-      className={styles.rowTappable}
+      className={`${styles.row} ${styles.rowTappable} ${!divider ? styles.noDivider : ''}`}
       onClick={onClick}
-      style={!divider ? { borderBottom: 'none' } : {}}
     >
       <div className={styles.rowIcon}>
         <span className="mi" style={{ fontSize: '1.15rem', color: danger ? '#ef4444' : undefined }}>{icon}</span>
@@ -155,7 +154,6 @@ function SegmentControl({ options, value, onChange }) {
 const PERSONAL_KEY = 'tailorbook_personal'
 
 function loadPersonal(authUser) {
-  // Seed from localStorage first, then fill gaps from Firebase Auth
   try {
     const raw = localStorage.getItem(PERSONAL_KEY)
     const stored = raw ? JSON.parse(raw) : {}
@@ -194,7 +192,6 @@ function PersonalModal({ personal, onBack, onSave, authUser }) {
   const handleSave = async () => {
     const updated = { ...personal, ...local }
     savePersonal(updated)
-    // Keep Firebase displayName in sync with any name edits
     if (authUser && local.fullName && local.fullName !== authUser.displayName) {
       try { await updateProfile(authUser, { displayName: local.fullName.trim() }) } catch { /* ignore */ }
     }
@@ -264,8 +261,6 @@ function BrandModal({ onBack, showToast }) {
 
   return (
     <FullModal title="Brand Identity" onBack={onBack} onSave={save}>
-
-      {/* Logo */}
       <FieldGroup>
         <Field label="Brand Logo" hint="PNG or JPG. Appears on invoice headers. Ideally square.">
           {local.brandLogo ? (
@@ -294,7 +289,6 @@ function BrandModal({ onBack, showToast }) {
         </Field>
       </FieldGroup>
 
-      {/* Identity */}
       <FieldGroup>
         <Field label="Shop / Brand Name">
           <TextInput value={local.brandName} onChange={set('brandName')} placeholder="e.g. Stitched by Amara" />
@@ -315,7 +309,6 @@ function BrandModal({ onBack, showToast }) {
         </Field>
       </FieldGroup>
 
-      {/* Contact */}
       <FieldGroup>
         <Field label="Business Phone">
           <TextInput value={local.brandPhone} onChange={set('brandPhone')} placeholder="+234 800 000 0000" type="tel" />
@@ -330,14 +323,9 @@ function BrandModal({ onBack, showToast }) {
           <TextInput value={local.brandWebsite} onChange={set('brandWebsite')} placeholder="instagram.com/yourbrand" />
         </Field>
       </FieldGroup>
-
     </FullModal>
   )
 }
-
-// ─────────────────────────────────────────────────────────────
-// Plan badge helper
-// ─────────────────────────────────────────────────────────────
 
 function PlanBadge({ isPremium }) {
   return (
@@ -349,10 +337,6 @@ function PlanBadge({ isPremium }) {
     </span>
   )
 }
-
-// ─────────────────────────────────────────────────────────────
-// Avatar — initials from name or logo
-// ─────────────────────────────────────────────────────────────
 
 function Avatar({ name, logo, size = 72 }) {
   const initials = name
@@ -376,10 +360,6 @@ function Avatar({ name, logo, size = 72 }) {
     </div>
   )
 }
-
-// ─────────────────────────────────────────────────────────────
-// Main Profile page
-// ─────────────────────────────────────────────────────────────
 
 function getOrSetJoinDate() {
   const key = 'tailorbook_joined'
@@ -422,11 +402,9 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
       <Header title="Account" onMenuClick={onMenuClick} />
 
       <div className={styles.scrollArea}>
-
-        {/* ── HERO CARD ── */}
+        {/* ── HERO CARD (Still a card for visual emphasis) ── */}
         <div className={styles.heroCard}>
           <div className={styles.heroCardGlow} />
-
           <div className={styles.heroTop}>
             <Avatar
               name={personal.fullName || settings.brandName}
@@ -446,7 +424,6 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
               <PlanBadge isPremium={isPremium} />
             </div>
           </div>
-
           <div className={styles.heroMeta}>
             <div className={styles.heroMetaItem}>
               <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>calendar_today</span>
@@ -463,114 +440,86 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
 
         {/* ── PERSONAL INFO ── */}
         <SectionHeader icon="person" label="Personal Info" />
-        <div className={styles.card}>
-          <InfoRow icon="badge"  label="Full Name" value={personal.fullName}  placeholder="Not set" />
-          <InfoRow icon="mail"   label="Email"     value={personal.email || user?.email} placeholder="Not set" />
-          <InfoRow icon="call"   label="Phone"     value={personal.phone}     placeholder="Not set" />
-          <InfoRow icon="public" label="Location"  value={[personal.city, personal.country].filter(Boolean).join(', ')} placeholder="Not set" divider={false} />
-        </div>
+        <InfoRow icon="badge"  label="Full Name" value={personal.fullName}  placeholder="Not set" />
+        <InfoRow icon="mail"   label="Email"     value={personal.email || user?.email} placeholder="Not set" />
+        <InfoRow icon="call"   label="Phone"     value={personal.phone}     placeholder="Not set" />
+        <InfoRow icon="public" label="Location"  value={[personal.city, personal.country].filter(Boolean).join(', ')} placeholder="Not set" />
         <TappableRow
           icon="edit"
           label="Edit Personal Info"
           onClick={() => setActiveModal('personal')}
+          divider={false}
         />
 
         {/* ── BRAND IDENTITY ── */}
         <SectionHeader icon="storefront" label="Brand Identity" />
-        <div className={styles.card}>
-
-          {hasBrand ? (
-            <div className={styles.brandPreview}>
-              {settings.brandLogo && (
-                <img src={settings.brandLogo} alt="Brand logo" className={styles.brandPreviewLogo} />
-              )}
-              <div className={styles.brandPreviewInfo}>
-                <div className={styles.brandPreviewName}>{settings.brandName || '—'}</div>
-                {settings.brandTagline && (
-                  <div className={styles.brandPreviewTagline}>{settings.brandTagline}</div>
-                )}
-              </div>
-              {settings.brandColour && (
-                <div
-                  className={styles.brandColourDot}
-                  style={{ background: settings.brandColour }}
-                  title={settings.brandColour}
-                />
+        {hasBrand ? (
+          <div className={`${styles.row} ${styles.brandPreview}`}>
+            {settings.brandLogo && (
+              <img src={settings.brandLogo} alt="Brand logo" className={styles.brandPreviewLogo} />
+            )}
+            <div className={styles.brandPreviewInfo}>
+              <div className={styles.brandPreviewName}>{settings.brandName || '—'}</div>
+              {settings.brandTagline && (
+                <div className={styles.brandPreviewTagline}>{settings.brandTagline}</div>
               )}
             </div>
-          ) : (
-            <div className={styles.brandEmpty}>
-              <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>storefront</span>
-              <span className={styles.brandEmptyText}>No brand set up yet</span>
-            </div>
-          )}
-
-          <InfoRow icon="store"    label="Brand Name"    value={settings.brandName}     placeholder="Not set" />
-          <InfoRow icon="format_quote" label="Tagline"   value={settings.brandTagline}  placeholder="Not set" />
-          <InfoRow icon="call"     label="Biz Phone"     value={settings.brandPhone}    placeholder="Not set" />
-          <InfoRow icon="mail"     label="Biz Email"     value={settings.brandEmail}    placeholder="Not set" />
-          <InfoRow icon="language" label="Website"       value={settings.brandWebsite}  placeholder="Not set" />
-          <InfoRow icon="location_on" label="Address"    value={settings.brandAddress}  placeholder="Not set" divider={false} />
-        </div>
+            {settings.brandColour && (
+              <div className={styles.brandColourDot} style={{ background: settings.brandColour }} />
+            )}
+          </div>
+        ) : (
+          <div className={`${styles.row} ${styles.brandEmpty}`}>
+            <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>storefront</span>
+            <span className={styles.brandEmptyText}>No brand set up yet</span>
+          </div>
+        )}
+        <InfoRow icon="store" label="Brand Name" value={settings.brandName} placeholder="Not set" />
+        <InfoRow icon="call"  label="Biz Phone"  value={settings.brandPhone} placeholder="Not set" />
         <TappableRow
           icon="edit"
           label="Edit Brand Identity"
           sub="Logo, colours, contact details used on invoices"
           onClick={() => setActiveModal('brand')}
+          divider={false}
         />
 
         {/* ── MY PLAN ── */}
         <SectionHeader icon="workspace_premium" label="My Plan" />
-        <div className={styles.card}>
-          <div className={styles.planRow}>
-            <div className={styles.planLeft}>
-              <div className={styles.planName}>{isPremium ? 'TailorBook Pro' : 'Free Plan'}</div>
-              <div className={styles.planSub}>
-                {isPremium
-                  ? 'All features unlocked — invoice customisation, branded PDFs, tax lines & more'
-                  : 'Basic features only. Upgrade to unlock invoice customisation and more.'}
-              </div>
+        <div className={styles.row}>
+          <div className={styles.planLeft}>
+            <div className={styles.planName}>{isPremium ? 'TailorFlow Pro' : 'Free Plan'}</div>
+            <div className={styles.planSub}>
+              {isPremium
+                ? 'All features unlocked — invoice customisation, branded PDFs & more'
+                : 'Basic features only. Upgrade to unlock brand customisation.'}
             </div>
-            <PlanBadge isPremium={isPremium} />
           </div>
-
-          {isPremium ? (
-            <>
-              <div className={styles.row} style={{ borderBottom: 'none' }}>
-                <div className={styles.rowIcon}>
-                  <span className="mi" style={{ fontSize: '1.15rem' }}>receipt</span>
-                </div>
-                <div className={styles.rowText}>
-                  <div className={styles.rowLabel}>Billing</div>
-                  <div className={styles.rowSub}>Monthly · renews automatically</div>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className={styles.upgradeStrip} onClick={onUpgrade}>
-              <div className={styles.upgradeStripGlow} />
-              <span className="mi" style={{ fontSize: '1.3rem', color: 'var(--accent)' }}>workspace_premium</span>
-              <div className={styles.upgradeStripText}>
-                <div className={styles.upgradeStripTitle}>Upgrade to Pro</div>
-                <div className={styles.upgradeStripSub}>Unlock everything — invoices, brand colours, PDFs</div>
-              </div>
-              <span className="mi" style={{ fontSize: '1rem', color: 'var(--accent)' }}>chevron_right</span>
-            </div>
-          )}
+          <PlanBadge isPremium={isPremium} />
         </div>
+        
+        {!isPremium && (
+          <div className={`${styles.row} ${styles.upgradeStrip}`} onClick={onUpgrade}>
+            <div className={styles.upgradeStripGlow} />
+            <span className="mi" style={{ fontSize: '1.3rem', color: 'var(--accent)' }}>workspace_premium</span>
+            <div className={styles.upgradeStripText}>
+              <div className={styles.upgradeStripTitle}>Upgrade to Pro</div>
+              <div className={styles.upgradeStripSub}>Unlock everything — invoices, brand colours, PDFs</div>
+            </div>
+            <span className="mi" style={{ fontSize: '1rem', color: 'var(--accent)' }}>chevron_right</span>
+          </div>
+        )}
 
         {/* ── ACCOUNT ── */}
         <SectionHeader icon="manage_accounts" label="Account" />
-        <div className={styles.card}>
-          <TappableRow
-            icon="logout"
-            label="Log Out"
-            sub="You can always log back in"
-            onClick={() => setLogoutConfirm(true)}
-            divider={false}
-            danger
-          />
-        </div>
+        <TappableRow
+          icon="logout"
+          label="Log Out"
+          sub="You can always log back in"
+          onClick={() => setLogoutConfirm(true)}
+          divider={false}
+          danger
+        />
 
         <div style={{ height: 40 }} />
       </div>
@@ -584,10 +533,7 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
         />
       )}
       {activeModal === 'brand' && (
-        <BrandModal
-          onBack={() => setActiveModal(null)}
-          showToast={showToast}
-        />
+        <BrandModal onBack={() => setActiveModal(null)} showToast={showToast} />
       )}
 
       <ConfirmSheet
@@ -596,7 +542,6 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
         onConfirm={handleLogout}
         onCancel={() => setLogoutConfirm(false)}
       />
-
       <Toast message={toastMsg} />
     </div>
   )
