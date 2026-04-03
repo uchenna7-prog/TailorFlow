@@ -7,6 +7,7 @@ import { BrandProvider }    from './contexts/BrandContext'
 import { CustomerProvider } from './contexts/CustomerContext'
 import { OrdersProvider }   from './contexts/OrdersContext'
 import { TaskProvider }     from './contexts/TaskContext'
+import { InvoiceProvider }  from './contexts/InvoiceContext'
 import { PremiumProvider }  from './contexts/PremiumContext'
 import App from './App'
 import './index.css'
@@ -19,8 +20,9 @@ import './index.css'
 //  BrandProvider     → reads SettingsContext
 //  PremiumProvider   → reads AuthContext (user.uid) → Firestore
 //  CustomerProvider  → reads AuthContext (user.uid)
-//  OrdersProvider    → reads AuthContext (user.uid)
+//  OrdersProvider    → reads AuthContext + CustomerContext
 //  TaskProvider      → reads AuthContext (user.uid)
+//  InvoiceProvider   → reads AuthContext + SettingsContext + CustomerContext
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -32,7 +34,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               <CustomerProvider>
                 <OrdersProvider>
                   <TaskProvider>
-                    <App />
+                    <InvoiceProvider>
+                      <App />
+                    </InvoiceProvider>
                   </TaskProvider>
                 </OrdersProvider>
               </CustomerProvider>
@@ -43,4 +47,3 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>
 )
-
