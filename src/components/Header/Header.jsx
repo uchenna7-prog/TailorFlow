@@ -1,216 +1,280 @@
-import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import styles from './Header.module.css'
-
-function Header({ onMenuClick, onBackClick, type = 'default', title, customActions = [] }) {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [notifOpen, setNotifOpen] = useState(false)
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  const PAGE_TITLES = {
-    '/': 'Dashboard',
-    '/customers': 'Customers',
-    '/tasks': 'Tasks',
-    '/settings': 'Settings',
-  }
-  const pageTitle = title ?? PAGE_TITLES[location.pathname] ?? 'TailorFlow'
-
-  const PAGE_DROPDOWN = {
-    '/': [
-      { icon: 'share', label: 'Share App', action: () => console.log('Share app') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-    '/customers': [
-      { icon: 'download', label: 'Export Clients', action: () => console.log('Export clients') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-    '/tasks': [
-      { icon: 'settings', label: 'Settings', action: () => navigate('/settings') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-    '/orders': [
-      { icon: 'download', label: 'Export Orders', action: () => console.log('Export orders') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-    '/gallery': [
-      { icon: 'upload', label: 'Upload Image', action: () => console.log('Upload image') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-    '/settings': [
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-    '/account': [
-      { icon: 'edit', label: 'Edit Profile', action: () => console.log('Edit profile') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-    '/contact': [
-      { icon: 'email', label: 'Send Message', action: () => console.log('Send message') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-    '/faqs': [
-      { icon: 'help', label: 'Get Help', action: () => console.log('Help clicked') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
-    ],
-  }
-
-  const toggleDropdown = () => setDropdownOpen(prev => !prev)
-  const closeDropdown = () => setDropdownOpen(false)
-  const toggleNotif = () => setNotifOpen(prev => !prev)
-  const closeNotif = () => setNotifOpen(false)
-
-  // Logic to handle back navigation vs modal closing
-  const handleBackAction = () => {
-    if (onBackClick) {
-      onBackClick()
-    } else {
-      navigate(-1)
-    }
-  }
-
-  const notifications = [
-    {
-      id: 1,
-      icon: '🎂',
-      type: 'birthday',
-      title: "Upcoming birthday",
-      body: "Uchendu Uchenna's birthday is in 2 days.",
-      time: 'In 2 days',
-      unread: true,
-    },
-    {
-      id: 2,
-      icon: '✂️',
-      type: 'order',
-      title: 'Pending order: Senator Suit',
-      body: 'Due Apr 10 — awaiting completion.',
-      time: 'Apr 10',
-      unread: true,
-    },
-    {
-      id: 3,
-      icon: '🧾',
-      type: 'invoice',
-      title: 'Unpaid: INV-001',
-      body: 'Senator Suit · ₦25,000 — awaiting payment.',
-      time: 'Mar 28',
-      unread: false,
-    },
-  ]
-  const hasUnread = notifications.some(n => n.unread)
-
-  return (
-    <>
-      <header className={`${styles.header} ${type === 'back' ? styles.backHeader : ''}`}>
-        <div className={styles.leftSide}>
-          {type === 'default' && (
-            <button className={styles.iconBtn} onClick={onMenuClick} aria-label="Open menu">
-              <span className={styles.hamburgerLines}><span /><span /><span /></span>
-            </button>
-          )}
-          {type === 'back' && (
-            <button className={styles.iconBtn} onClick={handleBackAction} aria-label="Go back">
-              <span className="mi" style={{ fontSize: '1.4rem' }}>arrow_back</span>
-            </button>
-          )}
-          <div className={styles.title}>{pageTitle}</div>
-        </div>
-
-        {type === 'back' && customActions.length > 0 && (
-          <div className={styles.rightActions}>
-            {customActions.map((action, i) => (
-              <button 
-                key={i} 
-                className={action.label ? styles.textBtn : styles.iconBtn} 
-                onClick={action.onClick} 
-                aria-label={action.label}
-                disabled={action.disabled}
-                style={{ color: action.color || 'var(--text2)' }}
-              >
-                {action.icon && (
-                  <span
-                    className={`mi${action.outlined ? '-outlined' : ''}`}
-                    style={{ fontSize: action.label ? '1.1rem' : '1.4rem' }}
-                  >
-                    {action.icon}
-                  </span>
-                )}
-                {action.label && <span>{action.label}</span>}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {type === 'default' && (
-          <div className={styles.rightActions}>
-            <button className={styles.iconBtn} onClick={toggleNotif} aria-label="Notifications">
-              <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>notifications</span>
-              {hasUnread && <span className={styles.notifDot} />}
-            </button>
-
-            <div className={styles.dropdownWrap}>
-              <button className={styles.iconBtn} onClick={toggleDropdown} aria-label="More options">
-                <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>more_vert</span>
-              </button>
-
-              {dropdownOpen && (
-                <>
-                  <div className={styles.dropdownBackdrop} onClick={closeDropdown} />
-                  <div className={styles.dropdown}>
-                    {(PAGE_DROPDOWN[location.pathname] ?? []).map((item, i, arr) => (
-                      <div key={i}>
-                        <button
-                          className={`${styles.dropdownItem} ${item.danger ? styles.danger : ''}`}
-                          onClick={() => { closeDropdown(); item.action() }}
-                        >
-                          <span className="mi" style={{ fontSize: '1.2rem', color: item.danger ? 'var(--danger)' : 'var(--text2)' }}>{item.icon}</span>
-                          {item.label}
-                        </button>
-                        {i < arr.length - 1 && <div className={styles.dropdownSeparator} />}
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-      </header>
-
-      {type === 'default' && notifOpen && (
-        <div className={styles.notifOverlay}>
-          <div className={styles.notifPanel}>
-            <div className={styles.notifHeader}>
-              <span className={styles.notifTitle}>Notifications</span>
-              <button className={styles.iconBtn} onClick={closeNotif}>
-                <span className="mi" style={{ fontSize: '1.6rem' }}>close</span>
-              </button>
-            </div>
-            <div className={styles.notifBody}>
-              {notifications.length === 0 ? (
-                <div className={styles.notifEmpty}>
-                  <span>🔔</span>
-                  <p>You're all caught up!</p>
-                </div>
-              ) : (
-                notifications.map(n => (
-                  <div key={n.id} className={`${styles.notifItem} ${n.unread ? styles.unread : ''}`}>
-                    <div className={`${styles.notifIcon} ${styles[n.type]}`}>{n.icon}</div>
-                    <div className={styles.notifContent}>
-                      <h5>{n.title}</h5>
-                      <p>{n.body}</p>
-                      <span className={styles.notifTime}>{n.time}</span>
-                    </div>
-                    {n.unread && <span className={styles.unreadDot} />}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  )
+/* ── HEADER ── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  min-height: 56px;
 }
 
-export default Header
+.leftSide {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* RIGHT ACTIONS */
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ── ICON BUTTON ── */
+.iconBtn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text);
+  border-radius: 10px;
+  transition: background 0.15s;
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.iconBtn:active {
+  background: var(--surface2);
+}
+
+/* ── TEXT BUTTON (e.g. Save/Add) ── */
+.textBtn {
+  background: var(--accent);
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+  transition: opacity 0.15s, transform 0.1s;
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  text-transform: capitalize;
+}
+
+.textBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.textBtn:active {
+  opacity: 0.9;
+  transform: scale(0.96);
+}
+
+/* ── HAMBURGER LINES ── */
+.hamburgerLines {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 18px;
+}
+.hamburgerLines span {
+  display: block;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+}
+
+/* ── NOTIFICATION DOT ── */
+.notifDot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warning);
+  border: 2px solid var(--bg);
+}
+
+/* ── DROPDOWN ── */
+.dropdownWrap {
+  position: relative;
+}
+
+.dropdownBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  min-width: 160px;
+  z-index: 300;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text2);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: background 0.12s;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.dropdownItem:active {
+  background: var(--surface2);
+}
+.dropdownItem.danger { color: var(--danger); }
+
+.dropdownSeparator {
+  height: 1px;
+  background: var(--border);
+  margin: 0 8px;
+}
+
+/* ── NOTIFICATION PANEL ── */
+.notifOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+
+.notifPanel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  animation: slideDown 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+.notifHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.notifTitle {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text2);
+}
+
+.notifBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.notifItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 10px;
+}
+.notifItem.unread {
+  border-color: rgba(251,146,60,0.3);
+  background: var(--surface2);
+}
+
+.notifIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+.notifIcon.birthday { background: rgba(251,146,60,0.12); }
+.notifIcon.order    { background: rgba(168,85,247,0.12); }
+.notifIcon.invoice  { background: rgba(34,197,94,0.12); }
+
+.notifContent { flex: 1; min-width: 0; }
+.notifContent h5 { font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
+.notifContent p  { font-size: 0.75rem; color: var(--text2); line-height: 1.4; }
+
+.notifTime {
+  display: block;
+  font-size: 0.62rem;
+  color: var(--text3);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.unreadDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warning);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.notifEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+  gap: 10px;
+  text-align: center;
+}
+.notifEmpty span { font-size: 2.5rem; opacity: 0.2; }
+.notifEmpty p    { font-size: 0.85rem; color: var(--text3); }
