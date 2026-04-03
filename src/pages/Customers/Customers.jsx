@@ -174,11 +174,14 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
   return (
     <>
       <div className={`${styles.formOverlay} ${isOpen ? styles.formOverlayOpen : ''}`}>
-        <div className={styles.formHeader}>
-          <button className="mi" onClick={handleClose} style={{ background:'none', border:'none', color:'var(--text)', fontSize:'1.8rem', cursor:'pointer' }}>arrow_back</button>
-          <div className={styles.formHeaderTitle}>New Customer</div>
-          <button className={styles.headerSaveBtn} onClick={handleSave}>Save</button>
-        </div>
+        <Header 
+          type="back" 
+          title="New Customer" 
+          onBackClick={handleClose} 
+          customActions={[
+            { icon: 'check', label: 'Save', onClick: handleSave, color: 'var(--accent)' }
+          ]}
+        />
 
         <div className={styles.formTabs}>
           <button className={`${styles.formTab} ${formTab === 'personal' ? styles.formTabActive : ''}`} onClick={() => setFormTab('personal')}>Personal Info</button>
