@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import styles from './Header.module.css'
 
-function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
+function Header({ onMenuClick, onBackClick, type = 'default', title, customActions = [] }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const navigate = useNavigate()
@@ -13,50 +13,41 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
     '/customers': 'Customers',
     '/tasks': 'Tasks',
     '/settings': 'Settings',
-     '/tasks': 'Tasks'
   }
-  const pageTitle = title ?? PAGE_TITLES[location.pathname] ?? 'TailorBook'
+  const pageTitle = title ?? PAGE_TITLES[location.pathname] ?? 'TailorFlow'
 
   const PAGE_DROPDOWN = {
     '/': [
       { icon: 'share', label: 'Share App', action: () => console.log('Share app') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-
     '/customers': [
       { icon: 'download', label: 'Export Clients', action: () => console.log('Export clients') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-
     '/tasks': [
       { icon: 'settings', label: 'Settings', action: () => navigate('/settings') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-
     '/orders': [
       { icon: 'download', label: 'Export Orders', action: () => console.log('Export orders') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-
     '/gallery': [
       { icon: 'upload', label: 'Upload Image', action: () => console.log('Upload image') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-
     '/settings': [
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-
     '/account': [
       { icon: 'edit', label: 'Edit Profile', action: () => console.log('Edit profile') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-
     '/contact': [
       { icon: 'email', label: 'Send Message', action: () => console.log('Send message') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
     ],
-
     '/faqs': [
       { icon: 'help', label: 'Get Help', action: () => console.log('Help clicked') },
       { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
@@ -67,6 +58,15 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
   const closeDropdown = () => setDropdownOpen(false)
   const toggleNotif = () => setNotifOpen(prev => !prev)
   const closeNotif = () => setNotifOpen(false)
+
+  // Logic to handle back navigation vs modal closing
+  const handleBackAction = () => {
+    if (onBackClick) {
+      onBackClick()
+    } else {
+      navigate(-1)
+    }
+  }
 
   const notifications = [
     {
@@ -109,7 +109,7 @@ function Header({ onMenuClick, type = 'default', title, customActions = [] }) {
             </button>
           )}
           {type === 'back' && (
-            <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="Go back">
+            <button className={styles.iconBtn} onClick={handleBackAction} aria-label="Go back">
               <span className="mi" style={{ fontSize: '1.4rem' }}>arrow_back</span>
             </button>
           )}
