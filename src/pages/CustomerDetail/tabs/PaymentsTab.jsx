@@ -1,4 +1,3 @@
-// src/pages/CustomerDetail/tabs/PaymentsTab.jsx
 // ─────────────────────────────────────────────────────────────
 // Payments tab for a single customer.
 // • Add payment → select order, set status, enter amount
@@ -16,6 +15,7 @@ import {
   deletePayment,
 } from '../../../services/paymentService'
 import ConfirmSheet from '../../../components/ConfirmSheet/ConfirmSheet'
+import Header from '../../../components/Header/Header'
 import styles from './PaymentsTab.module.css'
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -92,19 +92,14 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
 
   return (
     <div className={styles.overlay}>
-      <div className={styles.modalHeader}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button className="mi" onClick={handleClose} style={{ background: 'none', border: 'none', color: 'var(--text)', fontSize: '1.6rem', cursor: 'pointer' }}>arrow_back</button>
-          <span className={styles.modalTitle}>New Payment</span>
-        </div>
-        <button
-          className={styles.saveBtn}
-          onClick={handleSave}
-          disabled={!selectedOrder}
-        >
-          Save
-        </button>
-      </div>
+      <Header 
+        type="back"
+        title="New Payment"
+        onBackClick={handleClose}
+        customActions={[
+          { label: 'Save', onClick: handleSave, disabled: !selectedOrder }
+        ]}
+      />
 
       <div className={styles.modalBody}>
 
@@ -294,15 +289,14 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
 
   return (
     <div className={styles.overlay}>
-      <div className={styles.modalHeader}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button className="mi" onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text)', fontSize: '1.6rem', cursor: 'pointer' }}>arrow_back</button>
-          <span className={styles.modalTitle}>Payment Details</span>
-        </div>
-        <button className={styles.deleteIconBtn} onClick={onDelete}>
-          <span className="mi" style={{ fontSize: '1.3rem', color: 'var(--danger)' }}>delete_outline</span>
-        </button>
-      </div>
+      <Header 
+        type="back"
+        title="Payment Details"
+        onBackClick={onClose}
+        customActions={[
+          { icon: 'delete_outline', label: 'Delete', onClick: onDelete, color: 'var(--danger)' }
+        ]}
+      />
 
       <div className={styles.modalBody}>
 
