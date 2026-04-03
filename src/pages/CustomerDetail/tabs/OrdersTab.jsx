@@ -210,7 +210,7 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange })
         title={order.desc}
         onBackClick={onClose}
         customActions={[
-          { icon: 'delete_outline', label: 'Delete', onClick: onDelete, color: 'var(--danger)' }
+          { icon: 'delete_outline', onClick: onDelete, color: 'var(--danger)' }
         ]}
       />
 
