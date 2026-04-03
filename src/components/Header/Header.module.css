@@ -57,21 +57,22 @@
   background: var(--surface2);
 }
 
-/* ── TEXT BUTTON (For Save/Add Actions) ── */
+/* ── TEXT BUTTON (e.g. Save/Add) ── */
 .textBtn {
-  background: none;
+  background: var(--accent);
   border: none;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  padding: 8px 14px;
+  padding: 8px 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   border-radius: 10px;
-  transition: opacity 0.15s, background 0.15s;
-  color: var(--text);
+  transition: opacity 0.15s, transform 0.1s;
+  color: var(--bg);
   font-family: 'DM Sans', sans-serif;
+  text-transform: capitalize;
 }
 
 .textBtn:disabled {
@@ -80,8 +81,8 @@
 }
 
 .textBtn:active {
-  background: var(--surface2);
-  opacity: 0.8;
+  opacity: 0.9;
+  transform: scale(0.96);
 }
 
 /* ── HAMBURGER LINES ── */
@@ -277,4 +278,3 @@
 }
 .notifEmpty span { font-size: 2.5rem; opacity: 0.2; }
 .notifEmpty p    { font-size: 0.85rem; color: var(--text3); }
-
