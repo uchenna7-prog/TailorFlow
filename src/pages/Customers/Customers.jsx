@@ -179,7 +179,7 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
           title="New Customer" 
           onBackClick={handleClose} 
           customActions={[
-            { icon: 'check', label: 'Save', onClick: handleSave, color: 'var(--accent)' }
+            { label: 'Save', onClick: handleSave, color: 'var(--accent)' }
           ]}
         />
 
