@@ -119,13 +119,23 @@ function Header({ onMenuClick, onBackClick, type = 'default', title, customActio
         {type === 'back' && customActions.length > 0 && (
           <div className={styles.rightActions}>
             {customActions.map((action, i) => (
-              <button key={i} className={styles.iconBtn} onClick={action.onClick} aria-label={action.label}>
-                <span
-                  className={`mi${action.outlined ? '-outlined' : ''}`}
-                  style={{ fontSize: '1.4rem', color: action.color || 'var(--text2)' }}
-                >
-                  {action.icon}
-                </span>
+              <button 
+                key={i} 
+                className={action.label ? styles.textBtn : styles.iconBtn} 
+                onClick={action.onClick} 
+                aria-label={action.label}
+                disabled={action.disabled}
+                style={{ color: action.color || 'var(--text2)' }}
+              >
+                {action.icon && (
+                  <span
+                    className={`mi${action.outlined ? '-outlined' : ''}`}
+                    style={{ fontSize: action.label ? '1.1rem' : '1.4rem' }}
+                  >
+                    {action.icon}
+                  </span>
+                )}
+                {action.label && <span>{action.label}</span>}
               </button>
             ))}
           </div>
