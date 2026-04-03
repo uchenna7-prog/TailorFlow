@@ -269,13 +269,12 @@ function Textarea({ value, onChange, placeholder, rows = 3 }) {
 function FullModal({ title, onBack, onSave, children }) {
   return (
     <div className={styles.fullOverlay}>
-      <div className={styles.fullHeader}>
-        <button className={styles.backBtn} onClick={onBack}>
-          <span className="mi">arrow_back</span>
-        </button>
-        <span className={styles.fullTitle}>{title}</span>
-        {onSave && <button className={styles.fullSave} onClick={onSave}>Save</button>}
-      </div>
+      <Header 
+        type="back" 
+        title={title} 
+        onBackClick={onBack} 
+        customActions={onSave ? [{ label: 'Save', onClick: onSave }] : []}
+      />
       <div className={styles.fullContent}>{children}</div>
     </div>
   )
@@ -299,13 +298,12 @@ function TemplateModal({ isOpen, currentTemplate, onClose, onSelect }) {
 
   return (
     <div className={styles.fullOverlay}>
-      <div className={styles.fullHeader}>
-        <button className={styles.backBtn} onClick={onClose}>
-          <span className="mi">arrow_back</span>
-        </button>
-        <span className={styles.fullTitle}>Invoice Templates</span>
-        <button className={styles.fullSave} onClick={() => { onSelect(selected); onClose() }}>Select</button>
-      </div>
+      <Header 
+        type="back" 
+        title="Invoice Templates" 
+        onBackClick={onClose} 
+        customActions={[{ label: 'Select', onClick: () => { onSelect(selected); onClose() } }]}
+      />
       <div className={styles.fullContent}>
         {TEMPLATES.map(t => (
           <div key={t.id} className={styles.templateWrapper} onClick={() => setSelected(t.id)}>
