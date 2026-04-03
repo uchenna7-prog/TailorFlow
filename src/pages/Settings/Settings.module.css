@@ -1,150 +1,79 @@
+.page { background: #fff; min-height: 100dvh; display: flex; flex-direction: column; color: #1a1a1a; }
+.scrollArea { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 
-.page { background: var(--bg); min-height: 100dvh; display: flex; flex-direction: column; }
-.scrollArea { flex: 1; overflow-y: auto; padding: 8px 16px 40px; }
-
-/* ── SECTION HEADER ── */
-.sectionHeader { display: flex; align-items: center; gap: 7px; padding: 20px 4px 8px; }
-.sectionLabel { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); }
-
-/* ── PREMIUM BADGE ── */
-.premiumBadge {
-  display: inline-flex; align-items: center; gap: 3px;
-  background: linear-gradient(135deg, var(--accent), #b8942a);
-  color: var(--bg);
-  font-size: 0.55rem; font-weight: 900;
-  letter-spacing: 0.06em; padding: 2px 7px 2px 5px;
-  border-radius: 20px; margin-left: 2px;
+/* Section Header */
+.sectionHeader { 
+  display: flex; align-items: center; gap: 12px; 
+  padding: 24px 16px 12px; 
+  border-bottom: 1px solid #eee;
 }
+.sectionLabel { font-size: 1.05rem; font-weight: 700; color: #1a1a1a; }
 
-/* ── CARD & ROW ── */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-.row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-.rowTappable { cursor: pointer; }
-.rowTappable:active { background: var(--surface2); }
-.rowLocked { opacity: 0.55; cursor: default; }
-.rowIcon { width: 32px; height: 32px; border-radius: 9px; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text2); flex-shrink: 0; }
+/* Rows */
+.row { 
+  display: flex; align-items: center; gap: 12px; 
+  padding: 14px 16px; 
+  border-bottom: 1px solid #eee; 
+}
+.rowTappable:active { background: #f9f9f9; }
+.rowIcon { color: #1a1a1a; flex-shrink: 0; display: flex; align-items: center; }
 .rowText { flex: 1; min-width: 0; }
-.rowLabel { font-size: 0.9rem; font-weight: 700; color: var(--text); }
-.rowSub { font-size: 0.72rem; color: var(--text3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.rowRight { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.rowValue { font-size: 0.78rem; font-weight: 700; color: var(--accent); }
+.rowLabel { font-size: 0.95rem; font-weight: 500; color: #1a1a1a; line-height: 1.3; }
+.rowRight { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.rowValue { font-size: 0.95rem; font-weight: 500; color: #1a1a1a; }
 
-/* ── TOGGLE ── */
+/* Services Chips */
+.servicesRow { display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #eee; }
+.chip { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 500; }
+.dot { width: 18px; height: 18px; background: #2c3e50; border-radius: 50%; }
+
+/* Toggle */
 .toggle { 
-  width: 44px; height: 26px; border-radius: 13px; background: var(--surface2);
-  border: 1px solid var(--border); position: relative; cursor: pointer; flex-shrink: 0; transition: all 0.2s ease; 
+  width: 44px; height: 24px; border-radius: 20px; background: #eee;
+  border: none; position: relative; cursor: pointer; transition: 0.2s; 
 }
-.toggleOn { background: var(--accent); border-color: var(--accent); }
+.toggleOn { background: #d1d1d1; }
 .toggleThumb { 
-  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; 
-  background: var(--accent); transition: transform 0.2s, background 0.2s; 
+  position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; 
+  background: #fff; transition: transform 0.2s; 
 }
-.toggleOn .toggleThumb { transform: translateX(18px); background: var(--bg); }
+.toggleOn .toggleThumb { transform: translateX(20px); }
 
-/* ── FULL SCREEN MODAL ── */
-.fullOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; flex-direction: column; animation: slideIn 0.25s ease; }
-@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-.fullHeader { 
-  display: flex; align-items: center; padding: 12px 16px; 
-  background: var(--surface); border-bottom: 1px solid var(--border); 
-  min-height: 64px; /* Added height to accommodate larger icon */
+/* Segment Control */
+.segment { display: flex; border: 1px solid #1a1a1a; border-radius: 6px; overflow: hidden; min-width: 140px; }
+.segBtn { 
+  flex: 1; border: none; background: #fff; padding: 8px 10px; 
+  font-size: 0.8rem; font-weight: 600; cursor: pointer; border-right: 1px solid #1a1a1a;
 }
+.segBtn:last-child { border-right: none; }
+.segActive { background: #1a1a1a; color: #fff; }
 
-/* THE UPDATED BACK BUTTON STYLES */
-/* THE UPDATED BACK BUTTON STYLES */
-.backBtn { 
-  background: none; 
-  border: none; 
-  color: var(--text); 
-  padding: 8px; /* Added padding to make it easier to tap */
-  margin-right: 12px; 
-  cursor: pointer; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-  border-radius: 50%; /* Optional: makes the tap ripple circular */
-  transition: background 0.2s;
+/* Buttons */
+.btnContainer { padding: 32px 16px; display: flex; flex-direction: column; gap: 16px; }
+.saveBtn {
+  background: #000; color: #fff; border: none; border-radius: 30px;
+  padding: 16px; font-size: 1rem; font-weight: 700; width: 100%; cursor: pointer;
+}
+.deleteBtn {
+  background: #ff0000; color: #fff; border: none; border-radius: 30px;
+  padding: 16px; font-size: 1rem; font-weight: 700; width: 100%; cursor: pointer;
 }
 
-.backBtn:active {
-  background: var(--surface2); /* Visual feedback when pressed */
-}
+/* Modal Overlay & Base Styles (Preserved) */
+.fullOverlay { position: fixed; inset: 0; background: #fff; z-index: 5000; display: flex; flex-direction: column; }
+.fullContent { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+.fieldGroup { border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
+.field { padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 4px; }
+.fieldLabel { font-size: 0.75rem; font-weight: 700; color: #666; }
+.textInput, .textarea { width: 100%; border: 1px solid #eee; border-radius: 8px; padding: 10px; font-family: inherit; }
 
-.backBtn .mi { 
-  /* Increase this value to match the visual weight in the photo */
-  font-size: 1.8rem; 
-  display: block; 
-  line-height: 1;
-  font-weight: bold; /* Some icon fonts support weight for a "thicker" arrow */
-}
-
-
-.fullTitle { flex: 1; font-weight: 800; font-size: 1rem; color: var(--text); }
-.fullSave { background: var(--accent); border: none; padding: 8px 16px; border-radius: 8px; font-weight: 800; color: var(--bg); cursor: pointer; font-family: inherit; }
-.fullContent { flex: 1; overflow-y: auto; padding: 20px 16px 48px; display: flex; flex-direction: column; gap: 12px; }
-
-/* ── TEMPLATE PICKER ── */
-.templateWrapper { display: flex; flex-direction: column; gap: 12px; }
-.fullPreviewContainer { width: 100%; background: #fff; border-radius: 8px; border: 2px solid transparent; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; transition: 0.2s; }
-.fullPreviewActive { border-color: var(--accent); transform: scale(1.02); }
-.templateInfo { display: flex; align-items: center; gap: 10px; padding: 0 4px; }
-.radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; }
-.radioActive { background: var(--accent); border-color: var(--accent); position: relative; }
-.radioActive::after { content: ''; position: absolute; inset: 5px; background: var(--bg); border-radius: 50%; }
-.templateLabel { font-weight: 700; color: var(--text); font-size: 0.9rem; }
-
-/* ── FORMS ── */
-.fieldGroup { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-.field { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
-.field:last-child { border-bottom: none; }
-.fieldLabel { font-size: 0.68rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
-.fieldHint { font-size: 0.72rem; color: var(--text3); margin: 0; line-height: 1.4; }
-.textInput, .textarea {
-  width: 100%; background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; color: var(--text);
-  font-family: inherit; box-sizing: border-box; outline: none; transition: border-color 0.15s;
-}
-.textInput:focus, .textarea:focus { border-color: var(--accent); }
-
-/* ── SEGMENT CONTROL ── */
-.segment { display: flex; background: var(--surface2); border-radius: 10px; padding: 3px; gap: 2px; }
-.segBtn { flex: 1; border: none; background: none; border-radius: 8px; padding: 8px 4px; font-size: 0.73rem; font-weight: 700; color: var(--text3); cursor: pointer; transition: all 0.15s; font-family: inherit; }
-.segActive { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
-
-/* ── PREVIEW TEMPLATE STYLES ── */
-.pBase { padding: 20px; color: #1a1a1a; font-family: 'Inter', sans-serif; font-size: 9px; min-height: 400px; display: flex; flex-direction: column; }
-.pLargeTitle { font-size: 22px; font-weight: 900; }
-.pLargeTitleCenter { font-size: 20px; font-weight: 900; text-align: center; margin: 15px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 5px 0; }
-.pBody { flex: 1; margin: 20px 0; }
-.pMetaRow { display: flex; justify-content: space-between; margin-bottom: 20px; }
-.pTableModern { width: 100%; border-collapse: collapse; }
-.pTHead { display: flex; justify-content: space-between; font-weight: 800; border-bottom: 2px solid #1a1a1a; padding-bottom: 5px; margin-bottom: 8px; }
-.pTRow { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 6px 0; }
-.pTRow span:nth-child(1) { flex: 2; }
-.pTRow span:not(:nth-child(1)) { flex: 1; text-align: right; }
-.pSummary, .pSummarySide { margin-left: auto; width: 40%; margin-top: 15px; }
-.pSumRow { display: flex; justify-content: space-between; padding: 3px 0; }
-.pBold { font-weight: 900; font-size: 11px; border-top: 1px solid #1a1a1a; margin-top: 5px; }
-.pBrandCenter { text-align: center; }
-.pBrandName { font-size: 14px; font-weight: 800; }
-.pBrandSub { color: #666; font-size: 8px; }
-.pGoldBarFull { height: 8px; background: #eab308; margin: -20px -20px 15px; }
-.pHeaderSplit { display: flex; justify-content: space-between; align-items: flex-start; }
-.pMetaRight { text-align: right; font-size: 8px; line-height: 1.5; }
-.pTotalBox { background: #f8fafc; padding: 8px; font-weight: 900; border-left: 3px solid #1a1a1a; }
-.pPurpleBanner { background: #7c3aed; color: #fff; padding: 25px 20px; display: flex; justify-content: space-between; align-items: center; }
-.pLogoBoxWhite { border: 1px dashed rgba(255,255,255,0.4); padding: 8px; font-size: 7px; }
-.pLargeTitleWhite { font-size: 20px; font-weight: 900; }
-.pWhiteNo { font-size: 11px; font-weight: 700; }
-.pPurpleBottom { background: #7c3aed; padding: 15px 20px; margin-top: auto; color: #fff; opacity: 0.9; }
-.pFootSectionWhite { font-size: 8px; }
-.pHeaderFree { display: flex; justify-content: space-between; align-items: center; }
-.pTitleBlock { display: flex; flex-direction: column; }
-.pSubNo { font-size: 9px; color: #666; }
-.pLogoPlaceholderBig { background: #f3f4f6; border: 1px solid #e5e7eb; padding: 15px; font-weight: 800; color: #9ca3af; }
-.pFreeGrid { display: flex; gap: 10px; margin: 15px 0; }
-.pFreeBox { flex: 1; border: 1px solid #eee; padding: 8px; font-size: 7px; }
-.pFooterGray { background: #f9fafb; padding: 10px; text-align: center; font-weight: 700; margin-top: auto; }
-.pFooter { display: flex; gap: 10px; margin-top: auto; padding-top: 10px; border-top: 1px solid #eee; }
-.pFootSection { flex: 1; font-size: 7px; line-height: 1.5; }
+/* Template Preview Styles (Preserved) */
+.pBase { padding: 10px; color: #1a1a1a; font-size: 8px; min-height: 250px; background: #fff; border: 1px solid #eee; }
+.pLargeTitle { font-size: 16px; font-weight: 900; }
+.pTHead, .pTRow { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 4px 0; }
+.templateWrapper { margin-bottom: 20px; }
+.fullPreviewContainer { border: 2px solid transparent; border-radius: 8px; overflow: hidden; }
+.fullPreviewActive { border-color: #000; }
+.templateInfo { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #eee; }
+.radioActive { background: #000; border-color: #000; }
