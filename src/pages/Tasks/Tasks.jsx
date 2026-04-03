@@ -122,17 +122,14 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
 
   return (
     <div className={`${styles.modalOverlay} ${isOpen ? styles.modalOpen : ''}`}>
-      <div className={styles.modalHeader}>
-        <div className={styles.headerLeft}>
-          <button className={styles.modalClose} onClick={handleClose}>
-            <span className="mi" style={{ fontSize: '1.6rem' }}>arrow_back</span>
-          </button>
-          <span className={styles.modalTitle}>New Task</span>
-        </div>
-        <button className={styles.headerAddBtn} onClick={handleSave} disabled={!desc.trim()}>
-          Add
-        </button>
-      </div>
+      <Header 
+        type="back" 
+        title="New Task" 
+        onBackClick={handleClose} 
+        customActions={[
+          { icon: 'add', label: 'Add', onClick: handleSave, color: 'var(--accent)' }
+        ]}
+      />
 
       <div className={styles.modalBody}>
         <div className={styles.fieldGroup}>
