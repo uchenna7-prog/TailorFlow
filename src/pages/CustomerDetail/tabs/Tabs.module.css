@@ -178,6 +178,7 @@
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+
 /* ... Keep existing styles ... */
 
 /* ── PER-ITEM PRICING IN MODAL ── */
@@ -218,10 +219,6 @@
   font-family: 'DM Sans', sans-serif;
 }
 
-.itemPriceInput:focus {
-  border-color: var(--accent);
-}
-
 .totalIndicator {
   margin-top: 8px;
   padding-top: 12px;
@@ -232,23 +229,37 @@
   font-size: 0.85rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--text2);
 }
 
-/* ── MODAL BODY OVERRIDES ── */
-.sectionHeading {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: var(--text3); /* Slightly subtler */
-  text-transform: uppercase;
-  letter-spacing: 1px;
+/* ── ORDER DETAIL PRICING BREAKDOWN ── */
+.linkedRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 12px;
-  display: block;
 }
 
-/* Remove Generate Invoice Button from this specific tab as requested */
-.generateInvoiceBtn {
-  display: none !important;
+.linkedRow:last-child {
+  margin-bottom: 0;
 }
 
+/* Ensure the status buttons look clean */
+.statusToggleBtn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  color: var(--text3);
+  background: transparent;
+}
+
+.statusActive {
+  background: var(--surface2);
+  border-color: var(--success);
+  color: var(--success);
+}
