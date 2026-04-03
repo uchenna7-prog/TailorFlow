@@ -62,8 +62,10 @@ export default function CustomerDetail({ onMenuClick }) {
   }, [])
 
   // ── Generate invoice (called from PaymentsTab) ────────────
-  // Snapshots the active template + brand settings so InvoiceView always
+  // Paste this function inside CustomerDetail, replacing the existing handleGenerateInvoice.
+  // It now snapshots the active template + brand settings so InvoiceView always
   // renders the invoice exactly as it looked when it was created.
+
   const handleGenerateInvoice = useCallback(async (orderId) => {
     const existing = data.invoices.find(inv => String(inv.orderId) === String(orderId))
     if (existing) { showToast('Invoice already exists'); setActiveTab('invoice'); return }
@@ -115,6 +117,8 @@ export default function CustomerDetail({ onMenuClick }) {
         showTax:  settingsSnap.invoiceShowTax  || false,
         taxRate:  settingsSnap.invoiceTaxRate  || 0,
         dueDays:  settingsSnap.invoiceDueDays  || 7,
+        // Note: logo is stored separately in localStorage under tailorbook_brand_logo
+        // and is read via useBrand(), so it's available at view time already.
       },
     }
 
