@@ -156,7 +156,7 @@ function MeasureDetail({ measurement, onClose, onDelete }) {
         title={measurement.name}
         onBackClick={onClose}
         customActions={[
-          { icon: 'delete_outline', label: 'Delete', onClick: onDelete, color: 'var(--danger)' }
+          { icon: 'delete_outline', onClick: onDelete, color: 'var(--danger)' }
         ]}
       />
       <div className={styles.detailBody}>
