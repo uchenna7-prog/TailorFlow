@@ -294,7 +294,7 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
         title="Payment Details"
         onBackClick={onClose}
         customActions={[
-          { icon: 'delete_outline', label: 'Delete', onClick: onDelete, color: 'var(--danger)' }
+          { icon: 'delete_outline', onClick: onDelete, color: 'var(--danger)' }
         ]}
       />
 
