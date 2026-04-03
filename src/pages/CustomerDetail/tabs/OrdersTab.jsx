@@ -1,4 +1,7 @@
+// src/pages/CustomerDetail/tabs/OrdersTab.jsx
+
 import { useState, useEffect } from 'react'
+import { useOrders } from '../../../contexts/OrdersContext'
 import ConfirmSheet from '../../../components/ConfirmSheet/ConfirmSheet'
 import styles from './Tabs.module.css'
 
@@ -9,14 +12,24 @@ const PRIORITY_BANNER = {
   vip:    { cls: styles.bannerVip,    text: 'VIP ★' },
 }
 
-// ── Status config — single source of truth ────────────────────
-// These values must match the filter in Orders.jsx exactly
 const STATUSES = [
   { value: 'pending',   label: 'Pending'   },
   { value: 'completed', label: 'Completed' },
   { value: 'delivered', label: 'Delivered' },
   { value: 'cancelled', label: 'Cancelled' },
 ]
+
+// ── Timestamp → "Apr 3, 2026" ──────────────────────────────────
+function formatDate(ts) {
+  if (!ts) return 'Unknown Date'
+  // Firestore Timestamp
+  if (typeof ts.toDate === 'function') {
+    return ts.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  }
+  // Already a string (legacy local data)
+  if (typeof ts === 'string') return ts
+  return 'Unknown Date'
+}
 
 // ── ORDER FORM MODAL ──────────────────────────────────────────
 function OrderModal({ isOpen, onClose, measurements, onSave }) {
@@ -45,14 +58,13 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
 
   const handleSave = () => {
     if (!desc.trim()) return
-    const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     let dueDisplay = ''
     if (due) {
       const d = new Date(due + 'T00:00:00')
       dueDisplay = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     }
+    // No local id or date — Firestore will own both via addDoc + serverTimestamp
     onSave({
-      id:             Date.now() + Math.random(),
       desc:           desc.trim(),
       price:          price ? parseFloat(price) : null,
       qty:            parseInt(qty) || 1,
@@ -62,8 +74,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
       priority,
       measurementIds: [...selectedIds],
       measurementId:  selectedIds[0] ?? null,
-      status:         'pending',   // ← always starts as pending
-      date:           today,
+      status:         'pending',
     })
     reset()
     onClose()
@@ -158,6 +169,9 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
   const ids    = order.measurementIds?.length ? order.measurementIds : (order.measurementId ? [order.measurementId] : [])
   const linked = ids.map(id => measurements.find(m => String(m.id) === String(id))).filter(Boolean)
 
+  // Show the human-readable placed date
+  const placedOn = order.date || formatDate(order.createdAt)
+
   return (
     <div className={`${styles.detailModal} ${styles.detailOpen}`}>
       <div className={styles.detailHeader}>
@@ -180,23 +194,26 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           </div>
           <div className={styles.orderMetaCell}>
             <div className={styles.cellLabel}>Due Date</div>
-            <div className={styles.cellValue} style={{ fontSize: '0.85rem' }}>{order.due || '—'}</div>
+            <div className={styles.cellValue}>{order.due || '—'}</div>
           </div>
-
-          {/* ── STATUS SELECTOR — values match Orders.jsx filters ── */}
-          <div className={styles.orderMetaCell} style={{ gridColumn: '1 / -1' }}>
+          <div className={styles.orderMetaCell}>
             <div className={styles.cellLabel}>Status</div>
-            <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
-              {STATUSES.map(s => (
-                <button
-                  key={s.value}
-                  className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`}
-                  onClick={() => onStatusChange(order.id, s.value)}
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
+            <div className={styles.cellValue} style={{ textTransform: 'capitalize' }}>{order.status}</div>
+          </div>
+        </div>
+
+        <div className={styles.linkedSection} style={{ marginBottom: 16 }}>
+          <div className={styles.linkLabel}>Change Status</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+            {STATUSES.map(s => (
+              <button
+                key={s.value}
+                className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`}
+                onClick={() => onStatusChange(order.id, s.value)}
+              >
+                {s.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -227,7 +244,7 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           </div>
         )}
 
-        <div className={styles.detailDate}>Placed on {order.date}</div>
+        <div className={styles.detailDate}>Placed on {placedOn}</div>
 
         <button className={styles.generateInvoiceBtn} onClick={() => onGenerateInvoice(order.id)}>
           <span className="material-icons" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: '4px' }}>receipt_long</span>
@@ -239,7 +256,9 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
 }
 
 // ── MAIN TAB ──────────────────────────────────────────────────
-export default function OrdersTab({ orders, measurements, onSave, onDelete, onStatusChange, showToast }) {
+export default function OrdersTab({ customerId, orders, measurements, showToast }) {
+  const { addOrder, deleteOrder, updateOrderStatus } = useOrders()
+
   const [modalOpen,    setModalOpen]    = useState(false)
   const [detailOrder,  setDetailOrder]  = useState(null)
   const [confirmDel,   setConfirmDel]   = useState(null)
@@ -250,24 +269,37 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
     return () => document.removeEventListener('openOrderModal', handler)
   }, [])
 
-  const handleSave = (order) => {
-    onSave(order)
-    showToast('Order placed ✓')
+  const handleSave = async (orderData) => {
+    try {
+      await addOrder(customerId, orderData)
+      showToast('Order placed ✓')
+    } catch {
+      showToast('Failed to place order')
+    }
   }
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (!confirmDel) return
-    onDelete(confirmDel.id)
-    showToast('Order deleted')
+    try {
+      await deleteOrder(customerId, confirmDel.id)
+      showToast('Order deleted')
+    } catch {
+      showToast('Failed to delete order')
+    }
     setConfirmDel(null)
     setDetailOrder(null)
   }
 
-  const handleStatusChange = (id, status) => {
-    onStatusChange(id, status)
-    setDetailOrder(prev =>
-      prev && String(prev.id) === String(id) ? { ...prev, status } : prev
-    )
+  const handleStatusChange = async (id, status) => {
+    try {
+      await updateOrderStatus(customerId, id, status)
+      // Optimistically update the detail view while Firestore catches up
+      setDetailOrder(prev =>
+        prev && String(prev.id) === String(id) ? { ...prev, status } : prev
+      )
+    } catch {
+      showToast('Failed to update status')
+    }
   }
 
   const handleGenerateInvoice = (orderId) => {
@@ -277,9 +309,9 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
     showToast('Generating invoice…')
   }
 
-  // Group orders by date
+  // Group by the Firestore createdAt timestamp (or legacy date string)
   const grouped = orders.reduce((acc, o) => {
-    const key = o.date || 'Unknown Date'
+    const key = formatDate(o.createdAt) || o.date || 'Unknown Date'
     if (!acc[key]) acc[key] = []
     acc[key].push(o)
     return acc
@@ -297,7 +329,6 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
 
       {Object.entries(grouped).map(([date, dateOrders]) => (
         <div key={date} className={styles.orderGroup}>
-          {/* Date label + full-width divider line */}
           <div className={styles.orderGroupDate}>{date}</div>
           <div className={styles.orderGroupDivider} />
 
@@ -315,7 +346,6 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
                 className={`${styles.orderListItem} ${isLast ? styles.orderListItemLast : ''}`}
                 onClick={() => setDetailOrder(o)}
               >
-                {/* Left: grey outer box with white inner box holding icon/image */}
                 <div className={styles.orderListOuter}>
                   <div className={styles.orderListInner}>
                     {thumb?.imgSrc
@@ -325,10 +355,8 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
                   </div>
                 </div>
 
-                {/* Right: order info — small, not bold */}
                 <div className={styles.orderListInfo}>
                   <div className={styles.orderListDesc}>{o.desc}</div>
-                  
                   <div className={styles.orderListStatusRow}>
                     <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', verticalAlign: 'middle' }}>autorenew</span>
                     <span className={styles.orderListStatusText}>{statusLabel}</span>
