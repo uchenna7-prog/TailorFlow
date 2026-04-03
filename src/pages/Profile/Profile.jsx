@@ -79,13 +79,12 @@ function Toggle({ value, onChange }) {
 function FullModal({ title, onBack, onSave, children }) {
   return (
     <div className={styles.fullOverlay}>
-      <div className={styles.fullHeader}>
-        <button className={styles.backBtn} onClick={onBack}>
-          <span className="mi">arrow_back</span>
-        </button>
-        <span className={styles.fullTitle}>{title}</span>
-        {onSave && <button className={styles.fullSave} onClick={onSave}>Save</button>}
-      </div>
+      <Header 
+        type="back" 
+        title={title} 
+        onBackClick={onBack} 
+        customActions={onSave ? [{ label: 'Save', onClick: onSave }] : []} 
+      />
       <div className={styles.fullContent}>{children}</div>
     </div>
   )
