@@ -17,7 +17,7 @@ const NAV_ITEMS = [
   { path: '/profile',       label: 'My Account',   icon: 'person'         },
   { path: '/contact',       label: 'Contact Us',   icon: 'call'           },
   { path: '/faq',           label: 'FAQs',         icon: 'help_outline'   },
-  { path: '/logout',        label: 'Log out',      icon: 'logout'         },
+  { path: '/login',        label: 'Log out',      icon: 'logout'         },
 ]
 
 function SideBar({ isOpen, onClose }) {
