@@ -8,6 +8,7 @@ import { CustomerProvider } from './contexts/CustomerContext'
 import { OrdersProvider }   from './contexts/OrdersContext'
 import { TaskProvider }     from './contexts/TaskContext'
 import { InvoiceProvider }  from './contexts/InvoiceContext'
+import { PaymentProvider }  from './contexts/PaymentContext'
 import { PremiumProvider }  from './contexts/PremiumContext'
 import App from './App'
 import './index.css'
@@ -23,6 +24,7 @@ import './index.css'
 //  OrdersProvider    → reads AuthContext + CustomerContext
 //  TaskProvider      → reads AuthContext (user.uid)
 //  InvoiceProvider   → reads AuthContext + SettingsContext + CustomerContext
+//  PaymentProvider   → reads AuthContext + CustomerContext
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -35,7 +37,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <OrdersProvider>
                   <TaskProvider>
                     <InvoiceProvider>
-                      <App />
+                      <PaymentProvider>
+                        <App />
+                      </PaymentProvider>
                     </InvoiceProvider>
                   </TaskProvider>
                 </OrdersProvider>
