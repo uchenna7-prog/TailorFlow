@@ -127,12 +127,12 @@
 }
 
 .sectionTitle {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: var(--text2);
+  font-size: 0.78rem;
+  font-weight: 800; /* Increased for boldness */
+  color: var(--text); /* Darker for better visibility */
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .seeAllBtn {
@@ -144,7 +144,7 @@
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
   padding: 0;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 /* ── LIST SECTIONS ── */
