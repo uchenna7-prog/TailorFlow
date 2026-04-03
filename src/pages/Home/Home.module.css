@@ -152,7 +152,7 @@
 .actionList button:active { background: var(--surface2); }
 .actionList button .mi { color: var(--accent); font-size: 1.2rem; }
 
-/* ── LIST SECTIONS (orders + tasks — same pattern as all other pages) ── */
+/* ── LIST SECTIONS ── */
 .listSection { position: relative; }
 
 .listDivider {
@@ -217,6 +217,21 @@
 .listMeta { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
 .listMetaText { font-size: 0.75rem; font-weight: 400; color: var(--text2); }
 .listDue { font-size: 0.75rem; font-weight: 500; color: #ef4444; margin-top: 1px; }
+
+/* "Today" badge on appointment rows */
+.listApptToday {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #06b6d4;
+  border: 1px solid rgba(6,182,212,0.4);
+  background: rgba(6,182,212,0.1);
+  border-radius: 5px;
+  padding: 2px 6px;
+  margin-top: 3px;
+}
 
 /* Right price (orders) */
 .listRight { text-align: right; flex-shrink: 0; }
