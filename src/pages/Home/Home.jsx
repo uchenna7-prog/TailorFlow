@@ -337,13 +337,13 @@ function Home({ onMenuClick }) {
               </div>
               <div className={styles.actionCardText}>
                 <div className={styles.statValue} style={{ fontSize: '0.82rem' }}>Book</div>
-                <div className={styles.statLabel}>Appt</div>
+                <div className={styles.statLabel}>Appointment</div>
               </div>
             </div>
 
             <div className={styles.actionCard} onClick={() => navigate('/tasks')}>
               <div className={styles.statIconWrap}>
-                <span className="mi" style={{ fontSize: '1.3rem', color: 'var(--accent)' }}>add_circle_outline</span>
+                <span className="mi" style={{ fontSize: '1.3rem', color: 'var(--accent)' }}>assignment</span>
               </div>
               <div className={styles.actionCardText}>
                 <div className={styles.statValue} style={{ fontSize: '0.82rem' }}>New</div>
