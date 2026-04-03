@@ -127,7 +127,7 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
         title="New Task" 
         onBackClick={handleClose} 
         customActions={[
-          { icon: 'add', label: 'Add', onClick: handleSave, color: 'var(--accent)' }
+          { label: 'Add', onClick: handleSave, color: 'var(--accent)' }
         ]}
       />
 
