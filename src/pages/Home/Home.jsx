@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { useCustomers } from '../../contexts/CustomerContext'
-import { useOrders }    from '../../contexts/OrdersContext'
-import { useTasks }     from '../../contexts/TaskContext'
-import { useInvoices }  from '../../contexts/InvoiceContext'
-import { useAuth }      from '../../contexts/AuthContext'
+import { useCustomers }     from '../../contexts/CustomerContext'
+import { useOrders }        from '../../contexts/OrdersContext'
+import { useTasks }         from '../../contexts/TaskContext'
+import { useInvoices }      from '../../contexts/InvoiceContext'
+import { useAppointments }  from '../../contexts/AppointmentContext'
+import { useAuth }          from '../../contexts/AuthContext'
 import Header from '../../components/Header/Header'
 import styles from './Home.module.css'
 
@@ -23,6 +24,13 @@ function isInvoiceOverdue(inv) {
 function formatDate(dateStr) {
   if (!dateStr) return ''
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function formatApptDate(dateStr, timeStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr + 'T00:00:00')
+  const datePart = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return timeStr ? `${datePart} · ${timeStr}` : datePart
 }
 
 function dueThisWeek(dateStr) {
@@ -45,15 +53,38 @@ const CATEGORY_ICONS = {
   payment: 'payments',   fitting: 'checkroom',  shopping: 'shopping_cart',
 }
 
+const APPT_TYPE_ICONS = {
+  fitting:     'checkroom',
+  measurement: 'straighten',
+  delivery:    'local_shipping',
+  consultation:'chat_bubble_outline',
+  pickup:      'inventory_2',
+  other:       'event',
+}
+
+const APPT_STATUS_COLORS = {
+  scheduled:  '#818cf8',
+  confirmed:  '#22c55e',
+  completed:  '#94a3b8',
+  cancelled:  '#ef4444',
+  missed:     '#ef4444',
+}
+
 // ─────────────────────────────────────────────────────────────
 
 function Home({ onMenuClick }) {
   const navigate = useNavigate()
-  const { user }        = useAuth()
-  const { customers }   = useCustomers()
-  const { allOrders }   = useOrders()
-  const { tasks }       = useTasks()
-  const { allInvoices } = useInvoices()
+  const { user }              = useAuth()
+  const { customers }         = useCustomers()
+  const { allOrders }         = useOrders()
+  const { tasks }             = useTasks()
+  const { allInvoices }       = useInvoices()
+  const {
+    upcoming,
+    todayAppointments,
+    missedCount,
+    upcomingThisWeek,
+  } = useAppointments()
 
   // ── Second name logic ─────────────────────────────────────
   const displayName = (() => {
@@ -85,8 +116,14 @@ function Home({ onMenuClick }) {
   const pendingTasks     = tasks.filter(t => !t.done && !isTaskOverdue(t))
   const tasksDueThisWeek = pendingTasks.filter(t => dueThisWeek(t.dueDate)).length
 
-  const recentOrders = [...pendingOrders].slice(0, 4)
-  const recentTasks  = tasks.filter(t => !t.done).slice(0, 4)
+  // ── Appointment stat ──────────────────────────────────────
+  // Show today's count; sub-label is upcoming this week or missed
+  const todayCount = todayAppointments.length
+
+  // ── Recent lists ──────────────────────────────────────────
+  const recentOrders       = [...pendingOrders].slice(0, 4)
+  const recentTasks        = tasks.filter(t => !t.done).slice(0, 4)
+  const recentAppointments = upcoming.slice(0, 4)   // next 4 upcoming, soonest first
 
   return (
     <div className={styles.pageWrapper}>
@@ -101,9 +138,10 @@ function Home({ onMenuClick }) {
           <p className={styles.subtitle}>Here's what's happening in your shop today.</p>
         </section>
 
-        {/* STATS */}
+        {/* STATS — 2-column grid, now 6 cards (3 rows) */}
         <section className={styles.statsGrid}>
 
+          {/* Customers */}
           <div className={styles.statCard} onClick={() => navigate('/customers')}>
             <div className={styles.statIconWrap}>
               <span className="mi" style={{ fontSize: '1.3rem', color: '#818cf8' }}>groups</span>
@@ -111,12 +149,11 @@ function Home({ onMenuClick }) {
             <div>
               <div className={styles.statValue}>{customers.length}</div>
               <div className={styles.statLabel}>Total Customers</div>
-              <div className={styles.statSub}>
-                {`+${newCustomersThisMonth} this month`}
-              </div>
+              <div className={styles.statSub}>{`+${newCustomersThisMonth} this month`}</div>
             </div>
           </div>
 
+          {/* Pending Orders */}
           <div className={styles.statCard} onClick={() => navigate('/orders')}>
             <div className={styles.statIconWrap}>
               <span className="mi" style={{ fontSize: '1.3rem', color: '#fb923c' }}>content_cut</span>
@@ -130,6 +167,7 @@ function Home({ onMenuClick }) {
             </div>
           </div>
 
+          {/* Unpaid Invoices */}
           <div className={styles.statCard} onClick={() => navigate('/invoices')}>
             <div className={styles.statIconWrap}>
               <span className="mi" style={{ fontSize: '1.3rem', color: '#ef4444' }}>receipt_long</span>
@@ -143,6 +181,7 @@ function Home({ onMenuClick }) {
             </div>
           </div>
 
+          {/* Pending Tasks */}
           <div className={styles.statCard} onClick={() => navigate('/tasks')}>
             <div className={styles.statIconWrap}>
               <span className="mi" style={{ fontSize: '1.3rem', color: '#22c55e' }}>task_alt</span>
@@ -156,6 +195,34 @@ function Home({ onMenuClick }) {
             </div>
           </div>
 
+          {/* Today's Appointments */}
+          <div className={styles.statCard} onClick={() => navigate('/appointments')}>
+            <div className={styles.statIconWrap}>
+              <span className="mi" style={{ fontSize: '1.3rem', color: '#06b6d4' }}>event</span>
+            </div>
+            <div>
+              <div className={styles.statValue}>{todayCount}</div>
+              <div className={styles.statLabel}>Today's Appts</div>
+              <div className={styles.statSub} style={{ color: missedCount > 0 ? '#ef4444' : undefined }}>
+                {missedCount > 0 ? `${missedCount} missed` : `${upcomingThisWeek} this wk`}
+              </div>
+            </div>
+          </div>
+
+          {/* Upcoming this week — fills row 3 slot 2 */}
+          <div className={styles.statCard} onClick={() => navigate('/appointments')}>
+            <div className={styles.statIconWrap}>
+              <span className="mi" style={{ fontSize: '1.3rem', color: '#a855f7' }}>calendar_month</span>
+            </div>
+            <div>
+              <div className={styles.statValue}>{upcomingThisWeek}</div>
+              <div className={styles.statLabel}>Appts This Wk</div>
+              <div className={styles.statSub} style={{ color: missedCount > 0 ? '#ef4444' : undefined }}>
+                {`${missedCount} missed`}
+              </div>
+            </div>
+          </div>
+
         </section>
 
         {/* QUICK ACTIONS */}
@@ -165,6 +232,9 @@ function Home({ onMenuClick }) {
             <button onClick={() => navigate('/customers')}>
               <span className="mi">person_add</span> Add Customer
             </button>
+            <button onClick={() => navigate('/appointments')}>
+              <span className="mi">event</span> Book Appointment
+            </button>
             <button onClick={() => navigate('/tasks')}>
               <span className="mi">add_task</span> Manage Tasks
             </button>
@@ -173,6 +243,53 @@ function Home({ onMenuClick }) {
             </button>
           </div>
         </section>
+
+        {/* UPCOMING APPOINTMENTS */}
+        {recentAppointments.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>Upcoming Appointments</h3>
+              <button className={styles.seeAllBtn} onClick={() => navigate('/appointments')}>See all</button>
+            </div>
+            <div className={styles.listSection}>
+              <div className={styles.listDivider} />
+              {recentAppointments.map((appt, idx) => {
+                const isLast    = idx === recentAppointments.length - 1
+                const icon      = APPT_TYPE_ICONS[appt.type] || 'event'
+                const iconColor = APPT_STATUS_COLORS[appt.status] || '#818cf8'
+                const isToday   = todayAppointments.some(a => a.id === appt.id)
+                return (
+                  <div key={appt.id} className={`${styles.listItem} ${isLast ? styles.listItemLast : ''}`}>
+                    <div
+                      className={styles.listOuter}
+                      style={isToday ? { borderColor: 'rgba(6,182,212,0.35)', background: 'rgba(6,182,212,0.05)' } : {}}
+                    >
+                      <div className={styles.listInner}>
+                        <span className="mi" style={{ fontSize: '1.3rem', color: iconColor }}>{icon}</span>
+                      </div>
+                    </div>
+                    <div className={styles.listInfo}>
+                      <div className={styles.listDesc}>{appt.title || appt.type || 'Appointment'}</div>
+                      {appt.customerName && (
+                        <div className={styles.listMeta}>
+                          <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)', verticalAlign: 'middle' }}>person</span>
+                          <span className={styles.listMetaText}>{appt.customerName}</span>
+                        </div>
+                      )}
+                      <div className={styles.listMeta}>
+                        <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)', verticalAlign: 'middle' }}>schedule</span>
+                        <span className={styles.listMetaText}>{formatApptDate(appt.date, appt.time)}</span>
+                      </div>
+                      {isToday && (
+                        <div className={styles.listApptToday}>Today</div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        )}
 
         {/* RECENT ORDERS */}
         {recentOrders.length > 0 && (
