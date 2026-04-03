@@ -328,9 +328,7 @@ export default function OrdersTab({ orders, measurements, onSave, onDelete, onSt
                 {/* Right: order info — small, not bold */}
                 <div className={styles.orderListInfo}>
                   <div className={styles.orderListDesc}>{o.desc}</div>
-                  <div className={styles.orderListOrdRow}>
-                    Ord#&nbsp;&nbsp;{o.id?.toString().slice(-5).toUpperCase() ?? '—'}
-                  </div>
+                  
                   <div className={styles.orderListStatusRow}>
                     <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', verticalAlign: 'middle' }}>autorenew</span>
                     <span className={styles.orderListStatusText}>{statusLabel}</span>
