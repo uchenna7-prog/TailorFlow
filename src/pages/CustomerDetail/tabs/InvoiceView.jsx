@@ -293,8 +293,7 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
         onBackClick={onClose}
         customActions={[
           { 
-            icon: pdfLoading ? 'hourglass_top' : 'download', 
-            label: 'Download PDF', 
+            icon: pdfLoading ? 'hourglass_top' : 'download',  
             onClick: handleShare, 
             disabled: pdfLoading 
           }
