@@ -8,6 +8,15 @@
   position: relative;
 }
 
+/* Invisible div to track scroll position */
+.sentinel {
+  position: absolute;
+  top: 0;
+  height: 1px;
+  width: 100%;
+  pointer-events: none;
+}
+
 /* ── STICKY NAVIGATION ── */
 .navHeader {
   position: sticky;
@@ -15,6 +24,14 @@
   z-index: 110;
   background: var(--bg);
   min-height: 56px;
+}
+
+/* Target the title specifically to ensure long names truncate */
+.navHeader :global(.header-title) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%; /* Prevents name from hitting the edit/delete buttons */
 }
 
 /* ── PROFILE SECTION (SCROLLS AWAY) ── */
@@ -85,14 +102,6 @@
   align-items: flex-start;
 }
 
-.meta .mi {
-  font-size: 0.9rem;
-  line-height: 1;
-  display: inline-flex;
-  margin-top: 2px;
-  color: inherit;
-}
-
 .metaInline {
   display: flex;
   flex-wrap: wrap;
@@ -116,20 +125,11 @@
   opacity: 0.5;
 }
 
-.metaItem .mi {
-  font-size: 1.1rem;
-  color: var(--accent);
-}
-
 .birthday {
   font-weight: 600;
   font-size: 0.8rem;
   color: var(--warning);
   white-space: nowrap;
-}
-
-.metaItem.birthday .mi {
-  color: var(--warning);
 }
 
 /* ── ACTION BUTTONS ── */
@@ -160,7 +160,7 @@
 /* ── THE STICKY TABS ── */
 .stickyTabsWrapper {
   position: sticky;
-  top: 56px; /* Sticks exactly under the navHeader */
+  top: 56px;
   z-index: 100;
   background: var(--bg);
   border-top: 1px solid var(--border);
@@ -174,9 +174,7 @@
   scrollbar-width: none;
 }
 
-.tabs::-webkit-scrollbar {
-  display: none;
-}
+.tabs::-webkit-scrollbar { display: none; }
 
 .tab {
   flex: 0 0 auto;
@@ -188,16 +186,10 @@
   letter-spacing: 0.5px;
   cursor: pointer;
   position: relative;
-  text-align: center;
-  white-space: nowrap;
   transition: color 0.2s;
 }
 
-.tab.active {
-  color: var(--accent);
-  font-weight: 800;
-}
-
+.tab.active { color: var(--accent); font-weight: 800; }
 .tab.active::after {
   content: '';
   position: absolute;
@@ -209,14 +201,12 @@
   background: var(--accent);
 }
 
-/* ── SCROLLABLE CONTENT ── */
+/* ── TAB CONTENT ── */
 .tabContent {
   padding: 12px 20px 120px;
   flex: 1;
-  background: var(--bg);
 }
 
-/* ── FLOATING ACTION BUTTON ── */
 .fab {
   position: fixed;
   bottom: calc(30px + var(--sb, 0px));
@@ -231,7 +221,6 @@
   align-items: center;
   justify-content: center;
   z-index: 200;
-  cursor: pointer;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   font-size: 1.8rem;
 }
