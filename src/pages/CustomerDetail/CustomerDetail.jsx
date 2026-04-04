@@ -52,10 +52,27 @@ export default function CustomerDetail({ onMenuClick }) {
   const [toastMsg,      setToastMsg]      = useState('')
   const [invoicesState, setInvoicesState] = useState([])
   const [receipts,      setReceipts]      = useState([])
+  const [isScrolled,    setIsScrolled]    = useState(false)
+  
   const toastTimer = useRef(null)
   const tabsRef    = useRef(null)
+  const topSentinelRef = useRef(null)
 
   const orders = getOrders(id)
+
+  // ── Shrinking Header Observer ──
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // If the sentinel is NOT intersecting, it means it's scrolled off-top
+        setIsScrolled(!entry.isIntersecting)
+      },
+      { threshold: 0.1 }
+    )
+
+    if (topSentinelRef.current) observer.observe(topSentinelRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     if (data.invoices) setInvoicesState(data.invoices)
@@ -257,11 +274,14 @@ export default function CustomerDetail({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
+      {/* ── TOP SENTINEL (Trigger for Shrinking Header) ── */}
+      <div ref={topSentinelRef} className={styles.sentinel} />
+
       {/* ── STICKY TOP NAV ── */}
       <div className={styles.navHeader}>
         <Header
           type="back"
-          title="Customer Details"
+          title={isScrolled ? customer.name : "Customer Details"}
           customActions={[
             { icon: 'edit',   onClick: () => navigate(`/customers/edit/${id}`), outlined: true },
             { icon: 'delete', onClick: () => deleteCustomer(id), outlined: true, color: 'var(--danger)' },
