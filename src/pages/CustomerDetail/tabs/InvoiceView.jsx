@@ -1,5 +1,3 @@
-// src/pages/CustomerDetail/tabs/InvoiceView.jsx
-
 import { useRef, useState } from 'react'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
@@ -246,11 +244,25 @@ const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
 const STATUS_NEXT   = { unpaid: 'paid', paid: 'unpaid', overdue: 'paid' }
 
 async function generatePDF(paperEl, filename) {
-  const canvas = await html2canvas(paperEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false })
+  const canvas = await html2canvas(paperEl, { 
+    scale: 2, 
+    useCORS: true, 
+    backgroundColor: '#ffffff', 
+    logging: false,
+    height: paperEl.scrollHeight,
+    windowHeight: paperEl.scrollHeight
+  })
+  
   const imgData = canvas.toDataURL('image/png')
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: 'a4' })
-  const pdfW = pdf.internal.pageSize.getWidth()
+  const pdfW = 450
   const pdfH = (canvas.height * pdfW) / canvas.width
+  
+  const pdf = new jsPDF({ 
+    orientation: 'portrait', 
+    unit: 'px', 
+    format: [pdfW, pdfH] 
+  })
+  
   pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH)
   pdf.save(filename)
 }
@@ -261,19 +273,11 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
   const [invoice,    setInvoice]    = useState(initialInvoice)
   const [pdfLoading, setPdfLoading] = useState(false)
 
-  // ── KEY FIX: use the template that was active when this invoice
-  //    was generated (stored as invoice.template), falling back to
-  //    the current brand setting only for old invoices that predate
-  //    this field being saved.
   const templateKey = invoice.template || brand.template || 'editable'
   const Template    = TEMPLATE_MAP[templateKey] || EditableTemplate
 
-  // Build the effective brand object — merge current brand with any
-  // brand snapshot saved on the invoice (for currency, colours etc.)
   const effectiveBrand = {
     ...brand,
-    // If the invoice has a snapshot of the brand settings at creation
-    // time, those fields take priority so the PDF looks the same.
     ...(invoice.brandSnapshot || {}),
   }
 
