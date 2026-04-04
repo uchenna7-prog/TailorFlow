@@ -55,7 +55,7 @@ function SideBar({ isOpen, onClose }) {
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.path}
-                className={`${styles.navItem} ${location.pathname === item.path ? styles.active : ''} ${item.path === '/logout' ? styles.danger : ''}`}
+                className={`${styles.navItem} ${location.pathname === item.path ? styles.active : ''} ${item.path === '/login' ? styles.danger : ''}`}
                 onClick={() => handleNav(item.path)}
               >
                 <span className="mi">{item.icon}</span>
