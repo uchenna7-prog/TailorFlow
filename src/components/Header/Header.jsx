@@ -1,102 +1,132 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useNotifications } from '../../contexts/NotificationContext'
 import styles from './Header.module.css'
+
+// ── Notification type colours ─────────────────────────────────
+const TYPE_BG = {
+  order:       'rgba(168,85,247,0.12)',
+  invoice:     'rgba(34,197,94,0.12)',
+  task:        'rgba(99,102,241,0.12)',
+  appointment: 'rgba(6,182,212,0.12)',
+  birthday:    'rgba(251,146,60,0.12)',
+}
+
+function timeLabel(timeStr) {
+  if (!timeStr) return ''
+  // If stored as YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(timeStr)) {
+    const diff = Math.round((new Date(timeStr + 'T00:00:00') - new Date().setHours(0,0,0,0)) / 86400000)
+    if (diff === 0)  return 'Today'
+    if (diff === 1)  return 'Tomorrow'
+    if (diff === -1) return 'Yesterday'
+    if (diff < 0)    return `${Math.abs(diff)}d ago`
+    return `In ${diff}d`
+  }
+  // If stored as "MM-DD" (birthday)
+  return timeStr
+}
+
+// ── Single notification row ───────────────────────────────────
+function NotifItem({ n, onRead }) {
+  return (
+    <div
+      className={`${styles.notifItem} ${n.unread ? styles.unread : ''}`}
+      onClick={() => n.unread && onRead(n.id)}
+    >
+      <div className={styles.notifIcon} style={{ background: TYPE_BG[n.type] || 'var(--surface2)' }}>
+        {n.icon}
+      </div>
+      <div className={styles.notifContent}>
+        <h5>{n.title}</h5>
+        <p>{n.body}</p>
+        <span className={styles.notifTime}>{timeLabel(n.time)}</span>
+      </div>
+      {n.unread && <span className={styles.unreadDot} />}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
 
 function Header({ onMenuClick, onBackClick, type = 'default', title, customActions = [] }) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [notifOpen, setNotifOpen] = useState(false)
+  const [notifOpen,    setNotifOpen]    = useState(false)
+  const [notifTab,     setNotifTab]     = useState('all')   // 'all' | 'unread' | 'read'
   const navigate = useNavigate()
   const location = useLocation()
 
+  const { notifications, unreadCount, markRead, markAllRead } = useNotifications()
+
   const PAGE_TITLES = {
-    '/': 'Dashboard',
+    '/':          'Dashboard',
     '/customers': 'Customers',
-    '/tasks': 'Tasks',
-    '/settings': 'Settings',
+    '/tasks':     'Tasks',
+    '/settings':  'Settings',
   }
   const pageTitle = title ?? PAGE_TITLES[location.pathname] ?? 'TailorFlow'
 
   const PAGE_DROPDOWN = {
     '/': [
-      { icon: 'share', label: 'Share App', action: () => console.log('Share app') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'share',   label: 'Share App',       action: () => console.log('Share app') },
+      { icon: 'logout',  label: 'Log Out',          action: () => navigate('/logout'), danger: true },
     ],
     '/customers': [
-      { icon: 'download', label: 'Export Clients', action: () => console.log('Export clients') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'download', label: 'Export Clients',  action: () => console.log('Export clients') },
+      { icon: 'logout',   label: 'Log Out',         action: () => navigate('/logout'), danger: true },
     ],
     '/tasks': [
-      { icon: 'settings', label: 'Settings', action: () => navigate('/settings') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'settings', label: 'Settings',        action: () => navigate('/settings') },
+      { icon: 'logout',   label: 'Log Out',         action: () => navigate('/logout'), danger: true },
     ],
     '/orders': [
-      { icon: 'download', label: 'Export Orders', action: () => console.log('Export orders') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'download', label: 'Export Orders',   action: () => console.log('Export orders') },
+      { icon: 'logout',   label: 'Log Out',         action: () => navigate('/logout'), danger: true },
     ],
     '/gallery': [
-      { icon: 'upload', label: 'Upload Image', action: () => console.log('Upload image') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'upload',   label: 'Upload Image',    action: () => console.log('Upload image') },
+      { icon: 'logout',   label: 'Log Out',         action: () => navigate('/logout'), danger: true },
     ],
     '/settings': [
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'logout',   label: 'Log Out',         action: () => navigate('/logout'), danger: true },
     ],
     '/account': [
-      { icon: 'edit', label: 'Edit Profile', action: () => console.log('Edit profile') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'edit',     label: 'Edit Profile',    action: () => console.log('Edit profile') },
+      { icon: 'logout',   label: 'Log Out',         action: () => navigate('/logout'), danger: true },
     ],
     '/contact': [
-      { icon: 'email', label: 'Send Message', action: () => console.log('Send message') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'email',    label: 'Send Message',    action: () => console.log('Send message') },
+      { icon: 'logout',   label: 'Log Out',         action: () => navigate('/logout'), danger: true },
     ],
     '/faqs': [
-      { icon: 'help', label: 'Get Help', action: () => console.log('Help clicked') },
-      { icon: 'logout', label: 'Log Out', action: () => navigate('/logout'), danger: true },
+      { icon: 'help',     label: 'Get Help',        action: () => console.log('Help clicked') },
+      { icon: 'logout',   label: 'Log Out',         action: () => navigate('/logout'), danger: true },
     ],
   }
 
-  const toggleDropdown = () => setDropdownOpen(prev => !prev)
-  const closeDropdown = () => setDropdownOpen(false)
-  const toggleNotif = () => setNotifOpen(prev => !prev)
+  const toggleDropdown = () => setDropdownOpen(p => !p)
+  const closeDropdown  = () => setDropdownOpen(false)
+
+  const openNotif  = () => { setNotifTab('all'); setNotifOpen(true) }
   const closeNotif = () => setNotifOpen(false)
 
   const handleBackAction = () => {
-    if (onBackClick) {
-      onBackClick()
-    } else {
-      navigate(-1)
-    }
+    if (onBackClick) onBackClick()
+    else navigate(-1)
   }
 
-  const notifications = [
-    {
-      id: 1,
-      icon: '🎂',
-      type: 'birthday',
-      title: "Upcoming birthday",
-      body: "Uchendu Uchenna's birthday is in 2 days.",
-      time: 'In 2 days',
-      unread: true,
-    },
-    {
-      id: 2,
-      icon: '✂️',
-      type: 'order',
-      title: 'Pending order: Senator Suit',
-      body: 'Due Apr 10 — awaiting completion.',
-      time: 'Apr 10',
-      unread: true,
-    },
-    {
-      id: 3,
-      icon: '🧾',
-      type: 'invoice',
-      title: 'Unpaid: INV-001',
-      body: 'Senator Suit · ₦25,000 — awaiting payment.',
-      time: 'Mar 28',
-      unread: false,
-    },
+  // ── Filtered lists per tab ────────────────────────────────
+  const visibleNotifs = (() => {
+    if (notifTab === 'unread') return notifications.filter(n => n.unread)
+    if (notifTab === 'read')   return notifications.filter(n => !n.unread)
+    return notifications
+  })()
+
+  const TABS = [
+    { id: 'all',    label: 'All',    count: notifications.length },
+    { id: 'unread', label: 'Unread', count: unreadCount          },
+    { id: 'read',   label: 'Read',   count: notifications.length - unreadCount },
   ]
-  const hasUnread = notifications.some(n => n.unread)
 
   return (
     <>
@@ -118,13 +148,12 @@ function Header({ onMenuClick, onBackClick, type = 'default', title, customActio
         {type === 'back' && customActions.length > 0 && (
           <div className={styles.rightActions}>
             {customActions.map((action, i) => (
-              <button 
-                key={i} 
-                className={action.label ? styles.textBtn : styles.iconBtn} 
-                onClick={action.onClick} 
+              <button
+                key={i}
+                className={action.label ? styles.textBtn : styles.iconBtn}
+                onClick={action.onClick}
                 aria-label={action.label}
                 disabled={action.disabled}
-                /* For text buttons, we let CSS handle the color. For icons, we apply the custom color. */
                 style={!action.label ? { color: action.color || 'var(--text2)' } : {}}
               >
                 {action.icon && (
@@ -143,11 +172,17 @@ function Header({ onMenuClick, onBackClick, type = 'default', title, customActio
 
         {type === 'default' && (
           <div className={styles.rightActions}>
-            <button className={styles.iconBtn} onClick={toggleNotif} aria-label="Notifications">
+            {/* Notification bell */}
+            <button className={styles.iconBtn} onClick={openNotif} aria-label="Notifications">
               <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>notifications</span>
-              {hasUnread && <span className={styles.notifDot} />}
+              {unreadCount > 0 && (
+                <span className={styles.notifDot}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
 
+            {/* More menu */}
             <div className={styles.dropdownWrap}>
               <button className={styles.iconBtn} onClick={toggleDropdown} aria-label="More options">
                 <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text2)' }}>more_vert</span>
@@ -177,35 +212,62 @@ function Header({ onMenuClick, onBackClick, type = 'default', title, customActio
         )}
       </header>
 
+      {/* ── NOTIFICATION PANEL ── */}
       {type === 'default' && notifOpen && (
-        <div className={styles.notifOverlay}>
+        <div className={styles.notifOverlay} onClick={e => e.target === e.currentTarget && closeNotif()}>
           <div className={styles.notifPanel}>
+
+            {/* Panel header */}
             <div className={styles.notifHeader}>
               <span className={styles.notifTitle}>Notifications</span>
-              <button className={styles.iconBtn} onClick={closeNotif}>
-                <span className="mi" style={{ fontSize: '1.6rem' }}>close</span>
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                {unreadCount > 0 && (
+                  <button className={styles.markAllBtn} onClick={markAllRead}>
+                    Mark all read
+                  </button>
+                )}
+                <button className={styles.iconBtn} onClick={closeNotif}>
+                  <span className="mi" style={{ fontSize: '1.5rem' }}>close</span>
+                </button>
+              </div>
             </div>
+
+            {/* Tabs */}
+            <div className={styles.notifTabs}>
+              {TABS.map(t => (
+                <button
+                  key={t.id}
+                  className={`${styles.notifTabBtn} ${notifTab === t.id ? styles.notifTabActive : ''}`}
+                  onClick={() => setNotifTab(t.id)}
+                >
+                  {t.label}
+                  {t.count > 0 && (
+                    <span className={`${styles.notifTabBadge} ${t.id === 'unread' && t.count > 0 ? styles.notifTabBadgeAlert : ''}`}>
+                      {t.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Body */}
             <div className={styles.notifBody}>
-              {notifications.length === 0 ? (
+              {visibleNotifs.length === 0 ? (
                 <div className={styles.notifEmpty}>
-                  <span>🔔</span>
-                  <p>You're all caught up!</p>
+                  <span className="mi" style={{ fontSize: '2.5rem', opacity: 0.2 }}>
+                    {notifTab === 'read' ? 'done_all' : 'notifications_none'}
+                  </span>
+                  <p>
+                    {notifTab === 'unread' ? 'All caught up!' : notifTab === 'read' ? 'No read notifications yet.' : 'No notifications.'}
+                  </p>
                 </div>
               ) : (
-                notifications.map(n => (
-                  <div key={n.id} className={`${styles.notifItem} ${n.unread ? styles.unread : ''}`}>
-                    <div className={`${styles.notifIcon} ${styles[n.type]}`}>{n.icon}</div>
-                    <div className={styles.notifContent}>
-                      <h5>{n.title}</h5>
-                      <p>{n.body}</p>
-                      <span className={styles.notifTime}>{n.time}</span>
-                    </div>
-                    {n.unread && <span className={styles.unreadDot} />}
-                  </div>
+                visibleNotifs.map(n => (
+                  <NotifItem key={n.id} n={n} onRead={markRead} />
                 ))
               )}
             </div>
+
           </div>
         </div>
       )}
