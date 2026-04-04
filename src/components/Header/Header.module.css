@@ -1,3 +1,5 @@
+/* src/components/Header/Header.module.css */
+
 /* ── HEADER ── */
 .header {
   position: sticky;
@@ -17,16 +19,26 @@
   align-items: center;
   gap: 8px;
   flex: 1;
-  min-width: 0;
+  min-width: 0; /* Critical for text-overflow to work */
 }
 
 .title {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 800;
   letter-spacing: -0.3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text);
+  /* Smooth fade for the title swap */
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-out;
+  max-width: 100%;
+}
+
+/* Specific handling for the dynamic title swap */
+:global(.header-title) {
+  display: inline-block;
+  max-width: 220px; /* Adjust based on your button widths */
 }
 
 /* RIGHT ACTIONS */
@@ -251,9 +263,6 @@
   justify-content: center;
   font-size: 1.1rem;
 }
-.notifIcon.birthday { background: rgba(251,146,60,0.12); }
-.notifIcon.order    { background: rgba(168,85,247,0.12); }
-.notifIcon.invoice  { background: rgba(34,197,94,0.12); }
 
 .notifContent { flex: 1; min-width: 0; }
 .notifContent h5 { font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
@@ -366,4 +375,4 @@
   white-space: nowrap;
   transition: background 0.15s;
 }
-.markAllBtn:active { background: var(--surface2); }
+.markAllBtn:active { background: var(--surface1); }
