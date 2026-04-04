@@ -1,14 +1,9 @@
 // src/pages/Orders/Orders.jsx
-// ─────────────────────────────────────────────────────────────
-// Displays ALL orders across ALL customers.
-// Pulls customers from CustomerContext, then subscribes to
-// each customer's orders subcollection in real-time.
-// ─────────────────────────────────────────────────────────────
 
 import { useState, useRef } from 'react'
 import Header from '../../components/Header/Header'
 import styles from './Orders.module.css'
-import {useOrders} from '../../contexts/OrdersContext'
+import { useOrders } from '../../contexts/OrdersContext'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -22,9 +17,9 @@ function daysUntil(dateStr) {
   if (!dateStr) return ''
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const due   = new Date(dateStr + 'T00:00:00')
-  const diff  = Math.round((due - today) / (1000 * 60 * 60 * 24))
-  if (diff < 0)  return `${Math.abs(diff)}d overdue`
+  const due  = new Date(dateStr + 'T00:00:00')
+  const diff = Math.round((due - today) / (1000 * 60 * 60 * 24))
+  if (diff < 0)   return `${Math.abs(diff)}d overdue`
   if (diff === 0) return 'Due today'
   if (diff === 1) return 'Due tomorrow'
   return `${diff}d left`
@@ -37,15 +32,20 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+function fmt(price) {
+  if (price === null || price === undefined || price === '') return '—'
+  return `₦${Number(price).toLocaleString('en-NG')}`
+}
+
 // ── Tabs ──────────────────────────────────────────────────────
 
 const TABS = [
-  { id: 'all',       label: 'All',       icon: 'assignment'      },
-  { id: 'pending',   label: 'Pending',   icon: 'schedule'        },
-  { id: 'completed', label: 'Completed', icon: 'check_circle'    },
+  { id: 'all',       label: 'All',       icon: 'assignment'     },
+  { id: 'pending',   label: 'Pending',   icon: 'schedule'       },
+  { id: 'completed', label: 'Completed', icon: 'check_circle'   },
   { id: 'delivered', label: 'Delivered', icon: 'local_shipping'  },
-  { id: 'cancelled', label: 'Cancelled', icon: 'cancel'          },
-  { id: 'overdue',   label: 'Overdue',   icon: 'alarm_on'        },
+  { id: 'cancelled', label: 'Cancelled', icon: 'cancel'         },
+  { id: 'overdue',   label: 'Overdue',   icon: 'alarm_on'       },
 ]
 
 const EMPTY_CONFIG = {
@@ -64,15 +64,136 @@ const STATUS_ICON = {
   cancelled: 'cancel',
 }
 
+const STATUS_COLORS = {
+  pending:   { color: '#818cf8', bg: 'rgba(129,140,248,0.1)',  border: 'rgba(129,140,248,0.3)'  },
+  completed: { color: '#22c55e', bg: 'rgba(34,197,94,0.1)',   border: 'rgba(34,197,94,0.3)'   },
+  delivered: { color: '#a855f7', bg: 'rgba(168,85,247,0.1)',  border: 'rgba(168,85,247,0.3)'  },
+  cancelled: { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', border: 'rgba(148,163,184,0.3)' },
+}
+
+const PRIORITY_COLORS = {
+  normal: { color: 'var(--text2)',  bg: 'var(--surface2)', border: 'var(--border2)' },
+  urgent: { color: '#fb923c',       bg: 'rgba(251,146,60,0.1)',  border: 'rgba(251,146,60,0.3)'  },
+  vip:    { color: '#a855f7',       bg: 'rgba(168,85,247,0.1)',  border: 'rgba(168,85,247,0.3)'  },
+}
+
+// ── Order Detail Panel (bottom sheet) ─────────────────────────
+
+function OrderDetailPanel({ order, onClose }) {
+  if (!order) return null
+  const overdue  = isOverdue(order)
+  const due      = daysUntil(order.dueDate)
+  const sc       = STATUS_COLORS[order.status] ?? STATUS_COLORS.pending
+  const pc       = PRIORITY_COLORS[order.priority] ?? PRIORITY_COLORS.normal
+  const total    = order.price && order.qty ? order.price * order.qty : order.price
+
+  return (
+    <div className={styles.detailOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className={styles.detailPanel}>
+        <div className={styles.detailHandle} />
+
+        {/* Header */}
+        <div className={styles.detailHeader}>
+          <div className={styles.detailHeaderTitle}>Order Details</div>
+          <button onClick={onClose} className={styles.detailCloseBtn}>
+            <span className="mi" style={{ fontSize: '1.4rem' }}>close</span>
+          </button>
+        </div>
+
+        <div className={styles.detailBody}>
+          {/* Title + customer */}
+          <div className={styles.detailTitle}>{order.desc || order.name || 'Order'}</div>
+
+          {order.customerName && (
+            <div className={styles.detailCustomer}>
+              <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>person</span>
+              {order.customerName}
+            </div>
+          )}
+
+          {/* Status + priority pills */}
+          <div className={styles.detailPillRow}>
+            <span
+              className={styles.detailPill}
+              style={{ color: overdue ? '#ef4444' : sc.color, background: overdue ? 'rgba(239,68,68,0.1)' : sc.bg, borderColor: overdue ? 'rgba(239,68,68,0.3)' : sc.border }}
+            >
+              {overdue ? 'Overdue' : (order.status || 'Pending')}
+            </span>
+            {order.priority && order.priority !== 'normal' && (
+              <span
+                className={styles.detailPill}
+                style={{ color: pc.color, background: pc.bg, borderColor: pc.border }}
+              >
+                {order.priority.charAt(0).toUpperCase() + order.priority.slice(1)}
+              </span>
+            )}
+          </div>
+
+          {/* Info grid */}
+          <div className={styles.detailGrid}>
+            <div className={styles.detailCell}>
+              <div className={styles.detailCellLabel}>Price</div>
+              <div className={styles.detailCellVal}>{fmt(order.price)}</div>
+            </div>
+            <div className={styles.detailCell}>
+              <div className={styles.detailCellLabel}>Qty</div>
+              <div className={styles.detailCellVal}>{order.qty ?? 1}</div>
+            </div>
+            {total && order.qty > 1 && (
+              <div className={styles.detailCell}>
+                <div className={styles.detailCellLabel}>Total</div>
+                <div className={styles.detailCellVal}>{fmt(total)}</div>
+              </div>
+            )}
+            <div className={styles.detailCell}>
+              <div className={styles.detailCellLabel}>Placed On</div>
+              <div className={styles.detailCellVal} style={{ fontSize: '0.8rem' }}>{order.date || '—'}</div>
+            </div>
+            {order.dueDate && (
+              <div className={styles.detailCell} style={{ gridColumn: '1 / -1' }}>
+                <div className={styles.detailCellLabel}>Due Date</div>
+                <div
+                  className={styles.detailCellVal}
+                  style={{ fontSize: '0.85rem', color: overdue ? '#ef4444' : undefined }}
+                >
+                  {formatDate(order.dueDate)}{due ? ` · ${due}` : ''}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Notes */}
+          {order.notes && (
+            <div className={styles.detailNotes}>
+              <div className={styles.detailNotesLabel}>Notes</div>
+              <p>{order.notes}</p>
+            </div>
+          )}
+
+          {/* Linked cloth types */}
+          {order.linkedNames?.length > 0 && (
+            <div className={styles.detailLinked}>
+              <div className={styles.detailNotesLabel}>Cloth Types</div>
+              <div className={styles.detailLinkedNames}>{order.linkedNames.join(', ')}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Order List Item ───────────────────────────────────────────
 
-function OrderCard({ order, isLast }) {
+function OrderCard({ order, isLast, onTap }) {
   const overdue = isOverdue(order)
   const due     = daysUntil(order.dueDate)
 
   return (
-    <div className={`${styles.orderListItem} ${isLast ? styles.orderListItemLast : ''} ${overdue ? styles.orderListItemOverdue : ''}`}>
-      {/* Left: grey outer box with white inner box */}
+    <div
+      className={`${styles.orderListItem} ${isLast ? styles.orderListItemLast : ''} ${overdue ? styles.orderListItemOverdue : ''}`}
+      onClick={onTap}
+    >
       <div className={styles.orderListOuter}>
         <div className={styles.orderListInner}>
           <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : 'var(--text3)' }}>
@@ -81,7 +202,6 @@ function OrderCard({ order, isLast }) {
         </div>
       </div>
 
-      {/* Info */}
       <div className={styles.orderListInfo}>
         <div className={styles.orderListDesc}>{order.desc || order.name || 'Order'}</div>
         <div className={styles.orderListMeta}>
@@ -109,16 +229,15 @@ function OrderCard({ order, isLast }) {
 export default function Orders({ onMenuClick }) {
   const { allOrders } = useOrders()
 
-  const [activeTab, setActiveTab] = useState('all')
+  const [activeTab,   setActiveTab]   = useState('all')
+  const [detailOrder, setDetailOrder] = useState(null)
   const tabsRef = useRef(null)
 
-  // ── Tab scroll helper ────────────────────────────────────
   const handleTabClick = (e, tabId) => {
     setActiveTab(tabId)
     e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
   }
 
-  // ── Filter ───────────────────────────────────────────────
   const filtered = allOrders.filter(o => {
     if (activeTab === 'all')       return true
     if (activeTab === 'pending')   return !['completed','delivered','cancelled'].includes(o.status) && !isOverdue(o)
@@ -129,7 +248,6 @@ export default function Orders({ onMenuClick }) {
     return true
   })
 
-  // ── Counts ───────────────────────────────────────────────
   const counts = {
     all:       allOrders.length,
     pending:   allOrders.filter(o => !['completed','delivered','cancelled'].includes(o.status) && !isOverdue(o)).length,
@@ -139,7 +257,6 @@ export default function Orders({ onMenuClick }) {
     overdue:   allOrders.filter(o => isOverdue(o)).length,
   }
 
-  // ── Group by date ─────────────────────────────────────────
   const grouped = [...filtered]
     .sort((a, b) => {
       const da = a.dueDate || a.date || ''
@@ -195,12 +312,21 @@ export default function Orders({ onMenuClick }) {
                   key={`${order.customerId}-${order.id}`}
                   order={order}
                   isLast={idx === dateOrders.length - 1}
+                  onTap={() => setDetailOrder(order)}
                 />
               ))}
             </div>
           ))
         )}
       </div>
+
+      {/* Detail bottom sheet */}
+      {detailOrder && (
+        <OrderDetailPanel
+          order={detailOrder}
+          onClose={() => setDetailOrder(null)}
+        />
+      )}
     </div>
   )
 }
