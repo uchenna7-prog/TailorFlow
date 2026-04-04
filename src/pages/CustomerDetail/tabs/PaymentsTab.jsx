@@ -1,10 +1,4 @@
-// ─────────────────────────────────────────────────────────────
-// Payments tab for a single customer.
-// • Add payment → select order, set status, enter amount
-// • Part-payments accumulate with date stamps until total = full
-// • Status auto-upgrades to 'paid' when total >= order price
-// • Generate Invoice button lives here (not in OrdersTab)
-// ─────────────────────────────────────────────────────────────
+// src/pages/CustomerDetail/tabs/PaymentsTab.jsx
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../../contexts/AuthContext'
@@ -68,7 +62,6 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
       })
     }
 
-    // Auto-upgrade to paid if amount covers full price
     let finalStatus = status
     const total = initialInstallments.reduce((s, i) => s + i.amount, 0)
     const fullPrice = parseFloat(selectedOrder.price) || 0
@@ -79,6 +72,7 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
       orderId:      selectedOrder.id,
       orderDesc:    selectedOrder.desc,
       orderPrice:   selectedOrder.price ?? null,
+      orderItems:   selectedOrder.items  ?? [],
       status:       finalStatus,
       notes:        notes.trim(),
       installments: initialInstallments,
@@ -102,8 +96,6 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
       />
 
       <div className={styles.modalBody}>
-
-        {/* Select Order */}
         <div className={styles.fieldGroup}>
           <label className={styles.fieldLabel}>Related Order *</label>
           {selectedOrder ? (
@@ -141,7 +133,6 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
           )}
         </div>
 
-        {/* Payment Status */}
         <div className={styles.fieldGroup}>
           <label className={styles.fieldLabel}>Payment Status</label>
           <div className={styles.statusRow}>
@@ -158,7 +149,6 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
           </div>
         </div>
 
-        {/* Amount paid (only for part or paid) */}
         {(status === 'part' || status === 'paid') && (
           <div className={styles.fieldGroup}>
             <label className={styles.fieldLabel}>
@@ -175,7 +165,6 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
           </div>
         )}
 
-        {/* Payment method — shown when amount is entered */}
         {(status === 'part' || status === 'paid') && (
           <div className={styles.fieldGroup}>
             <label className={styles.fieldLabel}>Payment Method</label>
@@ -193,7 +182,6 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
           </div>
         )}
 
-        {/* Notes */}
         <div className={styles.fieldGroup}>
           <label className={styles.fieldLabel}>Notes <span className={styles.optional}>(optional)</span></label>
           <textarea
@@ -204,7 +192,6 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
             onChange={e => setNotes(e.target.value)}
           />
         </div>
-
       </div>
     </div>
   )
@@ -278,7 +265,7 @@ function AddInstallmentModal({ payment, onClose, onSave }) {
 
 // ── PAYMENT DETAIL MODAL ──────────────────────────────────────
 
-function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstallment, onGenerateInvoice }) {
+function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstallment, onGenerateReceipt }) {
   const [showInstallmentModal, setShowInstallmentModal] = useState(false)
   const sm = statusMeta(payment.status)
 
@@ -300,7 +287,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
 
       <div className={styles.modalBody}>
 
-        {/* Order info */}
         <div className={styles.detailCard}>
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>Order</span>
@@ -322,7 +308,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           )}
         </div>
 
-        {/* Status selector — only editable field */}
         <div className={styles.fieldGroup} style={{ marginTop: 18 }}>
           <label className={styles.fieldLabel}>Payment Status</label>
           <div className={styles.statusRow}>
@@ -339,7 +324,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           </div>
         </div>
 
-        {/* Payment summary */}
         {fullPrice > 0 && (
           <div className={styles.summaryCard}>
             <div className={styles.summaryRow}>
@@ -356,7 +340,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
                 <span style={{ color: '#ef4444', fontWeight: 700 }}>{fmt(remaining)}</span>
               </div>
             )}
-            {/* Progress bar */}
             {fullPrice > 0 && (
               <div className={styles.progressWrap}>
                 <div
@@ -368,7 +351,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           </div>
         )}
 
-        {/* Installment history */}
         {(payment.installments || []).length > 0 && (
           <div className={styles.fieldGroup}>
             <label className={styles.fieldLabel}>Payment History</label>
@@ -398,7 +380,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           </div>
         )}
 
-        {/* Add installment button — only if not fully paid */}
         {!isPaid && (
           <button className={styles.addInstallmentBtn} onClick={() => setShowInstallmentModal(true)}>
             <span className="mi" style={{ fontSize: '1.1rem' }}>add_circle_outline</span>
@@ -406,15 +387,14 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           </button>
         )}
 
-        {/* Generate Invoice */}
-        <button className={styles.generateInvoiceBtn} onClick={() => onGenerateInvoice(payment)}>
-          <span className="material-icons" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: 4 }}>receipt_long</span>
-          Generate Invoice
+        {/* ── Generate Receipt (replaces Generate Invoice) ── */}
+        <button className={styles.generateInvoiceBtn} onClick={() => onGenerateReceipt(payment)}>
+          <span className="mi" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: 4 }}>receipt</span>
+          Generate Receipt
         </button>
 
       </div>
 
-      {/* Installment modal */}
       {showInstallmentModal && (
         <AddInstallmentModal
           payment={payment}
@@ -428,22 +408,20 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
 
 // ── MAIN TAB ──────────────────────────────────────────────────
 
-export default function PaymentsTab({ customerId, orders, showToast, onGenerateInvoice }) {
+export default function PaymentsTab({ customerId, orders, showToast, onGenerateReceipt }) {
   const { user } = useAuth()
 
-  const [payments,    setPayments]    = useState([])
-  const [modalOpen,   setModalOpen]   = useState(false)
-  const [detailPay,   setDetailPay]   = useState(null)
-  const [confirmDel,  setConfirmDel]  = useState(null)
+  const [payments,   setPayments]   = useState([])
+  const [modalOpen,  setModalOpen]  = useState(false)
+  const [detailPay,  setDetailPay]  = useState(null)
+  const [confirmDel, setConfirmDel] = useState(null)
 
-  // ── Subscribe ─────────────────────────────────────────────
   useEffect(() => {
     if (!user || !customerId) return
     const unsub = subscribeToPayments(
       user.uid, customerId,
       (data) => {
         setPayments(data)
-        // Keep detail in sync if open
         setDetailPay(prev => {
           if (!prev) return null
           return data.find(p => p.id === prev.id) ?? null
@@ -454,18 +432,16 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
     return unsub
   }, [user, customerId])
 
-  // ── Save new payment ──────────────────────────────────────
   const handleSave = async (paymentData) => {
     if (!user) return
     try {
       await createPayment(user.uid, customerId, paymentData)
       showToast('Payment recorded ✓')
-    } catch (e) {
+    } catch {
       showToast('Failed to save payment.')
     }
   }
 
-  // ── Status change ─────────────────────────────────────────
   const handleStatusChange = async (paymentId, newStatus) => {
     if (!user) return
     try {
@@ -475,7 +451,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
     }
   }
 
-  // ── Add installment ───────────────────────────────────────
   const handleAddInstallment = async (paymentId, amount, method) => {
     if (!user) return
     const payment = payments.find(p => p.id === paymentId)
@@ -499,7 +474,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
     }
   }
 
-  // ── Delete ────────────────────────────────────────────────
   const handleDeleteConfirm = async () => {
     if (!confirmDel || !user) return
     try {
@@ -512,7 +486,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
     setDetailPay(null)
   }
 
-  // ── Group by date ─────────────────────────────────────────
   const grouped = payments.reduce((acc, p) => {
     const key = p.date || 'Unknown Date'
     if (!acc[key]) acc[key] = []
@@ -536,11 +509,11 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
           <div className={styles.payGroupDivider} />
 
           {datePayments.map((p, idx) => {
-            const sm         = statusMeta(p.status)
-            const isLast     = idx === datePayments.length - 1
-            const totalPaid  = (p.installments || []).reduce((s, i) => s + i.amount, 0)
-            const fullPrice  = parseFloat(p.orderPrice) || 0
-            const pct        = fullPrice > 0 ? Math.min(100, (totalPaid / fullPrice) * 100) : 0
+            const sm        = statusMeta(p.status)
+            const isLast    = idx === datePayments.length - 1
+            const totalPaid = (p.installments || []).reduce((s, i) => s + i.amount, 0)
+            const fullPrice = parseFloat(p.orderPrice) || 0
+            const pct       = fullPrice > 0 ? Math.min(100, (totalPaid / fullPrice) * 100) : 0
 
             return (
               <div
@@ -548,14 +521,11 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
                 className={`${styles.payListItem} ${isLast ? styles.payListItemLast : ''}`}
                 onClick={() => setDetailPay(p)}
               >
-                {/* Icon box */}
                 <div className={styles.payListOuter}>
                   <div className={styles.payListInner}>
                     <span className="mi" style={{ fontSize: '1.5rem', color: sm.color }}>payments</span>
                   </div>
                 </div>
-
-                {/* Info */}
                 <div className={styles.payListInfo}>
                   <div className={styles.payListDesc}>{p.orderDesc || 'Payment'}</div>
                   <div className={styles.payListMeta}>
@@ -565,12 +535,9 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
                   {fullPrice > 0 && (
                     <div className={styles.payListMeta}>
                       <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', verticalAlign: 'middle' }}>account_balance_wallet</span>
-                      <span className={styles.payListMetaText}>
-                        {fmt(totalPaid)} of {fmt(fullPrice)}
-                      </span>
+                      <span className={styles.payListMetaText}>{fmt(totalPaid)} of {fmt(fullPrice)}</span>
                     </div>
                   )}
-                  {/* Mini progress bar */}
                   {fullPrice > 0 && (
                     <div className={styles.miniProgressWrap}>
                       <div className={styles.miniProgressBar} style={{ width: `${pct}%`, background: sm.color }} />
@@ -583,7 +550,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
         </div>
       ))}
 
-      {/* Add Payment Modal */}
       <AddPaymentModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -591,7 +557,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
         onSave={handleSave}
       />
 
-      {/* Payment Detail */}
       {detailPay && (
         <PaymentDetail
           payment={detailPay}
@@ -599,14 +564,13 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
           onDelete={() => setConfirmDel(detailPay)}
           onStatusChange={handleStatusChange}
           onAddInstallment={handleAddInstallment}
-          onGenerateInvoice={(payment) => {
+          onGenerateReceipt={(payment) => {
             setDetailPay(null)
-            onGenerateInvoice(payment.orderId)
+            onGenerateReceipt(payment)
           }}
         />
       )}
 
-      {/* Confirm delete */}
       <ConfirmSheet
         open={!!confirmDel}
         title="Delete Payment?"
@@ -615,20 +579,17 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateI
         onCancel={() => setConfirmDel(null)}
       />
 
-      {/* FAB trigger — parent CustomerDetail passes openPaymentModal event */}
       <div style={{ display: 'none' }} id="__payment_modal_trigger__"
-  ref={() => {
-    const handler = () => setModalOpen(true)
-    document.addEventListener('openPaymentModal', handler)
-    return () => document.removeEventListener('openPaymentModal', handler)
-  }}
-/>
-
+        ref={() => {
+          const handler = () => setModalOpen(true)
+          document.addEventListener('openPaymentModal', handler)
+          return () => document.removeEventListener('openPaymentModal', handler)
+        }}
+      />
     </>
   )
 }
 
-// Export a helper so CustomerDetail can open the modal via the + button
 PaymentsTab.openModal = () => {
   document.getElementById('__payment_modal_trigger__')?.dispatchEvent(new Event('open'))
 }
