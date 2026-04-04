@@ -1,32 +1,33 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider }         from './contexts/AuthContext'
-import { SettingsProvider }     from './contexts/SettingsContext'
-import { BrandProvider }        from './contexts/BrandContext'
-import { CustomerProvider }     from './contexts/CustomerContext'
-import { OrdersProvider }       from './contexts/OrdersContext'
-import { TaskProvider }         from './contexts/TaskContext'
-import { InvoiceProvider }      from './contexts/InvoiceContext'
-import { PaymentProvider }      from './contexts/PaymentContext'
-import { AppointmentProvider }  from './contexts/AppointmentContext'
-import { PremiumProvider }      from './contexts/PremiumContext'
+import { AuthProvider }            from './contexts/AuthContext'
+import { SettingsProvider }        from './contexts/SettingsContext'
+import { BrandProvider }           from './contexts/BrandContext'
+import { CustomerProvider }        from './contexts/CustomerContext'
+import { OrdersProvider }          from './contexts/OrdersContext'
+import { TaskProvider }            from './contexts/TaskContext'
+import { InvoiceProvider }         from './contexts/InvoiceContext'
+import { PaymentProvider }         from './contexts/PaymentContext'
+import { AppointmentProvider }     from './contexts/AppointmentContext'
+import { NotificationProvider }    from './contexts/NotificationContext'
+import { PremiumProvider }         from './contexts/PremiumContext'
 import App from './App'
 import './index.css'
 
-// Provider order matters — each provider can only use contexts
-// from providers that wrap it:
+// Provider order — each provider can only use contexts from providers that wrap it:
 //
-//  AuthProvider         → Firebase session (no dependencies)
-//  SettingsProvider     → localStorage (no dependencies)
-//  BrandProvider        → reads SettingsContext
-//  PremiumProvider      → reads AuthContext (user.uid) → Firestore
-//  CustomerProvider     → reads AuthContext (user.uid)
-//  OrdersProvider       → reads AuthContext + CustomerContext
-//  TaskProvider         → reads AuthContext (user.uid)
-//  InvoiceProvider      → reads AuthContext + SettingsContext + CustomerContext
-//  PaymentProvider      → reads AuthContext + CustomerContext
-//  AppointmentProvider  → reads AuthContext (user.uid)
+//  AuthProvider          → Firebase session (no dependencies)
+//  SettingsProvider      → localStorage (no dependencies)
+//  BrandProvider         → reads SettingsContext
+//  PremiumProvider       → reads AuthContext
+//  CustomerProvider      → reads AuthContext
+//  OrdersProvider        → reads AuthContext + CustomerContext
+//  TaskProvider          → reads AuthContext
+//  InvoiceProvider       → reads AuthContext + SettingsContext + CustomerContext
+//  PaymentProvider       → reads AuthContext + CustomerContext
+//  AppointmentProvider   → reads AuthContext
+//  NotificationProvider  → reads Orders, Invoices, Tasks, Appointments, Customers
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -41,7 +42,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     <InvoiceProvider>
                       <PaymentProvider>
                         <AppointmentProvider>
-                          <App />
+                          <NotificationProvider>
+                            <App />
+                          </NotificationProvider>
                         </AppointmentProvider>
                       </PaymentProvider>
                     </InvoiceProvider>
