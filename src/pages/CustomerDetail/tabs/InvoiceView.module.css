@@ -42,7 +42,7 @@
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-  overflow: visible; /* Changed to visible for better PDF capture */
+  overflow: visible; 
   margin-bottom: 14px;
 }
 
@@ -224,6 +224,7 @@
   line-height: 1.5; 
 }
 
+/* ── SHARED BOTTOM ACTION BAR ── */
 .bottomBar {
   display: flex; 
   align-items: center; 
@@ -235,6 +236,21 @@
   flex-shrink: 0;
 }
 
+.statusBtn {
+  flex: 1; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px;
+  padding: 14px; 
+  border-radius: 12px; 
+  font-size: 0.9rem; 
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+}
+
+.statusBtnPaid { background: var(--accent); color: var(--bg); }
 .statusBtnUnpaid { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
 
 .deleteBtn {
@@ -247,4 +263,5 @@
   border: 1px solid color-mix(in srgb, var(--danger) 25%, transparent);
   border-radius: 12px; 
   color: var(--danger);
+  cursor: pointer;
 }
