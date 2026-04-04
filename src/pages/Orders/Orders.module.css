@@ -96,12 +96,12 @@
 
 .emptyState p { font-size: 0.85rem; color: var(--text3); }
 
-/* ── ORDER GROUP (date-grouped list, same pattern as customers/measurements) ── */
+/* ── ORDER GROUP ── */
 .orderGroup { margin-bottom: 16px; }
 .orderGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 0 8px; }
 .orderGroupDivider { height: 1px; background: var(--border); width: calc(100% + 32px); margin-left: -16px; }
 
-/* Each row */
+/* ── EACH ROW ── */
 .orderListItem {
   display: flex;
   align-items: center;
@@ -125,11 +125,8 @@
 
 .orderListItemLast::after { display: none; }
 .orderListItem:active { background: var(--surface); }
-
-/* Overdue tint */
 .orderListItemOverdue .orderListOuter { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.05); }
 
-/* Outer grey box */
 .orderListOuter {
   width: 80px;
   height: 80px;
@@ -142,7 +139,6 @@
   flex-shrink: 0;
 }
 
-/* Inner white box */
 .orderListInner {
   width: 58px;
   height: 58px;
@@ -154,10 +150,183 @@
   overflow: hidden;
 }
 
-/* Text */
 .orderListInfo { flex: 1; min-width: 0; }
 .orderListDesc { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .orderListMeta { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
 .orderListMetaText { font-size: 0.78rem; font-weight: 400; color: var(--text2); }
 .orderListDue { font-size: 0.78rem; font-weight: 500; color: var(--text2); margin-top: 1px; }
 .orderListDueOverdue { color: #ef4444; font-weight: 600; }
+
+/* ── DETAIL BOTTOM SHEET ── */
+.detailOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 3000;
+  display: flex;
+  align-items: flex-end;
+  backdrop-filter: blur(4px);
+}
+
+.detailPanel {
+  width: 100%;
+  max-height: 88dvh;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  animation: sheetUp 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.detailHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border2);
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.detailHeaderTitle {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text2);
+}
+
+.detailCloseBtn {
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.detailBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px calc(24px + var(--sb));
+  -webkit-overflow-scrolling: touch;
+}
+
+.detailTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.detailCustomer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 14px;
+}
+
+.detailPillRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.detailPill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.detailCell {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.detailCellLabel {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.detailCellVal {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.detailNotes {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.detailLinked {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.detailNotesLabel {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.detailNotes p {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.detailLinkedNames {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.5;
+}
