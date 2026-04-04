@@ -392,5 +392,5 @@
 }
 
 .markAllBtn:active {
-  background: var(--surface2);
+  background: var(--surface);
 }
