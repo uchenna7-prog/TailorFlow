@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { usePremium }   from '../../contexts/PremiumContext'
@@ -103,6 +103,148 @@ function PremiumSheet({ onClose }) {
   )
 }
 
+// ── Country Code Picker ───────────────────────────────────────
+const DEFAULT_COUNTRY = { name: 'DR Congo', dial_code: '+243', flag: '🇨🇩' }
+
+function CountryCodePicker({ selected, onSelect }) {
+  const [open, setOpen]       = useState(false)
+  const [search, setSearch]   = useState('')
+  const [countries, setCountries] = useState([])
+  const [loading, setLoading] = useState(false)
+  const dropdownRef = useRef(null)
+
+  // Fetch countries once when dropdown opens for the first time
+  useEffect(() => {
+    if (!open || countries.length > 0) return
+    setLoading(true)
+    fetch('https://restcountries.com/v3.1/all?fields=name,idd,flag,cca2')
+      .then(r => r.json())
+      .then(data => {
+        const list = []
+        data.forEach(c => {
+          const root   = c.idd?.root || ''
+          const suffix = c.idd?.suffixes
+          if (!root) return
+          // Some countries have multiple suffixes (e.g. +1 for US/CA)
+          const suffixes = Array.isArray(suffix) && suffix.length === 1 ? suffix : (suffix || [''])
+          suffixes.forEach(s => {
+            const dial_code = root + s
+            list.push({
+              name:      c.name?.common || '',
+              dial_code,
+              flag:      c.flag || '',
+              cca2:      c.cca2 || '',
+            })
+          })
+        })
+        // Sort alphabetically
+        list.sort((a, b) => a.name.localeCompare(b.name))
+        setCountries(list)
+      })
+      .catch(() => {
+        // On failure, just leave countries empty — fallback handled below
+      })
+      .finally(() => setLoading(false))
+  }, [open, countries.length])
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false)
+        setSearch('')
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const filtered = search.trim()
+    ? countries.filter(c =>
+        c.name.toLowerCase().includes(search.toLowerCase()) ||
+        c.dial_code.includes(search)
+      )
+    : countries
+
+  const handleSelect = (country) => {
+    onSelect(country)
+    setOpen(false)
+    setSearch('')
+  }
+
+  return (
+    <div className={styles.ccPickerWrap} ref={dropdownRef}>
+      <button
+        type="button"
+        className={styles.ccBtn}
+        onClick={() => setOpen(v => !v)}
+      >
+        <span className={styles.ccFlag}>{selected.flag}</span>
+        <span className={styles.ccCode}>{selected.dial_code}</span>
+        <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>expand_more</span>
+      </button>
+
+      {open && (
+        <div className={styles.ccDropdown}>
+          <div className={styles.ccSearchWrap}>
+            <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>search</span>
+            <input
+              autoFocus
+              type="text"
+              placeholder="Search country or code…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className={styles.ccSearchInput}
+            />
+          </div>
+          <div className={styles.ccList}>
+            {loading && (
+              <div className={styles.ccListEmpty}>Loading countries…</div>
+            )}
+            {!loading && filtered.length === 0 && (
+              <div className={styles.ccListEmpty}>No results</div>
+            )}
+            {!loading && filtered.map((c, i) => (
+              <button
+                key={`${c.cca2}-${c.dial_code}-${i}`}
+                type="button"
+                className={`${styles.ccOption} ${selected.dial_code === c.dial_code && selected.name === c.name ? styles.ccOptionActive : ''}`}
+                onClick={() => handleSelect(c)}
+              >
+                <span className={styles.ccFlag}>{c.flag}</span>
+                <span className={styles.ccOptionName}>{c.name}</span>
+                <span className={styles.ccOptionCode}>{c.dial_code}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Phone number formatting/validation helper ─────────────────
+/**
+ * Given the raw local number the user typed and the country object,
+ * returns the final phone string to store, or null if invalid.
+ *
+ * Rules:
+ * - If the user typed 11 digits AND the first digit is '0'  → strip the leading 0, store as dialCode + remaining 10 digits
+ * - If the user typed 10 digits → store as dialCode + 10 digits
+ * - Anything else → invalid
+ */
+function buildPhoneNumber(localNumber, countryDialCode) {
+  const digits = localNumber.replace(/\D/g, '')
+  if (digits.length === 11 && digits.startsWith('0')) {
+    return `${countryDialCode} ${digits.slice(1)}`
+  }
+  if (digits.length === 10) {
+    return `${countryDialCode} ${digits}`
+  }
+  return null // invalid
+}
+
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1)
 
@@ -159,7 +301,8 @@ const FEMALE_MEASUREMENTS = [
 function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
   const [formTab, setFormTab]         = useState('personal')
   const [name, setName]               = useState('')
-  const [phone, setPhone]             = useState('')
+  const [localPhone, setLocalPhone]   = useState('')
+  const [selectedCountry, setSelectedCountry] = useState(DEFAULT_COUNTRY)
   const [phoneType, setPhoneType]     = useState('Mobile')
   const [sex, setSex]                 = useState('')
   const [bdayDay, setBdayDay]         = useState('')
@@ -207,7 +350,8 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
   }
 
   const handleClose = () => {
-    setName(''); setPhone(''); setPhoneType('Mobile'); setSex('')
+    setName(''); setLocalPhone(''); setSelectedCountry(DEFAULT_COUNTRY)
+    setPhoneType('Mobile'); setSex('')
     setBdayDay(''); setBdayMonth(''); setEmail(''); setAddress('')
     setNotes(''); setPhoto(null); setBodyMeasurements({}); setCustomFields([]); setFormTab('personal')
     if (fileInputRef.current) fileInputRef.current.value = ''
@@ -218,9 +362,31 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
     const allBody = { ...bodyMeasurements }
     customFields.forEach(f => { if (f.label.trim()) allBody[f.label.trim()] = f.value })
     const birthday = bdayMonth && bdayDay ? `${bdayMonth}-${bdayDay}` : ''
+
+    // Build the phone number using our formatting rules
+    const builtPhone = buildPhoneNumber(localPhone, selectedCountry.dial_code)
+    // If localPhone is non-empty but builtPhone is null → invalid
+    if (localPhone.trim() && builtPhone === null) {
+      // Pass it back to parent which will show the toast
+      onSave({ name, phone: '__INVALID_PHONE__', phoneType, sex, birthday, email, address, notes, photo, bodyMeasurements: allBody })
+      return
+    }
+
+    const phone = builtPhone || ''
     onSave({ name, phone, phoneType, sex, birthday, email, address, notes, photo, bodyMeasurements: allBody })
     handleClose()
   }
+
+  // Live phone digit count for hint
+  const phoneDigits = localPhone.replace(/\D/g, '')
+  const phoneHint = (() => {
+    if (!phoneDigits) return null
+    if (phoneDigits.length === 11 && phoneDigits.startsWith('0')) return { ok: true, msg: 'Leading 0 will be removed when saving' }
+    if (phoneDigits.length === 10) return { ok: true, msg: 'Valid' }
+    if (phoneDigits.length > 11) return { ok: false, msg: 'Too many digits' }
+    if (phoneDigits.length === 11 && !phoneDigits.startsWith('0')) return { ok: false, msg: '11-digit numbers must start with 0' }
+    return { ok: false, msg: `${10 - phoneDigits.length} more digit${10 - phoneDigits.length !== 1 ? 's' : ''} needed` }
+  })()
 
   return (
     <>
@@ -286,17 +452,35 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
                 </div>
               </div>
 
-              <div className={styles.inputRow}>
-                <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Phone Number *</label>
-                  <input type="tel" className={styles.formInput} placeholder="080xxxxxxxx" inputMode="tel" value={phone} onChange={e => setPhone(e.target.value)} />
+              {/* ── Phone Number with Country Code ── */}
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Phone Number *</label>
+                <div className={styles.phoneRow}>
+                  <CountryCodePicker
+                    selected={selectedCountry}
+                    onSelect={setSelectedCountry}
+                  />
+                  <input
+                    type="tel"
+                    className={`${styles.formInput} ${styles.phoneInput}`}
+                    placeholder="e.g. 09078117654"
+                    inputMode="tel"
+                    value={localPhone}
+                    onChange={e => setLocalPhone(e.target.value)}
+                  />
                 </div>
-                <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>Phone Type</label>
-                  <select className={styles.formInput} value={phoneType} onChange={e => setPhoneType(e.target.value)}>
-                    <option>Mobile</option><option>Home</option><option>Work</option>
-                  </select>
-                </div>
+                {phoneHint && (
+                  <div className={styles.phoneHint} style={{ color: phoneHint.ok ? 'var(--accent)' : 'var(--danger)' }}>
+                    {phoneHint.msg}
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Phone Type</label>
+                <select className={styles.formInput} value={phoneType} onChange={e => setPhoneType(e.target.value)}>
+                  <option>Mobile</option><option>Home</option><option>Work</option>
+                </select>
               </div>
 
               <div className={styles.inputGroup}>
@@ -460,6 +644,7 @@ export default function Customers({ onMenuClick }) {
   const handleSave = async ({ name, phone, phoneType, sex, birthday, email, address, notes, photo, bodyMeasurements }) => {
     if (!name)  { showToast('Name is required'); return }
     if (!phone) { showToast('Phone number is required'); return }
+    if (phone === '__INVALID_PHONE__') { showToast('Phone number must be 10 digits (or 11 starting with 0)'); return }
     const today = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
     try {
       await addCustomer({ name, phone, phoneType, sex, birthday, email, address, notes, photo, bodyMeasurements, date: today })
