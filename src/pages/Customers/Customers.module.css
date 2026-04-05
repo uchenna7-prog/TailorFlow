@@ -522,3 +522,147 @@
 .measureImgRight .inputLabel {
   margin-bottom: 0;
 }
+
+/* ── PHONE ROW (country code + number input side by side) ── */
+.phoneRow {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.phoneInput {
+  flex: 1;
+}
+
+/* ── COUNTRY CODE PICKER BUTTON ── */
+.ccPickerWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ccBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 12px;
+  height: 100%;
+  min-height: 50px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  white-space: nowrap;
+}
+
+.ccBtn:active { border-color: var(--text2); }
+
+.ccFlag {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.ccCode {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── COUNTRY CODE DROPDOWN ── */
+.ccDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 2000;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: dropIn 0.18s ease;
+}
+
+.ccSearchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ccSearchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+}
+
+.ccSearchInput::placeholder { color: var(--text3); }
+
+.ccList {
+  max-height: 260px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px;
+}
+
+.ccListEmpty {
+  text-align: center;
+  padding: 20px;
+  font-size: 0.82rem;
+  color: var(--text3);
+}
+
+.ccOption {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.ccOption:active { background: var(--surface2); }
+.ccOptionActive { background: var(--surface2); }
+
+.ccOptionName {
+  flex: 1;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ccOptionCode {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text2);
+  flex-shrink: 0;
+}
+
+/* ── PHONE HINT ── */
+.phoneHint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-top: 5px;
+  padding-left: 4px;
+  transition: color 0.2s;
+}
+
