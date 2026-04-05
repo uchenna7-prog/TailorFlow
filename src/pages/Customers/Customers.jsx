@@ -155,26 +155,6 @@ const FEMALE_MEASUREMENTS = [
   'Trouser Waist', 'Inseam', 'Blouse Length', 'Under Bust', 'Armhole'
 ]
 
-function BodySVG({ sex }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-      <svg width="80" height="160" viewBox="0 0 80 160" fill="none">
-        <ellipse cx="40" cy="18" rx="13" ry="15" fill="var(--surface2)" stroke="var(--border2)" strokeWidth="1.5"/>
-        <rect x="35" y="31" width="10" height="10" rx="3" fill="var(--surface2)" stroke="var(--border2)" strokeWidth="1.5"/>
-        {sex === 'Female'
-          ? <path d="M20 41 Q16 70 18 100 L62 100 Q64 70 60 41 Q50 46 40 46 Q30 46 20 41Z" fill="var(--surface2)" stroke="var(--border2)" strokeWidth="1.5"/>
-          : <path d="M18 41 Q15 68 17 100 L63 100 Q65 68 62 41 L18 41Z" fill="var(--surface2)" stroke="var(--border2)" strokeWidth="1.5"/>
-        }
-        <path d="M18 43 Q8 65 10 90" stroke="var(--border2)" strokeWidth="6" strokeLinecap="round"/>
-        <path d="M62 43 Q72 65 70 90" stroke="var(--border2)" strokeWidth="6" strokeLinecap="round"/>
-        <path d="M28 100 Q26 130 27 155" stroke="var(--border2)" strokeWidth="8" strokeLinecap="round"/>
-        <path d="M52 100 Q54 130 53 155" stroke="var(--border2)" strokeWidth="8" strokeLinecap="round"/>
-        {sex === 'Female' && <ellipse cx="40" cy="58" rx="14" ry="5" stroke="var(--accent)" strokeWidth="1" fill="none" opacity="0.3"/>}
-        <line x1="22" y1="78" x2="58" y2="78" stroke="var(--accent)" strokeWidth="1" opacity="0.3" strokeDasharray="3,3"/>
-      </svg>
-    </div>
-  )
-}
 
 function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
   const [formTab, setFormTab]         = useState('personal')
@@ -345,7 +325,6 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
               )}
               {sex && (
                 <>
-                  <BodySVG sex={sex} />
                   <p style={{ fontSize:'0.65rem', fontWeight:800, color:'var(--text3)', textTransform:'uppercase', letterSpacing:1, marginBottom:14 }}>
                     {sex === 'Female' ? 'Female' : 'Male'} body measurements (inches)
                   </p>
@@ -585,14 +564,14 @@ export default function Customers({ onMenuClick }) {
       <div className={styles.scrollArea} onClick={() => filterOpen && setFilterOpen(false)}>
         {customers.length === 0 && (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>👤</div>
+            <div className={styles.emptyIcon}><span className="mi" style={{ fontSize: '3rem', color: 'var(--text3)' }}>person_outline</span></div>
             <p>No customer yet.</p>
             <span>Tap + to add your first customer</span>
           </div>
         )}
         {customers.length > 0 && filtered.length === 0 && (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>🔍</div>
+            <div className={styles.emptyIcon}><span className="mi" style={{ fontSize: '3rem', color: 'var(--text3)' }}>search_off</span></div>
             <p>No matches found.</p>
             <span>Try a different name or number</span>
           </div>
