@@ -24,6 +24,13 @@ const PRIORITY_COLORS = {
   urgent: { bg: 'rgba(239,68,68,0.12)',   border: 'rgba(239,68,68,0.4)',   text: '#ef4444' },
 }
 
+// ── Status text colours for task cards ───────────────────────
+const TASK_STATUS_TEXT = {
+  pending:  { color: '#856404' },
+  done:     { color: '#155724' },
+  overdue:  { color: '#721C24' },
+}
+
 const CATEGORY_ICONS = {
   general: 'assignment', sewing: 'content_cut', delivery: 'local_shipping',
   payment: 'payments',   fitting: 'checkroom',  shopping: 'shopping_cart',
@@ -314,6 +321,12 @@ function TaskCard({ task, onToggle, onDelete, onOpen, isLast }) {
   const due     = daysUntil(task.dueDate)
   const catIcon = CATEGORY_ICONS[task.category] || 'assignment'
 
+  const statusColor = task.done
+    ? TASK_STATUS_TEXT.done.color
+    : overdue
+    ? TASK_STATUS_TEXT.overdue.color
+    : TASK_STATUS_TEXT.pending.color
+
   return (
     <div
       className={`${styles.taskListItem} ${isLast ? styles.taskListItemLast : ''} ${task.done ? styles.taskListItemDone : ''} ${overdue ? styles.taskListItemOverdue : ''}`}
@@ -341,8 +354,8 @@ function TaskCard({ task, onToggle, onDelete, onOpen, isLast }) {
 
         <div className={styles.taskListMeta}>
           <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', verticalAlign: 'middle' }}>autorenew</span>
-          <span className={`${styles.taskListMetaText} ${task.done ? styles.taskListMetaDone : overdue ? styles.taskListMetaOverdue : ''}`}>
-            {task.done ? 'Done' : overdue ? 'Overdue' : PRIORITY_LABELS[task.priority] || 'Normal'}
+          <span className={styles.taskListMetaText} style={{ color: statusColor }}>
+            {task.done ? 'Completed' : overdue ? 'Overdue' : PRIORITY_LABELS[task.priority] || 'Normal'}
           </span>
         </div>
 
@@ -402,7 +415,7 @@ function TaskDetail({ task, onClose, onToggle, onDelete }) {
               className={`${styles.statusBtn} ${task.done ? styles.statusDoneBtn : ''}`}
               onClick={() => onToggle(task.id, false)}
             >
-              ✓ Done
+              ✓ Completed
             </button>
           </div>
 
@@ -467,10 +480,10 @@ function TaskDetail({ task, onClose, onToggle, onDelete }) {
 // ── Tabs Config ───────────────────────────────────────────────
 
 const TABS = [
-  { id: 'all',     label: 'All'     },
-  { id: 'pending', label: 'Pending' },
-  { id: 'done',    label: 'Done'    },
-  { id: 'overdue', label: 'Overdue' },
+  { id: 'all',       label: 'All'       },
+  { id: 'pending',   label: 'Pending'   },
+  { id: 'done',      label: 'Completed' },
+  { id: 'overdue',   label: 'Overdue'   },
 ]
 
 // ── Main Page ─────────────────────────────────────────────────
