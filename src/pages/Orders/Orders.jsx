@@ -71,7 +71,6 @@ const STATUS_COLORS = {
   cancelled: { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', border: 'rgba(148,163,184,0.3)' },
 }
 
-// ── Status text colours for card list items ───────────────────
 const STATUS_TEXT_COLORS = {
   pending:   '#856404',
   completed: '#155724',
@@ -196,6 +195,7 @@ function OrderDetailPanel({ order, onClose }) {
 function OrderCard({ order, isLast, onTap }) {
   const overdue = isOverdue(order)
   const due     = daysUntil(order.dueDate)
+  const thumb   = order.items?.[0]?.imgSrc
 
   return (
     <div
@@ -204,9 +204,12 @@ function OrderCard({ order, isLast, onTap }) {
     >
       <div className={styles.orderListOuter}>
         <div className={styles.orderListInner}>
-          <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : 'var(--text3)' }}>
-            {overdue ? 'alarm_on' : (STATUS_ICON[order.status] || 'assignment')}
-          </span>
+          {thumb
+            ? <img src={thumb} alt="" className={styles.orderListThumbImg} />
+            : <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : 'var(--text3)' }}>
+                {overdue ? 'alarm_on' : (STATUS_ICON[order.status] || 'assignment')}
+              </span>
+          }
         </div>
       </div>
 
