@@ -104,7 +104,7 @@ function PremiumSheet({ onClose }) {
 }
 
 // ── Country Code Picker ───────────────────────────────────────
-const DEFAULT_COUNTRY = { name: 'DR Congo', dial_code: '+243', flag: '🇨🇩' }
+const DEFAULT_COUNTRY = { name: 'Nigeria', dial_code: '+234', flag: '🇳🇬' }
 
 function CountryCodePicker({ selected, onSelect }) {
   const [open, setOpen]       = useState(false)
