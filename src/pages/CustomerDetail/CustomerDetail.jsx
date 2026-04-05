@@ -209,8 +209,6 @@ export default function CustomerDetail({ onMenuClick }) {
       isFullPayment:  isFullPay,
       balance:        isFullPay ? 0 : balance,
       notes:          payment.notes || '',
-      // Snapshot template + brand for receipts too
-      template:       invoiceTemplate || settingsSnap.invoiceTemplate || 'editable',
       brandSnapshot: {
         name:     invoiceBrand?.name    || settingsSnap.brandName      || '',
         tagline:  invoiceBrand?.tagline || settingsSnap.brandTagline   || '',
@@ -279,6 +277,18 @@ export default function CustomerDetail({ onMenuClick }) {
   }
 
   const showFab = ['dress', 'orders', 'payments'].includes(activeTab)
+
+  // Determine whether the active tab has any content cards.
+  // When empty AND the tabs are stuck (isScrolled), the tab content must not
+  // overflow the viewport — so the empty-state can't be scrolled under the header.
+  const tabItemCounts = {
+    dress:    data.measurements?.length ?? 0,
+    orders:   orders?.length            ?? 0,
+    invoice:  invoicesState?.length     ?? 0,
+    payments: orders?.filter(o => o.payments?.length).length ?? 0,
+    receipts: receipts?.length          ?? 0,
+  }
+  const activeTabIsEmpty = tabItemCounts[activeTab] === 0
 
   return (
     <div className={styles.page}>
@@ -371,7 +381,15 @@ export default function CustomerDetail({ onMenuClick }) {
         </div>
       </div>
 
-      <div className={styles.tabContent}>
+      {/*
+        data-empty is true when the active tab has no cards.
+        The CSS uses this to clamp the height to the remaining viewport
+        so the empty state cannot scroll beneath the sticky header + tabs.
+      */}
+      <div
+        className={styles.tabContent}
+        data-empty={activeTabIsEmpty ? 'true' : 'false'}
+      >
         {activeTab === 'dress' && (
           <MeasurementsTab
             measurements={data.measurements}
