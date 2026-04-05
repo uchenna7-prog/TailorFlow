@@ -150,6 +150,13 @@
   overflow: hidden;
 }
 
+.orderListThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
 .orderListInfo { flex: 1; min-width: 0; }
 .orderListDesc { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .orderListMeta { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
