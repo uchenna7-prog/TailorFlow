@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { updateProfile } from 'firebase/auth'
@@ -56,6 +56,146 @@ function SegmentControl({ options, value, onChange }) {
   )
 }
 
+// ── Country Code Picker ───────────────────────────────────────
+const DEFAULT_COUNTRY = { name: 'Nigeria', dial_code: '+234', flag: '🇳🇬' }
+
+function CountryCodePicker({ selected, onSelect }) {
+  const [open, setOpen]           = useState(false)
+  const [search, setSearch]       = useState('')
+  const [countries, setCountries] = useState([])
+  const [loading, setLoading]     = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    if (!open || countries.length > 0) return
+    setLoading(true)
+    fetch('https://restcountries.com/v3.1/all?fields=name,idd,flag,cca2')
+      .then(r => r.json())
+      .then(data => {
+        const list = []
+        data.forEach(c => {
+          const root    = c.idd?.root || ''
+          const suffix  = c.idd?.suffixes
+          if (!root) return
+          const suffixes = Array.isArray(suffix) && suffix.length === 1 ? suffix : (suffix || [''])
+          suffixes.forEach(s => {
+            list.push({ name: c.name?.common || '', dial_code: root + s, flag: c.flag || '', cca2: c.cca2 || '' })
+          })
+        })
+        list.sort((a, b) => a.name.localeCompare(b.name))
+        setCountries(list)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [open, countries.length])
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false); setSearch('')
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const filtered = search.trim()
+    ? countries.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.dial_code.includes(search))
+    : countries
+
+  const handleSelect = (country) => { onSelect(country); setOpen(false); setSearch('') }
+
+  return (
+    <div className={styles.ccPickerWrap} ref={dropdownRef}>
+      <button type="button" className={styles.ccBtn} onClick={() => setOpen(v => !v)}>
+        <span className={styles.ccFlag}>{selected.flag}</span>
+        <span className={styles.ccCode}>{selected.dial_code}</span>
+        <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>expand_more</span>
+      </button>
+
+      {open && (
+        <div className={styles.ccDropdown}>
+          <div className={styles.ccSearchWrap}>
+            <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>search</span>
+            <input
+              autoFocus
+              type="text"
+              placeholder="Search country or code…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className={styles.ccSearchInput}
+            />
+          </div>
+          <div className={styles.ccList}>
+            {loading && <div className={styles.ccListEmpty}>Loading countries…</div>}
+            {!loading && filtered.length === 0 && <div className={styles.ccListEmpty}>No results</div>}
+            {!loading && filtered.map((c, i) => (
+              <button
+                key={`${c.cca2}-${c.dial_code}-${i}`}
+                type="button"
+                className={`${styles.ccOption} ${selected.dial_code === c.dial_code && selected.name === c.name ? styles.ccOptionActive : ''}`}
+                onClick={() => handleSelect(c)}
+              >
+                <span className={styles.ccFlag}>{c.flag}</span>
+                <span className={styles.ccOptionName}>{c.name}</span>
+                <span className={styles.ccOptionCode}>{c.dial_code}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Phone number formatting/validation helper ─────────────────
+function buildPhoneNumber(localNumber, dialCode) {
+  const digits = localNumber.replace(/\D/g, '')
+  if (digits.length === 11 && digits.startsWith('0')) return `${dialCode} ${digits.slice(1)}`
+  if (digits.length === 10) return `${dialCode} ${digits}`
+  return null
+}
+
+// ── Phone hint helper ─────────────────────────────────────────
+function getPhoneHint(localNumber) {
+  const digits = localNumber.replace(/\D/g, '')
+  if (!digits) return null
+  if (digits.length === 11 && digits.startsWith('0')) return { ok: true,  msg: 'Leading 0 will be removed when saving' }
+  if (digits.length === 10)                            return { ok: true,  msg: 'Valid' }
+  if (digits.length > 11)                              return { ok: false, msg: 'Too many digits' }
+  if (digits.length === 11 && !digits.startsWith('0')) return { ok: false, msg: '11-digit numbers must start with 0' }
+  return { ok: false, msg: `${10 - digits.length} more digit${10 - digits.length !== 1 ? 's' : ''} needed` }
+}
+
+// ── Phone field with country code picker ─────────────────────
+function PhoneField({ label, hint, error, localValue, onLocalChange, country, onCountryChange }) {
+  const phoneHint = getPhoneHint(localValue)
+  return (
+    <Field label={label} hint={hint} error={error}>
+      <div className={styles.phoneRow}>
+        <CountryCodePicker selected={country} onSelect={onCountryChange} />
+        <div className={styles.inputWrap} style={{ flex: 1 }}>
+          <input
+            type="tel"
+            inputMode="tel"
+            className={styles.textInput}
+            placeholder="e.g. 09078117654"
+            value={localValue}
+            onChange={e => onLocalChange(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
+      </div>
+      {phoneHint && (
+        <p className={styles.phoneHint} style={{ color: phoneHint.ok ? 'var(--accent)' : '#ef4444' }}>
+          {phoneHint.msg}
+        </p>
+      )}
+    </Field>
+  )
+}
+
 // ── Step 1 ────────────────────────────────────────────────────
 
 function StepAccount({ data, onChange, errors }) {
@@ -109,7 +249,7 @@ function StepAccount({ data, onChange, errors }) {
 
 // ── Step 2 ────────────────────────────────────────────────────
 
-function StepPersonal({ data, onChange, errors }) {
+function StepPersonal({ data, onChange, errors, phoneLocal, onPhoneLocal, phoneCountry, onPhoneCountry }) {
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepIntro}>
@@ -119,9 +259,14 @@ function StepPersonal({ data, onChange, errors }) {
       <Field label="Full Name" error={errors.fullName}>
         <TextInput value={data.fullName} onChange={v => onChange('fullName', v)} placeholder="e.g. Amara Okonkwo" icon="badge" />
       </Field>
-      <Field label="Phone Number" error={errors.phone}>
-        <TextInput type="tel" value={data.phone} onChange={v => onChange('phone', v)} placeholder="+234 800 000 0000" icon="call" />
-      </Field>
+      <PhoneField
+        label="Phone Number"
+        error={errors.phone}
+        localValue={phoneLocal}
+        onLocalChange={onPhoneLocal}
+        country={phoneCountry}
+        onCountryChange={onPhoneCountry}
+      />
       <Field label="City" error={errors.city}>
         <TextInput value={data.city} onChange={v => onChange('city', v)} placeholder="e.g. Lagos" icon="location_on" />
       </Field>
@@ -134,7 +279,7 @@ function StepPersonal({ data, onChange, errors }) {
 
 // ── Step 3 — Full brand (matches Profile BrandModal) ──────────
 
-function StepBrand({ data, onChange, errors }) {
+function StepBrand({ data, onChange, errors, brandPhoneLocal, onBrandPhoneLocal, brandPhoneCountry, onBrandPhoneCountry }) {
   const logoInputRef = useRef(null)
 
   const handleLogoChange = useCallback((e) => {
@@ -192,9 +337,14 @@ function StepBrand({ data, onChange, errors }) {
       </Field>
 
       {/* Contact */}
-      <Field label="Business Phone" hint="Optional.">
-        <TextInput type="tel" value={data.brandPhone} onChange={v => onChange('brandPhone', v)} placeholder="+234 800 000 0000" icon="call" />
-      </Field>
+      <PhoneField
+        label="Business Phone"
+        hint="Optional."
+        localValue={brandPhoneLocal}
+        onLocalChange={onBrandPhoneLocal}
+        country={brandPhoneCountry}
+        onCountryChange={onBrandPhoneCountry}
+      />
       <Field label="Business Email" hint="Optional.">
         <TextInput type="email" value={data.brandEmail} onChange={v => onChange('brandEmail', v)} placeholder="shop@email.com" icon="mail" />
       </Field>
@@ -249,7 +399,7 @@ function StepDots({ steps, current }) {
 
 // ── Validation ────────────────────────────────────────────────
 
-function validateStep(stepId, data) {
+function validateStep(stepId, data, phoneLocal, brandPhoneLocal) {
   const errors = {}
   if (stepId === 'account') {
     if (!data.email.trim()) errors.email = 'Email is required'
@@ -261,7 +411,13 @@ function validateStep(stepId, data) {
   }
   if (stepId === 'personal') {
     if (!data.fullName.trim()) errors.fullName = 'Full name is required'
-    if (!data.phone.trim()) errors.phone = 'Phone number is required'
+    if (!phoneLocal.trim()) {
+      errors.phone = 'Phone number is required'
+    } else {
+      const digits = phoneLocal.replace(/\D/g, '')
+      const valid = (digits.length === 10) || (digits.length === 11 && digits.startsWith('0'))
+      if (!valid) errors.phone = 'Enter a valid 10-digit number (or 11 starting with 0)'
+    }
   }
   // Brand — all optional, no required fields
   return errors
@@ -287,6 +443,12 @@ export default function Signup() {
   const [authError, setAuthError] = useState('')
   const [loading,   setLoading]   = useState(false)
 
+  // ── Separate local phone state for both phone fields ──────
+  const [phoneLocal,       setPhoneLocal]       = useState('')
+  const [phoneCountry,     setPhoneCountry]     = useState(DEFAULT_COUNTRY)
+  const [brandPhoneLocal,  setBrandPhoneLocal]  = useState('')
+  const [brandPhoneCountry,setBrandPhoneCountry]= useState(DEFAULT_COUNTRY)
+
   const currentStep = STEPS[step]
 
   const handleChange = useCallback((key, value) => {
@@ -295,11 +457,17 @@ export default function Signup() {
   }, [])
 
   const handleNext = async () => {
-    const errs = validateStep(currentStep.id, data)
+    const errs = validateStep(currentStep.id, data, phoneLocal, brandPhoneLocal)
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setErrors({})
 
     if (step < STEPS.length - 1) { setStep(s => s + 1); return }
+
+    // Build final phone strings before submitting
+    const builtPhone      = buildPhoneNumber(phoneLocal, phoneCountry.dial_code) || phoneLocal
+    const builtBrandPhone = brandPhoneLocal.trim()
+      ? (buildPhoneNumber(brandPhoneLocal, brandPhoneCountry.dial_code) || brandPhoneLocal)
+      : ''
 
     setLoading(true)
     setAuthError('')
@@ -312,7 +480,7 @@ export default function Signup() {
         localStorage.setItem('tailorbook_personal', JSON.stringify({
           fullName: data.fullName.trim(),
           email:    data.email.trim(),
-          phone:    data.phone.trim(),
+          phone:    builtPhone,
           city:     data.city.trim(),
           country:  data.country.trim(),
         }))
@@ -327,7 +495,7 @@ export default function Signup() {
           brandName:       data.brandName.trim(),
           brandTagline:    data.brandTagline.trim(),
           brandColour:     data.brandColour || '#D4AF37',
-          brandPhone:      data.brandPhone.trim(),
+          brandPhone:      builtBrandPhone,
           brandEmail:      data.brandEmail.trim(),
           brandAddress:    data.brandAddress.trim(),
           brandWebsite:    data.brandWebsite.trim(),
@@ -374,8 +542,28 @@ export default function Signup() {
         </div>
 
         {currentStep.id === 'account'  && <StepAccount  data={data} onChange={handleChange} errors={errors} />}
-        {currentStep.id === 'personal' && <StepPersonal data={data} onChange={handleChange} errors={errors} />}
-        {currentStep.id === 'brand'    && <StepBrand    data={data} onChange={handleChange} errors={errors} />}
+        {currentStep.id === 'personal' && (
+          <StepPersonal
+            data={data}
+            onChange={handleChange}
+            errors={errors}
+            phoneLocal={phoneLocal}
+            onPhoneLocal={v => { setPhoneLocal(v); setErrors(prev => { const e = { ...prev }; delete e.phone; return e }) }}
+            phoneCountry={phoneCountry}
+            onPhoneCountry={setPhoneCountry}
+          />
+        )}
+        {currentStep.id === 'brand' && (
+          <StepBrand
+            data={data}
+            onChange={handleChange}
+            errors={errors}
+            brandPhoneLocal={brandPhoneLocal}
+            onBrandPhoneLocal={setBrandPhoneLocal}
+            brandPhoneCountry={brandPhoneCountry}
+            onBrandPhoneCountry={setBrandPhoneCountry}
+          />
+        )}
 
         {authError && (
           <div style={{ color: 'var(--danger)', fontSize: '0.85rem', textAlign: 'center', marginBottom: 12 }}>
