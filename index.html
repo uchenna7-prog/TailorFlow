@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+
+    <script>
+  window.onerror = function(msg, src, line) {
+    document.body.style.background = '#fff';
+    document.body.style.color = '#000';
+    document.body.style.padding = '20px';
+    document.body.innerHTML = '<b>Error:</b><br>' + msg + '<br>Line: ' + line;
+  }
+</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#000000" />
