@@ -143,11 +143,11 @@ export function NotificationProvider({ children }) {
 
   // ── Auto-request push permission once on mount ────────────
   useEffect(() => {
+    if (!('Notification' in window)) return
     if (Notification.permission === 'granted') {
       setPushEnabled(true)
       return
     }
-    // Don't auto-prompt — wait for user action via requestPushPermission()
   }, [])
 
   // ── Build notifications from live data ────────────────────
