@@ -7,16 +7,21 @@
 //
 // Read state is persisted in localStorage so "mark as read"
 // survives page refreshes without an extra Firestore write.
+//
+// Push notifications are sent via the Web Push API whenever
+// a new notification appears that the user hasn't seen yet.
 // ─────────────────────────────────────────────────────────────
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useMemo, useState } from 'react'
 import { useOrders }       from './OrdersContext'
 import { useInvoices }     from './InvoiceContext'
 import { useTasks }        from './TaskContext'
 import { useAppointments } from './AppointmentContext'
 import { useCustomers }    from './CustomerContext'
 
-const STORAGE_KEY = 'tailorflow_read_notifs'
+const STORAGE_KEY  = 'tailorflow_read_notifs'
+const PUSHED_KEY   = 'tailorflow_pushed_notifs'
+const VAPID_KEY    = 'BAe8t_ReMQne5iBlUJyfwd3HQ8N-TcLJoSH2ai0QSWOQhrSLrbJeQnGENUm01yBoRkynmlnRE-86S_9dFOVaRdM'
 
 function loadReadIds() {
   try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')) }
@@ -25,6 +30,16 @@ function loadReadIds() {
 
 function saveReadIds(set) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])) }
+  catch {}
+}
+
+function loadPushedIds() {
+  try { return new Set(JSON.parse(localStorage.getItem(PUSHED_KEY) || '[]')) }
+  catch { return new Set() }
+}
+
+function savePushedIds(set) {
+  try { localStorage.setItem(PUSHED_KEY, JSON.stringify([...set])) }
   catch {}
 }
 
@@ -44,7 +59,6 @@ function isInvoiceOverdue(inv) {
 }
 
 function birthdayDaysUntil(birthdayStr) {
-  // birthday stored as "MM-DD"
   if (!birthdayStr) return null
   const [month, day] = birthdayStr.split('-').map(Number)
   const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -53,13 +67,63 @@ function birthdayDaysUntil(birthdayStr) {
   return Math.round((thisYear - today) / (1000 * 60 * 60 * 24))
 }
 
+// ── VAPID key helper ──────────────────────────────────────────
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const raw     = window.atob(base64)
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)))
+}
+
+// ── Request push permission + subscribe ───────────────────────
+async function subscribeToPush() {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null
+
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') return null
+
+    const reg          = await navigator.serviceWorker.ready
+    const existing     = await reg.pushManager.getSubscription()
+    if (existing) return existing
+
+    const subscription = await reg.pushManager.subscribe({
+      userVisibleOnly:      true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_KEY),
+    })
+    return subscription
+  } catch (err) {
+    console.warn('Push subscription failed:', err)
+    return null
+  }
+}
+
+// ── Send a local push notification via SW ────────────────────
+async function sendLocalPush(title, body, icon = '/icons/icon-192.png') {
+  try {
+    if (!('serviceWorker' in navigator)) return
+    const reg = await navigator.serviceWorker.ready
+    await reg.showNotification(title, {
+      body,
+      icon,
+      badge: '/icons/icon-192.png',
+      vibrate: [200, 100, 200],
+      tag:  title, // prevents duplicate popups for same alert
+    })
+  } catch (err) {
+    console.warn('showNotification failed:', err)
+  }
+}
+
 // ─────────────────────────────────────────────────────────────
 
 const NotificationContext = createContext({
-  notifications: [],
-  unreadCount:   0,
-  markRead:      () => {},
-  markAllRead:   () => {},
+  notifications:       [],
+  unreadCount:         0,
+  pushEnabled:         false,
+  markRead:            () => {},
+  markAllRead:         () => {},
+  requestPushPermission: async () => {},
 })
 
 export function NotificationProvider({ children }) {
@@ -69,10 +133,22 @@ export function NotificationProvider({ children }) {
   const { upcoming: upcomingAppts } = useAppointments()
   const { customers }   = useCustomers()
 
-  const [readIds, setReadIds] = useState(() => loadReadIds())
+  const [readIds,     setReadIds]     = useState(() => loadReadIds())
+  const [pushedIds,   setPushedIds]   = useState(() => loadPushedIds())
+  const [pushEnabled, setPushEnabled] = useState(false)
 
-  // Persist whenever readIds changes
-  useEffect(() => { saveReadIds(readIds) }, [readIds])
+  // Persist whenever readIds / pushedIds change
+  useEffect(() => { saveReadIds(readIds)   }, [readIds])
+  useEffect(() => { savePushedIds(pushedIds) }, [pushedIds])
+
+  // ── Auto-request push permission once on mount ────────────
+  useEffect(() => {
+    if (Notification.permission === 'granted') {
+      setPushEnabled(true)
+      return
+    }
+    // Don't auto-prompt — wait for user action via requestPushPermission()
+  }, [])
 
   // ── Build notifications from live data ────────────────────
   const notifications = useMemo(() => {
@@ -92,7 +168,7 @@ export function NotificationProvider({ children }) {
             title: `Overdue: ${o.desc || 'Order'}`,
             body:  `${o.customerName ? `${o.customerName} · ` : ''}${Math.abs(diff)}d past due date.`,
             time:  o.dueDate,
-            sortKey: 0,   // highest priority
+            sortKey: 0,
           })
         } else if (diff <= 3) {
           list.push({
@@ -209,9 +285,26 @@ export function NotificationProvider({ children }) {
       return 0
     })
 
-    // Stamp unread: a notification is unread if its id is NOT in readIds
     return list.map(n => ({ ...n, unread: !readIds.has(n.id) }))
   }, [allOrders, allInvoices, tasks, upcomingAppts, customers, readIds])
+
+  // ── Fire push notifications for new items ─────────────────
+  const isFirstRun = useRef(true)
+  useEffect(() => {
+    // Skip on first mount — don't blast all existing notifications
+    if (isFirstRun.current) { isFirstRun.current = false; return }
+    if (!pushEnabled) return
+
+    notifications.forEach(n => {
+      if (pushedIds.has(n.id)) return   // already pushed this one
+      sendLocalPush(n.title, n.body)
+      setPushedIds(prev => {
+        const next = new Set(prev)
+        next.add(n.id)
+        return next
+      })
+    })
+  }, [notifications, pushEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const unreadCount = notifications.filter(n => n.unread).length
 
@@ -227,8 +320,21 @@ export function NotificationProvider({ children }) {
     setReadIds(new Set(notifications.map(n => n.id)))
   }
 
+  // ── Called from UI (e.g. a "Enable Notifications" button) ─
+  const requestPushPermission = async () => {
+    const sub = await subscribeToPush()
+    if (sub) setPushEnabled(true)
+  }
+
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, markRead, markAllRead }}>
+    <NotificationContext.Provider value={{
+      notifications,
+      unreadCount,
+      pushEnabled,
+      markRead,
+      markAllRead,
+      requestPushPermission,
+    }}>
       {children}
     </NotificationContext.Provider>
   )
