@@ -36,6 +36,76 @@
   font-weight: 400;
 }
 
+/* ── NOTIFICATION BANNER ── */
+.notifBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 14px 14px;
+  margin-bottom: 18px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.notifBannerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.notifBannerTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.notifBannerSub {
+  font-size: 0.7rem;
+  color: var(--text3);
+  font-weight: 400;
+}
+
+.notifBannerActions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.notifBannerEnable {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.notifBannerEnable:active { opacity: 0.8; }
+
+.notifBannerDismiss {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  padding: 2px 0;
+}
+
 /* ── STATS GRID ── */
 .statsGrid {
   display: grid;
@@ -128,8 +198,8 @@
 
 .sectionTitle {
   font-size: 0.78rem;
-  font-weight: 800; /* Increased for boldness */
-  color: var(--text); /* Darker for better visibility */
+  font-weight: 800;
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin-bottom: 12px;
