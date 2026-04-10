@@ -112,7 +112,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin-bottom: 22px;
+  margin-bottom: 12px;
 }
 
 /* ── STAT CARD — desktop ── */
@@ -153,8 +153,8 @@
 .statBgIcon {
   display: none;
   position: absolute;
-  right: -10px;
-  bottom: -10px;
+  right: -8px;
+  bottom: -8px;
   font-size: 7rem;
   color: var(--text);
   opacity: 0.07;
@@ -192,6 +192,61 @@
   color: var(--text3);
   font-weight: 600;
   margin-top: 3px;
+}
+
+/* ── REVENUE CARD ── */
+.revenueCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.revenueCard:active { background: var(--surface2); }
+
+.revenueCardLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.revenueLabel {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+}
+
+.revenueAmount {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.revenueTarget {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text3);
+}
+
+.revenuePercent {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text3);
+}
+
+.revenueDonutWrap {
+  flex-shrink: 0;
 }
 
 /* ── QUICK ACTIONS DESKTOP — hidden on mobile ── */
@@ -363,21 +418,24 @@
     padding-bottom: calc(90px + var(--sb, 0px));
   }
 
-  /* ── Stats: one per row ── */
+  /* ── Stats: 2-col grid matching reference image ── */
   .statsGrid {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
   }
 
-  /* Mobile card layout — exactly like reference image */
+  /* Mobile card layout — 2-column version */
   .statCard {
-    padding: 22px 20px;
+    padding: 16px 14px 14px 14px;
     align-items: flex-start;
     flex-direction: column;
     gap: 0;
     border-radius: 16px;
-    min-height: 110px;
+    min-height: 100px;
     border: 1px solid var(--border);
+    /* Extra right padding so bg icon doesn't bleed over text */
+    padding-right: 16px;
   }
 
   /* Hide coloured left icon on mobile */
@@ -385,49 +443,59 @@
     display: none;
   }
 
-  /* Show background watermark on mobile */
+  /* Show background watermark on mobile — with generous offset so it
+     sits comfortably inside the card boundary */
   .statBgIcon {
     display: block;
-    font-size: 7.5rem;
-    right: -10px;
-    bottom: -12px;
-    /* no colour — matches greyed-out reference image look */
+    font-size: 5.5rem;
+    right: -4px;
+    bottom: -6px;
     color: var(--text);
     opacity: 0.07;
   }
 
   /* Label at top — uppercase, spaced, small */
   .statLabel {
-    font-size: 0.63rem;
+    font-size: 0.58rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     color: var(--text3);
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
-  /* Big number + inline sub on same baseline row */
+  /* Big number */
   .statValueRow {
     display: flex;
     align-items: baseline;
-    gap: 10px;
+    gap: 6px;
     flex-wrap: wrap;
   }
 
   .statValue {
-    font-size: 2.6rem;
+    font-size: 2rem;
     font-weight: 800;
     color: var(--text);
     line-height: 1;
-    letter-spacing: -1.5px;
+    letter-spacing: -1px;
   }
 
   .statSub {
-    font-size: 0.72rem;
+    font-size: 0.62rem;
     font-weight: 500;
     color: var(--text3);
     margin-top: 0;
+  }
+
+  /* ── Revenue card mobile ── */
+  .revenueCard {
+    padding: 16px 18px;
+    margin-bottom: 22px;
+  }
+
+  .revenueAmount {
+    font-size: 1.5rem;
   }
 
   /* ── Hide desktop quick actions on mobile ── */
