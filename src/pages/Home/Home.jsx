@@ -342,16 +342,28 @@ function Home({ onMenuClick }) {
   const todayCount = todayAppointments.length
 
   // ── Revenue calculation from PaymentContext ───────────────
+  // Uses allPayments from PaymentContext — same data source as AllPayments page.
+  // Sums all installment amounts within the goal's time window.
   const revenueEarned = (() => {
     if (!revenueGoal) return 0
     const windowStart = getWindowStart(revenueGoal.period)
+
     return allPayments
-      .filter(p => {
-        if (!p.createdAt) return false
-        const ms = p.createdAt?.toMillis?.() ?? new Date(p.createdAt).getTime()
-        return ms >= windowStart.getTime()
+      .flatMap(p => {
+        // Each payment may have installments — sum those with a date in the window
+        const installments = p.installments || []
+        if (installments.length === 0) return []
+
+        return installments
+          .filter(inst => {
+            const dateStr = inst.date || p.date
+            if (!dateStr) return false
+            const ms = new Date(dateStr).getTime()
+            return ms >= windowStart.getTime()
+          })
+          .map(inst => Number(inst.amount) || 0)
       })
-      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+      .reduce((sum, amt) => sum + amt, 0)
   })()
 
   const revenuePct = revenueGoal && revenueGoal.goal > 0
@@ -373,6 +385,7 @@ function Home({ onMenuClick }) {
       value:       pendingOrders.length,
       label:       'Pending Orders',
       sub:         `${ordersDueThisWeek} due this wk`,
+      // Orange when there are orders due this week, muted otherwise
       subColor:    ordersDueThisWeek > 0 ? '#fb923c' : 'var(--text3)',
       route:       '/orders',
     },
@@ -395,7 +408,8 @@ function Home({ onMenuClick }) {
       sub:         missedCount > 0
         ? `${missedCount} missed`
         : `${upcomingThisWeek} this wk`,
-      subColor:    missedCount > 0 ? '#ef4444' : 'var(--text3)',
+      // Red for missed, cyan for upcoming this week (matches the card's icon colour)
+      subColor:    missedCount > 0 ? '#ef4444' : '#06b6d4',
       route:       '/appointments',
     },
     {
@@ -405,6 +419,7 @@ function Home({ onMenuClick }) {
       value:       pendingTasks.length,
       label:       'Pending Tasks',
       sub:         `${tasksDueThisWeek} due this wk`,
+      // Orange when tasks are due this week
       subColor:    tasksDueThisWeek > 0 ? '#fb923c' : 'var(--text3)',
       route:       '/tasks',
     },
@@ -459,7 +474,7 @@ function Home({ onMenuClick }) {
                 )}
               </div>
 
-              {/* Background watermark icon */}
+              {/* Background watermark icon — partially cut off bottom-right */}
               <span className={`mi ${styles.statBgIcon}`}>{card.bgIcon}</span>
             </div>
           ))}
@@ -467,7 +482,7 @@ function Home({ onMenuClick }) {
 
         {/* REVENUE CARD */}
         {!revenueGoal ? (
-          /* ── Empty state: Set a goal ── */
+          /* ── Empty state: no graph, just add prompt ── */
           <div
             className={styles.revenueCard}
             onClick={() => setShowGoalModal(true)}
@@ -481,12 +496,10 @@ function Home({ onMenuClick }) {
               <div className={styles.revenueEmptyTitle}>Set a goal</div>
               <div className={styles.revenueEmptySub}>Track weekly, monthly or yearly revenue</div>
             </div>
-            <div className={styles.revenueDonutWrap} style={{ opacity: 0.18 }}>
-              <RevenueDonut pct={0} />
-            </div>
+            {/* No donut here — only shown when a goal exists */}
           </div>
         ) : (
-          /* ── Active revenue card ── */
+          /* ── Active revenue card — donut reflects real payment data ── */
           <div
             className={styles.revenueCard}
             onClick={() => setShowGoalModal(true)}
