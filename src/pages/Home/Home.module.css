@@ -453,17 +453,17 @@
     box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.07);
   }
 
-  /* Regular action button */
+  /* Action button — all 5 buttons identical */
   .mobileQuickBtn {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 4px;
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px 6px 0;
+    padding: 4px 2px 0;
     color: var(--text3);
     font-family: inherit;
     transition: color 0.15s;
@@ -471,40 +471,16 @@
   }
   .mobileQuickBtn:active { color: var(--accent); }
 
-  /* Two-line label */
+  /* Label: narrow box forces one word per line naturally */
   .mobileQuickLabel {
-    font-size: 0.57rem;
+    font-size: 0.56rem;
     font-weight: 600;
-    line-height: 1.25;
+    width: 38px;
+    line-height: 1.3;
     text-align: center;
     color: inherit;
-    /* each word wraps naturally onto its own line */
-    word-break: break-word;
-    max-width: 44px;
-  }
-
-  /* Centre FAB (+) — raised above the bar */
-  .mobileQuickBtnPrimary {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
-    transition: transform 0.15s, box-shadow 0.15s;
-    flex-shrink: 0;
-    /* lift above the bar — sits centred in its flex slot */
-    position: relative;
-    bottom: 16px;
-  }
-  .mobileQuickBtnPrimary:active {
-    transform: scale(0.92);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: normal;
   }
 }
