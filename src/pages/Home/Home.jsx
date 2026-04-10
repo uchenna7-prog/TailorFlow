@@ -217,20 +217,20 @@ function MobileQuickActions({ navigate }) {
   return (
     <nav className={styles.mobileQuickNav}>
       <button className={styles.mobileQuickBtn} onClick={() => navigate('/customers')}>
-        <span className="mi" style={{ fontSize: '1.45rem' }}>person_add</span>
-        <span className={styles.mobileQuickLabel}>New Customer</span>
+        <span className="mi" style={{ fontSize: '1.45rem' }}>groups</span>
+        <span className={styles.mobileQuickLabel}> Customers</span>
       </button>
       <button className={styles.mobileQuickBtn} onClick={() => navigate('/appointments')}>
         <span className="mi" style={{ fontSize: '1.45rem' }}>event</span>
-        <span className={styles.mobileQuickLabel}>Book Appt</span>
+        <span className={styles.mobileQuickLabel}> Appointments</span>
       </button>
       <button className={styles.mobileQuickBtn} onClick={() => navigate('/orders')}>
-        <span className="mi" style={{ fontSize: '1.45rem' }}>add_shopping_cart</span>
-        <span className={styles.mobileQuickLabel}>Add Order</span>
+        <span className="mi" style={{ fontSize: '1.45rem' }}>shopping_cart</span>
+        <span className={styles.mobileQuickLabel}> Orders</span>
       </button>
       <button className={styles.mobileQuickBtn} onClick={() => navigate('/tasks')}>
         <span className="mi" style={{ fontSize: '1.45rem' }}>assignment</span>
-        <span className={styles.mobileQuickLabel}>Add Task</span>
+        <span className={styles.mobileQuickLabel}> Tasks</span>
       </button>
     </nav>
   )
@@ -406,7 +406,7 @@ function Home({ onMenuClick }) {
       bgIcon:      'today',
       iconColor:   '#06b6d4',
       value:       todayCount,
-      label:       "Today's Appts",
+      label:       "Today's Appointments",
       sub:         missedCount > 0
         ? `${missedCount} missed`
         : `${upcomingThisWeek} this wk`,
