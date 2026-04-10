@@ -103,27 +103,28 @@ function MobileQuickActions({ navigate }) {
 
       <button className={styles.mobileQuickBtn} onClick={() => navigate('/customers')}>
         <span className="mi" style={{ fontSize: '1.45rem' }}>person_add</span>
-        <span className={styles.mobileQuickLabel}>New{'\n'}Customer</span>
+        <span className={styles.mobileQuickLabel}>New Customer</span>
       </button>
 
       <button className={styles.mobileQuickBtn} onClick={() => navigate('/appointments')}>
         <span className="mi" style={{ fontSize: '1.45rem' }}>event</span>
-        <span className={styles.mobileQuickLabel}>Book{'\n'}Appt</span>
+        <span className={styles.mobileQuickLabel}>Book Appt</span>
       </button>
 
-      {/* Centre FAB */}
-      <button className={styles.mobileQuickBtnPrimary} onClick={() => navigate('/orders')}>
-        <span className="mi" style={{ fontSize: '1.7rem' }}>add</span>
+      {/* Add Order — regular button, same style */}
+      <button className={styles.mobileQuickBtn} onClick={() => navigate('/orders')}>
+        <span className="mi" style={{ fontSize: '1.45rem' }}>add_shopping_cart</span>
+        <span className={styles.mobileQuickLabel}>Add Order</span>
       </button>
 
       <button className={styles.mobileQuickBtn} onClick={() => navigate('/tasks')}>
         <span className="mi" style={{ fontSize: '1.45rem' }}>assignment</span>
-        <span className={styles.mobileQuickLabel}>Add{'\n'}Task</span>
+        <span className={styles.mobileQuickLabel}>Add Task</span>
       </button>
 
       <button className={styles.mobileQuickBtn} onClick={() => navigate('/customers')}>
         <span className="mi" style={{ fontSize: '1.45rem' }}>groups</span>
-        <span className={styles.mobileQuickLabel}>All{'\n'}Customers</span>
+        <span className={styles.mobileQuickLabel}>Customers</span>
       </button>
 
     </nav>
