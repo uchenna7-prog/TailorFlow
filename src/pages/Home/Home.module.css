@@ -81,7 +81,7 @@
 
 .notifBannerEnable {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
   border: none;
   border-radius: 8px;
   padding: 6px 14px;
@@ -91,7 +91,6 @@
   cursor: pointer;
   transition: opacity 0.15s;
 }
-
 .notifBannerEnable:active { opacity: 0.8; }
 
 .notifBannerDismiss {
@@ -106,8 +105,9 @@
   padding: 2px 0;
 }
 
-/* ── STATS GRID ── */
-/* Desktop: 2-column grid (unchanged) */
+/* ═══════════════════════════════════════════
+   STATS GRID — desktop: 2-col (unchanged)
+   ═══════════════════════════════════════════ */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -115,7 +115,7 @@
   margin-bottom: 22px;
 }
 
-/* ── STAT CARD ── */
+/* ── STAT CARD — desktop ── */
 .statCard {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -126,56 +126,12 @@
   align-items: flex-start;
   cursor: pointer;
   transition: background 0.15s;
-  /* needed for the bg icon positioning */
   position: relative;
   overflow: hidden;
 }
-
 .statCard:active { background: var(--surface2); }
 
-/* Stat card body text block */
-.statCardBody {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Background watermark icon — hidden on desktop, shown on mobile */
-.statBgIcon {
-  position: absolute;
-  right: -6px;
-  bottom: -6px;
-  font-size: 4.5rem;
-  opacity: 0.07;
-  pointer-events: none;
-  user-select: none;
-  /* hidden by default (desktop 2-col is compact, doesn't need it) */
-  display: none;
-}
-
-/* ── ACTION CARD (Vertical Variant) — desktop quick actions ── */
-.actionCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.actionCard:active { background: var(--surface2); }
-
-.actionCardText {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
+/* Left colour icon box — desktop only, hidden on mobile */
 .statIconWrap {
   width: 34px;
   height: 34px;
@@ -186,6 +142,33 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.statCardBody {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Background watermark — hidden on desktop */
+.statBgIcon {
+  display: none;
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  font-size: 7rem;
+  color: var(--text);
+  opacity: 0.07;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+/* Inline row: big number + sub text beside it */
+.statValueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .statValue {
@@ -199,6 +182,8 @@
   font-size: 0.62rem;
   color: var(--text3);
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
   margin-top: 2px;
 }
 
@@ -215,8 +200,30 @@
   margin-bottom: 22px;
 }
 
-/* ── MOBILE BOTTOM QUICK ACTIONS NAV ── */
-/* Hidden on desktop, shown on mobile */
+/* ── ACTION CARD (desktop quick actions grid) ── */
+.actionCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.actionCard:active { background: var(--surface2); }
+
+.actionCardText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── MOBILE BOTTOM QUICK NAV — hidden on desktop ── */
 .mobileQuickNav {
   display: none;
 }
@@ -248,7 +255,7 @@
   font-weight: 700;
   color: var(--accent);
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: inherit;
   padding: 0;
   margin-bottom: 12px;
 }
@@ -302,7 +309,7 @@
   width: 50px;
   height: 50px;
   border-radius: 9px;
-  background: #fff;
+  background: var(--surface2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -313,7 +320,7 @@
 .listDesc { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .listMeta { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
 .listMetaText { font-size: 0.75rem; font-weight: 400; color: var(--text2); }
-.listDue { font-size: 0.75rem; font-weight: 500; color: #ef4444; margin-top: 1px; }
+.listDue { font-size: 0.75rem; font-weight: 500; color: var(--danger); margin-top: 1px; }
 
 .listApptToday {
   display: inline-block;
@@ -346,58 +353,94 @@
 .listQty { font-size: 0.65rem; color: var(--text3); margin-top: 2px; }
 
 
-/* ════════════════════════════════════════════
+/* ═══════════════════════════════════════════
    MOBILE  ≤ 600px
-   ════════════════════════════════════════════ */
+   ═══════════════════════════════════════════ */
 @media (max-width: 600px) {
 
-  /* Add bottom padding so content isn't hidden behind fixed nav */
+  /* Extra bottom space for fixed nav */
   .main {
-    padding-bottom: calc(80px + var(--sb, 0px));
+    padding-bottom: calc(90px + var(--sb, 0px));
   }
 
   /* ── Stats: one per row ── */
   .statsGrid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 12px;
   }
 
-  /* Taller card with more horizontal room for the watermark */
+  /* Mobile card layout — exactly like reference image */
   .statCard {
-    padding: 16px 14px;
-    align-items: center;
+    padding: 22px 20px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+    border-radius: 16px;
+    min-height: 110px;
+    border: 1px solid var(--border);
   }
 
-  /* Show the bg watermark icon on mobile */
+  /* Hide coloured left icon on mobile */
+  .statIconWrap {
+    display: none;
+  }
+
+  /* Show background watermark on mobile */
   .statBgIcon {
     display: block;
-    font-size: 5.5rem;
-    right: -8px;
-    bottom: -10px;
+    font-size: 7.5rem;
+    right: -10px;
+    bottom: -12px;
+    /* no colour — matches greyed-out reference image look */
+    color: var(--text);
+    opacity: 0.07;
   }
 
-  /* Slightly larger numbers on the bigger card */
-  .statValue {
-    font-size: 1.4rem;
-  }
-
+  /* Label at top — uppercase, spaced, small */
   .statLabel {
-    font-size: 0.7rem;
+    font-size: 0.63rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text3);
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+
+  /* Big number + inline sub on same baseline row */
+  .statValueRow {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .statValue {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -1.5px;
   }
 
   .statSub {
-    font-size: 0.63rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text3);
+    margin-top: 0;
   }
 
-  /* ── Hide desktop quick actions section on mobile ── */
+  /* ── Hide desktop quick actions on mobile ── */
   .quickActionsDesktop {
     display: none;
   }
 
-  /* ── Mobile bottom quick actions nav ── */
+  /* ═══════════════════════════════════════════
+     MOBILE BOTTOM QUICK ACTIONS NAV
+     ═══════════════════════════════════════════ */
   .mobileQuickNav {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-around;
     position: fixed;
     bottom: 0;
@@ -406,60 +449,62 @@
     z-index: 100;
     background: var(--surface);
     border-top: 1px solid var(--border);
-    padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    padding: 10px 4px calc(10px + var(--sb, 0px));
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.07);
   }
 
+  /* Regular action button */
   .mobileQuickBtn {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    justify-content: flex-end;
+    gap: 4px;
     background: none;
     border: none;
     cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 12px;
+    padding: 4px 6px 0;
     color: var(--text3);
     font-family: inherit;
-    transition: background 0.15s, color 0.15s;
+    transition: color 0.15s;
     flex: 1;
   }
+  .mobileQuickBtn:active { color: var(--accent); }
 
-  .mobileQuickBtn:active {
-    background: var(--surface2);
-    color: var(--accent);
-  }
-
+  /* Two-line label */
   .mobileQuickLabel {
-    font-size: 0.58rem;
+    font-size: 0.57rem;
     font-weight: 600;
-    line-height: 1;
+    line-height: 1.25;
     text-align: center;
-    white-space: nowrap;
+    color: inherit;
+    /* each word wraps naturally onto its own line */
+    word-break: break-word;
+    max-width: 44px;
   }
 
-  /* Centre "+" FAB button */
+  /* Centre FAB (+) — raised above the bar */
   .mobileQuickBtnPrimary {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px;
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
     background: var(--accent);
-    color: #fff;
+    color: var(--bg);
     border: none;
     cursor: pointer;
     font-family: inherit;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
     transition: transform 0.15s, box-shadow 0.15s;
     flex-shrink: 0;
-    margin-top: -18px; /* lifts it above the bar */
+    /* lift above the bar — sits centred in its flex slot */
+    position: relative;
+    bottom: 16px;
   }
-
   .mobileQuickBtnPrimary:active {
-    transform: scale(0.93);
+    transform: scale(0.92);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 }
