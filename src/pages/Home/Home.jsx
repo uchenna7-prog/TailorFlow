@@ -491,8 +491,13 @@ function Home({ onMenuClick }) {
         {/* HERO */}
         <section className={styles.hero}>
           <p className={styles.welcomeLabel}>
-            <span className="mi" style={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '4px', opacity: 0.7 }}>{iconRef.current}</span>
             {greetingRef.current}
+            <span className={`mi ${styles.greetingIcon}`} data-icon={iconRef.current} style={
+              iconRef.current === 'wb_sunny'    ? { color: '#f59e0b' } :
+              iconRef.current === 'waving_hand' ? { color: '#818cf8' } :
+              iconRef.current === 'nights_stay' ? { color: '#f472b6' } :
+                                                   { color: '#94a3b8' }
+            }>{iconRef.current}</span>
           </p>
           <h1 className={styles.title}>{displayName}</h1>
           <p className={styles.subtitle}>{subtextRef.current}</p>
