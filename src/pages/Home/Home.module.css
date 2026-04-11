@@ -15,11 +15,33 @@
   padding-top: 8px;
 }
 
+.heroTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
 .welcomeLabel {
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text3);
-  margin: 0 0 2px;
+  margin: 0;
+}
+
+/* "Updated now" badge */
+.updatedBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 9px 3px 7px;
+  letter-spacing: 0.2px;
 }
 
 .title {
@@ -150,7 +172,6 @@
 }
 
 /* Background watermark — hidden on desktop, shown on mobile */
-/* Positioned so the icon is cut off at the bottom-right corner */
 .statBgIcon {
   display: none;
   position: absolute;
@@ -162,7 +183,6 @@
   pointer-events: none;
   user-select: none;
   line-height: 1;
-  /* No rotation — straight icons like Monzo/Revolut/N26 */
 }
 
 .statValue {
@@ -195,7 +215,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 18px 20px;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -271,6 +291,130 @@
   font-size: 0.72rem;
   color: var(--text3);
   font-weight: 400;
+}
+
+/* ═══════════════════════════════════════════
+   CUSTOMER INSIGHTS CARD
+   ═══════════════════════════════════════════ */
+.insightsCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px 18px;
+  margin-bottom: 22px;
+}
+
+.insightsHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.insightsIconWrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: color-mix(in srgb, #818cf8 12%, transparent);
+  border: 1px solid color-mix(in srgb, #818cf8 25%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.insightsTitle {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.insightsSub {
+  font-size: 0.65rem;
+  color: var(--text3);
+  font-weight: 400;
+}
+
+.insightsViewAll {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.insightsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.insightsStat {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Best customer spans full width below the 3 stat cols */
+.insightsStatWide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.insightsStatValue {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.insightsStatLabel {
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.insightsBestLabel {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.insightsBestName {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  max-width: 60%;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.insightsBestEmpty {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text3);
+  font-style: italic;
 }
 
 /* ═══════════════════════════════════════════
@@ -513,6 +657,58 @@
   margin-bottom: 12px;
 }
 
+/* ── EMPTY STATE ── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 20px;
+  background: var(--surface);
+  border: 1px dashed var(--border2);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.emptyStateIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.emptyStateMsg {
+  font-size: 0.78rem;
+  color: var(--text3);
+  font-weight: 400;
+  margin: 0;
+  max-width: 220px;
+  line-height: 1.5;
+}
+
+.emptyStateBtn {
+  margin-top: 4px;
+  background: none;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 20px;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.emptyStateBtn:active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
 /* ── LIST SECTIONS ── */
 .listSection { position: relative; }
 
@@ -640,12 +836,10 @@
     display: none;
   }
 
-  /* Show background watermark on mobile — cut off at bottom-right corner */
+  /* Show background watermark on mobile */
   .statBgIcon {
     display: block;
     font-size: 5.5rem;
-    /* Pushed far enough right and down that roughly 30–40% of the icon
-       bleeds off the card edge, exactly like banking / fintech apps     */
     right: -18px;
     bottom: -16px;
     color: var(--text);
@@ -682,11 +876,21 @@
   /* ── Revenue card mobile ── */
   .revenueCard {
     padding: 16px 18px;
-    margin-bottom: 22px;
+    margin-bottom: 16px;
   }
 
   .revenueAmount {
     font-size: 1.5rem;
+  }
+
+  /* ── Insights card mobile ── */
+  .insightsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .insightsStatValue {
+    font-size: 1.1rem;
   }
 
   /* Modal full-width on mobile */
