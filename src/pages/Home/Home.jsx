@@ -54,25 +54,25 @@ function getGreeting() {
   return 'Good night'
 }
 
-function getGreetingEmoji() {
+function getGreetingIcon() {
   const hour = new Date().getHours()
-  if (hour >= 5 && hour < 12)  return '☀️'
-  if (hour >= 12 && hour < 17) return '👋'
-  if (hour >= 17 && hour < 21) return '🌆'
-  return '🌙'
+  if (hour >= 5 && hour < 12)  return 'wb_sunny'
+  if (hour >= 12 && hour < 17) return 'waving_hand'
+  if (hour >= 17 && hour < 21) return 'nights_stay'
+  return 'bedtime'
 }
 
 // ── Random subtexts ───────────────────────────────────────────
 const SUBTEXTS = [
   "Here's what's happening in your shop today.",
   "Let's see how your shop is doing right now.",
-  "Your shop summary is ready — take a look.",
+  "Your shop summary is ready, take a look.",
   "Stay on top of your shop with today's snapshot.",
-  "Everything at a glance — your shop, your day.",
+  "Everything at a glance, your shop, your day.",
   "Here's your daily shop overview. Let's get to work.",
-  "Check in on your orders, tasks & appointments.",
+  "Check in on your orders, tasks and appointments.",
   "A fresh look at what needs your attention today.",
-  "Your shop is waiting — here's what's on the list.",
+  "Your shop is waiting, here's what's on the list.",
   "Quick recap: here's where things stand today.",
 ]
 
@@ -217,9 +217,9 @@ function RevenueGoalModal({ onSave, onClose }) {
 
         {/* Period hint */}
         <div className={styles.periodHint}>
-          {period === 'weekly'  && '📅 Resets every Monday'}
-          {period === 'monthly' && '📅 Resets on the 1st of each month'}
-          {period === 'yearly'  && '📅 Resets on January 1st each year'}
+          {period === 'weekly'  && <><span className="mi" style={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '5px' }}>date_range</span>Resets every Monday</>}
+          {period === 'monthly' && <><span className="mi" style={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '5px' }}>calendar_month</span>Resets on the 1st of each month</>}
+          {period === 'yearly'  && <><span className="mi" style={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '5px' }}>event_repeat</span>Resets on January 1st each year</>}
         </div>
 
         <button
@@ -277,15 +277,12 @@ function MobileQuickActions({ navigate }) {
 }
 
 // ── Empty state component ─────────────────────────────────────
-function EmptyState({ icon, message, sub, actionLabel, onAction }) {
+function EmptyState({ icon, message, sub }) {
   return (
     <div className={styles.emptyState}>
       <span className={`mi ${styles.emptyStateIcon}`}>{icon}</span>
       <p className={styles.emptyStateMsg}>{message}</p>
       {sub && <p className={styles.emptyStateSub}>{sub}</p>}
-      {actionLabel && onAction && (
-        <button className={styles.emptyStateBtn} onClick={onAction}>{actionLabel}</button>
-      )}
     </div>
   )
 }
@@ -340,7 +337,7 @@ function Home({ onMenuClick }) {
 
   // ── Timely greeting & random subtext (stable per session) ──
   const greetingRef  = useRef(getGreeting())
-  const emojiRef     = useRef(getGreetingEmoji())
+  const iconRef      = useRef(getGreetingIcon())
   const subtextRef   = useRef(getRandomSubtext())
   const updatedAtRef = useRef(new Date())
 
@@ -494,7 +491,8 @@ function Home({ onMenuClick }) {
         {/* HERO */}
         <section className={styles.hero}>
           <p className={styles.welcomeLabel}>
-            {greetingRef.current} {emojiRef.current}
+            <span className="mi" style={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: '4px', opacity: 0.7 }}>{iconRef.current}</span>
+            {greetingRef.current}
           </p>
           <h1 className={styles.title}>{displayName}</h1>
           <p className={styles.subtitle}>{subtextRef.current}</p>
@@ -599,8 +597,6 @@ function Home({ onMenuClick }) {
               icon="event_available"
               message="No upcoming appointments"
               sub="Scheduled appointments will appear here."
-              actionLabel="Book Appointment"
-              onAction={() => navigate('/appointments')}
             />
           ) : (
             <div className={styles.listSection}>
@@ -753,8 +749,6 @@ function Home({ onMenuClick }) {
               icon="shopping_bag"
               message="No pending orders"
               sub="New and pending orders will show up here."
-              actionLabel="View Orders"
-              onAction={() => navigate('/orders')}
             />
           ) : (
             <div className={styles.listSection}>
@@ -812,8 +806,6 @@ function Home({ onMenuClick }) {
               icon="assignment_turned_in"
               message="No pending tasks"
               sub="Tasks you create will appear here."
-              actionLabel="Add Task"
-              onAction={() => navigate('/tasks')}
             />
           ) : (
             <div className={styles.listSection}>
