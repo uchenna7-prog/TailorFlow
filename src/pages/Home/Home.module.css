@@ -608,25 +608,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 28px 20px 24px;
-  background: var(--surface);
-  border: 1px dashed var(--border2);
-  border-radius: 14px;
+  padding: 32px 20px 28px;
   text-align: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .emptyStateIcon {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   color: var(--text3);
-  opacity: 0.5;
+  opacity: 0.4;
   margin-bottom: 6px;
 }
 
 .emptyStateMsg {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--text2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text3);
   margin: 0;
 }
 
@@ -634,25 +631,9 @@
   font-size: 0.75rem;
   color: var(--text3);
   font-weight: 400;
-  margin: 0 0 10px;
+  margin: 0;
   line-height: 1.4;
-}
-
-.emptyStateBtn {
-  margin-top: 6px;
-  padding: 8px 20px;
-  border-radius: 10px;
-  border: 1.5px solid var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.emptyStateBtn:active {
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  opacity: 0.8;
 }
 
 @media (max-width: 600px) {
