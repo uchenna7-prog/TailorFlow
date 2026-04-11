@@ -34,6 +34,19 @@
   font-size: 0.8rem;
   color: var(--text3);
   font-weight: 400;
+  margin: 0 0 4px;
+}
+
+/* ── Updated-at timestamp ── */
+.updatedAt {
+  font-size: 0.68rem;
+  color: var(--text3);
+  font-weight: 500;
+  margin: 4px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  opacity: 0.75;
 }
 
 /* ── NOTIFICATION BANNER ── */
@@ -587,6 +600,61 @@
 .listPrice { font-size: 0.88rem; font-weight: 700; color: var(--text); white-space: nowrap; }
 .listQty { font-size: 0.65rem; color: var(--text3); margin-top: 2px; }
 
+/* ═══════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════ */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px 24px;
+  background: var(--surface);
+  border: 1px dashed var(--border2);
+  border-radius: 14px;
+  text-align: center;
+  gap: 4px;
+}
+
+.emptyStateIcon {
+  font-size: 2.2rem;
+  color: var(--text3);
+  opacity: 0.5;
+  margin-bottom: 6px;
+}
+
+.emptyStateMsg {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text2);
+  margin: 0;
+}
+
+.emptyStateSub {
+  font-size: 0.75rem;
+  color: var(--text3);
+  font-weight: 400;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.emptyStateBtn {
+  margin-top: 6px;
+  padding: 8px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.emptyStateBtn:active {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
 @media (max-width: 600px) {
   .main {
     padding-bottom: calc(90px + var(--sb, 0px));
@@ -697,11 +765,11 @@
   .mobileQuickBtn:active { color: var(--accent); }
 
   .mobileQuickLabel {
-  font-size: 0.56rem;
-  font-weight: 600;
-  line-height: 1.3;
-  text-align: center;
-  color: inherit;
-  white-space: nowrap;   /* keeps it on one line */
-}
+    font-size: 0.56rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    color: inherit;
+    white-space: nowrap;
+  }
 }
