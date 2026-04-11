@@ -34,15 +34,6 @@
   font-size: 0.8rem;
   color: var(--text3);
   font-weight: 400;
-  margin: 0 0 4px;
-}
-
-.syncLabel {
-  font-size: 0.65rem;
-  color: var(--text3);
-  font-weight: 400;
-  margin: 0;
-  opacity: 0.7;
 }
 
 /* ── NOTIFICATION BANNER ── */
@@ -54,7 +45,7 @@
   border: 1px solid var(--border2);
   border-radius: 14px;
   padding: 14px 14px;
-  margin-bottom: 12px;
+  margin-bottom: 18px;
   animation: slideDown 0.3s ease;
 }
 
@@ -114,130 +105,6 @@
   padding: 2px 0;
 }
 
-/* ── OVERDUE ALERT BANNER ── */
-.overdueBanner {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  background: rgba(239, 68, 68, 0.06);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  animation: slideDown 0.3s ease;
-}
-
-.overdueBannerText {
-  flex: 1;
-  min-width: 0;
-}
-
-.overdueBannerTitle {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: #ef4444;
-  margin-bottom: 3px;
-}
-
-.overdueBannerLine {
-  font-size: 0.7rem;
-  color: var(--text2);
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.overdueBannerActions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.overdueBannerBtn {
-  background: #ef4444;
-  color: #fff;
-  border: none;
-  border-radius: 7px;
-  padding: 5px 12px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-.overdueBannerDismiss {
-  background: none;
-  border: none;
-  color: var(--text3);
-  font-size: 0.72rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  padding: 2px 4px;
-}
-
-/* ── BIRTHDAY CARD ── */
-.birthdayCard {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(135deg, rgba(251,146,60,0.08) 0%, rgba(244,114,182,0.08) 100%);
-  border: 1px solid rgba(251,146,60,0.2);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-
-.birthdayText {
-  flex: 1;
-  min-width: 0;
-}
-
-.birthdayName {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.birthdaySub {
-  font-size: 0.7rem;
-  color: var(--text3);
-  font-weight: 500;
-}
-
-/* ── TOP CUSTOMER CARD ── */
-.topCustomerCard {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-}
-
-.topCustomerText {
-  flex: 1;
-  min-width: 0;
-}
-
-.topCustomerName {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.topCustomerSub {
-  font-size: 0.7rem;
-  color: var(--text3);
-  font-weight: 500;
-}
-
 /* ═══════════════════════════════════════════
    STATS GRID — 2-col
    ═══════════════════════════════════════════ */
@@ -264,6 +131,7 @@
 }
 .statCard:active { background: var(--surface2); }
 
+/* Left colour icon box — desktop only, hidden on mobile */
 .statIconWrap {
   width: 34px;
   height: 34px;
@@ -281,23 +149,20 @@
   flex-direction: column;
 }
 
+/* Background watermark — hidden on desktop, shown on mobile */
+/* Positioned so the icon is cut off at the bottom-right corner */
 .statBgIcon {
   display: none;
   position: absolute;
   right: -14px;
   bottom: -14px;
   font-size: 5.5rem;
-  color: var(--card-accent, var(--text));
-  opacity: 0.07;
+  color: var(--text);
+  opacity: 0.065;
   pointer-events: none;
   user-select: none;
   line-height: 1;
-}
-
-.statValueRow {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
+  /* No rotation — straight icons like Monzo/Revolut/N26 */
 }
 
 .statValue {
@@ -305,12 +170,6 @@
   font-weight: 800;
   color: var(--text);
   line-height: 1.1;
-}
-
-.statDelta {
-  font-size: 0.6rem;
-  font-weight: 700;
-  line-height: 1;
 }
 
 .statLabel {
@@ -322,167 +181,12 @@
   margin-top: 2px;
 }
 
+/* Sub text — always BELOW the number */
 .statSub {
   font-size: 0.55rem;
   font-weight: 600;
   margin-top: 4px;
   line-height: 1.2;
-}
-
-/* ── WEEK AT A GLANCE ── */
-.weekGlance {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-}
-
-.weekGlanceLabel {
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text3);
-  margin-bottom: 10px;
-}
-
-.weekGlanceDays {
-  display: flex;
-  justify-content: space-between;
-}
-
-.weekDay {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-}
-
-.weekDayName {
-  font-size: 0.58rem;
-  font-weight: 600;
-  color: var(--text3);
-  text-transform: uppercase;
-}
-
-.weekDayNum {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text2);
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
-
-.weekDayToday .weekDayNum {
-  background: var(--accent);
-  color: var(--bg);
-}
-
-.weekDayToday .weekDayName {
-  color: var(--accent);
-}
-
-.weekDayDot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.55rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.weekDayEmpty {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--border2);
-}
-
-/* ── TODAY'S SCHEDULE STRIP ── */
-.scheduleWrap {
-  margin-bottom: 12px;
-}
-
-.scheduleHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.scheduleTitle {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-
-.scheduleScroll {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none;
-}
-.scheduleScroll::-webkit-scrollbar { display: none; }
-
-.scheduleCard {
-  flex-shrink: 0;
-  width: 90px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 3px solid #818cf8;
-  border-radius: 12px;
-  padding: 10px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
-
-.scheduleTime {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text3);
-  text-align: center;
-}
-
-.scheduleIconWrap {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.scheduleName {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text);
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 76px;
-}
-
-.scheduleType {
-  font-size: 0.58rem;
-  color: var(--text3);
-  font-weight: 500;
-  text-align: center;
-  text-transform: capitalize;
 }
 
 /* ── REVENUE CARD ── */
@@ -530,63 +234,41 @@
   color: var(--text3);
 }
 
+.revenuePercent {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text3);
+}
+
 .revenueDonutWrap {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* ── Revenue empty state ── */
+.revenueEmptyIconRow {
+  margin-bottom: 6px;
+}
+
 .revenueEmptyIconWrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  border: 1.5px dashed color-mix(in srgb, var(--accent) 30%, transparent);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
 .revenueEmptyTitle {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 800;
   color: var(--text);
-  margin-bottom: 1px;
+  margin-bottom: 3px;
 }
 
 .revenueEmptySub {
-  font-size: 0.75rem;
-  color: var(--text3);
-  font-weight: 450;
-  line-height: 1.3;
-}
-
-/* ── EMPTY STATES ── */
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 32px 20px;
-  background: var(--surface);
-  border: 1px dashed var(--border2);
-  border-radius: 16px;
-  margin-bottom: 22px;
-  text-align: center;
-}
-
-.emptyStateTitle {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--text2);
-}
-
-.emptyStateSub {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text3);
   font-weight: 400;
 }
@@ -662,6 +344,7 @@
   margin-bottom: 8px;
 }
 
+/* Period tabs */
 .periodTabs {
   display: flex;
   gap: 8px;
@@ -687,6 +370,7 @@
   color: var(--accent);
 }
 
+/* Goal input */
 .goalInputRow {
   display: flex;
   gap: 8px;
@@ -721,6 +405,7 @@
 .goalInput:focus { border-color: var(--accent); }
 .goalInput::placeholder { color: var(--text3); font-weight: 400; }
 
+/* Period hint */
 .periodHint {
   font-size: 0.72rem;
   color: var(--text3);
@@ -731,6 +416,7 @@
   border: 1px solid var(--border);
 }
 
+/* Buttons */
 .modalSaveBtn {
   width: 100%;
   padding: 14px;
@@ -761,12 +447,13 @@
   cursor: pointer;
 }
 
-/* ── QUICK ACTIONS DESKTOP ── */
+/* ── QUICK ACTIONS DESKTOP — hidden on mobile ── */
 .quickActionsDesktop {
   display: block;
   margin-bottom: 22px;
 }
 
+/* ── ACTION CARD (desktop quick actions grid) ── */
 .actionCard {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -789,10 +476,12 @@
   align-items: center;
 }
 
+/* ── MOBILE BOTTOM QUICK NAV — hidden on desktop ── */
 .mobileQuickNav {
   display: none;
 }
 
+/* ── SECTION ── */
 .section {
   margin-bottom: 22px;
 }
@@ -824,6 +513,7 @@
   margin-bottom: 12px;
 }
 
+/* ── LIST SECTIONS ── */
 .listSection { position: relative; }
 
 .listDivider {
@@ -915,17 +605,25 @@
 .listPrice { font-size: 0.88rem; font-weight: 700; color: var(--text); white-space: nowrap; }
 .listQty { font-size: 0.65rem; color: var(--text3); margin-top: 2px; }
 
+
+/* ═══════════════════════════════════════════
+   MOBILE  ≤ 600px
+   ═══════════════════════════════════════════ */
 @media (max-width: 600px) {
+
+  /* Extra bottom space for fixed nav */
   .main {
     padding-bottom: calc(90px + var(--sb, 0px));
   }
 
+  /* ── Stats: 2-col grid ── */
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     margin-bottom: 12px;
   }
 
+  /* Mobile card layout */
   .statCard {
     padding: 16px 14px 14px 14px;
     align-items: flex-start;
@@ -934,23 +632,27 @@
     border-radius: 16px;
     min-height: 100px;
     border: 1px solid var(--border);
-    border-left: 3px solid var(--card-accent, var(--border));
     padding-right: 16px;
   }
 
+  /* Hide coloured left icon on mobile */
   .statIconWrap {
     display: none;
   }
 
+  /* Show background watermark on mobile — cut off at bottom-right corner */
   .statBgIcon {
     display: block;
     font-size: 5.5rem;
+    /* Pushed far enough right and down that roughly 30–40% of the icon
+       bleeds off the card edge, exactly like banking / fintech apps     */
     right: -18px;
     bottom: -16px;
-    color: var(--card-accent, var(--text));
-    opacity: 0.07;
+    color: var(--text);
+    opacity: 0.065;
   }
 
+  /* Label at top */
   .statLabel {
     font-size: 0.58rem;
     font-weight: 700;
@@ -961,6 +663,7 @@
     margin-bottom: 8px;
   }
 
+  /* Big number */
   .statValue {
     font-size: 2rem;
     font-weight: 800;
@@ -969,17 +672,14 @@
     letter-spacing: -1px;
   }
 
-  .statDelta {
-    font-size: 0.65rem;
-    font-weight: 700;
-  }
-
+  /* Sub text — smaller, below the number */
   .statSub {
     font-size: 0.58rem;
     font-weight: 600;
     margin-top: 5px;
   }
 
+  /* ── Revenue card mobile ── */
   .revenueCard {
     padding: 16px 18px;
     margin-bottom: 22px;
@@ -989,18 +689,23 @@
     font-size: 1.5rem;
   }
 
+  /* Modal full-width on mobile */
   .modalSheet {
     border-radius: 22px 22px 0 0;
     padding-bottom: calc(32px + var(--sb, 0px));
   }
 
+  /* ── Hide desktop quick actions on mobile ── */
   .quickActionsDesktop {
     display: none;
   }
 
+  /* ═══════════════════════════════════════════
+     MOBILE BOTTOM QUICK ACTIONS NAV
+     ═══════════════════════════════════════════ */
   .mobileQuickNav {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-around;
     position: fixed;
     bottom: 0;
@@ -1033,9 +738,12 @@
   .mobileQuickLabel {
     font-size: 0.56rem;
     font-weight: 600;
+    width: 38px;
     line-height: 1.3;
     text-align: center;
     color: inherit;
-    white-space: nowrap;
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: normal;
   }
 }
