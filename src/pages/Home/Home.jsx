@@ -406,7 +406,7 @@ function Home({ onMenuClick }) {
       bgIcon:      'today',
       iconColor:   '#06b6d4',
       value:       todayCount,
-      label:       "Today's Appointments",
+      label:       "Today's Appts",
       sub:         missedCount > 0
         ? `${missedCount} missed`
         : `${upcomingThisWeek} this wk`,
