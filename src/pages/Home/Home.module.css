@@ -49,6 +49,14 @@
   opacity: 0.75;
 }
 
+/* ── Greeting icon ── */
+.greetingIcon {
+  font-size: 1.1rem !important;
+  vertical-align: middle;
+  margin-left: 5px;
+  line-height: 1;
+}
+
 /* ── NOTIFICATION BANNER ── */
 .notifBanner {
   display: flex;
