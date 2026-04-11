@@ -14,6 +14,7 @@ import { NotificationProvider }    from './contexts/NotificationContext'
 import { PremiumProvider }         from './contexts/PremiumContext'
 import App from './App'
 import './index.css'
+import { registerSW } from 'virtual:pwa-register'
 
 // Provider order — each provider can only use contexts from providers that wrap it:
 //
@@ -59,12 +60,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>
 )
 
-// ── Register Service Worker (PWA) ─────────────────────────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then(reg => console.log('SW registered:', reg.scope))
-      .catch(err => console.error('SW registration failed:', err))
-  })
-}
+// ── Register Service Worker (PWA auto-update) ─────────────────
+registerSW({
+  onNeedRefresh() {
+    window.location.reload()
+  },
+  onOfflineReady() {
+    console.log('TailorFlow is ready for offline use')
+  },
+})
