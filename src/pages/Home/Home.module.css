@@ -141,27 +141,59 @@
 .statCard {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 11px 10px;
+  border-radius: 16px;
+  padding: 16px 14px 14px;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
   align-items: flex-start;
+  gap: 0;
   cursor: pointer;
   transition: background 0.15s;
+  min-height: 130px;
 }
 .statCard:active { background: var(--surface2); }
 
+/* Icon — top, tinted rounded square */
 .statIconWrap {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: var(--surface2); border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 14px;
 }
-.statCardBody { display: flex; flex-direction: column; }
-.statBgIcon   { display: none; }
 
-.statValue { font-size: 1.15rem; font-weight: 800; color: var(--text); line-height: 1.1; }
-.statLabel { font-size: 0.62rem; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
-.statSub   { font-size: 0.55rem; font-weight: 700; margin-top: 4px; line-height: 1.2; }
+/* No body wrapper needed — direct children */
+.statBgIcon { display: none; }
+.statCardBody { display: contents; }
+
+/* Big number */
+.statValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -1px;
+  margin-bottom: 6px;
+}
+
+/* Label — uppercase caps, wraps to 2 lines naturally */
+.statLabel {
+  font-size: 0.6rem;
+  color: var(--text3);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.35;
+  margin-bottom: 0;
+}
+
+/* Sub-text — sits below label */
+.statSub {
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin-top: 6px;
+  line-height: 1.2;
+}
 
 /* ── Delta badges ── */
 .deltaUp {
@@ -472,17 +504,11 @@
 
   .statsGrid { grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 12px; }
 
-  .statCard {
-    padding: 16px 14px 14px; align-items: flex-start;
-    flex-direction: column; gap: 0; border-radius: 16px;
-    min-height: 110px;
-  }
-  .statIconWrap { display: none; }
-  .statBgIcon   { display: none; }
-
-  .statLabel { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-top: 0; margin-bottom: 8px; }
-  .statValue { font-size: 1.9rem; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -1px; }
-  .statSub   { font-size: 0.58rem; font-weight: 700; margin-top: 5px; }
+  .statCard   { padding: 14px 12px 12px; min-height: 120px; border-radius: 16px; }
+  .statIconWrap { width: 36px; height: 36px; border-radius: 10px; margin-bottom: 12px; }
+  .statValue  { font-size: 1.85rem; letter-spacing: -1px; margin-bottom: 5px; }
+  .statLabel  { font-size: 0.58rem; }
+  .statSub    { font-size: 0.63rem; margin-top: 5px; }
 
   .revenueCard   { padding: 16px 18px; margin-bottom: 12px; }
   .revenueAmount { font-size: 1.5rem; }
