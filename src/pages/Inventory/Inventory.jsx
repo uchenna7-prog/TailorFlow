@@ -35,7 +35,7 @@ const UNITS = ['yards', 'metres', 'pcs', 'rolls', 'kg', 'g', 'packets', 'boxes',
 const TABS = [
   { id: 'all',       label: 'All'        },
   { id: 'low',       label: 'Low Stock'  },
-  { id: 'ok',        label: 'In Stock'   },
+  { id: 'ok',        label: 'In Stock' },
   { id: 'out',       label: 'Out'        },
 ]
 
@@ -476,13 +476,7 @@ function InventoryCard({ item, isLast, onTap }) {
             <span>{item.colour}</span>
           </div>
         )}
-        <span
-          className={styles.statusPill}
-          style={{ background: sc.bg, color: sc.color, borderColor: sc.border, borderRadius: '6px' }}
-        >
-          {sc.label}
-        </span>
-        <div className={styles.cardMeta} style={{ marginTop: 4 }}>
+        <div className={styles.cardMeta}>
           <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)' }}>category</span>
           <span>{cat.label}</span>
         </div>
@@ -493,6 +487,12 @@ function InventoryCard({ item, isLast, onTap }) {
           {item.quantity}
           <span className={styles.cardUnit}>{item.unit}</span>
         </div>
+        <span
+          className={styles.statusPill}
+          style={{ background: sc.bg, color: sc.color, borderColor: sc.border, borderRadius: '6px' }}
+        >
+          {sc.label}
+        </span>
       </div>
     </div>
   )
@@ -610,35 +610,11 @@ export default function Inventory({ onMenuClick }) {
     return acc
   }, {})
 
-  // Summary stats for the strip
-  const totalItems    = items.length
   const lowStockCount = counts.low + counts.out
 
   return (
     <div className={styles.page}>
       <Header onMenuClick={onMenuClick} title="Inventory" />
-
-      {/* ── Summary strip ── */}
-      {totalItems > 0 && (
-        <div className={styles.summaryStrip}>
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryNum}>{totalItems}</span>
-            <span className={styles.summaryLabel}>Items</span>
-          </div>
-          <div className={styles.summaryDivider} />
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryNum} style={{ color: '#22c55e' }}>{counts.ok}</span>
-            <span className={styles.summaryLabel}>In Stock</span>
-          </div>
-          <div className={styles.summaryDivider} />
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryNum} style={{ color: lowStockCount > 0 ? '#ef4444' : 'var(--text3)' }}>
-              {lowStockCount}
-            </span>
-            <span className={styles.summaryLabel}>Needs Attention</span>
-          </div>
-        </div>
-      )}
 
       {/* ── Search + category filter ── */}
       <div className={styles.searchContainer}>
