@@ -307,21 +307,18 @@
 }
 
 /* ── STAGE CHIP ROW (used in form modal + detail view) ── */
-/*
-  KEY FIX: flex-wrap: wrap + align-items: flex-start + flex: 0 0 auto on chips
-  prevents any chip (incl. "Fabric Ready") from stretching to fill the row.
-*/
 .stageChipRow {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: flex-start; /* Corrected to align chips to the left */
   align-items: flex-start;
   margin-top: 4px;
   margin-bottom: 4px;
 }
 
 .stageChip {
-  display: inline-flex;
+  display: inline-flex !important; /* Force inline layout */
   align-items: center;
   gap: 5px;
   padding: 8px 12px;
@@ -335,9 +332,11 @@
   cursor: pointer;
   transition: all 0.18s;
   white-space: nowrap;
-  /* chips size to their own content — never stretch to fill the row */
-  flex: 0 0 auto;
-  width: fit-content;
+  
+  /* FIXED: Use !important to prevent stretching */
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: max-content !important;
 }
 
 .stageChip:active {
