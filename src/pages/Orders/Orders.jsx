@@ -67,11 +67,11 @@ const STATUS_ICON = {
 }
 
 const STATUS_COLORS = {
-  pending:       { color: '#818cf8', bg: 'rgba(129,140,248,0.1)',  border: 'rgba(129,140,248,0.3)'  },
-  'in-progress': { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.3)'  },
-  completed:     { color: '#22c55e', bg: 'rgba(34,197,94,0.1)',   border: 'rgba(34,197,94,0.3)'   },
-  delivered:     { color: '#a855f7', bg: 'rgba(168,85,247,0.1)',  border: 'rgba(168,85,247,0.3)'  },
-  cancelled:     { color: '#94a3b8', bg: 'rgba(148,163,184,0.1)', border: 'rgba(148,163,184,0.3)' },
+  pending:       { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.35)' },
+  'in-progress': { color: '#3b82f6', bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.35)' },
+  completed:     { color: '#22c55e', bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.35)'  },
+  delivered:     { color: '#a855f7', bg: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.35)' },
+  cancelled:     { color: '#94a3b8', bg: 'rgba(148,163,184,0.12)',border: 'rgba(148,163,184,0.35)'},
 }
 
 const STATUS_TEXT_COLORS = {
@@ -94,9 +94,13 @@ function OrderDetailPanel({ order, onClose }) {
   if (!order) return null
   const overdue  = isOverdue(order)
   const due      = daysUntil(order.dueDate)
-  const sc       = STATUS_COLORS[order.status] ?? STATUS_COLORS.pending
+  const sc       = overdue
+    ? { color: '#ef4444', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.35)' }
+    : STATUS_COLORS[order.status] ?? STATUS_COLORS.pending
   const pc       = PRIORITY_COLORS[order.priority] ?? PRIORITY_COLORS.normal
-  const total    = order.price && order.qty ? order.price * order.qty : order.price
+  const total    = order.price && order.qty && order.qty > 1 ? order.price * order.qty : null
+  const items    = order.items || []
+  const stageObj = STAGES.find(s => s.value === order.stage)
 
   return (
     <div className={styles.detailOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
@@ -112,6 +116,33 @@ function OrderDetailPanel({ order, onClose }) {
         </div>
 
         <div className={styles.detailBody}>
+
+          {/* Garment images / icons row */}
+          {items.length > 0 && (
+            <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+              {items.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <div style={{
+                    width: 56, height: 56, borderRadius: 12,
+                    background: 'var(--surface2)', border: '1px solid var(--border)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    overflow: 'hidden', flexShrink: 0,
+                  }}>
+                    {item.imgSrc
+                      ? <img src={item.imgSrc} alt={item.name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }} />
+                      : <span className="material-icons" style={{ fontSize: '1.6rem', color: 'var(--text3)' }}>checkroom</span>
+                    }
+                  </div>
+                  {item.name && (
+                    <span style={{ fontSize: '0.6rem', fontWeight: 600, color: 'var(--text3)', textAlign: 'center', maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {item.name}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Title + customer */}
           <div className={styles.detailTitle}>{order.desc || order.name || 'Order'}</div>
 
@@ -122,13 +153,13 @@ function OrderDetailPanel({ order, onClose }) {
             </div>
           )}
 
-          {/* Status + priority pills */}
+          {/* Status + priority + stage pills */}
           <div className={styles.detailPillRow}>
             <span
               className={styles.detailPill}
-              style={{ color: overdue ? '#ef4444' : sc.color, background: overdue ? 'rgba(239,68,68,0.1)' : sc.bg, borderColor: overdue ? 'rgba(239,68,68,0.3)' : sc.border }}
+              style={{ color: sc.color, background: sc.bg, borderColor: sc.border }}
             >
-              {overdue ? 'Overdue' : (order.status || 'Pending')}
+              {overdue ? 'Overdue' : (order.status ? order.status.replace('-', ' ') : 'Pending')}
             </span>
             {order.priority && order.priority !== 'normal' && (
               <span
@@ -136,6 +167,12 @@ function OrderDetailPanel({ order, onClose }) {
                 style={{ color: pc.color, background: pc.bg, borderColor: pc.border }}
               >
                 {order.priority.charAt(0).toUpperCase() + order.priority.slice(1)}
+              </span>
+            )}
+            {stageObj && (
+              <span className={styles.detailPill} style={{ color: 'var(--text2)', background: 'var(--surface2)', borderColor: 'var(--border2)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <span className="material-icons" style={{ fontSize: '0.75rem' }}>{stageObj.icon}</span>
+                {stageObj.label}
               </span>
             )}
           </div>
@@ -150,7 +187,7 @@ function OrderDetailPanel({ order, onClose }) {
               <div className={styles.detailCellLabel}>Qty</div>
               <div className={styles.detailCellVal}>{order.qty ?? 1}</div>
             </div>
-            {total && order.qty > 1 && (
+            {total && (
               <div className={styles.detailCell}>
                 <div className={styles.detailCellLabel}>Total</div>
                 <div className={styles.detailCellVal}>{fmt(total)}</div>
@@ -251,54 +288,37 @@ function OrderCard({ order, isLast, onTap }) {
           <span className={styles.orderListMetaText}>{order.customerName || '—'}</span>
         </div>
 
-        {/* Status badge — coloured pill */}
+        {/* Status badge — coloured pill matching homepage style */}
         {order.status && (
           <div style={{ marginBottom: 4 }}>
             <span style={{
               display: 'inline-flex',
               alignItems: 'center',
-              fontSize: '0.62rem',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              padding: '3px 8px',
-              borderRadius: 20,
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              padding: '2px 10px',
+              borderRadius: 6,
               color: sc.color,
               background: sc.bg,
               border: `1px solid ${sc.border}`,
             }}>
-              {overdue ? 'Overdue' : order.status.replace('-', ' ')}
+              {overdue ? 'Overdue' : order.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}
             </span>
           </div>
         )}
 
-        {/* Stage badge */}
+        {/* Stage — plain text with icon, no pill box */}
         {stageObj && (
-          <div style={{ marginBottom: 3 }}>
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              fontSize: '0.62rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.4px',
-              padding: '3px 8px',
-              borderRadius: 20,
-              color: 'var(--text2)',
-              background: 'var(--surface2)',
-              border: '1px solid var(--border2)',
-            }}>
-              <span className="material-icons" style={{ fontSize: '0.7rem' }}>{stageObj.icon}</span>
-              {stageObj.label}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+            <span className="material-icons" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>{stageObj.icon}</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 500, color: 'var(--text2)' }}>{stageObj.label}</span>
           </div>
         )}
 
-        {/* Due date */}
+        {/* Due date — always red */}
         {(order.dueDate || order.due) && (
-          <div className={`${styles.orderListDue} ${overdue ? styles.orderListDueOverdue : ''}`}>
-            Due: {order.dueDate ? formatDate(order.dueDate) : order.due}{order.dueDate && due ? ` · ${due}` : ''}
+          <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#ef4444', marginTop: 1 }}>
+            Due {order.dueDate ? formatDate(order.dueDate) : order.due}{order.dueDate && due ? ` · ${due}` : ''}
           </div>
         )}
       </div>
