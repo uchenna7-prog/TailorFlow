@@ -1,5 +1,3 @@
-// src/pages/CustomerDetail/tabs/OrdersTab.jsx
-
 import { useState, useEffect } from 'react'
 import { useOrders } from '../../../contexts/OrdersContext'
 import ConfirmSheet from '../../../components/ConfirmSheet/ConfirmSheet'
@@ -528,18 +526,24 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
                 <div className={styles.orderListInfo}>
                   <div className={styles.orderListDesc}>{o.desc}</div>
 
-                  {/* Status row */}
-                  <div className={styles.orderListStatusRow}>
-                    <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>autorenew</span>
-                    <span className={styles.orderListStatusText}>{statusObj.label}</span>
-                    {stageObj && (
-                      <>
-                        <span style={{ color: 'var(--border2)', fontSize: '0.7rem' }}>•</span>
-                        <span className="mi" style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{stageObj.icon}</span>
-                        <span className={styles.orderListStageText}>{stageObj.label}</span>
-                      </>
-                    )}
+                  {/* ── Status Badge Line ── */}
+                  <div style={{ marginBottom: 4 }}>
+                    <span className={`${styles.statusBadge} ${
+                      o.status === 'pending' ? styles.statusPending : 
+                      o.status === 'in-progress' ? styles.statusProgress : 
+                      styles.statusDone
+                    }`}>
+                      {statusObj.label}
+                    </span>
                   </div>
+
+                  {/* ── Stage Row (Moved to next line) ── */}
+                  {stageObj && (
+                    <div className={styles.orderListStageRow}>
+                      <span className="mi" style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{stageObj.icon}</span>
+                      <span className={styles.orderListStageText}>{stageObj.label}</span>
+                    </div>
+                  )}
 
                   <div className={styles.orderListPriceLine}>
                     {priceStr} <span className={styles.orderListQty}>({o.qty} pcs)</span>
