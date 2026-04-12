@@ -152,6 +152,28 @@ export default function CustomerDetail({ onMenuClick }) {
     }
   }, [data, orders, showToast, invoiceTemplate, invoiceBrand])
 
+  // ── AUTO-MARK INVOICE AS PAID ────────────────────────────────
+  // Called by PaymentsTab whenever a payment reaches 'paid' status.
+  // Finds the matching invoice by orderId and flips it to 'paid'
+  // automatically — no manual toggle needed.
+  const handleInvoicePaid = useCallback(async (orderId) => {
+    const matchingInvoice = invoicesState.find(
+      inv => String(inv.orderId) === String(orderId) && inv.status !== 'paid'
+    )
+    if (!matchingInvoice) return
+    try {
+      await data.updateInvoiceStatus(matchingInvoice.id, 'paid')
+      setInvoicesState(prev =>
+        prev.map(inv =>
+          inv.id === matchingInvoice.id ? { ...inv, status: 'paid' } : inv
+        )
+      )
+      showToast('Invoice auto-marked as Paid ✓')
+    } catch {
+      showToast('Could not auto-update invoice.')
+    }
+  }, [invoicesState, data, showToast])
+
   const handleGenerateReceipt = useCallback(async (payment) => {
     if (!user) return
 
@@ -425,6 +447,7 @@ export default function CustomerDetail({ onMenuClick }) {
             orders={orders}
             showToast={showToast}
             onGenerateReceipt={handleGenerateReceipt}
+            onInvoicePaid={handleInvoicePaid}
           />
         )}
         {activeTab === 'receipts' && (
