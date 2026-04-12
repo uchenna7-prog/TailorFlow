@@ -229,19 +229,18 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 16px 18px 16px;
+  padding: 14px 16px;
   margin-bottom: 22px;
   cursor: pointer;
   transition: background 0.15s;
 }
 .customerCard:active { background: var(--surface2); }
 
-/* Top: section label + chevron */
 .customerCardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .customerCardSectionLabel {
   font-size: 0.62rem;
@@ -251,39 +250,35 @@
   color: var(--text3);
 }
 
-/* Hero: big number inline with label */
-.customerHeroRow {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 14px;
+/* Hero: number then label stacked underneath */
+.customerHeroBlock {
+  margin-bottom: 12px;
 }
 .customerHeroNumber {
-  font-size: 2.8rem;
+  font-size: 2.6rem;
   font-weight: 800;
   color: var(--text);
   line-height: 1;
   letter-spacing: -1.5px;
-  flex-shrink: 0;
 }
 .customerHeroLabel {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 500;
   color: var(--text3);
+  margin-top: 3px;
 }
 
-/* Divider */
 .customerCardRule {
   height: 1px;
   background: var(--border);
-  margin: 0 0 12px;
+  margin: 0 0 11px;
 }
 
-/* Stacked rows: label on left, value on right — names never clip */
+/* Stacked rows: label left, value right */
 .customerStatStack {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 8px;
 }
 .customerStatRow {
   display: flex;
@@ -302,7 +297,6 @@
   font-weight: 700;
   color: var(--text);
   text-align: right;
-  /* truncate gracefully if name is very long */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -494,9 +488,9 @@
   .revenueAmount { font-size: 1.5rem; }
 
   /* Customer card — mobile */
-  .customerCard             { padding: 14px 16px 14px; }
-  .customerHeroNumber       { font-size: 2.4rem; letter-spacing: -1.5px; }
-  .customerHeroLabel        { font-size: 0.72rem; }
+  .customerCard             { padding: 12px 14px; }
+  .customerHeroNumber       { font-size: 2.2rem; letter-spacing: -1px; }
+  .customerHeroLabel        { font-size: 0.7rem; }
   .customerCardSectionLabel { font-size: 0.58rem; }
   .customerStatVal          { font-size: 0.8rem; }
   .customerStatLbl          { font-size: 0.73rem; }
