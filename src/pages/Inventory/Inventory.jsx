@@ -476,7 +476,13 @@ function InventoryCard({ item, isLast, onTap }) {
             <span>{item.colour}</span>
           </div>
         )}
-        <div className={styles.cardMeta}>
+        <span
+          className={styles.statusPill}
+          style={{ background: sc.bg, color: sc.color, borderColor: sc.border, borderRadius: '6px' }}
+        >
+          {sc.label}
+        </span>
+        <div className={styles.cardMeta} style={{ marginTop: 4 }}>
           <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)' }}>category</span>
           <span>{cat.label}</span>
         </div>
@@ -487,12 +493,6 @@ function InventoryCard({ item, isLast, onTap }) {
           {item.quantity}
           <span className={styles.cardUnit}>{item.unit}</span>
         </div>
-        <span
-          className={styles.statusPill}
-          style={{ background: sc.bg, color: sc.color, borderColor: sc.border, borderRadius: '6px' }}
-        >
-          {sc.label}
-        </span>
       </div>
     </div>
   )
