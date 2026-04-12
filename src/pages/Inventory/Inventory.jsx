@@ -357,7 +357,7 @@ function ItemDetail({ item, onClose, onEdit, onDelete, onAdjust }) {
                 {item.colour && <div className={styles.detailColour}>{item.colour}</div>}
                 <span
                   className={styles.statusPill}
-                  style={{ background: sc.bg, color: sc.color, borderColor: sc.border }}
+                  style={{ background: sc.bg, color: sc.color, borderColor: sc.border, borderRadius: '6px' }}
                 >
                   {sc.label}
                 </span>
@@ -489,7 +489,7 @@ function InventoryCard({ item, isLast, onTap }) {
         </div>
         <span
           className={styles.statusPill}
-          style={{ background: sc.bg, color: sc.color, borderColor: sc.border }}
+          style={{ background: sc.bg, color: sc.color, borderColor: sc.border, borderRadius: '6px' }}
         >
           {sc.label}
         </span>
