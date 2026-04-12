@@ -559,10 +559,6 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
                 <input type="text" className={styles.formInput} placeholder="Optional" value={address} onChange={e => setAddress(e.target.value)} />
               </div>
 
-              <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Notes</label>
-                <input type="text" className={styles.formInput} placeholder="e.g. Prefers loose fits" value={notes} onChange={e => setNotes(e.target.value)} />
-              </div>
             </>
           )}
 
