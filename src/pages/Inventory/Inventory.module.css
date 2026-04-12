@@ -182,6 +182,7 @@
   color: var(--text3);
   text-transform: uppercase;
   letter-spacing: 0.6px;
+  white-space: nowrap;
   cursor: pointer;
   position: relative;
   transition: color 0.2s;
