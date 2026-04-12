@@ -34,14 +34,19 @@ function ReceiptCard({ receipt, currency, onTap, isLast }) {
       <div className={styles.invoiceListInfo}>
         <div className={styles.invoiceListDesc}>{receipt.orderDesc || 'Payment'}</div>
         <div className={styles.invoiceListSub}>Generated on {receipt.date}</div>
-        <div className={styles.invoiceListStatusRow}>
-          <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', verticalAlign: 'middle' }}>
-            {isFullPay ? 'check_circle' : 'pending'}
-          </span>
-          <span className={styles.invoiceListStatusText} style={{ color: isFullPay ? '#22c55e' : '#fb923c' }}>
-            {statusLabel}
-          </span>
-        </div>
+        <span style={{
+          display: 'inline-block',
+          marginTop: '4px',
+          padding: '2px 8px',
+          borderRadius: '6px',
+          fontSize: '0.72rem',
+          fontWeight: 600,
+          background: isFullPay ? 'rgba(34,197,94,0.12)'  : 'rgba(251,146,60,0.12)',
+          color:      isFullPay ? '#15803d'                : '#c2410c',
+          border:     isFullPay ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(251,146,60,0.3)',
+        }}>
+          {statusLabel}
+        </span>
         <div className={styles.invoiceListAmount}>{fmt(currency, totalPaid)}</div>
       </div>
     </div>
