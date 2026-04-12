@@ -15,6 +15,7 @@ import {
   addOrder          as fsAdd,
   updateOrder       as fsUpdate,
   updateOrderStatus as fsUpdateStatus,
+  updateOrderStage  as fsUpdateStage,
   deleteOrder       as fsDelete,
 } from '../services/orderService'
 
@@ -29,11 +30,8 @@ export function OrdersProvider({ children }) {
   const unsubsRef = useRef({})
 
   // ── Subscribe to ALL customers' orders ────────────────────
-  // Runs whenever the customers list changes.
-  // Each customer gets its own real-time listener.
   useEffect(() => {
     if (!user || !customers.length) {
-      // Clean up all listeners and clear state
       Object.values(unsubsRef.current).forEach(u => u())
       unsubsRef.current = {}
       setOrderMap({})
@@ -57,7 +55,7 @@ export function OrdersProvider({ children }) {
 
     // Add listeners for new customers
     customers.forEach(customer => {
-      if (unsubsRef.current[customer.id]) return // already subscribed
+      if (unsubsRef.current[customer.id]) return
 
       const unsub = subscribeToOrders(
         user.uid,
@@ -78,7 +76,6 @@ export function OrdersProvider({ children }) {
       unsubsRef.current[customer.id] = unsub
     })
 
-    // Cleanup on unmount
     return () => {
       Object.values(unsubsRef.current).forEach(u => u())
       unsubsRef.current = {}
@@ -132,6 +129,16 @@ export function OrdersProvider({ children }) {
     }
   }, [user])
 
+  const updateOrderStage = useCallback(async (customerId, orderId, stage) => {
+    if (!user) return
+    try {
+      await fsUpdateStage(user.uid, customerId, String(orderId), stage)
+    } catch (err) {
+      console.error('[OrdersContext] updateOrderStage:', err)
+      throw err
+    }
+  }, [user])
+
   const deleteOrder = useCallback(async (customerId, orderId) => {
     if (!user) return
     try {
@@ -149,6 +156,7 @@ export function OrdersProvider({ children }) {
       addOrder,
       updateOrder,
       updateOrderStatus,
+      updateOrderStage,
       deleteOrder,
     }}>
       {children}
