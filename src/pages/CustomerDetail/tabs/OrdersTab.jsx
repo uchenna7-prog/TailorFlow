@@ -10,14 +10,30 @@ const PRIORITY_COLOR = { normal: 'var(--border2)', urgent: '#fb923c', vip: '#a85
 const PRIORITY_BANNER = {
   normal: { cls: styles.bannerNormal, text: 'Normal Priority' },
   urgent: { cls: styles.bannerUrgent, text: 'Urgent ★' },
-  vip: { cls: styles.bannerVip, text: 'VIP ★' },
+  vip:    { cls: styles.bannerVip,    text: 'VIP ★' },
 }
 
 const STATUSES = [
-  { value: 'pending',   label: 'Pending'   },
-  { value: 'completed', label: 'Completed' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'pending',     label: 'Pending'      },
+  { value: 'in-progress', label: 'In Progress'  },
+  { value: 'completed',   label: 'Completed'    },
+  { value: 'delivered',   label: 'Delivered'    },
+  { value: 'cancelled',   label: 'Cancelled'    },
+]
+
+// Production stages — ordered from start to finish
+const STAGES = [
+  { value: 'measurement_taken', label: 'Measurement Taken', icon: 'straighten'     },
+  { value: 'fabric_ready',      label: 'Fabric Ready',      icon: 'roll_content'   },
+  { value: 'cutting',           label: 'Cutting',           icon: 'content_cut'    },
+  { value: 'weaving',           label: 'Weaving',           icon: 'texture'        },
+  { value: 'sewing',            label: 'Sewing',            icon: 'send'           },
+  { value: 'embroidery',        label: 'Embroidery',        icon: 'auto_awesome'   },
+  { value: 'fitting',           label: 'Fitting',           icon: 'accessibility'  },
+  { value: 'adjustments',       label: 'Adjustments',       icon: 'tune'           },
+  { value: 'finishing',         label: 'Finishing',         icon: 'dry_cleaning'   },
+  { value: 'quality_check',     label: 'Quality Check',     icon: 'fact_check'     },
+  { value: 'ready',             label: 'Ready',             icon: 'check_circle'   },
 ]
 
 function formatDate(ts) {
@@ -29,18 +45,24 @@ function formatDate(ts) {
   return 'Unknown Date'
 }
 
+// Returns today's date as a readable string e.g. "Apr 12, 2026"
+function todayReadable() {
+  return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
 // ── ORDER FORM MODAL ──────────────────────────────────────────
 function OrderModal({ isOpen, onClose, measurements, onSave }) {
-  const [selectedItems, setSelectedItems] = useState([]) 
-  const [pickerQuery, setPickerQuery] = useState('')
-  const [desc, setDesc] = useState('')
-  const [due, setDue] = useState('')
-  const [priority, setPriority] = useState('normal')
-  const [notes, setNotes] = useState('')
+  const [selectedItems, setSelectedItems] = useState([])
+  const [pickerQuery,   setPickerQuery]   = useState('')
+  const [desc,          setDesc]          = useState('')
+  const [due,           setDue]           = useState('')
+  const [priority,      setPriority]      = useState('normal')
+  const [notes,         setNotes]         = useState('')
+  const [stage,         setStage]         = useState('')
 
   const reset = () => {
-    setSelectedItems([]); setPickerQuery(''); setDesc(''); 
-    setDue(''); setPriority('normal'); setNotes('')
+    setSelectedItems([]); setPickerQuery(''); setDesc('')
+    setDue(''); setPriority('normal'); setNotes(''); setStage('')
   }
 
   const toggleId = (m) => {
@@ -53,13 +75,13 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
   }
 
   const updateItemPrice = (id, priceValue) => {
-    setSelectedItems(prev => prev.map(item => 
+    setSelectedItems(prev => prev.map(item =>
       item.id === id ? { ...item, price: priceValue } : item
     ))
   }
 
-  const totalPrice = selectedItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
-  const dynamicQty = selectedItems.length || 1
+  const totalPrice   = selectedItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
+  const dynamicQty   = selectedItems.length || 1
 
   const filteredMeasurements = pickerQuery.trim()
     ? measurements.filter(m => m.name.toLowerCase().includes(pickerQuery.toLowerCase()))
@@ -75,16 +97,18 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
     }
 
     onSave({
-      desc: desc.trim() || (selectedItems.length > 0 ? selectedItems.map(i => i.name).join(', ') : 'New Order'),
-      price: totalPrice,
-      items: selectedItems.map(i => ({ id: i.id, price: parseFloat(i.price) || 0, name: i.name, imgSrc: i.imgSrc || null })),
-      qty: dynamicQty,
-      due: dueDisplay,
-      dueRaw: due,
-      notes: notes.trim(),
+      desc:           desc.trim() || (selectedItems.length > 0 ? selectedItems.map(i => i.name).join(', ') : 'New Order'),
+      price:          totalPrice,
+      items:          selectedItems.map(i => ({ id: i.id, price: parseFloat(i.price) || 0, name: i.name, imgSrc: i.imgSrc || null })),
+      qty:            dynamicQty,
+      due:            dueDisplay,
+      dueRaw:         due,
+      notes:          notes.trim(),
       priority,
       measurementIds: selectedItems.map(i => i.id),
-      status: 'pending',
+      status:         'pending',
+      stage:          stage || null,
+      takenAt:        todayReadable(),   // human-readable date the order was taken
     })
     reset()
     onClose()
@@ -94,22 +118,28 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
 
   return (
     <div className={`${styles.modalOverlay} ${isOpen ? styles.modalOpen : ''}`}>
-      <Header 
+      <Header
         type="back"
         title="New Order"
         onBackClick={handleClose}
-        customActions={[
-          { label: 'Place Order', onClick: handleSave }
-        ]}
+        customActions={[{ label: 'Place Order', onClick: handleSave }]}
       />
 
       <div className={styles.modalBody}>
         <div style={{ padding: '20px' }}>
+
+          {/* ── 1. Select Clothes ── */}
           <p className={styles.sectionHeading}>1. Select Clothes</p>
           {measurements.length > 5 && (
             <div className={styles.pickerSearchWrap}>
               <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)' }}>search</span>
-              <input type="text" placeholder="Search cloth type…" value={pickerQuery} onChange={e => setPickerQuery(e.target.value)} className={styles.pickerSearchInput} />
+              <input
+                type="text"
+                placeholder="Search cloth type…"
+                value={pickerQuery}
+                onChange={e => setPickerQuery(e.target.value)}
+                className={styles.pickerSearchInput}
+              />
             </div>
           )}
 
@@ -117,9 +147,15 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
             {filteredMeasurements.map(m => {
               const selected = selectedItems.find(i => i.id === String(m.id))
               return (
-                <div key={m.id} className={`${styles.pickerItem} ${selected ? styles.pickerSelected : ''}`} onClick={() => toggleId(m)}>
+                <div
+                  key={m.id}
+                  className={`${styles.pickerItem} ${selected ? styles.pickerSelected : ''}`}
+                  onClick={() => toggleId(m)}
+                >
                   <div className={styles.pickerThumb}>
-                    {m.imgSrc ? <img src={m.imgSrc} alt={m.name} /> : <span className="mi" style={{ fontSize: '1.1rem' }}>checkroom</span>}
+                    {m.imgSrc
+                      ? <img src={m.imgSrc} alt={m.name} />
+                      : <span className="mi" style={{ fontSize: '1.1rem' }}>checkroom</span>}
                   </div>
                   <div className={styles.pickerInfo}>
                     <h5>{m.name}</h5>
@@ -133,6 +169,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
             })}
           </div>
 
+          {/* ── 2. Pricing ── */}
           {selectedItems.length > 0 && (
             <>
               <p className={styles.sectionHeading} style={{ marginTop: 24 }}>2. Pricing Per Item</p>
@@ -143,14 +180,14 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
                       {item.imgSrc ? <img src={item.imgSrc} alt="" /> : <span className="mi">checkroom</span>}
                     </div>
                     <div style={{ flex: 1 }}>
-                       <label className={styles.labelTiny} style={{ marginBottom: 2 }}>{item.name} Price (₦)</label>
-                       <input 
-                        type="number" 
-                        placeholder="0.00" 
+                      <label className={styles.labelTiny} style={{ marginBottom: 2 }}>{item.name} Price (₦)</label>
+                      <input
+                        type="number"
+                        placeholder="0.00"
                         className={styles.itemPriceInput}
                         value={item.price}
                         onChange={(e) => updateItemPrice(item.id, e.target.value)}
-                       />
+                      />
                     </div>
                   </div>
                 ))}
@@ -162,15 +199,28 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
             </>
           )}
 
+          {/* ── 3. Final Details ── */}
           <p className={styles.sectionHeading} style={{ marginTop: 24 }}>3. Final Details</p>
           <div className={styles.orderFormCard}>
             <label className={styles.labelTiny}>Order Description</label>
-            <input type="text" className={styles.clothInput} placeholder="e.g. Full Native Set" value={desc} onChange={e => setDesc(e.target.value)} />
+            <input
+              type="text"
+              className={styles.clothInput}
+              placeholder="e.g. Full Native Set"
+              value={desc}
+              onChange={e => setDesc(e.target.value)}
+            />
 
             <div style={{ display: 'flex', gap: 14, marginBottom: 20 }}>
               <div style={{ flex: 1 }}>
                 <label className={styles.labelTiny}>Due Date</label>
-                <input type="date" className={styles.clothInput} style={{ marginBottom: 0 }} value={due} onChange={e => setDue(e.target.value)} />
+                <input
+                  type="date"
+                  className={styles.clothInput}
+                  style={{ marginBottom: 0 }}
+                  value={due}
+                  onChange={e => setDue(e.target.value)}
+                />
               </div>
               <div style={{ flex: 1 }}>
                 <label className={styles.labelTiny}>Calculated Qty</label>
@@ -181,15 +231,40 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
             <label className={styles.labelTiny}>Priority</label>
             <div className={styles.priorityRow}>
               {['normal', 'urgent', 'vip'].map(p => (
-                <button key={p} className={`${styles.priorityChip} ${priority === p ? styles[`priority_${p}`] : ''}`} onClick={() => setPriority(p)}>
+                <button
+                  key={p}
+                  className={`${styles.priorityChip} ${priority === p ? styles[`priority_${p}`] : ''}`}
+                  onClick={() => setPriority(p)}
+                >
                   {p.charAt(0).toUpperCase() + p.slice(1)}
                 </button>
               ))}
             </div>
 
+            {/* ── Stage Selector ── */}
+            <label className={styles.labelTiny} style={{ marginTop: 20 }}>Current Stage</label>
+            <div className={styles.stageChipRow}>
+              {STAGES.map(s => (
+                <button
+                  key={s.value}
+                  className={`${styles.stageChip} ${stage === s.value ? styles.stageChipActive : ''}`}
+                  onClick={() => setStage(prev => prev === s.value ? '' : s.value)}
+                >
+                  <span className="mi" style={{ fontSize: '0.85rem' }}>{s.icon}</span>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+
             <label className={styles.labelTiny} style={{ marginTop: 20 }}>Notes</label>
-            <textarea className={styles.orderTextarea} placeholder="Fabric color, styles, etc..." value={notes} onChange={e => setNotes(e.target.value)} />
+            <textarea
+              className={styles.orderTextarea}
+              placeholder="Fabric color, styles, etc..."
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+            />
           </div>
+
         </div>
       </div>
     </div>
@@ -197,14 +272,15 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
 }
 
 // ── ORDER DETAIL ──────────────────────────────────────────────
-function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, onGenerateInvoice }) {
+function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, onStageChange, onGenerateInvoice }) {
   if (!order) return null
-  const banner  = PRIORITY_BANNER[order.priority] ?? PRIORITY_BANNER.normal
-  const placedOn = order.date || formatDate(order.createdAt)
+  const banner   = PRIORITY_BANNER[order.priority] ?? PRIORITY_BANNER.normal
+  const placedOn = order.takenAt || order.date || formatDate(order.createdAt)
+  const stageObj = STAGES.find(s => s.value === order.stage)
 
   return (
     <div className={`${styles.detailModal} ${styles.detailOpen}`}>
-      <Header 
+      <Header
         type="back"
         title={order.desc}
         onBackClick={onClose}
@@ -216,17 +292,38 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
       <div className={styles.detailBody}>
         <span className={`${styles.priorityBanner} ${banner.cls}`}>{banner.text}</span>
 
+        {/* Meta grid — price, status, stage, due */}
         <div className={styles.orderMetaGrid}>
           <div className={styles.orderMetaCell}>
-            <div className={styles.cellLabel}>Total Order Price</div>
+            <div className={styles.cellLabel}>Total Price</div>
             <div className={styles.cellValue}>₦{Number(order.price || 0).toLocaleString()}</div>
           </div>
           <div className={styles.orderMetaCell}>
             <div className={styles.cellLabel}>Status</div>
-            <div className={styles.cellValue} style={{ textTransform: 'capitalize' }}>{order.status}</div>
+            <div className={styles.cellValue} style={{ textTransform: 'capitalize' }}>
+              {STATUSES.find(s => s.value === order.status)?.label ?? 'Pending'}
+            </div>
+          </div>
+          <div className={styles.orderMetaCell}>
+            <div className={styles.cellLabel}>Current Stage</div>
+            <div className={styles.cellValue} style={{ fontSize: '0.85rem' }}>
+              {stageObj
+                ? <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span className="mi" style={{ fontSize: '1rem' }}>{stageObj.icon}</span>
+                    {stageObj.label}
+                  </span>
+                : <span style={{ color: 'var(--text3)', fontWeight: 500, fontSize: '0.8rem' }}>Not set</span>}
+            </div>
+          </div>
+          <div className={styles.orderMetaCell}>
+            <div className={styles.cellLabel}>Due</div>
+            <div className={styles.cellValue} style={{ fontSize: '0.85rem', color: order.due ? 'var(--danger)' : 'var(--text3)' }}>
+              {order.due || '—'}
+            </div>
           </div>
         </div>
 
+        {/* Garments */}
         {order.items && order.items.length > 0 && (
           <div className={styles.linkedSection}>
             <div className={styles.linkLabel}>Selected Garments & Prices</div>
@@ -234,7 +331,9 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
               <div key={idx} className={styles.linkedRow} style={{ justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div className={styles.linkedThumb}>
-                    {item.imgSrc ? <img src={item.imgSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span className="mi">checkroom</span>}
+                    {item.imgSrc
+                      ? <img src={item.imgSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <span className="mi">checkroom</span>}
                   </div>
                   <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{item.name}</div>
                 </div>
@@ -246,17 +345,40 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           </div>
         )}
 
+        {/* Change Status */}
         <div className={styles.linkedSection}>
           <div className={styles.linkLabel}>Change Status</div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {STATUSES.map(s => (
-              <button key={s.value} className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`} onClick={() => onStatusChange(order.id, s.value)}>
+              <button
+                key={s.value}
+                className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`}
+                onClick={() => onStatusChange(order.id, s.value)}
+              >
                 {s.label}
               </button>
             ))}
           </div>
         </div>
 
+        {/* Change Stage */}
+        <div className={styles.linkedSection}>
+          <div className={styles.linkLabel}>Change Stage</div>
+          <div className={styles.stageChipRow}>
+            {STAGES.map(s => (
+              <button
+                key={s.value}
+                className={`${styles.stageChip} ${order.stage === s.value ? styles.stageChipActive : ''}`}
+                onClick={() => onStageChange(order.id, order.stage === s.value ? null : s.value)}
+              >
+                <span className="mi" style={{ fontSize: '0.85rem' }}>{s.icon}</span>
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Notes */}
         {order.notes && (
           <div className={styles.notesSection}>
             <div className={styles.linkLabel}>Notes</div>
@@ -264,9 +386,14 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           </div>
         )}
 
-        <div className={styles.detailDate}>Order Placed: {placedOn} • Qty: {order.qty}</div>
+        {/* Footer dates */}
+        <div className={styles.detailDate}>
+          Order Taken: {placedOn}
+          {order.due && <> &nbsp;•&nbsp; Due: {order.due}</>}
+          &nbsp;•&nbsp; Qty: {order.qty}
+        </div>
 
-        {/* ── Generate Invoice button ── */}
+        {/* Generate Invoice */}
         <button
           className={styles.generateInvoiceBtn}
           onClick={() => onGenerateInvoice(order.id)}
@@ -282,7 +409,7 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
 
 // ── MAIN TAB ──────────────────────────────────────────────────
 export default function OrdersTab({ customerId, orders, measurements, showToast, onGenerateInvoice }) {
-  const { addOrder, deleteOrder, updateOrderStatus } = useOrders()
+  const { addOrder, deleteOrder, updateOrderStatus, updateOrderStage } = useOrders()
   const [modalOpen,   setModalOpen]   = useState(false)
   const [detailOrder, setDetailOrder] = useState(null)
   const [confirmDel,  setConfirmDel]  = useState(null)
@@ -322,8 +449,18 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
     }
   }
 
+  const handleStageChange = async (id, stage) => {
+    try {
+      await updateOrderStage(customerId, id, stage)
+      setDetailOrder(prev => prev && String(prev.id) === String(id) ? { ...prev, stage } : prev)
+    } catch {
+      showToast('Failed to update stage')
+    }
+  }
+
+  // Group by takenAt (human date) or createdAt — most recent date first
   const grouped = orders.reduce((acc, o) => {
-    const key = formatDate(o.createdAt) || o.date || 'Unknown Date'
+    const key = o.takenAt || formatDate(o.createdAt) || o.date || 'Unknown Date'
     if (!acc[key]) acc[key] = []
     acc[key].push(o)
     return acc
@@ -344,24 +481,43 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
           <div className={styles.orderGroupDivider} />
           {dateOrders.map((o, idx) => {
             const priceStr   = o.price ? `₦${Number(o.price).toLocaleString()}` : '₦0'
-            const statusLabel = STATUSES.find(s => s.value === o.status)?.label ?? 'Pending'
+            const statusObj  = STATUSES.find(s => s.value === o.status) ?? STATUSES[0]
+            const stageObj   = STAGES.find(s => s.value === o.stage)
             const itemsList  = o.items || []
             const thumb      = itemsList[0]?.imgSrc
 
             return (
-              <div key={o.id} className={`${styles.orderListItem} ${idx === dateOrders.length - 1 ? styles.orderListItemLast : ''}`} onClick={() => setDetailOrder(o)}>
+              <div
+                key={o.id}
+                className={`${styles.orderListItem} ${idx === dateOrders.length - 1 ? styles.orderListItemLast : ''}`}
+                onClick={() => setDetailOrder(o)}
+              >
                 <div className={styles.orderListOuter}>
                   <div className={styles.orderListInner}>
-                    {thumb ? <img src={thumb} alt="" className={styles.orderListThumbImg} /> : <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>content_cut</span>}
+                    {thumb
+                      ? <img src={thumb} alt="" className={styles.orderListThumbImg} />
+                      : <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>content_cut</span>}
                   </div>
                 </div>
                 <div className={styles.orderListInfo}>
                   <div className={styles.orderListDesc}>{o.desc}</div>
+
+                  {/* Status row */}
                   <div className={styles.orderListStatusRow}>
                     <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>autorenew</span>
-                    <span className={styles.orderListStatusText}>{statusLabel}</span>
+                    <span className={styles.orderListStatusText}>{statusObj.label}</span>
+                    {stageObj && (
+                      <>
+                        <span style={{ color: 'var(--border2)', fontSize: '0.7rem' }}>•</span>
+                        <span className="mi" style={{ fontSize: '0.82rem', color: 'var(--accent)' }}>{stageObj.icon}</span>
+                        <span className={styles.orderListStageText}>{stageObj.label}</span>
+                      </>
+                    )}
                   </div>
-                  <div className={styles.orderListPriceLine}>{priceStr} <span className={styles.orderListQty}>({o.qty} pcs)</span></div>
+
+                  <div className={styles.orderListPriceLine}>
+                    {priceStr} <span className={styles.orderListQty}>({o.qty} pcs)</span>
+                  </div>
                   {o.due && <div className={styles.orderListDue}>Due: {o.due}</div>}
                 </div>
               </div>
@@ -370,7 +526,12 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
         </div>
       ))}
 
-      <OrderModal isOpen={modalOpen} onClose={() => setModalOpen(false)} measurements={measurements} onSave={handleSave} />
+      <OrderModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        measurements={measurements}
+        onSave={handleSave}
+      />
 
       {detailOrder && (
         <OrderDetail
@@ -379,6 +540,7 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
           onClose={() => setDetailOrder(null)}
           onDelete={() => setConfirmDel(detailOrder)}
           onStatusChange={handleStatusChange}
+          onStageChange={handleStageChange}
           onGenerateInvoice={(orderId) => {
             setDetailOrder(null)
             onGenerateInvoice(orderId)
@@ -386,7 +548,13 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
         />
       )}
 
-      <ConfirmSheet open={!!confirmDel} title="Delete Order?" message="This can't be undone." onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDel(null)} />
+      <ConfirmSheet
+        open={!!confirmDel}
+        title="Delete Order?"
+        message="This can't be undone."
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setConfirmDel(null)}
+      />
     </>
   )
 }
