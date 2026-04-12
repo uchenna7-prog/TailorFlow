@@ -11,18 +11,25 @@ function fmt(currency = '₦', amount) {
 
 const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
 
+const STATUS_STYLES = {
+  paid:    { bg: 'rgba(34,197,94,0.12)',   color: '#15803d', border: 'rgba(34,197,94,0.3)'   },
+  unpaid:  { bg: 'rgba(234,179,8,0.12)',   color: '#a16207', border: 'rgba(234,179,8,0.3)'   },
+  overdue: { bg: 'rgba(239,68,68,0.12)',   color: '#dc2626', border: 'rgba(239,68,68,0.3)'   },
+}
+
 // ─────────────────────────────────────────────────────────────
 // Invoice card
 // ─────────────────────────────────────────────────────────────
 
 function InvoiceCard({ invoice, currency, onTap, isLast }) {
-  // ── FIX: derive total from itemised prices when available,
-  //    otherwise fall back to the stored price field (never × qty).
   const total = invoice.items?.length > 0
     ? invoice.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
     : (parseFloat(invoice.price) || 0)
 
-  const statusLabel = STATUS_LABELS[invoice.status] || invoice.status
+  const statusKey   = invoice.status || 'unpaid'
+  const statusLabel = STATUS_LABELS[statusKey] || invoice.status
+  const sty         = STATUS_STYLES[statusKey] || STATUS_STYLES.unpaid
+  const pieceCount  = invoice.items?.length > 0 ? invoice.items.length : (invoice.qty || null)
 
   return (
     <div
@@ -40,11 +47,27 @@ function InvoiceCard({ invoice, currency, onTap, isLast }) {
       <div className={styles.invoiceListInfo}>
         <div className={styles.invoiceListDesc}>{invoice.orderDesc || 'Order'}</div>
         <div className={styles.invoiceListSub}>Generated on {invoice.date}</div>
-        <div className={styles.invoiceListStatusRow}>
-          <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', verticalAlign: 'middle' }}>autorenew</span>
-          <span className={styles.invoiceListStatusText}>{statusLabel}</span>
+        <span style={{
+          display: 'inline-block',
+          marginTop: '4px',
+          padding: '2px 8px',
+          borderRadius: '6px',
+          fontSize: '0.72rem',
+          fontWeight: 600,
+          border: `1px solid ${sty.border}`,
+          background: sty.bg,
+          color: sty.color,
+        }}>
+          {statusLabel}
+        </span>
+        <div className={styles.invoiceListAmount}>
+          {fmt(currency, total)}
+          {pieceCount && (
+            <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'var(--text3)', marginLeft: '5px' }}>
+              ({pieceCount} {pieceCount === 1 ? 'pc' : 'pcs'})
+            </span>
+          )}
         </div>
-        <div className={styles.invoiceListAmount}>{fmt(currency, total)}</div>
       </div>
     </div>
   )
