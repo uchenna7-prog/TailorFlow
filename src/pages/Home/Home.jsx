@@ -453,8 +453,17 @@ function Home({ onMenuClick }) {
   const getInvDueDate = (i) => {
     const explicit = i.due || i.dueDate || i.due_date || i.dueOn
     if (explicit) return explicit
-    const ms = i.createdAt?.toMillis?.() ?? (i.createdAt?.seconds ? i.createdAt.seconds * 1000 : null)
-    if (!ms) return null
+    // Handle every possible Firestore Timestamp / date shape
+    let ms = null
+    const ca = i.createdAt
+    if (!ca) return null
+    if (typeof ca.toMillis === 'function')       ms = ca.toMillis()
+    else if (typeof ca.toDate === 'function')     ms = ca.toDate().getTime()
+    else if (typeof ca.seconds === 'number')      ms = ca.seconds * 1000
+    else if (typeof ca === 'number')              ms = ca
+    else if (typeof ca === 'string')              ms = new Date(ca).getTime()
+    else if (ca instanceof Date)                  ms = ca.getTime()
+    if (!ms || isNaN(ms)) return null
     const dueDays = settings.invoiceDueDays ?? 7
     return new Date(ms + dueDays * 86400000).toISOString().slice(0, 10)
   }
@@ -581,8 +590,8 @@ function Home({ onMenuClick }) {
       label:       'Unpaid Invoices',
       sub:         totalOverdue > 0
                      ? `${totalOverdue} overdue`
-                     : invoicesDueThisWeek > 0
-                       ? `${invoicesDueThisWeek} due this wk`
+                     : totalUnpaid > 0
+                       ? `${invoicesDueThisWeek > 0 ? invoicesDueThisWeek : totalUnpaid} due this wk`
                        : null,
       subColor:    totalOverdue > 0 ? '#ef4444' : '#fb923c',
       delta:       null,
