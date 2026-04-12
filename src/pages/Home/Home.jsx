@@ -137,7 +137,7 @@ function RevenueDonut({ pct }) {
   return (
     <svg width="88" height="88" viewBox="0 0 88 88">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--border2,#e2e8f0)" strokeWidth="8" />
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f472b6" strokeWidth="8"
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#94a3b8" strokeWidth="8"
         strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
         transform={`rotate(-90 ${cx} ${cy})`} />
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#60a5fa" strokeWidth="8"
@@ -452,11 +452,12 @@ function Home({ onMenuClick }) {
   const overdueInvoices = allInvoices.filter(i => isInvoiceOverdue(i))
   const totalUnpaid     = unpaidInvoices.length
   const totalOverdue    = overdueInvoices.length
-  const invThisWeek     = allInvoices.filter(i => i.createdAt && new Date(i.createdAt) >= weekAgo).length
-  const invLastWeek     = allInvoices.filter(i => {
+  const invThisWeek          = allInvoices.filter(i => i.createdAt && new Date(i.createdAt) >= weekAgo).length
+  const invLastWeek          = allInvoices.filter(i => {
     if (!i.createdAt) return false; const d = new Date(i.createdAt)
     return d >= twoWksAgo && d < weekAgo
   }).length
+  const invoicesDueThisWeek  = unpaidInvoices.filter(i => dueThisWeek(i.due)).length
 
   // ── Tasks ─────────────────────────────────────────────────
   const pendingTasks     = tasks.filter(t => !t.done && !isTaskOverdue(t))
@@ -555,7 +556,7 @@ function Home({ onMenuClick }) {
                        ? `${ordersCreatedThisWeek} this wk`
                        : null,
       subColor:    ordersDueThisWeek > 0 ? '#fb923c' : 'var(--text3)',
-      delta:       makeDelta(ordersCreatedThisWeek, ordersCreatedLastWeek),
+      delta:       null,
       positiveIsGood: true,        route: '/orders',
     },
     {
@@ -564,11 +565,11 @@ function Home({ onMenuClick }) {
       label:       'Unpaid Invoices',
       sub:         totalOverdue > 0
                      ? `${totalOverdue} overdue`
-                     : invThisWeek > 0
-                       ? `${invThisWeek} this wk`
+                     : invoicesDueThisWeek > 0
+                       ? `${invoicesDueThisWeek} due this wk`
                        : null,
-      subColor:    totalOverdue > 0 ? '#ef4444' : 'var(--text3)',
-      delta:       makeDelta(invThisWeek, invLastWeek),
+      subColor:    totalOverdue > 0 ? '#ef4444' : '#fb923c',
+      delta:       null,
       positiveIsGood: false,       route: '/invoices',
     },
     {
@@ -581,7 +582,7 @@ function Home({ onMenuClick }) {
                        ? `${upcomingThisWeek} this wk`
                        : null,
       subColor:    missedCount > 0 ? '#ef4444' : 'var(--text3)',
-      delta:       makeDelta(apptThisWeek, apptLastWeek),
+      delta:       null,
       positiveIsGood: true,        route: '/appointments',
     },
     {
@@ -594,7 +595,7 @@ function Home({ onMenuClick }) {
                        ? `${tasksThisWeek} this wk`
                        : null,
       subColor:    tasksDueThisWeek > 0 ? '#fb923c' : 'var(--text3)',
-      delta:       makeDelta(tasksThisWeek, tasksLastWeek),
+      delta:       null,
       positiveIsGood: false,       route: '/tasks',
     },
   ]
@@ -947,4 +948,3 @@ function Home({ onMenuClick }) {
 }
 
 export default Home
-
