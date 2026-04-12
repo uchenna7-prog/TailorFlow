@@ -1,8 +1,6 @@
 // src/services/orderService.js
 // ─────────────────────────────────────────────────────────────
 // Data path: users/{uid}/customers/{customerId}/orders/{orderId}
-// Orders live as a subcollection under each customer so you can
-// query "all orders for customer X" cheaply.
 // ─────────────────────────────────────────────────────────────
 
 import {
@@ -32,6 +30,7 @@ export async function addOrder(uid, customerId, data) {
   const ref = await addDoc(ordersRef(uid, customerId), {
     ...data,
     status:    data.status    || 'pending',
+    stage:     data.stage     || null,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   })
@@ -60,6 +59,13 @@ export async function updateOrder(uid, customerId, orderId, data) {
 export async function updateOrderStatus(uid, customerId, orderId, status) {
   await updateDoc(orderDoc(uid, customerId, orderId), {
     status,
+    updatedAt: serverTimestamp(),
+  })
+}
+
+export async function updateOrderStage(uid, customerId, orderId, stage) {
+  await updateDoc(orderDoc(uid, customerId, orderId), {
+    stage,
     updatedAt: serverTimestamp(),
   })
 }
