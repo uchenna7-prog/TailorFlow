@@ -406,7 +406,10 @@
   z-index: 9999;
   opacity: 0;
   transition: opacity 0.3s, transform 0.3s;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
+  max-width: calc(100vw - 48px);
+  text-align: center;
   pointer-events: none;
 }
 
