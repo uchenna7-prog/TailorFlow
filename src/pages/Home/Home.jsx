@@ -584,7 +584,9 @@ function Home({ onMenuClick }) {
 
   // ── Recent lists ──────────────────────────────────────────
   const recentOrders       = [...pendingOrders].slice(0, 4)
-  const recentTasks        = tasks.filter(t => !t.done).slice(0, 4)
+  const recentTasks        = [...tasks]
+    .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0))
+    .slice(0, 4)
   const recentAppointments = upcoming.slice(0, 4)
   const pastAppointments   = recentAppts.slice(0, 4)
 
@@ -961,12 +963,12 @@ function Home({ onMenuClick }) {
               {recentTasks.map((task, idx) => {
                 const isLast    = idx === recentTasks.length - 1
                 const overdue   = isTaskOverdue(task)
-                const iconColor = overdue ? '#ef4444' : (PRIORITY_COLORS[task.priority] || '#818cf8')
+                const iconColor = overdue ? '#ef4444' : task.done ? '#22c55e' : '#818cf8'
                 const catIcon   = CATEGORY_ICONS[task.category] || 'assignment'
                 return (
                   <div key={task.id} className={`${styles.listItem} ${isLast ? styles.listItemLast : ''}`}>
                     <div className={styles.listOuter}
-                      style={overdue ? { borderColor: 'rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.05)' } : {}}>
+                      style={overdue ? { borderColor: 'rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.05)' } : task.done ? { borderColor: 'rgba(34,197,94,0.3)', background: 'rgba(34,197,94,0.04)' } : {}}>
                       <div className={styles.listInner}>
                         <span className="mi" style={{ fontSize: '1.3rem', color: iconColor }}>{catIcon}</span>
                       </div>
