@@ -31,6 +31,13 @@ const TASK_STATUS_TEXT = {
   overdue:  { color: '#721C24' },
 }
 
+// ── Status pill styles (matches Home page) ────────────────────
+const TASK_STATUS_STYLES = {
+  completed: { bg: 'rgba(34,197,94,0.12)',   color: '#15803d', border: 'rgba(34,197,94,0.3)'   },
+  overdue:   { bg: 'rgba(239,68,68,0.12)',   color: '#dc2626', border: 'rgba(239,68,68,0.3)'   },
+  pending:   { bg: 'rgba(234,179,8,0.12)',   color: '#a16207', border: 'rgba(234,179,8,0.3)'   },
+}
+
 const CATEGORY_ICONS = {
   general: 'assignment', sewing: 'content_cut', delivery: 'local_shipping',
   payment: 'payments',   fitting: 'checkroom',  shopping: 'shopping_cart',
@@ -317,15 +324,8 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
 
 function TaskCard({ task, onToggle, onDelete, onOpen, isLast }) {
   const overdue = isOverdue(task)
-  const pc      = PRIORITY_COLORS[task.priority] ?? PRIORITY_COLORS.normal
-  const due     = daysUntil(task.dueDate)
   const catIcon = CATEGORY_ICONS[task.category] || 'assignment'
-
-  const statusColor = task.done
-    ? TASK_STATUS_TEXT.done.color
-    : overdue
-    ? TASK_STATUS_TEXT.overdue.color
-    : TASK_STATUS_TEXT.pending.color
+  const iconColor = overdue ? '#ef4444' : task.done ? '#22c55e' : '#818cf8'
 
   return (
     <div
@@ -333,9 +333,9 @@ function TaskCard({ task, onToggle, onDelete, onOpen, isLast }) {
       onClick={onOpen}
     >
       {/* Left: grey outer box with white inner box */}
-      <div className={styles.taskListOuter} style={{ borderColor: overdue ? 'rgba(239,68,68,0.35)' : undefined, background: overdue ? 'rgba(239,68,68,0.05)' : undefined }}>
+      <div className={styles.taskListOuter} style={overdue ? { borderColor: 'rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.05)' } : task.done ? { borderColor: 'rgba(34,197,94,0.3)', background: 'rgba(34,197,94,0.04)' } : undefined}>
         <div className={styles.taskListInner}>
-          <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : pc.text }}>
+          <span className="mi" style={{ fontSize: '1.5rem', color: iconColor }}>
             {catIcon}
           </span>
         </div>
@@ -352,16 +352,30 @@ function TaskCard({ task, onToggle, onDelete, onOpen, isLast }) {
           </div>
         )}
 
-        <div className={styles.taskListMeta}>
-          <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', verticalAlign: 'middle' }}>autorenew</span>
-          <span className={styles.taskListMetaText} style={{ color: statusColor }}>
-            {task.done ? 'Completed' : overdue ? 'Overdue' : PRIORITY_LABELS[task.priority] || 'Normal'}
-          </span>
-        </div>
+        {(() => {
+          const statusKey = overdue ? 'overdue' : task.done ? 'completed' : 'pending'
+          const sty = TASK_STATUS_STYLES[statusKey]
+          const label = statusKey.charAt(0).toUpperCase() + statusKey.slice(1)
+          return (
+            <span style={{
+              display: 'inline-block',
+              marginTop: '4px',
+              padding: '2px 8px',
+              borderRadius: '6px',
+              fontSize: '0.72rem',
+              fontWeight: 600,
+              border: `1px solid ${sty.border}`,
+              background: sty.bg,
+              color: sty.color,
+            }}>
+              {label}
+            </span>
+          )
+        })()}
 
         {task.dueDate && (
-          <div className={`${styles.taskListDue} ${overdue ? styles.taskListDueOverdue : ''}`}>
-            Due On {formatDate(task.dueDate)}{due ? ` · ${due}` : ''}
+          <div className={styles.taskListDue} style={overdue ? { color: '#ef4444' } : {}}>
+            Due {formatDate(task.dueDate)}
           </div>
         )}
       </div>
