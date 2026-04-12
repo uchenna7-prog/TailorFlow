@@ -548,14 +548,18 @@ function Home({ onMenuClick }) {
   // Sub-text colour logic:
   //   • Red   → overdue / missed / alert state
   //   • Amber → approaching deadline (due this week) / warning
-  //   • var(--text3) (neutral) → normal / all-clear state
+  //   • var(--text3) (neutral muted) → normal info (this wk count with no urgency)
   const statCards = [
     {
       desktopIcon: 'shopping_bag', bgIcon: 'shopping_bag',
       iconColor:   '#f59e0b',      value: pendingOrders.length,
       label:       'Pending Orders',
-      sub:         ordersDueThisWeek > 0 ? `${ordersDueThisWeek} due this week` : null,
-      subColor:    '#fb923c',   // amber — deadline approaching
+      sub:         ordersDueThisWeek > 0
+                     ? `${ordersDueThisWeek} due this wk`
+                     : ordersCreatedThisWeek > 0
+                       ? `${ordersCreatedThisWeek} this wk`
+                       : null,
+      subColor:    ordersDueThisWeek > 0 ? '#fb923c' : 'var(--text3)',
       delta:       makeDelta(ordersCreatedThisWeek, ordersCreatedLastWeek),
       positiveIsGood: true,        route: '/orders',
     },
@@ -563,8 +567,12 @@ function Home({ onMenuClick }) {
       desktopIcon: 'receipt_long', bgIcon: 'receipt_long',
       iconColor:   '#ef4444',      value: totalUnpaid,
       label:       'Unpaid Invoices',
-      sub:         totalOverdue > 0 ? `${totalOverdue} overdue` : null,
-      subColor:    '#ef4444',   // red — overdue is urgent
+      sub:         totalOverdue > 0
+                     ? `${totalOverdue} overdue`
+                     : invThisWeek > 0
+                       ? `${invThisWeek} this wk`
+                       : null,
+      subColor:    totalOverdue > 0 ? '#ef4444' : 'var(--text3)',
       delta:       makeDelta(invThisWeek, invLastWeek),
       positiveIsGood: false,       route: '/invoices',
     },
@@ -575,9 +583,9 @@ function Home({ onMenuClick }) {
       sub:         missedCount > 0
                      ? `${missedCount} missed`
                      : upcomingThisWeek > 0
-                       ? `${upcomingThisWeek} this week`
+                       ? `${upcomingThisWeek} this wk`
                        : null,
-      subColor:    missedCount > 0 ? '#ef4444' : '#06b6d4',  // red for missed, teal for upcoming
+      subColor:    missedCount > 0 ? '#ef4444' : 'var(--text3)',
       delta:       makeDelta(apptThisWeek, apptLastWeek),
       positiveIsGood: true,        route: '/appointments',
     },
@@ -585,8 +593,12 @@ function Home({ onMenuClick }) {
       desktopIcon: 'task_alt',     bgIcon: 'checklist',
       iconColor:   '#22c55e',      value: pendingTasks.length,
       label:       'Pending Tasks',
-      sub:         tasksDueThisWeek > 0 ? `${tasksDueThisWeek} due this week` : null,
-      subColor:    '#fb923c',   // amber — deadlines approaching
+      sub:         tasksDueThisWeek > 0
+                     ? `${tasksDueThisWeek} due this wk`
+                     : tasksThisWeek > 0
+                       ? `${tasksThisWeek} this wk`
+                       : null,
+      subColor:    tasksDueThisWeek > 0 ? '#fb923c' : 'var(--text3)',
       delta:       makeDelta(tasksThisWeek, tasksLastWeek),
       positiveIsGood: false,       route: '/tasks',
     },
@@ -691,27 +703,28 @@ function Home({ onMenuClick }) {
 
         {/* 3. CUSTOMER INSIGHTS CARD — full width ── */}
         <div className={styles.customerCard} onClick={() => navigate('/customers')}>
-          {/* Top row: icon + title + chevron */}
-          <div className={styles.customerCardTop}>
+
+          {/* Section label + chevron */}
+          <div className={styles.customerCardHeader}>
+            <span className={styles.customerCardSectionLabel}>Customer Insights</span>
+            <span className="mi" style={{ fontSize: '0.95rem', color: 'var(--text3)' }}>chevron_right</span>
+          </div>
+
+          {/* Hero: big number + label side by side (like Stripe's summary cards) */}
+          <div className={styles.customerHeroRow}>
+            <div className={styles.customerHeroLeft}>
+              <div className={styles.customerHeroNumber}>{totalCustomers.toLocaleString()}</div>
+              <div className={styles.customerHeroLabel}>Total Customers</div>
+            </div>
             <div className={styles.customerCardIconWrap}>
               <span className={styles.customerCardEmoji}>👥</span>
             </div>
-            <span className={styles.customerCardTitle}>Customer Insights</span>
-            <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)', marginLeft: 'auto', flexShrink: 0 }}>
-              chevron_right
-            </span>
-          </div>
-
-          {/* Hero total customers number */}
-          <div className={styles.customerHeroBlock}>
-            <div className={styles.customerHeroLabel}>Total Customers</div>
-            <div className={styles.customerHeroNumber}>{totalCustomers.toLocaleString()}</div>
           </div>
 
           {/* Thin horizontal rule */}
           <div className={styles.customerCardRule} />
 
-          {/* Three stat pills in a row */}
+          {/* Three stat cells */}
           <div className={styles.customerStatRow}>
             <div className={styles.customerStatCell}>
               <span className={styles.customerStatVal} style={{ color: 'var(--accent)' }}>
@@ -740,16 +753,13 @@ function Home({ onMenuClick }) {
           <RevenueGoalModal onSave={handleSaveGoal} onClose={() => setShowGoalModal(false)} />
         )}
 
-        {/* ── UPCOMING APPOINTMENTS ── */}
+        {/* ── UPCOMING APPOINTMENTS — hidden when empty ── */}
+        {recentAppointments.length > 0 && (
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h3 className={styles.sectionTitle}>Upcoming Appointments</h3>
             <button className={styles.seeAllBtn} onClick={() => navigate('/appointments')}>See all</button>
           </div>
-          {recentAppointments.length === 0 ? (
-            <EmptyState icon="event_available" message="No upcoming appointments"
-              sub="Scheduled appointments will appear here." />
-          ) : (
             <div className={styles.listSection}>
               <div className={styles.listDivider} />
               {recentAppointments.map((appt, idx) => {
@@ -783,8 +793,8 @@ function Home({ onMenuClick }) {
                 )
               })}
             </div>
-          )}
         </section>
+        )}
 
         {/* ── RECENT APPOINTMENTS ── */}
         {pastAppointments.length > 0 && (
@@ -863,16 +873,13 @@ function Home({ onMenuClick }) {
           </div>
         </section>
 
-        {/* ── RECENT ORDERS ── */}
+        {/* ── RECENT ORDERS — hidden when empty ── */}
+        {recentOrders.length > 0 && (
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h3 className={styles.sectionTitle}>Recent Orders</h3>
             <button className={styles.seeAllBtn} onClick={() => navigate('/orders')}>See all</button>
           </div>
-          {recentOrders.length === 0 ? (
-            <EmptyState icon="shopping_bag" message="No pending orders"
-              sub="New and pending orders will show up here." />
-          ) : (
             <div className={styles.listSection}>
               <div className={styles.listDivider} />
               {recentOrders.map((order, idx) => {
@@ -908,19 +915,16 @@ function Home({ onMenuClick }) {
                 )
               })}
             </div>
-          )}
         </section>
+        )}
 
-        {/* ── RECENT TASKS ── */}
+        {/* ── RECENT TASKS — hidden when empty ── */}
+        {recentTasks.length > 0 && (
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h3 className={styles.sectionTitle}>Recent Tasks</h3>
             <button className={styles.seeAllBtn} onClick={() => navigate('/tasks')}>See all</button>
           </div>
-          {recentTasks.length === 0 ? (
-            <EmptyState icon="assignment_turned_in" message="No pending tasks"
-              sub="Tasks you create will appear here." />
-          ) : (
             <div className={styles.listSection}>
               <div className={styles.listDivider} />
               {recentTasks.map((task, idx) => {
@@ -958,8 +962,8 @@ function Home({ onMenuClick }) {
                 )
               })}
             </div>
-          )}
         </section>
+        )}
 
       </main>
 
@@ -969,4 +973,3 @@ function Home({ onMenuClick }) {
 }
 
 export default Home
-
