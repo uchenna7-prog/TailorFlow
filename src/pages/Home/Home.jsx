@@ -127,11 +127,27 @@ const APPT_STATUS_COLORS = {
   cancelled: '#ef4444', missed: '#ef4444',
 }
 const ORDER_STATUS_STYLES = {
-  pending:   { bg: 'rgba(234,179,8,0.12)',   color: '#a16207', border: 'rgba(234,179,8,0.3)'   },
-  completed: { bg: 'rgba(34,197,94,0.12)',   color: '#15803d', border: 'rgba(34,197,94,0.3)'   },
-  delivered: { bg: 'rgba(129,140,248,0.12)', color: '#4f46e5', border: 'rgba(129,140,248,0.3)' },
-  cancelled: { bg: 'rgba(239,68,68,0.12)',   color: '#dc2626', border: 'rgba(239,68,68,0.3)'   },
+  pending:     { bg: 'rgba(234,179,8,0.12)',   color: '#a16207', border: 'rgba(234,179,8,0.3)'   },
+  'in-progress':{ bg: 'rgba(59,130,246,0.12)', color: '#2563eb', border: 'rgba(59,130,246,0.3)'  },
+  completed:   { bg: 'rgba(34,197,94,0.12)',   color: '#15803d', border: 'rgba(34,197,94,0.3)'   },
+  delivered:   { bg: 'rgba(129,140,248,0.12)', color: '#4f46e5', border: 'rgba(129,140,248,0.3)' },
+  cancelled:   { bg: 'rgba(239,68,68,0.12)',   color: '#dc2626', border: 'rgba(239,68,68,0.3)'   },
 }
+
+// Production stages — must match OrdersTab
+const STAGES = [
+  { value: 'measurement_taken', label: 'Measurement Taken', icon: 'straighten'    },
+  { value: 'fabric_ready',      label: 'Fabric Ready',      icon: 'roll_content'  },
+  { value: 'cutting',           label: 'Cutting',           icon: 'content_cut'   },
+  { value: 'weaving',           label: 'Weaving',           icon: 'texture'       },
+  { value: 'sewing',            label: 'Sewing',            icon: 'send'          },
+  { value: 'embroidery',        label: 'Embroidery',        icon: 'auto_awesome'  },
+  { value: 'fitting',           label: 'Fitting',           icon: 'accessibility' },
+  { value: 'adjustments',       label: 'Adjustments',       icon: 'tune'          },
+  { value: 'finishing',         label: 'Finishing',         icon: 'dry_cleaning'  },
+  { value: 'quality_check',     label: 'Quality Check',     icon: 'fact_check'    },
+  { value: 'ready',             label: 'Ready',             icon: 'check_circle'  },
+]
 
 // ─────────────────────────────────────────────────────────────
 // SUB-COMPONENTS
@@ -144,9 +160,7 @@ function RevenueDonut({ pct }) {
   const blueDash = (filled / 100) * circ
   return (
     <svg width="88" height="88" viewBox="0 0 88 88">
-      {/* Gray full-circle track — always visible, shows 100% gray at 0% */}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#94a3b8" strokeWidth="8" />
-      {/* Blue arc fills in from top as pct increases */}
       {filled > 0 && (
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="#60a5fa" strokeWidth="8"
           strokeDasharray={`${blueDash} ${circ}`} strokeLinecap="round"
@@ -158,11 +172,8 @@ function RevenueDonut({ pct }) {
   )
 }
 
-// ── Delta: renders nothing when there's no change ────────────
 function Delta({ delta, positiveIsGood = true }) {
-  // No change → render nothing at all
   if (!delta || delta.direction === 'same') return null
-
   const isPositive = delta.direction === 'up'
   const isGood     = positiveIsGood ? isPositive : !isPositive
   return (
@@ -181,7 +192,7 @@ function StatusPill({ status }) {
   return (
     <span className={styles.statusPill}
       style={{ background: sty.bg, color: sty.color, borderColor: sty.border }}>
-      {s.charAt(0).toUpperCase() + s.slice(1)}
+      {s === 'in-progress' ? 'In Progress' : s.charAt(0).toUpperCase() + s.slice(1)}
     </span>
   )
 }
@@ -464,11 +475,9 @@ function Home({ onMenuClick }) {
   }).length
 
   // ── Invoices ──────────────────────────────────────────────
-  // Helper: get the due date string for any invoice, computed or explicit
   const getInvDueDate = (i) => {
     const explicit = i.due || i.dueDate || i.due_date || i.dueOn
     if (explicit) return explicit
-    // Handle every possible Firestore Timestamp / date shape
     let ms = null
     const ca = i.createdAt
     if (!ca) return null
@@ -499,180 +508,79 @@ function Home({ onMenuClick }) {
   }).length
   const invoicesDueThisWeek = unpaidInvoices.filter(i => dueThisWeek(getInvDueDate(i))).length
 
-  // ── Tasks ─────────────────────────────────────────────────
-  const pendingTasks     = tasks.filter(t => !t.done && !isTaskOverdue(t))
-  const overdueTasks     = tasks.filter(t => isTaskOverdue(t))
-  const tasksDueThisWeek = pendingTasks.filter(t => dueThisWeek(t.dueDate)).length
-  const tasksThisWeek    = tasks.filter(t => t.createdAt && new Date(t.createdAt) >= weekAgo).length
-  const tasksLastWeek    = tasks.filter(t => {
-    if (!t.createdAt) return false; const d = new Date(t.createdAt)
-    return d >= twoWksAgo && d < weekAgo
-  }).length
-
-  // ── Appointments ──────────────────────────────────────────
-  const todayCount   = todayAppointments.length
-  const apptThisWeek = upcoming.filter(a => dueThisWeek(a.date)).length
-  const apptLastWeek = recentAppts.filter(a => {
-    if (!a.date) return false
-    const d = new Date(a.date + 'T00:00:00')
-    return d >= twoWksAgo && d < weekAgo
-  }).length
-
   // ── Revenue ───────────────────────────────────────────────
-  const calcRevenue = (sinceDate, beforeDate = null) => {
-    if (!revenueGoal) return 0
-    return allPayments.flatMap(p => {
-      const insts = p.installments || []
-      if (!insts.length) return []
-      return insts
-        .filter(inst => {
-          const ds = inst.date || p.date
-          if (!ds) return false
-          const d = new Date(ds)
-          if (d < sinceDate) return false
-          if (beforeDate && d >= beforeDate) return false
-          return true
-        })
-        .map(inst => Number(inst.amount) || 0)
-    }).reduce((s, a) => s + a, 0)
-  }
+  const revenueOrders = allOrders.filter(o => ['completed','delivered'].includes(o.status))
+  const windowStart   = revenueGoal ? getWindowStart(revenueGoal.period) : null
+  const prevStart     = revenueGoal ? getPrevWindowStart(revenueGoal.period) : null
+  const earnedInWindow = revenueGoal
+    ? revenueOrders.filter(o => {
+        const d = o.createdAt ? new Date(o.createdAt) : null
+        return d && d >= windowStart
+      }).reduce((sum, o) => sum + (Number(o.price) || 0), 0)
+    : 0
+  const earnedInPrevWindow = revenueGoal
+    ? revenueOrders.filter(o => {
+        const d = o.createdAt ? new Date(o.createdAt) : null
+        return d && d >= prevStart && d < windowStart
+      }).reduce((sum, o) => sum + (Number(o.price) || 0), 0)
+    : 0
+  const pct = revenueGoal ? Math.min(Math.round((earnedInWindow / revenueGoal.goal) * 100), 100) : 0
 
-  const revenueEarned     = revenueGoal ? calcRevenue(getWindowStart(revenueGoal.period)) : 0
-  const revenuePrevPeriod = revenueGoal ? calcRevenue(getPrevWindowStart(revenueGoal.period), getWindowStart(revenueGoal.period)) : 0
-  const revenuePct        = revenueGoal?.goal > 0 ? Math.min(Math.round((revenueEarned / revenueGoal.goal) * 100), 100) : 0
-  const revenueDiff       = revenueEarned - revenuePrevPeriod
-  const revenueUp         = revenueDiff >= 0
+  // ── Recent lists ──────────────────────────────────────────
+  const recentOrders = [...allOrders]
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+    .slice(0, 5)
+
+  const recentTasks = [...tasks]
+    .filter(t => !t.done)
+    .sort((a, b) => {
+      const aOver = isTaskOverdue(a), bOver = isTaskOverdue(b)
+      if (aOver && !bOver) return -1
+      if (!aOver && bOver) return 1
+      return 0
+    })
+    .slice(0, 5)
+
+  const pastAppointments = [...(recentAppts || [])]
+    .filter(a => ['completed','cancelled','missed'].includes(a.status))
+    .slice(0, 3)
 
   // ── Urgent items ──────────────────────────────────────────
   const urgentItems = []
-  const soonAppt = upcoming.find(a => {
-    if (!a.date || !a.time || a.date !== todayStr) return false
-    const [hh, mm] = a.time.split(':').map(Number)
-    const apptTime = new Date(); apptTime.setHours(hh, mm, 0, 0)
-    const diff = apptTime - Date.now()
-    return diff > 0 && diff < 2 * 60 * 60 * 1000
-  })
-  if (soonAppt) {
-    const [hh, mm] = soonAppt.time.split(':').map(Number)
-    const apptTime = new Date(); apptTime.setHours(hh, mm, 0, 0)
-    const minsLeft = Math.round((apptTime - Date.now()) / 60000)
-    urgentItems.push({
-      icon:  APPT_TYPE_ICONS[soonAppt.type] || 'event',
-      text:  `Appointment in ${minsLeft} min${minsLeft !== 1 ? 's' : ''}${soonAppt.customerName ? ` · ${soonAppt.customerName}` : ''}`,
-      route: '/appointments',
-    })
-  }
-  if (overdueTasks.length > 0) urgentItems.push({
-    icon: 'assignment_late',
-    text: `${overdueTasks.length} overdue task${overdueTasks.length > 1 ? 's' : ''}`,
-    route: '/tasks',
-  })
-  const ordersDueToday = pendingOrders.filter(o => (o.dueDate || o.dueRaw) === todayStr).length
-  if (ordersDueToday > 0) urgentItems.push({
-    icon: 'local_shipping',
-    text: `${ordersDueToday} order${ordersDueToday > 1 ? 's' : ''} due today`,
-    route: '/orders',
-  })
-  if (totalOverdue > 0) urgentItems.push({
-    icon: 'receipt_long',
-    text: `${totalOverdue} overdue invoice${totalOverdue > 1 ? 's' : ''}`,
-    route: '/invoices',
-  })
+  if (ordersDueThisWeek > 0)
+    urgentItems.push({ icon: 'shopping_bag', text: `${ordersDueThisWeek} order${ordersDueThisWeek > 1 ? 's' : ''} due this week`, route: '/orders' })
+  if (totalOverdue > 0)
+    urgentItems.push({ icon: 'receipt_long', text: `${totalOverdue} overdue invoice${totalOverdue > 1 ? 's' : ''}`, route: '/invoices' })
+  if (missedCount > 0)
+    urgentItems.push({ icon: 'event_busy', text: `${missedCount} missed appointment${missedCount > 1 ? 's' : ''}`, route: '/appointments' })
 
-  // ── Recent lists ──────────────────────────────────────────
-  const recentOrders       = [...pendingOrders].slice(0, 4)
-  const recentTasks        = tasks.filter(t => !t.done).slice(0, 4)
-  const recentAppointments = upcoming.slice(0, 4)
-  const pastAppointments   = recentAppts.slice(0, 4)
+  // ── Order/invoice delta ───────────────────────────────────
+  const orderDelta  = makeDelta(ordersCreatedThisWeek, ordersCreatedLastWeek)
+  const invoiceDelta = makeDelta(invThisWeek, invLastWeek)
 
-  const statCards = [
-    {
-      desktopIcon: 'shopping_bag',
-      iconColor:   '#f59e0b',      value: pendingOrders.length,
-      label:       'Pending Orders',
-      sub:         ordersDueThisWeek > 0
-                     ? `${ordersDueThisWeek} due this wk`
-                     : ordersCreatedThisWeek > 0
-                       ? `${ordersCreatedThisWeek} this wk`
-                       : null,
-      subColor:    ordersDueThisWeek > 0 ? '#fb923c' : 'var(--text3)',
-      delta:       null,
-      positiveIsGood: true,        route: '/orders',
-    },
-    {
-      desktopIcon: 'receipt_long',
-      iconColor:   '#ef4444',      value: totalUnpaid,
-      label:       'Unpaid Invoices',
-      sub:         totalOverdue > 0
-                     ? `${totalOverdue} overdue`
-                     : totalUnpaid > 0
-                       ? `${invoicesDueThisWeek > 0 ? invoicesDueThisWeek : totalUnpaid} due this wk`
-                       : null,
-      subColor:    totalOverdue > 0 ? '#ef4444' : '#fb923c',
-      delta:       null,
-      positiveIsGood: false,       route: '/invoices',
-    },
-    {
-      desktopIcon: 'event',
-      iconColor:   '#06b6d4',      value: todayCount,
-      label:       "Today's Appts",
-      sub:         missedCount > 0
-                     ? `${missedCount} missed`
-                     : upcomingThisWeek > 0
-                       ? `${upcomingThisWeek} this wk`
-                       : null,
-      subColor:    missedCount > 0 ? '#ef4444' : '#fb923c',
-      delta:       null,
-      positiveIsGood: true,        route: '/appointments',
-    },
-    {
-      desktopIcon: 'task_alt',
-      iconColor:   '#22c55e',      value: pendingTasks.length,
-      label:       'Pending Tasks',
-      sub:         tasksDueThisWeek > 0
-                     ? `${tasksDueThisWeek} due this wk`
-                     : tasksThisWeek > 0
-                       ? `${tasksThisWeek} this wk`
-                       : null,
-      subColor:    tasksDueThisWeek > 0 ? '#fb923c' : 'var(--text3)',
-      delta:       null,
-      positiveIsGood: false,       route: '/tasks',
-    },
-  ]
-
-  // ── Top customer sub-line: "₦30k • 5 orders" ─────────────
-  const topCustomerMeta = (() => {
-    const { orderCount, totalSpend } = topCustomer
-    if (!orderCount) return null
-    const parts = []
-    const spendStr = formatNairaCompact(totalSpend)
-    if (spendStr) parts.push(spendStr)
-    parts.push(`${orderCount} order${orderCount !== 1 ? 's' : ''}`)
-    return parts.join(' • ')
-  })()
-
-  // ─────────────────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────────────────
   return (
     <div className={styles.pageWrapper}>
-      <Header onMenuClick={onMenuClick} />
+      <Header type="menu" title="Dashboard" onMenuClick={onMenuClick} showNotifications />
+
+      {showGoalModal && (
+        <RevenueGoalModal onSave={handleSaveGoal} onClose={() => setShowGoalModal(false)} />
+      )}
 
       <main className={styles.main}>
 
-        {/* ── HERO — no date, emoji greeting ── */}
-        <section className={styles.hero}>
+        {/* ── HERO ── */}
+        <div className={styles.hero}>
           <p className={styles.welcomeLabel}>
             {greetingRef.current}
             <span className={styles.greetingEmoji}>{greetEmojiRef.current}</span>
           </p>
           <h1 className={styles.title}>{displayName}</h1>
           <p className={styles.subtitle}>{subtextRef.current}</p>
-          <p className={styles.updatedAt}>
-            <span className="mi" style={{ fontSize: '0.7rem', verticalAlign: 'middle', marginRight: '3px' }}>update</span>
+          <div className={styles.updatedAt}>
+            <span className="mi" style={{ fontSize: '0.72rem' }}>schedule</span>
             Updated at {formatUpdatedTime(updatedAtRef.current)}
-          </p>
-        </section>
+          </div>
+        </div>
 
         {/* ── NOTIFICATION BANNER ── */}
         {showBanner && <NotifBanner onEnable={handleEnable} onDismiss={handleDismiss} />}
@@ -680,130 +588,162 @@ function Home({ onMenuClick }) {
         {/* ── URGENT STRIP ── */}
         <UrgentStrip items={urgentItems} navigate={navigate} />
 
-        {/* 1. STAT CARDS GRID ── */}
-        <section className={styles.statsGrid}>
-          {statCards.map((card, i) => (
-            <div key={i} className={styles.statCard} onClick={() => navigate(card.route)}>
-              <div className={styles.statIconWrap}>
-                <span className="mi" style={{ fontSize: '1.25rem', color: 'var(--text)' }}>
-                  {card.desktopIcon}
-                </span>
-              </div>
-              <div className={styles.statValue}>{card.value}</div>
-              <div className={styles.statLabel}>{card.label}</div>
-              {card.sub && (
-                <div className={styles.statSub} style={{ color: card.subColor }}>{card.sub}</div>
-              )}
-              <Delta delta={card.delta} positiveIsGood={card.positiveIsGood} />
+        {/* ── STAT CARDS ── */}
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard} onClick={() => navigate('/orders')}>
+            <div className={styles.statIconWrap}>
+              <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--accent)' }}>shopping_bag</span>
             </div>
-          ))}
-        </section>
-
-        {/* 2. REVENUE CARD — full width ── */}
-        {!revenueGoal ? (
-          <div className={styles.revenueCard} onClick={() => setShowGoalModal(true)}
-            style={{ justifyContent: 'flex-start', gap: '20px' }}>
-            <div className={styles.revenueEmptyIconWrap}>
-              <span className="mi" style={{ fontSize: '1.6rem', color: 'var(--accent)' }}>ads_click</span>
-            </div>
-            <div className={styles.revenueCardLeft} style={{ gap: '2px' }}>
-              <div className={styles.revenueEmptyTitle}>Set your first goal</div>
-              <div className={styles.revenueEmptySub}>Tap here to track your shop's revenue growth</div>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.revenueCard} onClick={() => setShowGoalModal(true)}>
-            <div className={styles.revenueCardLeft}>
-              <div className={styles.revenueLabel}>{periodLabel(revenueGoal.period)} · Revenue</div>
-              <div className={styles.revenueAmount}>
-                {revenueGoal.currency}{revenueEarned.toLocaleString()}
-              </div>
-              <div className={styles.revenueTarget}>
-                Goal: {revenueGoal.currency}{revenueGoal.goal.toLocaleString()}
-              </div>
-              {/* Only show vs-last-period row when there's an actual difference */}
-              {revenueDiff !== 0 && (
-                <div className={styles.revenueVs}>
-                  <span className="mi" style={{
-                    fontSize: '0.7rem', verticalAlign: 'middle', marginRight: '3px',
-                    color: revenueUp ? '#22c55e' : '#ef4444'
-                  }}>{revenueUp ? 'arrow_upward' : 'arrow_downward'}</span>
-                  <span style={{ color: revenueUp ? '#22c55e' : '#ef4444', fontSize: '0.72rem', fontWeight: 700 }}>
-                    {revenueGoal.currency}{Math.abs(revenueDiff).toLocaleString()}
-                  </span>
-                  <span style={{ color: 'var(--text3)', fontSize: '0.7rem', marginLeft: '3px' }}>
-                    vs last {revenueGoal.period === 'weekly' ? 'week' : revenueGoal.period === 'monthly' ? 'month' : 'year'}
-                  </span>
+            <div className={styles.statCardBody}>
+              <div className={styles.statValue}>{pendingOrders.length}</div>
+              <div className={styles.statLabel}>Active Orders</div>
+              <Delta delta={orderDelta} />
+              {ordersDueThisWeek > 0 && (
+                <div className={styles.statSub} style={{ color: '#ef4444' }}>
+                  {ordersDueThisWeek} due this week
                 </div>
               )}
-              {/* Sparkline removed — donut is sufficient visual */}
-            </div>
-            <div className={styles.revenueDonutWrap}>
-              <RevenueDonut pct={revenuePct} />
             </div>
           </div>
-        )}
 
-        {/* 3. CUSTOMER INSIGHTS CARD — full width ── */}
-        <div className={styles.customerCard} onClick={() => navigate('/customers')}>
-
-          {/* Header row */}
-          <div className={styles.customerCardHeader}>
-            <span className={styles.customerCardSectionLabel}>Customer Insights</span>
-            <span className="mi" style={{ fontSize: '0.95rem', color: 'var(--text3)' }}>chevron_right</span>
-          </div>
-
-          {/* Hero total — number big, label underneath */}
-          <div className={styles.customerHeroBlock}>
-            <div className={styles.customerHeroNumber}>{totalCustomers.toLocaleString()}</div>
-            <div className={styles.customerHeroLabel}>Total Customers</div>
-          </div>
-
-          {/* Divider */}
-          <div className={styles.customerCardRule} />
-
-          {/* Two stats only — top customer + new this month */}
-          <div className={styles.customerStatStack}>
-            <div className={styles.customerStatRow}>
-              <span className={styles.customerStatLbl}>Top Customer</span>
-              <div className={styles.customerTopVal}>
-                <span style={{ color: 'var(--accent)' }}>{topCustomer.name}</span>
-                {topCustomerMeta && (
-                  <span className={styles.customerTopMeta}>{topCustomerMeta}</span>
-                )}
-              </div>
+          <div className={styles.statCard} onClick={() => navigate('/invoices')}>
+            <div className={styles.statIconWrap}>
+              <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--accent)' }}>receipt_long</span>
             </div>
-            <div className={styles.customerStatRow}>
-              <span className={styles.customerStatLbl}>New This Month</span>
-              <span className={styles.customerStatVal}>{newCustThisMonth}</span>
+            <div className={styles.statCardBody}>
+              <div className={styles.statValue}>{totalUnpaid}</div>
+              <div className={styles.statLabel}>Unpaid Invoices</div>
+              <Delta delta={invoiceDelta} positiveIsGood={false} />
+              {totalOverdue > 0 && (
+                <div className={styles.statSub} style={{ color: '#ef4444' }}>
+                  {totalOverdue} overdue
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.statCard} onClick={() => navigate('/appointments')}>
+            <div className={styles.statIconWrap}>
+              <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--accent)' }}>event</span>
+            </div>
+            <div className={styles.statCardBody}>
+              <div className={styles.statValue}>{upcoming.length}</div>
+              <div className={styles.statLabel}>Upcoming Appts</div>
+              {upcomingThisWeek > 0 && (
+                <div className={styles.statSub} style={{ color: 'var(--accent)' }}>
+                  {upcomingThisWeek} this week
+                </div>
+              )}
+              {missedCount > 0 && (
+                <div className={styles.statSub} style={{ color: '#ef4444' }}>
+                  {missedCount} missed
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.statCard} onClick={() => navigate('/tasks')}>
+            <div className={styles.statIconWrap}>
+              <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--accent)' }}>assignment</span>
+            </div>
+            <div className={styles.statCardBody}>
+              <div className={styles.statValue}>{recentTasks.length}</div>
+              <div className={styles.statLabel}>Open Tasks</div>
+              {recentTasks.filter(isTaskOverdue).length > 0 && (
+                <div className={styles.statSub} style={{ color: '#ef4444' }}>
+                  {recentTasks.filter(isTaskOverdue).length} overdue
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {showGoalModal && (
-          <RevenueGoalModal onSave={handleSaveGoal} onClose={() => setShowGoalModal(false)} />
-        )}
+        {/* ── REVENUE CARD ── */}
+        <div className={styles.revenueCard} onClick={() => setShowGoalModal(true)}>
+          {revenueGoal ? (
+            <>
+              <div className={styles.revenueCardLeft}>
+                <div className={styles.revenueLabel}>{periodLabel(revenueGoal.period)} Revenue</div>
+                <div className={styles.revenueAmount}>
+                  {revenueGoal.currency}{earnedInWindow.toLocaleString()}
+                </div>
+                <div className={styles.revenueTarget}>
+                  Goal: {revenueGoal.currency}{revenueGoal.goal.toLocaleString()}
+                </div>
+                <div className={styles.revenueVs}>
+                  <Delta delta={makeDelta(earnedInWindow, earnedInPrevWindow)} />
+                </div>
+              </div>
+              <div className={styles.revenueDonutWrap}>
+                <RevenueDonut pct={pct} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.revenueCardLeft}>
+                <div className={styles.revenueEmptyTitle}>Set a Revenue Goal</div>
+                <div className={styles.revenueEmptySub}>Track weekly, monthly or yearly progress</div>
+              </div>
+              <div className={styles.revenueEmptyIconWrap}>
+                <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--accent)' }}>track_changes</span>
+              </div>
+            </>
+          )}
+        </div>
 
-        {/* ── UPCOMING APPOINTMENTS — hidden when empty ── */}
-        {recentAppointments.length > 0 && (
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>Upcoming Appointments</h3>
-            <button className={styles.seeAllBtn} onClick={() => navigate('/appointments')}>See all</button>
+        {/* ── CUSTOMER INSIGHTS ── */}
+        <div className={styles.customerCard} onClick={() => navigate('/customers')}>
+          <div className={styles.customerCardHeader}>
+            <span className={styles.customerCardSectionLabel}>Customer Insights</span>
+            <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>chevron_right</span>
           </div>
+          <div className={styles.customerHeroBlock}>
+            <div className={styles.customerHeroNumber}>{totalCustomers}</div>
+            <div className={styles.customerHeroLabel}>Total Customers</div>
+          </div>
+          <div className={styles.customerCardRule} />
+          <div className={styles.customerStatStack}>
+            <div className={styles.customerStatRow}>
+              <span className={styles.customerStatLbl}>New this month</span>
+              <span className={styles.customerStatVal}>{newCustThisMonth}</span>
+            </div>
+            <div className={styles.customerStatRow}>
+              <span className={styles.customerStatLbl}>Retention rate</span>
+              <span className={styles.customerStatVal}>{retentionRate}%</span>
+            </div>
+            <div className={styles.customerStatRow}>
+              <span className={styles.customerStatLbl}>Top customer</span>
+              <div className={styles.customerTopVal}>
+                {topCustomer.name}
+                {topCustomer.orderCount > 0 && (
+                  <span className={styles.customerTopMeta}>
+                    {topCustomer.orderCount} orders · {formatNairaCompact(topCustomer.totalSpend) || '₦0'}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── TODAY'S APPOINTMENTS ── */}
+        {todayAppointments && todayAppointments.length > 0 && (
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>Today's Appointments</h3>
+              <button className={styles.seeAllBtn} onClick={() => navigate('/appointments')}>See all</button>
+            </div>
             <div className={styles.listSection}>
               <div className={styles.listDivider} />
-              {recentAppointments.map((appt, idx) => {
-                const isLast    = idx === recentAppointments.length - 1
-                const icon      = APPT_TYPE_ICONS[appt.type] || 'event'
+              {todayAppointments.map((appt, idx) => {
+                const isLast    = idx === todayAppointments.length - 1
                 const iconColor = APPT_STATUS_COLORS[appt.status] || '#818cf8'
-                const isToday   = todayAppointments.some(a => a.id === appt.id)
                 return (
                   <div key={appt.id} className={`${styles.listItem} ${isLast ? styles.listItemLast : ''}`}>
-                    <div className={styles.listOuter}
-                      style={isToday ? { borderColor: 'rgba(6,182,212,0.35)', background: 'rgba(6,182,212,0.05)' } : {}}>
+                    <div className={styles.listOuter} style={{ borderColor: `${iconColor}40`, background: `${iconColor}08` }}>
                       <div className={styles.listInner}>
-                        <span className="mi" style={{ fontSize: '1.3rem', color: iconColor }}>{icon}</span>
+                        <span className="mi" style={{ fontSize: '1.3rem', color: iconColor }}>
+                          {APPT_TYPE_ICONS[appt.type] || 'event'}
+                        </span>
                       </div>
                     </div>
                     <div className={styles.listInfo}>
@@ -818,20 +758,20 @@ function Home({ onMenuClick }) {
                         <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)', verticalAlign: 'middle' }}>schedule</span>
                         <span className={styles.listMetaText}>{formatApptDate(appt.date, appt.time)}</span>
                       </div>
-                      {isToday && <div className={styles.listApptToday}>Today</div>}
+                      <span className={styles.listApptToday}>Today</span>
                     </div>
                   </div>
                 )
               })}
             </div>
-        </section>
+          </section>
         )}
 
-        {/* ── RECENT APPOINTMENTS ── */}
+        {/* ── PAST APPOINTMENTS ── */}
         {pastAppointments.length > 0 && (
           <section className={styles.section}>
             <div className={styles.sectionHeader}>
-              <h3 className={styles.sectionTitle}>Recent Appointments</h3>
+              <h3 className={styles.sectionTitle}>Past Appointments</h3>
               <button className={styles.seeAllBtn} onClick={() => navigate('/appointments')}>See all</button>
             </div>
             <div className={styles.listSection}>
@@ -904,19 +844,20 @@ function Home({ onMenuClick }) {
           </div>
         </section>
 
-        {/* ── RECENT ORDERS — hidden when empty ── */}
+        {/* ── RECENT ORDERS ── */}
         {recentOrders.length > 0 && (
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>Recent Orders</h3>
-            <button className={styles.seeAllBtn} onClick={() => navigate('/orders')}>See all</button>
-          </div>
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>Recent Orders</h3>
+              <button className={styles.seeAllBtn} onClick={() => navigate('/orders')}>See all</button>
+            </div>
             <div className={styles.listSection}>
               <div className={styles.listDivider} />
               {recentOrders.map((order, idx) => {
                 const isLast   = idx === recentOrders.length - 1
                 const priceStr = order.price != null ? `₦${Number(order.price).toLocaleString()}` : '—'
                 const thumb    = order.items?.[0]?.imgSrc
+                const stageObj = STAGES.find(s => s.value === order.stage)
                 return (
                   <div key={order.id} className={`${styles.listItem} ${isLast ? styles.listItemLast : ''}`}>
                     <div className={styles.listOuter}>
@@ -934,6 +875,12 @@ function Home({ onMenuClick }) {
                         <span className={styles.listMetaText}>{order.customerName || '—'}</span>
                       </div>
                       <StatusPill status={order.status} />
+                      {stageObj && (
+                        <div className={styles.listStageLine}>
+                          <span className="mi" style={{ fontSize: '0.78rem' }}>{stageObj.icon}</span>
+                          {stageObj.label}
+                        </div>
+                      )}
                       {(order.due || order.dueRaw) && (
                         <div className={styles.listDue}>Due {order.due || formatDate(order.dueRaw)}</div>
                       )}
@@ -946,16 +893,16 @@ function Home({ onMenuClick }) {
                 )
               })}
             </div>
-        </section>
+          </section>
         )}
 
-        {/* ── RECENT TASKS — hidden when empty ── */}
+        {/* ── RECENT TASKS ── */}
         {recentTasks.length > 0 && (
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>Recent Tasks</h3>
-            <button className={styles.seeAllBtn} onClick={() => navigate('/tasks')}>See all</button>
-          </div>
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h3 className={styles.sectionTitle}>Recent Tasks</h3>
+              <button className={styles.seeAllBtn} onClick={() => navigate('/tasks')}>See all</button>
+            </div>
             <div className={styles.listSection}>
               <div className={styles.listDivider} />
               {recentTasks.map((task, idx) => {
@@ -993,7 +940,7 @@ function Home({ onMenuClick }) {
                 )
               })}
             </div>
-        </section>
+          </section>
         )}
 
       </main>
