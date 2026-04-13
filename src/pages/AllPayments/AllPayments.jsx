@@ -478,11 +478,12 @@ export default function AllPayments({ onMenuClick }) {
     toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
   }, [])
 
-  // ── Build order image lookup: "customerId__orderId" → imageUrl ─
+  // ── Build order image lookup: "customerId__orderId" → imgSrc ──
   const orderImageMap = {}
   for (const order of allOrders) {
-    if (order.imageUrl && order.customerId && order.id) {
-      orderImageMap[`${order.customerId}__${order.id}`] = order.imageUrl
+    const imgSrc = order.items?.[0]?.imgSrc
+    if (imgSrc && order.customerId && order.id) {
+      orderImageMap[`${order.customerId}__${order.id}`] = imgSrc
     }
   }
 
