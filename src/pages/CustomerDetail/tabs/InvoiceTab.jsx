@@ -9,12 +9,18 @@ function fmt(currency = '₦', amount) {
   return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`
 }
 
-const STATUS_LABELS = { unpaid: 'Unpaid', paid: 'Paid', overdue: 'Overdue' }
+const STATUS_LABELS = {
+  unpaid:    'Unpaid',
+  part_paid: 'Part Payment',
+  paid:      'Full Payment',
+  overdue:   'Overdue',
+}
 
 const STATUS_STYLES = {
-  paid:    { bg: 'rgba(34,197,94,0.12)',   color: '#15803d', border: 'rgba(34,197,94,0.3)'   },
-  unpaid:  { bg: 'rgba(234,179,8,0.12)',   color: '#a16207', border: 'rgba(234,179,8,0.3)'   },
-  overdue: { bg: 'rgba(239,68,68,0.12)',   color: '#dc2626', border: 'rgba(239,68,68,0.3)'   },
+  paid:      { bg: 'rgba(34,197,94,0.12)',   color: '#15803d', border: 'rgba(34,197,94,0.3)'   },
+  part_paid: { bg: 'rgba(251,146,60,0.12)',  color: '#c2410c', border: 'rgba(251,146,60,0.3)'  },
+  unpaid:    { bg: 'rgba(234,179,8,0.12)',   color: '#a16207', border: 'rgba(234,179,8,0.3)'   },
+  overdue:   { bg: 'rgba(239,68,68,0.12)',   color: '#dc2626', border: 'rgba(239,68,68,0.3)'   },
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -120,7 +126,7 @@ export default function InvoiceTab({
 
   const handleStatusChange = (id, newStatus) => {
     onStatusChange(id, newStatus)
-    showToast(`Marked as ${newStatus}`)
+    showToast(`Marked as ${STATUS_LABELS[newStatus] || newStatus}`)
     if (viewingInvoice?.id === id) {
       setViewingInvoice(prev => ({ ...prev, status: newStatus }))
     }
