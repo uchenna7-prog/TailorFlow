@@ -13,14 +13,20 @@ function fmt(currency = '₦', amount) {
 // ── Receipt card (same layout as InvoiceCard) ─────────────────
 
 function ReceiptCard({ receipt, currency, onTap, isLast }) {
-  // For the card display: show cumulativePaid if available (new receipts),
-  // otherwise fall back to summing receipt.payments (old receipts).
-  const displayPaid = receipt.cumulativePaid != null
-    ? parseFloat(receipt.cumulativePaid)
-    : (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
+  // FIX 2: The card should show the amount paid in THIS specific receipt,
+  // not the cumulative running total. cumulativePaid is only used to
+  // determine whether the full order has been paid (for the status badge).
 
-  const orderTotal  = parseFloat(receipt.orderPrice) || displayPaid
-  const isFullPay   = displayPaid >= orderTotal && orderTotal > 0
+  // Amount paid in this receipt only
+  const thisPaymentAmount = (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
+
+  // Cumulative running total — used only for the full/part status badge
+  const cumulativePaid = receipt.cumulativePaid != null
+    ? parseFloat(receipt.cumulativePaid)
+    : thisPaymentAmount
+
+  const orderTotal  = parseFloat(receipt.orderPrice) || cumulativePaid
+  const isFullPay   = cumulativePaid >= orderTotal && orderTotal > 0
   const statusLabel = isFullPay ? 'Paid in Full' : 'Part Payment'
 
   return (
@@ -52,7 +58,8 @@ function ReceiptCard({ receipt, currency, onTap, isLast }) {
         }}>
           {statusLabel}
         </span>
-        <div className={styles.invoiceListAmount}>{fmt(currency, displayPaid)}</div>
+        {/* Show the amount paid in this receipt, not the running cumulative total */}
+        <div className={styles.invoiceListAmount}>{fmt(currency, thisPaymentAmount)}</div>
       </div>
     </div>
   )
