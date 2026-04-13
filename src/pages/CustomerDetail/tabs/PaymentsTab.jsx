@@ -36,8 +36,12 @@ function statusMeta(value) {
 // ── ADD PAYMENT MODAL ─────────────────────────────────────────
 // Shows "Payment Type" (Full / Part) — NOT the status chips.
 // Status chips (Not Paid / Part / Paid) belong in PaymentDetail only.
+//
+// If the selected order already has a payment card, the form fields
+// are replaced with a contextual message guiding the user to the
+// existing card instead of allowing a duplicate.
 
-function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
+function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [orderDropOpen, setOrderDropOpen] = useState(false)
   // paymentType: 'full' | 'part'
@@ -53,11 +57,19 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
 
   const handleClose = () => { reset(); onClose() }
 
-  // FIX 1b: Always derive final status from the actual amount vs order price.
-  // The chip is a hint but never overrides the math — so saving "Full Payment"
-  // with a partial amount will correctly produce 'part', not 'paid'.
+  // Check if the selected order already has a payment card
+  const existingPayment = selectedOrder
+    ? payments.find(p => String(p.orderId) === String(selectedOrder.id))
+    : null
+
+  // Was the existing payment originally a full payment or part payment?
+  // A single-installment 'paid' doc = full payment. Anything else = part.
+  const existingIsFullPayment = existingPayment
+    ? (existingPayment.installments || []).length === 1 && existingPayment.status === 'paid'
+    : false
+
   const handleSave = () => {
-    if (!selectedOrder || !amount) return
+    if (!selectedOrder || !amount || existingPayment) return
 
     const installment = [{
       amount: parseFloat(amount),
@@ -71,10 +83,8 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
 
     let finalStatus
     if (fullPrice > 0) {
-      // Order price known — derive from math, ignore the chip
       finalStatus = entered >= fullPrice ? 'paid' : 'part'
     } else {
-      // No order price set — trust the chip as fallback
       finalStatus = paymentType === 'full' ? 'paid' : 'part'
     }
 
@@ -101,7 +111,7 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
         title="New Payment"
         onBackClick={handleClose}
         customActions={[
-          { label: 'Save', onClick: handleSave, disabled: !selectedOrder || !amount }
+          { label: 'Save', onClick: handleSave, disabled: !selectedOrder || !amount || !!existingPayment }
         ]}
       />
 
@@ -145,86 +155,109 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
           )}
         </div>
 
-        {/* Payment Type — 2 chips: Full Payment | Part Payment */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Payment Type</label>
-          <div className={styles.statusRow}>
-            <button
-              className={`${styles.statusChip} ${paymentType === 'full' ? styles.statusChipActive : ''}`}
-              style={paymentType === 'full'
-                ? { borderColor: '#22c55e', color: '#22c55e', background: 'rgba(34,197,94,0.12)' }
-                : {}}
-              onClick={() => setPaymentType('full')}
-            >
-              Full Payment
-            </button>
-            <button
-              className={`${styles.statusChip} ${paymentType === 'part' ? styles.statusChipActive : ''}`}
-              style={paymentType === 'part'
-                ? { borderColor: '#fb923c', color: '#fb923c', background: 'rgba(251,146,60,0.12)' }
-                : {}}
-              onClick={() => setPaymentType('part')}
-            >
-              Part Payment
+        {/* ── Duplicate payment block ── */}
+        {existingPayment ? (
+          <div className={styles.duplicateNotice}>
+            <div className={styles.duplicateIconWrap}>
+              <span className="mi" style={{ fontSize: '1.6rem', color: existingIsFullPayment ? '#15803d' : '#c2410c' }}>
+                {existingIsFullPayment ? 'check_circle' : 'payments'}
+              </span>
+            </div>
+            <div className={styles.duplicateTitle}>
+              {existingIsFullPayment
+                ? 'This order is fully paid'
+                : 'Payment already in progress'}
+            </div>
+            <p className={styles.duplicateBody}>
+              {existingIsFullPayment
+                ? `A full payment has already been recorded for "${selectedOrder.desc}". Tap the payment card on the Payments tab to view the details.`
+                : `A payment card already exists for "${selectedOrder.desc}". To record the next instalment, tap that card and use the "Record Another Payment" option.`}
+            </p>
+            <button className={styles.duplicateDismiss} onClick={handleClose}>
+              Got it
             </button>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Payment Type — 2 chips: Full Payment | Part Payment */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel}>Payment Type</label>
+              <div className={styles.statusRow}>
+                <button
+                  className={`${styles.statusChip} ${paymentType === 'full' ? styles.statusChipActive : ''}`}
+                  style={paymentType === 'full'
+                    ? { borderColor: '#22c55e', color: '#22c55e', background: 'rgba(34,197,94,0.12)' }
+                    : {}}
+                  onClick={() => setPaymentType('full')}
+                >
+                  Full Payment
+                </button>
+                <button
+                  className={`${styles.statusChip} ${paymentType === 'part' ? styles.statusChipActive : ''}`}
+                  style={paymentType === 'part'
+                    ? { borderColor: '#fb923c', color: '#fb923c', background: 'rgba(251,146,60,0.12)' }
+                    : {}}
+                  onClick={() => setPaymentType('part')}
+                >
+                  Part Payment
+                </button>
+              </div>
+            </div>
 
-        {/* Amount — label adapts to payment type */}
-        {/* FIX 1a: onChange auto-switches the chip based on amount vs order price */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>
-            {paymentType === 'part' ? 'Initial Amount Paid (₦)' : 'Amount (₦)'}
-          </label>
-          <input
-            type="number"
-            className={styles.input}
-            placeholder={selectedOrder ? `of ${fmt(selectedOrder.price)}` : '0.00'}
-            inputMode="decimal"
-            value={amount}
-            onChange={e => {
-              const val = e.target.value
-              setAmount(val)
-              // Auto-flip the payment type chip based on whether the entered
-              // amount covers the full order price or not
-              if (selectedOrder) {
-                const fullPrice = parseFloat(selectedOrder.price) || 0
-                const entered   = parseFloat(val) || 0
-                if (fullPrice > 0) {
-                  setPaymentType(entered > 0 && entered < fullPrice ? 'part' : 'full')
-                }
-              }
-            }}
-          />
-        </div>
+            {/* Amount */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel}>
+                {paymentType === 'part' ? 'Initial Amount Paid (₦)' : 'Amount (₦)'}
+              </label>
+              <input
+                type="number"
+                className={styles.input}
+                placeholder={selectedOrder ? `of ${fmt(selectedOrder.price)}` : '0.00'}
+                inputMode="decimal"
+                value={amount}
+                onChange={e => {
+                  const val = e.target.value
+                  setAmount(val)
+                  if (selectedOrder) {
+                    const fullPrice = parseFloat(selectedOrder.price) || 0
+                    const entered   = parseFloat(val) || 0
+                    if (fullPrice > 0) {
+                      setPaymentType(entered > 0 && entered < fullPrice ? 'part' : 'full')
+                    }
+                  }
+                }}
+              />
+            </div>
 
-        {/* Payment Method — always shown */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Payment Method</label>
-          <div className={styles.methodRow}>
-            {['cash', 'transfer', 'card', 'other'].map(m => (
-              <button
-                key={m}
-                className={`${styles.methodChip} ${method === m ? styles.methodActive : ''}`}
-                onClick={() => setMethod(m)}
-              >
-                {m.charAt(0).toUpperCase() + m.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
+            {/* Payment Method */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel}>Payment Method</label>
+              <div className={styles.methodRow}>
+                {['cash', 'transfer', 'card', 'other'].map(m => (
+                  <button
+                    key={m}
+                    className={`${styles.methodChip} ${method === m ? styles.methodActive : ''}`}
+                    onClick={() => setMethod(m)}
+                  >
+                    {m.charAt(0).toUpperCase() + m.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {/* Notes */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Notes <span className={styles.optional}>(optional)</span></label>
-          <textarea
-            className={styles.textarea}
-            placeholder="Any extra details…"
-            value={notes}
-            rows={2}
-            onChange={e => setNotes(e.target.value)}
-          />
-        </div>
+            {/* Notes */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel}>Notes <span className={styles.optional}>(optional)</span></label>
+              <textarea
+                className={styles.textarea}
+                placeholder="Any extra details…"
+                value={notes}
+                rows={2}
+                onChange={e => setNotes(e.target.value)}
+              />
+            </div>
+          </>
+        )}
 
       </div>
     </div>
@@ -309,12 +342,10 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
   const isNowFullyPaid = fullPrice > 0 && totalPaid >= fullPrice
   const hasInstallments = installments.length > 0
 
-  // Progress bar — cap at 99% for part payments so it never looks full
   const pct = fullPrice > 0
     ? (isPaid ? Math.min(100, (totalPaid / fullPrice) * 100) : Math.min(99, (totalPaid / fullPrice) * 100))
     : 0
 
-  // Smart status chip logic — same as before
   const hasPartPayments = installments.length > 0
 
   return (
@@ -359,13 +390,11 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           <div className={styles.summaryCard} style={{ marginTop: 16 }}>
             <label className={styles.fieldLabel} style={{ marginBottom: 12, display: 'block' }}>Payment Breakdown</label>
 
-            {/* Order value row */}
             <div className={styles.summaryRow}>
               <span>Order Value</span>
               <span style={{ fontWeight: 700, color: 'var(--text)' }}>{fmt(fullPrice)}</span>
             </div>
 
-            {/* Each installment with running balance */}
             {installments.map((inst, idx) => {
               const runningBefore = installments.slice(0, idx).reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
               const runningAfter  = runningBefore + (parseFloat(inst.amount) || 0)
@@ -374,7 +403,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
 
               return (
                 <div key={inst.id ?? idx} style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-                  {/* Payment N label */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                     <span style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       Payment {idx + 1}{installments.length > 1 ? ` of ${installments.length}` : ''}{methodLabel ? ` · ${methodLabel}` : ''}{inst.date ? ` · ${inst.date}` : ''}
@@ -389,7 +417,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
                     </span>
                   </div>
 
-                  {/* Balance before */}
                   {idx > 0 && (
                     <div className={styles.summaryRow} style={{ marginBottom: 4 }}>
                       <span style={{ color: 'var(--text3)' }}>Balance Before</span>
@@ -397,13 +424,11 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
                     </div>
                   )}
 
-                  {/* Amount paid */}
                   <div className={styles.summaryRow} style={{ marginBottom: 4 }}>
                     <span>Amount Paid</span>
                     <span style={{ color: '#22c55e', fontWeight: 700 }}>{fmt(inst.amount)}</span>
                   </div>
 
-                  {/* Balance after */}
                   <div className={styles.summaryRow} style={{ marginBottom: 0 }}>
                     <span>Balance After</span>
                     <span style={{ color: balAfter > 0 ? '#ef4444' : '#22c55e', fontWeight: 700 }}>
@@ -414,7 +439,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
               )
             })}
 
-            {/* Overall progress bar */}
             <div style={{ marginTop: 16 }}>
               <div className={styles.progressWrap}>
                 <div className={styles.progressBar} style={{ width: `${pct}%` }} />
@@ -559,8 +583,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
     try {
       await createPayment(user.uid, customerId, paymentData)
       showToast('Payment recorded ✓')
-      // Auto-update the matching invoice status based on payment type:
-      // 'paid' → Full Payment, 'part' → Part Payment
       if (paymentData.status === 'paid') {
         onInvoicePaid?.(paymentData.orderId, 'paid')
       } else if (paymentData.status === 'part') {
@@ -598,11 +620,9 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
       })
       if (newStatus === 'paid') {
         showToast('Payment complete! Marked as Paid ✓')
-        // Auto-update the matching invoice to Full Payment
         onInvoicePaid?.(payment.orderId, 'paid')
       } else {
         showToast('Payment recorded ✓')
-        // Auto-update the matching invoice to Part Payment
         onInvoicePaid?.(payment.orderId, 'part_paid')
       }
     } catch {
@@ -610,28 +630,17 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
     }
   }
 
-  // Build a receipt snapshot with correct cumulativePaid.
-  // Each receipt only stores the single installment being receipted,
-  // but we also store cumulativePaid = sum of ALL installments up to
-  // this point so the receipt can show the correct running balance.
   const handleGenerateReceipt = (payment) => {
     const allInstallments = payment.installments || []
     const cumulativePaid  = allInstallments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
-
-    // The latest installment is the one being receipted right now
-    const latestInstallment = allInstallments[allInstallments.length - 1] ?? null
-
-    // previousInstallments = all installments EXCEPT the latest one
+    const latestInstallment    = allInstallments[allInstallments.length - 1] ?? null
     const previousInstallments = allInstallments.slice(0, -1)
     const previousPaid         = previousInstallments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
 
     const receiptPayload = {
       ...payment,
-      // payments array on the receipt = only the installment being receipted
       payments:             latestInstallment ? [latestInstallment] : allInstallments,
-      // cumulativePaid = running total of everything paid so far (including this one)
       cumulativePaid,
-      // previousInstallments & previousPaid so ReceiptView can show the payment chain
       previousInstallments,
       previousPaid,
     }
@@ -680,7 +689,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
             const totalPaid      = installments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
             const fullPrice      = parseFloat(p.orderPrice) || 0
             const installCount   = installments.length
-            // Cap at 99% for part payments so bar never looks full
             const pct            = fullPrice > 0
               ? (p.status === 'part' ? Math.min(99, (totalPaid / fullPrice) * 100) : Math.min(100, (totalPaid / fullPrice) * 100))
               : 0
@@ -706,7 +714,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
                   </div>
                 </div>
                 <div className={styles.payListInfo}>
-                  {/* Title row with installment badge */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                     <span className={styles.payListDesc} style={{ flex: 1 }}>{p.orderDesc || 'Payment'}</span>
                     {installCount > 1 && (
@@ -756,6 +763,7 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         orders={orders}
+        payments={payments}
         onSave={handleSave}
       />
 
