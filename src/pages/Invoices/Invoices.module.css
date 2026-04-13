@@ -1,362 +1,375 @@
-// src/pages/Invoices/Invoices.jsx
-// ─────────────────────────────────────────────────────────────
-// Displays ALL invoices across ALL customers.
-// Subscribes to each customer's invoices subcollection live.
-// ─────────────────────────────────────────────────────────────
-
-import { useState, useEffect, useRef } from 'react'
-import { useAuth }      from '../../contexts/AuthContext'
-import { useCustomers } from '../../contexts/CustomerContext'
-import { useSettings }  from '../../contexts/SettingsContext'
-import { useOrders }    from '../../contexts/OrdersContext'
-import { subscribeToInvoices, updateInvoiceStatus, deleteInvoice } from '../../services/invoiceService'
-import InvoiceView from '../CustomerDetail/tabs/InvoiceView'
-import Header from '../../components/Header/Header'
-import styles from './Invoices.module.css'
-
-// ── Helpers ───────────────────────────────────────────────────
-
-function fmt(currency = '₦', amount) {
-  const n = parseFloat(amount) || 0
-  return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--bg);
 }
 
-function isOverdue(invoice) {
-  if (invoice.status === 'paid') return false
-  if (!invoice.due) return false
-  return new Date(invoice.due + 'T23:59:59') < new Date()
+/* ── SEARCH + FILTER ── */
+.searchContainer {
+  padding: 14px 16px 10px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return 'Unknown Date'
-  const d = new Date(dateStr)
-  if (isNaN(d)) return dateStr
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-// ── Tabs ──────────────────────────────────────────────────────
-
-const TABS = [
-  { id: 'all',       label: 'All'          },
-  { id: 'unpaid',    label: 'Unpaid'       },
-  { id: 'part_paid', label: 'Part Payment' },
-  { id: 'paid',      label: 'Paid'         },
-  { id: 'overdue',   label: 'Overdue'      },
-]
-
-const STATUS_LABELS = { unpaid: 'Unpaid', part_paid: 'Part Payment', paid: 'Paid', overdue: 'Overdue' }
-
-const STATUS_STYLES = {
-  paid:      { bg: 'rgba(34,197,94,0.12)',   color: '#15803d', border: 'rgba(34,197,94,0.3)'   },
-  part_paid: { bg: 'rgba(251,146,60,0.12)',  color: '#c2410c', border: 'rgba(251,146,60,0.3)'  },
-  unpaid:    { bg: 'rgba(234,179,8,0.12)',   color: '#a16207', border: 'rgba(234,179,8,0.3)'   },
-  overdue:   { bg: 'rgba(239,68,68,0.12)',   color: '#dc2626', border: 'rgba(239,68,68,0.3)'   },
+.searchBox {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 11px 14px;
+  gap: 10px;
+  transition: border-color 0.2s;
 }
 
-// ── Invoice List Item ─────────────────────────────────────────
+.searchBox:focus-within { border-color: var(--border2); }
 
-function InvoiceCard({ invoice, currency, onTap, isLast, orderImageUrl }) {
-  const total = invoice.items?.length > 0
-    ? invoice.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
-    : (parseFloat(invoice.price) || 0)
-  const overdue    = isOverdue(invoice)
-  const statusKey  = overdue && invoice.status !== 'paid' ? 'overdue' : (invoice.status || 'unpaid')
-  const sty        = STATUS_STYLES[statusKey] ?? STATUS_STYLES.unpaid
-
-  return (
-    <div
-      className={`${styles.invoiceListItem} ${isLast ? styles.invoiceListItemLast : ''} ${overdue ? styles.invoiceListItemOverdue : ''}`}
-      onClick={onTap}
-    >
-      {/* Left: grey outer box with white inner box */}
-      <div className={styles.invoiceListOuter}>
-        <div className={styles.invoiceListInner}>
-          {orderImageUrl ? (
-            <img
-              src={orderImageUrl}
-              alt={invoice.orderDesc || 'Order'}
-              className={styles.orderImg}
-            />
-          ) : (
-            <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : 'var(--text3)' }}>
-              receipt_long
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className={styles.invoiceListInfo}>
-        <div className={styles.invoiceListDesc}>{invoice.orderDesc || 'Order'}</div>
-        <div className={styles.invoiceListOrdRow}>{invoice.number}</div>
-        <div className={styles.invoiceListMeta}>
-          <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', verticalAlign: 'middle' }}>person</span>
-          <span className={styles.invoiceListMetaText}>{invoice.customerName || '—'}</span>
-        </div>
-        <span style={{
-          display: 'inline-block',
-          marginTop: '4px',
-          padding: '2px 8px',
-          borderRadius: '6px',
-          fontSize: '0.72rem',
-          fontWeight: 600,
-          background: sty.bg,
-          color:      sty.color,
-          border:     `1px solid ${sty.border}`,
-        }}>
-          {STATUS_LABELS[statusKey] ?? statusKey}
-        </span>
-        <div className={`${styles.invoiceListAmount}`}>{fmt(currency, total)}</div>
-      </div>
-    </div>
-  )
+.searchBox input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  width: 100%;
+  outline: none;
 }
 
-// ── Full Invoice View — delegated to InvoiceView component ───
-// InvoiceView reads invoice.template + invoice.brandSnapshot to
-// always render with the template active at creation time.
+.searchBox input::placeholder { color: var(--text3); }
 
-// ── Main Page ─────────────────────────────────────────────────
-
-export default function Invoices({ onMenuClick }) {
-  const { user }      = useAuth()
-  const { customers } = useCustomers()
-  const { settings }  = useSettings()
-  const { allOrders } = useOrders()
-  const currency      = settings.invoiceCurrency || '₦'
-
-  const [allInvoices, setAllInvoices] = useState([])
-  const [activeTab,   setActiveTab]   = useState('all')
-  const [viewing,     setViewing]     = useState(null)
-  const [search,      setSearch]      = useState('')
-  const [filterOpen,  setFilterOpen]  = useState(false)
-  const unsubsRef = useRef({})
-
-  // ── Subscribe to every customer's invoices ────────────────
-  useEffect(() => {
-    Object.values(unsubsRef.current).forEach(u => u())
-    unsubsRef.current = {}
-
-    if (!user || !customers.length) {
-      setAllInvoices([])
-      return
-    }
-
-    const invoiceMap = {}
-
-    customers.forEach(customer => {
-      const unsub = subscribeToInvoices(
-        user.uid,
-        customer.id,
-        (invoices) => {
-          invoiceMap[customer.id] = invoices.map(inv => ({
-            ...inv,
-            customerName: inv.customerName || customer.name,
-            customerId:   customer.id,
-          }))
-          const flat = Object.values(invoiceMap)
-            .flat()
-            .sort((a, b) => {
-              const aTime = a.createdAt?.toMillis?.() ?? 0
-              const bTime = b.createdAt?.toMillis?.() ?? 0
-              return bTime - aTime
-            })
-          setAllInvoices([...flat])
-        },
-        (err) => console.error('[Invoices]', customer.id, err)
-      )
-      unsubsRef.current[customer.id] = unsub
-    })
-
-    return () => {
-      Object.values(unsubsRef.current).forEach(u => u())
-      unsubsRef.current = {}
-    }
-  }, [user, customers])
-
-  // ── Build order image lookup: "customerId__orderId" → imgSrc ──
-  const orderImageMap = {}
-  for (const order of allOrders) {
-    const imgSrc = order.items?.[0]?.imgSrc
-    if (imgSrc && order.customerId && order.id) {
-      orderImageMap[`${order.customerId}__${order.id}`] = imgSrc
-    }
-  }
-
-  // ── Filter ───────────────────────────────────────────────
-  const filtered = allInvoices.filter(inv => {
-    if (activeTab === 'all')       return true
-    if (activeTab === 'paid')      return inv.status === 'paid'
-    if (activeTab === 'unpaid')    return inv.status !== 'paid' && inv.status !== 'part_paid' && !isOverdue(inv)
-    if (activeTab === 'part_paid') return inv.status === 'part_paid' && !isOverdue(inv)
-    if (activeTab === 'overdue')   return isOverdue(inv)
-    return true
-  })
-
-  // ── Counts ───────────────────────────────────────────────
-  const counts = {
-    all:       allInvoices.length,
-    unpaid:    allInvoices.filter(i => i.status !== 'paid' && i.status !== 'part_paid' && !isOverdue(i)).length,
-    part_paid: allInvoices.filter(i => i.status === 'part_paid' && !isOverdue(i)).length,
-    paid:      allInvoices.filter(i => i.status === 'paid').length,
-    overdue:   allInvoices.filter(i => isOverdue(i)).length,
-  }
-
-  const EMPTY_TEXT = {
-    all:       'No invoices yet.',
-    unpaid:    'No unpaid invoices.',
-    part_paid: 'No part-payment invoices.',
-    paid:      'No paid invoices yet.',
-    overdue:   'No overdue invoices. All good!',
-  }
-
-  // ── Search filter ────────────────────────────────────────
-  const searchFiltered = search.trim()
-    ? filtered.filter(inv =>
-        (inv.orderDesc    || '').toLowerCase().includes(search.toLowerCase()) ||
-        (inv.customerName || '').toLowerCase().includes(search.toLowerCase()) ||
-        (inv.number       || '').toLowerCase().includes(search.toLowerCase())
-      )
-    : filtered
-
-  // ── Group by date ─────────────────────────────────────────
-  const grouped = searchFiltered.reduce((acc, inv) => {
-    const key = inv.date || 'Unknown Date'
-    if (!acc[key]) acc[key] = []
-    acc[key].push(inv)
-    return acc
-  }, {})
-
-  return (
-    <div className={styles.page}>
-      <Header title="Invoices" onMenuClick={onMenuClick} />
-
-      {/* ── Search + filter ── */}
-      <div className={styles.searchContainer}>
-        <div className={styles.searchRow}>
-          <div className={styles.searchBox}>
-            <span className="mi" style={{ color: 'var(--text3)', fontSize: '1.1rem' }}>search</span>
-            <input
-              type="text"
-              placeholder="Search invoices or clients…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-            {search && (
-              <button
-                style={{ background: 'none', border: 'none', color: 'var(--text3)', display: 'flex', cursor: 'pointer', padding: 0 }}
-                onClick={() => setSearch('')}
-              >
-                <span className="mi" style={{ fontSize: '1rem' }}>close</span>
-              </button>
-            )}
-          </div>
-          <button
-            className={`${styles.filterBtn} ${filterOpen ? styles.filterBtnActive : ''}`}
-            onClick={() => setFilterOpen(p => !p)}
-          >
-            <span className="mi" style={{ fontSize: '1.2rem' }}>tune</span>
-          </button>
-        </div>
-
-        {filterOpen && (
-          <div className={styles.filterDropdown}>
-            <div className={styles.filterDropdownTitle}>Filter by Status</div>
-            {TABS.map(t => (
-              <button
-                key={t.id}
-                className={`${styles.filterOption} ${activeTab === t.id ? styles.filterOptionActive : ''}`}
-                onClick={() => { setActiveTab(t.id); setFilterOpen(false) }}
-              >
-                <span className="mi" style={{ fontSize: '1.1rem' }}>
-                  {t.id === 'paid' ? 'check_circle' : t.id === 'unpaid' ? 'pending' : t.id === 'part_paid' ? 'payments' : t.id === 'overdue' ? 'alarm' : 'receipt_long'}
-                </span>
-                {t.label}
-                {activeTab === t.id && <span className="mi" style={{ fontSize: '1rem', marginLeft: 'auto', color: 'var(--accent)' }}>check</span>}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Tabs */}
-      <div className={styles.tabs} onClick={() => filterOpen && setFilterOpen(false)}>
-        {TABS.map(tab => (
-          <div
-            key={tab.id}
-            className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-            onClick={(e) => {
-              setActiveTab(tab.id)
-              e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-            }}
-          >
-            {tab.label}
-            {counts[tab.id] > 0 && (
-              <span className={`${styles.tabBadge} ${tab.id === 'overdue' ? styles.badgeOverdue : ''}`}>
-                {counts[tab.id]}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* List */}
-      <div className={styles.listArea} onClick={() => filterOpen && setFilterOpen(false)}>
-        {searchFiltered.length === 0 ? (
-          <div className={styles.emptyState}>
-            <span className="mi" style={{ fontSize: '2.8rem', opacity: 0.2 }}>receipt_long</span>
-            <p>{EMPTY_TEXT[activeTab]}</p>
-            {activeTab === 'all' && (
-              <span className={styles.emptyHint}>
-                Go to a customer → Orders → Generate Invoice
-              </span>
-            )}
-          </div>
-        ) : (
-          Object.entries(grouped).map(([date, dateInvoices]) => (
-            <div key={date} className={styles.invoiceGroup}>
-              <div className={styles.invoiceGroupDate}>{date}</div>
-              <div className={styles.invoiceGroupDivider} />
-              {dateInvoices.map((inv, idx) => (
-                <InvoiceCard
-                  key={`${inv.customerId}-${inv.id}`}
-                  invoice={inv}
-                  currency={currency}
-                  isLast={idx === dateInvoices.length - 1}
-                  onTap={() => setViewing(inv)}
-                  orderImageUrl={orderImageMap[`${inv.customerId}__${inv.orderId}`] ?? null}
-                />
-              ))}
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Full invoice view — uses InvoiceView so template is preserved */}
-      {viewing && (
-        <InvoiceView
-          invoice={viewing}
-          customer={{
-            name:    viewing.customerName || '—',
-            phone:   viewing.customerPhone || '',
-            address: viewing.customerAddress || '',
-          }}
-          onClose={() => setViewing(null)}
-          onStatusChange={async (id, newStatus) => {
-            try {
-              await updateInvoiceStatus(user.uid, viewing.customerId, id, newStatus)
-              setViewing(prev => prev ? { ...prev, status: newStatus } : null)
-            } catch { /* silent */ }
-          }}
-          onDelete={async (id) => {
-            try {
-              await deleteInvoice(user.uid, viewing.customerId, id)
-              setViewing(null)
-            } catch { /* silent */ }
-          }}
-          showToast={() => {}}
-        />
-      )}
-    </div>
-  )
+.filterBtn {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
 }
+
+.filterBtn:active { background: var(--surface); }
+
+.filterBtnActive {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.filterDropdown {
+  position: absolute;
+  top: calc(100% - 4px);
+  right: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 8px;
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  z-index: 200;
+  animation: dropIn 0.18s ease;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.filterDropdownTitle {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 10px 8px;
+}
+
+.filterOption {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.filterOption:active { background: var(--surface2); }
+.filterOptionActive  { color: var(--text); background: var(--surface2); font-weight: 700; }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 56px;
+  z-index: 50;
+  flex-shrink: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  flex: 0 0 auto;
+  padding: 14px 22px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: color 0.2s;
+}
+
+.tabActive { color: var(--accent); font-weight: 800; }
+
+.tabActive::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+.tabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  color: var(--text3);
+  font-size: 0.6rem;
+  font-weight: 800;
+  border-radius: 20px;
+  padding: 1px 6px;
+  min-width: 18px;
+  border: 1px solid var(--border);
+}
+
+.badgeOverdue {
+  background: rgba(239,68,68,0.12);
+  color: #ef4444;
+  border-color: rgba(239,68,68,0.3);
+}
+
+/* ── LIST ── */
+.listArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px calc(30px + var(--sb));
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── INVOICE GROUP (date-grouped, same pattern as orders/customers) ── */
+.invoiceGroup { margin-bottom: 16px; }
+.invoiceGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 0 8px; }
+.invoiceGroupDivider { height: 1px; background: var(--border); width: calc(100% + 32px); margin-left: -16px; }
+
+/* Each row */
+.invoiceListItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  cursor: pointer;
+  transition: background 0.15s;
+  background: var(--bg);
+  position: relative;
+}
+
+.invoiceListItem::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: -16px;
+  height: 1px;
+  background: var(--border);
+}
+
+.invoiceListItemLast::after { display: none; }
+.invoiceListItem:active { background: var(--surface); }
+
+/* Overdue tint */
+.invoiceListItemOverdue .invoiceListOuter {
+  border-color: rgba(239,68,68,0.35);
+  background: rgba(239,68,68,0.05);
+}
+
+/* Outer grey box */
+.invoiceListOuter {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Inner white box */
+.invoiceListInner {
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Order image inside card icon box */
+.orderImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Text */
+.invoiceListInfo { flex: 1; min-width: 0; }
+.invoiceListDesc { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.invoiceListOrdRow { font-size: 0.78rem; font-weight: 400; color: var(--text2); margin-bottom: 3px; }
+.invoiceListMeta { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.invoiceListMetaText { font-size: 0.78rem; font-weight: 400; color: var(--text2); }
+.invoiceListAmount { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-top: 2px; }
+
+/* Inline status text colours */
+.statusText_paid    { color: #16a34a; }
+.statusText_unpaid  { color: #6366f1; }
+.statusText_overdue { color: #ef4444; }
+
+/* ── STATUS BADGES (used in full view only) ── */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border: 1px solid transparent;
+}
+
+.status_paid    { background: rgba(34,197,94,0.12);  color: #16a34a; border-color: rgba(34,197,94,0.3);  }
+.status_unpaid  { background: rgba(99,102,241,0.12); color: #6366f1; border-color: rgba(99,102,241,0.3); }
+.status_overdue { background: rgba(239,68,68,0.12);  color: #ef4444; border-color: rgba(239,68,68,0.3);  }
+
+/* ── EMPTY STATE ── */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 70px;
+  gap: 10px;
+  text-align: center;
+}
+
+.emptyState p { font-size: 0.85rem; color: var(--text3); }
+.emptyHint { font-size: 0.75rem; color: var(--text3); opacity: 0.6; }
+
+/* ── FULL INVOICE VIEW ── */
+.viewOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 800;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(12px + var(--st)) 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.viewTitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.viewBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px calc(40px + var(--sb));
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── INVOICE DOCUMENT ── */
+.invoiceDoc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px 20px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.docHeader { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.docBrand { display: flex; align-items: center; gap: 8px; }
+.docBrandName { font-size: 1.1rem; font-weight: 800; font-family: 'Libre Baskerville', serif; color: var(--text); }
+.docRight { text-align: right; }
+.docInvoiceLabel { font-size: 0.6rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+.docNumber { font-size: 1rem; font-weight: 800; color: var(--accent); margin-top: 2px; }
+.docDivider { height: 1px; background: var(--border); margin: 16px 0; }
+.docSection { margin-bottom: 16px; }
+.docSectionLabel { font-size: 0.58rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+.docSectionValue { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.docMetaGrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.docMetaCell {}
+.docMetaLabel { font-size: 0.58rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+.docMetaValue { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+.docTableHeader { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; font-size: 0.6rem; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.docTableRow { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--text); padding-bottom: 8px; }
+.docLinked { margin-top: 12px; }
+.docLinkedNames { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
+.docTotalRow { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 4px; }
+.docTotalLabel { font-size: 0.8rem; font-weight: 700; color: var(--text2); }
+.docTotalAmount { font-size: 1.2rem; font-weight: 800; color: var(--text); }
+.docNotes { margin-top: 16px; padding: 12px; background: var(--surface2); border-radius: 10px; border: 1px solid var(--border); }
+.docNotes p { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
+.docFooter { text-align: center; font-size: 0.75rem; color: var(--text3); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
