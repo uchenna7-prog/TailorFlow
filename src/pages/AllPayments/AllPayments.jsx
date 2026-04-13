@@ -15,7 +15,7 @@
 // Two installments for the same order on different days → two rows.
 // ─────────────────────────────────────────────────────────────
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useNavigate }  from 'react-router-dom'
 import { usePayments }  from '../../contexts/PaymentContext'
 import { useOrders }    from '../../contexts/OrdersContext'
@@ -469,6 +469,16 @@ export default function AllPayments({ onMenuClick }) {
   const [filterOpen, setFilterOpen] = useState(false)
   const [filterStatus, setFilterStatus] = useState('all')
   const toastTimer = useRef(null)
+  const tabsRef    = useRef(null)
+
+  // Smooth-scroll the active tab into view whenever it changes
+  useEffect(() => {
+    if (!tabsRef.current) return
+    const activeEl = tabsRef.current.querySelector(`.${styles.tabActive}`)
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+    }
+  }, [activeTab])
 
   const showToast = useCallback((msg) => {
     setToastMsg(msg)
@@ -583,7 +593,7 @@ export default function AllPayments({ onMenuClick }) {
       </div>
 
       {/* ── Tabs ── */}
-      <div className={styles.tabs}>
+      <div className={styles.tabs} ref={tabsRef}>
         {TABS.map(tab => (
           <div
             key={tab.id}
