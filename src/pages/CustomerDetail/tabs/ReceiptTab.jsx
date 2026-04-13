@@ -13,9 +13,14 @@ function fmt(currency = '₦', amount) {
 // ── Receipt card (same layout as InvoiceCard) ─────────────────
 
 function ReceiptCard({ receipt, currency, onTap, isLast }) {
-  const totalPaid = (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
-  const orderTotal = parseFloat(receipt.orderPrice) || totalPaid
-  const isFullPay  = totalPaid >= orderTotal && orderTotal > 0
+  // For the card display: show cumulativePaid if available (new receipts),
+  // otherwise fall back to summing receipt.payments (old receipts).
+  const displayPaid = receipt.cumulativePaid != null
+    ? parseFloat(receipt.cumulativePaid)
+    : (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
+
+  const orderTotal  = parseFloat(receipt.orderPrice) || displayPaid
+  const isFullPay   = displayPaid >= orderTotal && orderTotal > 0
   const statusLabel = isFullPay ? 'Paid in Full' : 'Part Payment'
 
   return (
@@ -47,7 +52,7 @@ function ReceiptCard({ receipt, currency, onTap, isLast }) {
         }}>
           {statusLabel}
         </span>
-        <div className={styles.invoiceListAmount}>{fmt(currency, totalPaid)}</div>
+        <div className={styles.invoiceListAmount}>{fmt(currency, displayPaid)}</div>
       </div>
     </div>
   )
