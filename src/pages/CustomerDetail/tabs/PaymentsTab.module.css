@@ -19,6 +19,9 @@
 /* Inner white box */
 .payListInner { width: 58px; height: 58px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
+/* Order image inside card icon box */
+.orderImg { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
 /* Text */
 .payListInfo { flex: 1; min-width: 0; }
 .payListDesc { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
