@@ -371,6 +371,8 @@ export default function Orders({ onMenuClick }) {
 
   const [activeTab,   setActiveTab]   = useState('all')
   const [detailOrder, setDetailOrder] = useState(null)
+  const [search,      setSearch]      = useState('')
+  const [filterOpen,  setFilterOpen]  = useState(false)
   const tabsRef = useRef(null)
 
   const handleTabClick = (e, tabId) => {
@@ -399,15 +401,24 @@ export default function Orders({ onMenuClick }) {
     overdue:       allOrders.filter(o => isOverdue(o)).length,
   }
 
-  const grouped = [...filtered]
+  // Apply search filter on top of tab filter
+  const searchFiltered = search.trim()
+    ? filtered.filter(o =>
+        (o.desc  || o.name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (o.customerName || '').toLowerCase().includes(search.toLowerCase())
+      )
+    : filtered
+
+  const grouped = [...searchFiltered]
     .sort((a, b) => {
       const da = a.dueDate || a.date || ''
       const db = b.dueDate || b.date || ''
       return db.localeCompare(da)
     })
     .reduce((acc, o) => {
-      const raw = o.date || o.dueDate || ''
-      const key = raw ? formatDate(raw) : 'Unknown Date'
+      // o.date is already a formatted string like "Apr 13, 2026" — use it directly.
+      // Only fall back to formatDate for dueDate (which is an ISO string).
+      const key = o.date || (o.dueDate ? formatDate(o.dueDate) : 'Unknown Date')
       if (!acc[key]) acc[key] = []
       acc[key].push(o)
       return acc
@@ -417,8 +428,54 @@ export default function Orders({ onMenuClick }) {
     <div className={styles.page}>
       <Header title="Orders" onMenuClick={onMenuClick} />
 
+      {/* ── Search + filter ── */}
+      <div className={styles.searchContainer}>
+        <div className={styles.searchRow}>
+          <div className={styles.searchBox}>
+            <span className="material-icons" style={{ color: 'var(--text3)', fontSize: '1.1rem' }}>search</span>
+            <input
+              type="text"
+              placeholder="Search orders or clients…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            {search && (
+              <button
+                style={{ background: 'none', border: 'none', color: 'var(--text3)', display: 'flex', cursor: 'pointer', padding: 0 }}
+                onClick={() => setSearch('')}
+              >
+                <span className="material-icons" style={{ fontSize: '1rem' }}>close</span>
+              </button>
+            )}
+          </div>
+          <button
+            className={`${styles.filterBtn} ${filterOpen ? styles.filterBtnActive : ''}`}
+            onClick={() => setFilterOpen(p => !p)}
+          >
+            <span className="material-icons" style={{ fontSize: '1.2rem' }}>tune</span>
+          </button>
+        </div>
+
+        {filterOpen && (
+          <div className={styles.filterDropdown}>
+            <div className={styles.filterDropdownTitle}>Filter by Status</div>
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                className={`${styles.filterOption} ${activeTab === t.id ? styles.filterOptionActive : ''}`}
+                onClick={() => { setActiveTab(t.id); setFilterOpen(false) }}
+              >
+                <span className="material-icons" style={{ fontSize: '1.1rem' }}>{t.icon}</span>
+                {t.label}
+                {activeTab === t.id && <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto', color: 'var(--accent)' }}>check</span>}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Tabs */}
-      <div className={styles.tabs} ref={tabsRef}>
+      <div className={styles.tabs} ref={tabsRef} onClick={() => filterOpen && setFilterOpen(false)}>
         {TABS.map(tab => (
           <div
             key={tab.id}
@@ -436,8 +493,8 @@ export default function Orders({ onMenuClick }) {
       </div>
 
       {/* List */}
-      <div className={styles.listArea}>
-        {filtered.length === 0 ? (
+      <div className={styles.listArea} onClick={() => filterOpen && setFilterOpen(false)}>
+        {searchFiltered.length === 0 ? (
           <div className={styles.emptyState}>
             <span className="material-icons" style={{ fontSize: '2.8rem', opacity: 0.2 }}>
               {EMPTY_CONFIG[activeTab].icon}
