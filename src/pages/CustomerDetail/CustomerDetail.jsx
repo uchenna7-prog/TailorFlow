@@ -8,6 +8,7 @@ import { useCustomerData } from '../../hooks/useCustomerData'
 import { useOrders }      from '../../contexts/OrdersContext'
 import { useInvoice }     from '../../contexts/InvoiceContext'
 import { addReceipt, subscribeToReceipts, deleteReceipt } from '../../services/receiptService'
+import { subscribeToPayments } from '../../services/paymentService'
 import { useAuth }        from '../../contexts/AuthContext'
 import Header        from '../../components/Header/Header'
 import Toast         from '../../components/Toast/Toast'
@@ -59,6 +60,7 @@ export default function CustomerDetail({ onMenuClick }) {
   const toastTimer     = useRef(null)
   const tabsRef        = useRef(null)
   const topSentinelRef = useRef(null)
+  const healedRef      = useRef(false)  // tracks one-time invoice status heal
 
   const orders = getOrders(id)
 
@@ -74,6 +76,52 @@ export default function CustomerDetail({ onMenuClick }) {
   useEffect(() => {
     if (data.invoices) setInvoicesState(data.invoices)
   }, [data.invoices])
+
+  // ── One-time heal: fix invoices stuck as 'unpaid' that have real payments ──
+  // Runs once per customer page load after both invoices and payments are ready.
+  // Corrects any invoice whose Firestore status was never updated by an older
+  // version of the app (before the part_paid fix was deployed).
+  useEffect(() => {
+    if (!user || !id || healedRef.current) return
+    if (!data.invoices || data.invoices.length === 0) return
+
+    const unsubPayments = subscribeToPayments(
+      user.uid, id,
+      async (payments) => {
+        if (healedRef.current) return
+        healedRef.current = true  // only run once
+
+        for (const p of payments) {
+          if (!p.orderId) continue
+          const paidAmount = (p.installments || []).reduce(
+            (s, i) => s + (parseFloat(i.amount) || 0), 0
+          )
+          if (paidAmount <= 0) continue
+
+          // Find the matching invoice that is still stuck as 'unpaid'
+          const inv = data.invoices.find(
+            i => String(i.orderId) === String(p.orderId) && i.status === 'unpaid'
+          )
+          if (!inv) continue
+
+          // Derive correct status from payment
+          const correctStatus = p.status === 'paid' ? 'paid' : 'part_paid'
+          try {
+            await data.updateInvoiceStatus(inv.id, correctStatus)
+            setInvoicesState(prev =>
+              prev.map(i => i.id === inv.id ? { ...i, status: correctStatus } : i)
+            )
+          } catch (e) {
+            console.error('[CustomerDetail] heal invoice status:', e)
+          }
+        }
+      },
+      (err) => console.error('[CustomerDetail] heal payments sub:', err)
+    )
+
+    // Unsubscribe immediately after the first snapshot — we only need it once
+    return () => unsubPayments()
+  }, [user, id, data.invoices])
 
   useEffect(() => {
     if (!user || !id) return
@@ -147,7 +195,13 @@ export default function CustomerDetail({ onMenuClick }) {
 
   const handleInvoicePaid = useCallback(async (orderId, invoiceStatus) => {
     const newStatus = invoiceStatus || 'paid'
-    const matchingInvoice = invoicesState.find(
+    // Always use the live Firestore-synced list (data.invoices) so we have
+    // the real Firestore document ID, not a stale local float ID.
+    // Fall back to invoicesState if data.invoices isn't populated yet.
+    const sourceList = (data.invoices && data.invoices.length > 0)
+      ? data.invoices
+      : invoicesState
+    const matchingInvoice = sourceList.find(
       inv => String(inv.orderId) === String(orderId) && inv.status !== 'paid'
     )
     if (!matchingInvoice) return
