@@ -297,29 +297,82 @@ function NotifBanner({ onEnable, onDismiss }) {
 }
 
 function MobileQuickActions({ navigate }) {
+  const path = window.location.pathname
+  const navItems = [
+    { icon: 'home',         label: 'Home',         route: '/'             },
+    { icon: 'groups',       label: 'Customers',    route: '/customers'    },
+    { icon: 'event',        label: 'Appointments', route: '/appointments' },
+    { icon: 'shopping_cart',label: 'Orders',       route: '/orders'       },
+    { icon: 'assignment',   label: 'Tasks',        route: '/tasks'        },
+  ]
   return (
     <nav className={styles.mobileQuickNav}>
-      <button className={styles.mobileQuickBtn} onClick={() => navigate('/customers')}>
-        <span className="mi" style={{ fontSize: '1.45rem' }}>groups</span>
-        <span className={styles.mobileQuickLabel}>Customers</span>
-      </button>
-      <button className={styles.mobileQuickBtn} onClick={() => navigate('/appointments')}>
-        <span className="mi" style={{ fontSize: '1.45rem' }}>event</span>
-        <span className={styles.mobileQuickLabel}>Appointments</span>
-      </button>
-      <button className={styles.mobileQuickBtn} onClick={() => navigate('/orders')}>
-        <span className="mi" style={{ fontSize: '1.45rem' }}>shopping_cart</span>
-        <span className={styles.mobileQuickLabel}>Orders</span>
-      </button>
-      <button className={styles.mobileQuickBtn} onClick={() => navigate('/tasks')}>
-        <span className="mi" style={{ fontSize: '1.45rem' }}>assignment</span>
-        <span className={styles.mobileQuickLabel}>Tasks</span>
-      </button>
+      {navItems.map(item => {
+        const isActive = item.route === '/'
+          ? path === '/' || path === '/home'
+          : path.startsWith(item.route)
+        return (
+          <button
+            key={item.route}
+            className={`${styles.mobileQuickBtn} ${isActive ? styles.mobileQuickBtnActive : ''}`}
+            onClick={() => navigate(item.route)}
+          >
+            <span className="mi" style={{ fontSize: '1.45rem' }}>{item.icon}</span>
+            <span className={styles.mobileQuickLabel}>{item.label}</span>
+          </button>
+        )
+      })}
     </nav>
   )
 }
 
-function EmptyState({ icon, message, sub }) {
+function StatCard({ card, navigate }) {
+  const [showTip, setShowTip] = useState(false)
+  return (
+    <div className={styles.statCard} onClick={() => navigate(card.route)}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 0 }}>
+        <div className={styles.statIconWrap} style={{ marginBottom: 0 }}>
+          <span className="mi" style={{ fontSize: '1.25rem', color: 'var(--text)' }}>
+            {card.desktopIcon}
+          </span>
+        </div>
+        {card.tooltip && (
+          <div style={{ position: 'relative' }}>
+            <span
+              className="mi"
+              style={{ fontSize: '0.9rem', color: 'var(--text3)', cursor: 'pointer', lineHeight: 1 }}
+              onClick={e => { e.stopPropagation(); setShowTip(v => !v) }}
+            >
+              info
+            </span>
+            {showTip && (
+              <div
+                style={{
+                  position: 'absolute', top: '22px', right: 0, zIndex: 50,
+                  background: 'var(--surface)', border: '1px solid var(--border2)',
+                  borderRadius: '8px', padding: '8px 10px',
+                  fontSize: '0.68rem', fontWeight: 500, color: 'var(--text2)',
+                  width: '160px', lineHeight: 1.45, boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                }}
+                onClick={e => e.stopPropagation()}
+              >
+                {card.tooltip}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      <div className={styles.statValue} style={{ marginTop: '14px' }}>{card.value}</div>
+      <div className={styles.statLabel}>{card.label}</div>
+      {card.sub && (
+        <div className={styles.statSub} style={{ color: card.subColor }}>{card.sub}</div>
+      )}
+      <Delta delta={card.delta} positiveIsGood={card.positiveIsGood} />
+    </div>
+  )
+}
+
+
   return (
     <div className={styles.emptyState}>
       <span className={`mi ${styles.emptyStateIcon}`}>{icon}</span>
@@ -502,6 +555,18 @@ function Home({ onMenuClick }) {
   }).length
   const invoicesDueThisWeek = unpaidInvoices.filter(i => dueThisWeek(getInvDueDate(i))).length
 
+  // ── Zero-paid invoices (no payment recorded at all) ───────
+  const getPaidAmount = (inv) => {
+    const matched = allPayments.filter(p => p.invoiceId === inv.id)
+    return matched.reduce((sum, p) => {
+      const insts = p.installments || []
+      if (insts.length) return sum + insts.reduce((s, inst) => s + (Number(inst.amount) || 0), 0)
+      return sum + (Number(p.amount) || 0)
+    }, 0)
+  }
+  const zeroPaidInvoices    = allInvoices.filter(i => i.status !== 'paid' && getPaidAmount(i) === 0)
+  const zeroPaidDueThisWeek = zeroPaidInvoices.filter(i => dueThisWeek(getInvDueDate(i))).length
+
   // ── Tasks ─────────────────────────────────────────────────
   const pendingTasks     = tasks.filter(t => !t.done && !isTaskOverdue(t))
   const overdueTasks     = tasks.filter(t => isTaskOverdue(t))
@@ -606,16 +671,17 @@ function Home({ onMenuClick }) {
     },
     {
       desktopIcon: 'receipt_long',
-      iconColor:   '#ef4444',      value: totalUnpaid,
+      iconColor:   '#ef4444',      value: zeroPaidInvoices.length,
       label:       'Unpaid Invoices',
-      sub:         totalOverdue > 0
-                     ? `${totalOverdue} overdue`
-                     : totalUnpaid > 0
-                       ? `${invoicesDueThisWeek > 0 ? invoicesDueThisWeek : totalUnpaid} due this wk`
+      sub:         zeroPaidDueThisWeek > 0
+                     ? `${zeroPaidDueThisWeek} due this wk`
+                     : zeroPaidInvoices.length > 0
+                       ? `${zeroPaidInvoices.length} due this wk`
                        : null,
-      subColor:    totalOverdue > 0 ? '#ef4444' : '#fb923c',
+      subColor:    '#fb923c',
       delta:       null,
       positiveIsGood: false,       route: '/invoices',
+      tooltip:     'Only invoices with no payment recorded yet.',
     },
     {
       desktopIcon: 'event',
@@ -688,19 +754,7 @@ function Home({ onMenuClick }) {
         {/* 1. STAT CARDS GRID ── */}
         <section className={styles.statsGrid}>
           {statCards.map((card, i) => (
-            <div key={i} className={styles.statCard} onClick={() => navigate(card.route)}>
-              <div className={styles.statIconWrap}>
-                <span className="mi" style={{ fontSize: '1.25rem', color: 'var(--text)' }}>
-                  {card.desktopIcon}
-                </span>
-              </div>
-              <div className={styles.statValue}>{card.value}</div>
-              <div className={styles.statLabel}>{card.label}</div>
-              {card.sub && (
-                <div className={styles.statSub} style={{ color: card.subColor }}>{card.sub}</div>
-              )}
-              <Delta delta={card.delta} positiveIsGood={card.positiveIsGood} />
-            </div>
+            <StatCard key={i} card={card} navigate={navigate} />
           ))}
         </section>
 
