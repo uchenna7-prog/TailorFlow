@@ -145,19 +145,21 @@ export default function CustomerDetail({ onMenuClick }) {
     }
   }, [data, orders, showToast, invoiceTemplate, invoiceBrand])
 
-  const handleInvoicePaid = useCallback(async (orderId) => {
+  const handleInvoicePaid = useCallback(async (orderId, invoiceStatus) => {
+    const newStatus = invoiceStatus || 'paid'
     const matchingInvoice = invoicesState.find(
       inv => String(inv.orderId) === String(orderId) && inv.status !== 'paid'
     )
     if (!matchingInvoice) return
     try {
-      await data.updateInvoiceStatus(matchingInvoice.id, 'paid')
+      await data.updateInvoiceStatus(matchingInvoice.id, newStatus)
       setInvoicesState(prev =>
         prev.map(inv =>
-          inv.id === matchingInvoice.id ? { ...inv, status: 'paid' } : inv
+          inv.id === matchingInvoice.id ? { ...inv, status: newStatus } : inv
         )
       )
-      showToast('Invoice auto-marked as Paid ✓')
+      const label = newStatus === 'part_paid' ? 'Part Payment' : 'Full Payment'
+      showToast(`Invoice marked as ${label} ✓`)
     } catch {
       showToast('Could not auto-update invoice.')
     }
