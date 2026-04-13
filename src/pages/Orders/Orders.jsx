@@ -32,6 +32,20 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+// Returns a reliable display date for grouping.
+// Priority: o.date (already formatted string) → createdAt Timestamp → dueDate ISO string → 'Unknown Date'
+function getOrderGroupDate(o) {
+  if (o.date && o.date !== 'Unknown Date') return o.date
+  if (o.createdAt) {
+    const d = typeof o.createdAt.toDate === 'function'
+      ? o.createdAt.toDate()
+      : new Date(o.createdAt)
+    if (!isNaN(d)) return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  }
+  if (o.dueDate) return formatDate(o.dueDate)
+  return 'Unknown Date'
+}
+
 function fmt(price) {
   if (price === null || price === undefined || price === '') return '—'
   return `₦${Number(price).toLocaleString('en-NG')}`
@@ -416,9 +430,7 @@ export default function Orders({ onMenuClick }) {
       return db.localeCompare(da)
     })
     .reduce((acc, o) => {
-      // o.date is already a formatted string like "Apr 13, 2026" — use it directly.
-      // Only fall back to formatDate for dueDate (which is an ISO string).
-      const key = o.date || (o.dueDate ? formatDate(o.dueDate) : 'Unknown Date')
+      const key = getOrderGroupDate(o)
       if (!acc[key]) acc[key] = []
       acc[key].push(o)
       return acc
