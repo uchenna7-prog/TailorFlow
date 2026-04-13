@@ -384,14 +384,16 @@
 }
 
 .statusPill {
+  display: inline-block;
   font-size: 0.58rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 2px 8px;
-  border-radius: 20px;
+  border-radius: 6px;
   border: 1px solid;
   white-space: nowrap;
+  margin-bottom: 2px;
 }
 
 /* -- EMPTY STATE -- */
