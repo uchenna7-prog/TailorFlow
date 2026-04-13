@@ -298,19 +298,24 @@ function AddInstallmentModal({ payment, onClose, onSave }) {
 }
 
 // ── PAYMENT DETAIL MODAL ──────────────────────────────────────
-// Payment Status chips (Not Paid / Part Payment / Paid) live here.
 
 function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstallment, onGenerateReceipt }) {
   const [showInstallmentModal, setShowInstallmentModal] = useState(false)
-  const sm        = statusMeta(payment.status)
-  const totalPaid = (payment.installments || []).reduce((s, i) => s + i.amount, 0)
-  const fullPrice = parseFloat(payment.orderPrice) || 0
-  const remaining = fullPrice > 0 ? fullPrice - totalPaid : null
-  const isPaid    = payment.status === 'paid'
+  const installments  = payment.installments || []
+  const fullPrice     = parseFloat(payment.orderPrice) || 0
+  const totalPaid     = installments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
+  const remaining     = fullPrice > 0 ? Math.max(0, fullPrice - totalPaid) : 0
+  const isPaid        = payment.status === 'paid'
+  const isNowFullyPaid = fullPrice > 0 && totalPaid >= fullPrice
+  const hasInstallments = installments.length > 0
 
-  // FIX 3: Smart status chip logic
-  const hasPartPayments = (payment.installments || []).length > 0
-  const isNowFullyPaid  = fullPrice > 0 && totalPaid >= fullPrice
+  // Progress bar — cap at 99% for part payments so it never looks full
+  const pct = fullPrice > 0
+    ? (isPaid ? Math.min(100, (totalPaid / fullPrice) * 100) : Math.min(99, (totalPaid / fullPrice) * 100))
+    : 0
+
+  // Smart status chip logic — same as before
+  const hasPartPayments = installments.length > 0
 
   return (
     <div className={styles.overlay}>
@@ -325,15 +330,18 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
 
       <div className={styles.modalBody}>
 
+        {/* ── Order info card ── */}
         <div className={styles.detailCard}>
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>Order</span>
             <span className={styles.detailVal}>{payment.orderDesc || '—'}</span>
           </div>
-          <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>Order Value</span>
-            <span className={styles.detailVal}>{fmt(payment.orderPrice)}</span>
-          </div>
+          {fullPrice > 0 && (
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>Order Value</span>
+              <span className={styles.detailVal}>{fmt(fullPrice)}</span>
+            </div>
+          )}
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>Date Created</span>
             <span className={styles.detailVal}>{payment.date}</span>
@@ -346,92 +354,84 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           )}
         </div>
 
-        {/* FIX 3: Smart Payment Status chips */}
-        <div className={styles.fieldGroup} style={{ marginTop: 18 }}>
-          <label className={styles.fieldLabel}>Payment Status</label>
+        {/* ── Smart payment breakdown ── */}
+        {fullPrice > 0 && hasInstallments && (
+          <div className={styles.summaryCard} style={{ marginTop: 16 }}>
+            <label className={styles.fieldLabel} style={{ marginBottom: 12, display: 'block' }}>Payment Breakdown</label>
 
-          {/* Contextual hint when part payments exist */}
-          {hasPartPayments && (
-            <div style={{
-              fontSize: '0.7rem',
-              color: 'var(--text3)',
-              marginBottom: 8,
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              padding: '6px 10px',
-            }}>
-              {isNowFullyPaid
-                ? '✓ All payments received — status upgraded to Paid.'
-                : 'Part payments recorded. Only Part Payment is available.'}
+            {/* Order value row */}
+            <div className={styles.summaryRow}>
+              <span>Order Value</span>
+              <span style={{ fontWeight: 700, color: 'var(--text)' }}>{fmt(fullPrice)}</span>
             </div>
-          )}
 
-          <div className={styles.statusRow}>
-            {PAY_STATUS.map(s => {
-              // When part payments exist:
-              //   - If balance is cleared → only 'paid' is active/selectable
-              //   - If balance still remains → only 'part' is active/selectable
-              //   - 'not_paid' and the other irrelevant chip are locked
-              const isLocked = hasPartPayments && (
-                isNowFullyPaid
-                  ? s.value !== 'paid'
-                  : s.value !== 'part'
-              )
-
-              // Active chip: if fully paid, force 'paid' highlight regardless of stored status
-              const isActive = isNowFullyPaid
-                ? s.value === 'paid'
-                : payment.status === s.value
+            {/* Each installment with running balance */}
+            {installments.map((inst, idx) => {
+              const runningBefore = installments.slice(0, idx).reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
+              const runningAfter  = runningBefore + (parseFloat(inst.amount) || 0)
+              const balAfter      = Math.max(0, fullPrice - runningAfter)
+              const methodLabel   = inst.method ? inst.method.charAt(0).toUpperCase() + inst.method.slice(1) : ''
 
               return (
-                <button
-                  key={s.value}
-                  className={`${styles.statusChip} ${isActive ? styles.statusChipActive : ''}`}
-                  style={{
-                    ...(isActive ? { borderColor: s.color, color: s.color, background: `${s.color}18` } : {}),
-                    ...(isLocked ? { opacity: 0.3, cursor: 'not-allowed' } : {}),
-                  }}
-                  disabled={isLocked}
-                  onClick={() => !isLocked && onStatusChange(payment.id, s.value)}
-                >
-                  {s.label}
-                </button>
+                <div key={inst.id ?? idx} style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+                  {/* Payment N label */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Payment {idx + 1}{installments.length > 1 ? ` of ${installments.length}` : ''}{methodLabel ? ` · ${methodLabel}` : ''}{inst.date ? ` · ${inst.date}` : ''}
+                    </span>
+                    <span style={{
+                      fontSize: '0.6rem', fontWeight: 800,
+                      background: 'rgba(251,146,60,0.14)', color: '#fb923c',
+                      border: '1px solid rgba(251,146,60,0.3)',
+                      borderRadius: 20, padding: '1px 7px',
+                    }}>
+                      {idx + 1}/{installments.length}
+                    </span>
+                  </div>
+
+                  {/* Balance before */}
+                  {idx > 0 && (
+                    <div className={styles.summaryRow} style={{ marginBottom: 4 }}>
+                      <span style={{ color: 'var(--text3)' }}>Balance Before</span>
+                      <span style={{ color: '#f59e0b', fontWeight: 700 }}>{fmt(runningBefore > 0 ? fullPrice - runningBefore : fullPrice)}</span>
+                    </div>
+                  )}
+
+                  {/* Amount paid */}
+                  <div className={styles.summaryRow} style={{ marginBottom: 4 }}>
+                    <span>Amount Paid</span>
+                    <span style={{ color: '#22c55e', fontWeight: 700 }}>{fmt(inst.amount)}</span>
+                  </div>
+
+                  {/* Balance after */}
+                  <div className={styles.summaryRow} style={{ marginBottom: 0 }}>
+                    <span>Balance After</span>
+                    <span style={{ color: balAfter > 0 ? '#ef4444' : '#22c55e', fontWeight: 700 }}>
+                      {balAfter > 0 ? fmt(balAfter) : 'Fully Paid ✓'}
+                    </span>
+                  </div>
+                </div>
               )
             })}
-          </div>
-        </div>
 
-        {fullPrice > 0 && (
-          <div className={styles.summaryCard}>
-            <div className={styles.summaryRow}>
-              <span>Total Order Value</span>
-              <span>{fmt(fullPrice)}</span>
-            </div>
-            <div className={styles.summaryRow}>
-              <span>Total Paid</span>
-              <span style={{ color: '#22c55e', fontWeight: 700 }}>{fmt(totalPaid)}</span>
-            </div>
-            {remaining !== null && remaining > 0 && (
-              <div className={styles.summaryRow}>
-                <span>Balance</span>
-                <span style={{ color: '#ef4444', fontWeight: 700 }}>{fmt(remaining)}</span>
+            {/* Overall progress bar */}
+            <div style={{ marginTop: 16 }}>
+              <div className={styles.progressWrap}>
+                <div className={styles.progressBar} style={{ width: `${pct}%` }} />
               </div>
-            )}
-            <div className={styles.progressWrap}>
-              <div
-                className={styles.progressBar}
-                style={{ width: `${Math.min(100, (totalPaid / fullPrice) * 100).toFixed(1)}%` }}
-              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                <span style={{ fontSize: '0.62rem', color: 'var(--text3)', fontWeight: 600 }}>{fmt(totalPaid)} paid</span>
+                <span style={{ fontSize: '0.62rem', color: 'var(--text3)', fontWeight: 600 }}>{fmt(fullPrice)} total</span>
+              </div>
             </div>
           </div>
         )}
 
-        {(payment.installments || []).length > 0 && (
-          <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>Payment History</label>
+        {/* Fallback summary for no-price payments */}
+        {(!fullPrice || !hasInstallments) && hasInstallments && (
+          <div className={styles.summaryCard} style={{ marginTop: 16 }}>
             <div className={styles.installmentList}>
-              {payment.installments.map((inst, idx) => (
+              {installments.map((inst, idx) => (
                 <div key={inst.id ?? idx} className={styles.installmentRow}>
                   <div className={styles.installmentOuter}>
                     <div className={styles.installmentInner}>
@@ -455,6 +455,44 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
             </div>
           </div>
         )}
+
+        {/* ── Status chips ── */}
+        <div className={styles.fieldGroup} style={{ marginTop: 18 }}>
+          <label className={styles.fieldLabel}>Payment Status</label>
+          {hasPartPayments && (
+            <div style={{
+              fontSize: '0.7rem', color: 'var(--text3)', marginBottom: 8,
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: 8, padding: '6px 10px',
+            }}>
+              {isNowFullyPaid
+                ? '✓ All payments received — status upgraded to Paid.'
+                : 'Part payments recorded. Only Part Payment is available.'}
+            </div>
+          )}
+          <div className={styles.statusRow}>
+            {PAY_STATUS.map(s => {
+              const isLocked = hasPartPayments && (
+                isNowFullyPaid ? s.value !== 'paid' : s.value !== 'part'
+              )
+              const isActive = isNowFullyPaid ? s.value === 'paid' : payment.status === s.value
+              return (
+                <button
+                  key={s.value}
+                  className={`${styles.statusChip} ${isActive ? styles.statusChipActive : ''}`}
+                  style={{
+                    ...(isActive ? { borderColor: s.color, color: s.color, background: `${s.color}18` } : {}),
+                    ...(isLocked ? { opacity: 0.3, cursor: 'not-allowed' } : {}),
+                  }}
+                  disabled={isLocked}
+                  onClick={() => !isLocked && onStatusChange(payment.id, s.value)}
+                >
+                  {s.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
         {!isPaid && (
           <button className={styles.addInstallmentBtn} onClick={() => setShowInstallmentModal(true)}>
@@ -627,11 +665,16 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
           <div className={styles.payGroupDate}>{date}</div>
           <div className={styles.payGroupDivider} />
           {datePayments.map((p, idx) => {
-            const sm        = statusMeta(p.status)
-            const isLast    = idx === datePayments.length - 1
-            const totalPaid = (p.installments || []).reduce((s, i) => s + i.amount, 0)
-            const fullPrice = parseFloat(p.orderPrice) || 0
-            const pct       = fullPrice > 0 ? Math.min(100, (totalPaid / fullPrice) * 100) : 0
+            const sm             = statusMeta(p.status)
+            const isLast         = idx === datePayments.length - 1
+            const installments   = p.installments || []
+            const totalPaid      = installments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
+            const fullPrice      = parseFloat(p.orderPrice) || 0
+            const installCount   = installments.length
+            // Cap at 99% for part payments so bar never looks full
+            const pct            = fullPrice > 0
+              ? (p.status === 'part' ? Math.min(99, (totalPaid / fullPrice) * 100) : Math.min(100, (totalPaid / fullPrice) * 100))
+              : 0
 
             return (
               <div
@@ -645,7 +688,21 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
                   </div>
                 </div>
                 <div className={styles.payListInfo}>
-                  <div className={styles.payListDesc}>{p.orderDesc || 'Payment'}</div>
+                  {/* Title row with installment badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <span className={styles.payListDesc} style={{ flex: 1 }}>{p.orderDesc || 'Payment'}</span>
+                    {installCount > 1 && (
+                      <span style={{
+                        fontSize: '0.6rem', fontWeight: 800,
+                        background: 'rgba(251,146,60,0.14)', color: '#fb923c',
+                        border: '1px solid rgba(251,146,60,0.3)',
+                        borderRadius: 20, padding: '1px 7px', flexShrink: 0,
+                        letterSpacing: '0.02em',
+                      }}>
+                        {installCount}/{installCount}
+                      </span>
+                    )}
+                  </div>
                   <span style={{
                     display: 'inline-block',
                     marginTop: '4px',
