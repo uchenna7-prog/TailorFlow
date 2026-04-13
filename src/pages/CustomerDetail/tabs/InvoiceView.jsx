@@ -29,89 +29,6 @@ function getDueDate(invoice, dueDays) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Confirmation Sheet
-// ─────────────────────────────────────────────────────────────
-
-function ConfirmUnpaidSheet({ open, onConfirm, onCancel }) {
-  if (!open) return null
-  return (
-    <div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'rgba(0,0,0,0.45)',
-        display: 'flex', alignItems: 'flex-end',
-      }}
-      onClick={e => e.target === e.currentTarget && onCancel()}
-    >
-      <div style={{
-        width: '100%',
-        background: 'var(--surface, #1c1c1e)',
-        borderRadius: '18px 18px 0 0',
-        padding: '24px 20px 36px',
-      }}>
-        <div style={{
-          width: 36, height: 4,
-          background: 'var(--text3, #555)',
-          borderRadius: 2,
-          margin: '0 auto 20px',
-        }} />
-        <div style={{
-          fontSize: '1.05rem',
-          fontWeight: 700,
-          color: 'var(--text1, #fff)',
-          marginBottom: 8,
-          textAlign: 'center',
-        }}>
-          Mark as Unpaid?
-        </div>
-        <div style={{
-          fontSize: '0.88rem',
-          color: 'var(--text2, #aaa)',
-          textAlign: 'center',
-          marginBottom: 24,
-          lineHeight: 1.5,
-        }}>
-          This invoice is already marked as paid.{'\n'}Are you sure you want to revert it to unpaid?
-        </div>
-        <button
-          onClick={onConfirm}
-          style={{
-            width: '100%',
-            padding: '14px',
-            borderRadius: 12,
-            border: 'none',
-            background: '#ef4444',
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: '0.95rem',
-            cursor: 'pointer',
-            marginBottom: 10,
-          }}
-        >
-          Yes, Mark as Unpaid
-        </button>
-        <button
-          onClick={onCancel}
-          style={{
-            width: '100%',
-            padding: '14px',
-            borderRadius: 12,
-            border: 'none',
-            background: 'var(--surface2, #2c2c2e)',
-            color: 'var(--text1, #fff)',
-            fontWeight: 600,
-            fontSize: '0.95rem',
-            cursor: 'pointer',
-          }}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
 // Shared inner pieces
 // ─────────────────────────────────────────────────────────────
 
@@ -235,14 +152,12 @@ function PrintableTemplate({ invoice, customer, brand }) {
         <div style={{ textAlign: 'right', fontSize: 9 }}>
           <div>ISSUE DATE: <strong>{invoice.date}</strong></div>
           <div>DUE DATE: <strong>{dueDate}</strong></div>
-          <div>INVOICE #: <strong>{invoice.number}</strong></div>
         </div>
       </div>
-      <div className={styles.metaRow} style={{ borderBottom: '1px solid #eee', paddingBottom: 10, marginBottom: 16 }}>
+      <div className={styles.metaRow}>
         <div>
           <div className={styles.metaLabel}>BILL FROM</div>
-          <div className={styles.metaVal}>{brand.name || brand.ownerName}</div>
-          {brand.address && <div className={styles.metaSub}>{brand.address}</div>}
+          <div className={styles.metaVal}>{brand.name}</div>
           {brand.phone && <div className={styles.metaSub}>{brand.phone}</div>}
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -335,17 +250,6 @@ const STATUS_LABELS = {
   overdue:   'Overdue',
 }
 
-// Toggling from the invoice view:
-//   unpaid / overdue  → paid (manual full-pay)
-//   part_paid         → paid (confirm balance settled)
-//   paid              → unpaid (requires confirmation)
-const STATUS_NEXT = {
-  unpaid:    'paid',
-  overdue:   'paid',
-  part_paid: 'paid',
-  paid:      'unpaid',
-}
-
 async function generatePDF(paperEl, filename) {
   const canvas = await html2canvas(paperEl, { 
     scale: 2, 
@@ -373,9 +277,8 @@ async function generatePDF(paperEl, filename) {
 export default function InvoiceView({ invoice: initialInvoice, customer, onClose, onStatusChange, onDelete, showToast }) {
   const { brand } = useBrand()
   const paperRef  = useRef(null)
-  const [invoice,         setInvoice]         = useState(initialInvoice)
-  const [pdfLoading,      setPdfLoading]      = useState(false)
-  const [showUnpaidSheet, setShowUnpaidSheet] = useState(false)
+  const [invoice,    setInvoice]    = useState(initialInvoice)
+  const [pdfLoading, setPdfLoading] = useState(false)
 
   const templateKey = invoice.template || brand.template || 'editable'
   const Template    = TEMPLATE_MAP[templateKey] || EditableTemplate
@@ -383,27 +286,6 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
   const effectiveBrand = {
     ...brand,
     ...(invoice.brandSnapshot || {}),
-  }
-
-  const handleToggleStatus = () => {
-    // paid → unpaid requires confirmation
-    if (invoice.status === 'paid') {
-      setShowUnpaidSheet(true)
-      return
-    }
-    // part_paid → paid: mark balance as settled
-    // unpaid / overdue → paid
-    const newStatus = STATUS_NEXT[invoice.status] || 'paid'
-    onStatusChange(invoice.id, newStatus)
-    setInvoice(prev => ({ ...prev, status: newStatus }))
-    showToast?.(`Marked as ${STATUS_LABELS[newStatus] || newStatus}`)
-  }
-
-  const handleConfirmUnpaid = () => {
-    setShowUnpaidSheet(false)
-    onStatusChange(invoice.id, 'unpaid')
-    setInvoice(prev => ({ ...prev, status: 'unpaid' }))
-    showToast?.('Marked as unpaid')
   }
 
   const handleShare = async () => {
@@ -421,15 +303,6 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
     }
   }
 
-  // Determine bottom button label based on current status
-  const isAlreadyPaid = invoice.status === 'paid'
-  const isPartPaid    = invoice.status === 'part_paid'
-  const bottomBtnLabel = isAlreadyPaid
-    ? 'Mark as Unpaid'
-    : isPartPaid
-      ? 'Mark as Fully Paid'
-      : 'Mark as Paid'
-
   return (
     <div className={styles.overlay}>
       <Header
@@ -441,7 +314,12 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
             icon: pdfLoading ? 'hourglass_top' : 'download',
             onClick: handleShare,
             disabled: pdfLoading,
-          }
+          },
+          {
+            icon: 'delete',
+            onClick: () => onDelete(invoice.id),
+            className: styles.headerDeleteBtn,
+          },
         ]}
       />
 
@@ -462,29 +340,8 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
             <div className={styles.notesText}>{invoice.notes}</div>
           </div>
         )}
-        <div style={{ height: 100 }} />
+        <div style={{ height: 32 }} />
       </div>
-
-      <div className={styles.bottomBar}>
-        <button
-          className={`${styles.statusBtn} ${isAlreadyPaid ? styles.statusBtnUnpaid : styles.statusBtnPaid}`}
-          onClick={handleToggleStatus}
-        >
-          <span className="mi" style={{ fontSize: '1rem' }}>
-            {isAlreadyPaid ? 'undo' : 'check_circle'}
-          </span>
-          {bottomBtnLabel}
-        </button>
-        <button className={styles.deleteBtn} onClick={() => onDelete(invoice.id)}>
-          <span className="mi">delete</span>
-        </button>
-      </div>
-
-      <ConfirmUnpaidSheet
-        open={showUnpaidSheet}
-        onConfirm={handleConfirmUnpaid}
-        onCancel={() => setShowUnpaidSheet(false)}
-      />
     </div>
   )
 }
