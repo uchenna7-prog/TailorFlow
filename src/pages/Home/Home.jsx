@@ -373,6 +373,7 @@ function StatCard({ card, navigate }) {
 }
 
 
+function EmptyState({ icon, message, sub }) {
   return (
     <div className={styles.emptyState}>
       <span className={`mi ${styles.emptyStateIcon}`}>{icon}</span>
