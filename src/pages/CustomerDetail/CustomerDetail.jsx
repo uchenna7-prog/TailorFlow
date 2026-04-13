@@ -33,7 +33,7 @@ function getBirthday(birthday) {
 }
 
 const TABS = [
-  { id: 'dress',    label: 'Dress\nMeasurements' }, 
+  { id: 'dress',    label: 'Dress\nMeasurements' },
   { id: 'orders',   label: 'Orders'             },
   { id: 'invoice',  label: 'Invoices'           },
   { id: 'payments', label: 'Payments'           },
@@ -56,20 +56,17 @@ export default function CustomerDetail({ onMenuClick }) {
   const [receipts,      setReceipts]      = useState([])
   const [isScrolled,    setIsScrolled]    = useState(false)
 
-  const toastTimer = useRef(null)
-  const tabsRef    = useRef(null)
+  const toastTimer     = useRef(null)
+  const tabsRef        = useRef(null)
   const topSentinelRef = useRef(null)
 
   const orders = getOrders(id)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsScrolled(!entry.isIntersecting)
-      },
+      ([entry]) => setIsScrolled(!entry.isIntersecting),
       { threshold: 0.1 }
     )
-
     if (topSentinelRef.current) observer.observe(topSentinelRef.current)
     return () => observer.disconnect()
   }, [])
@@ -101,8 +98,6 @@ export default function CustomerDetail({ onMenuClick }) {
     const order = orders.find(o => String(o.id) === String(orderId))
     if (!order) return
 
-    // Use live context values as the primary source for the snapshot.
-    // Fall back to localStorage for any fields the context doesn't expose.
     let settingsSnap = {}
     try { settingsSnap = JSON.parse(localStorage.getItem('tailorbook_settings') || '{}') } catch {}
 
@@ -125,8 +120,6 @@ export default function CustomerDetail({ onMenuClick }) {
       notes:     order.notes,
       status:    'unpaid',
       date:      today,
-      // Snapshot the active template + brand at creation time so InvoiceView
-      // always renders with the correct template even if settings change later.
       template:  invoiceTemplate || settingsSnap.invoiceTemplate || 'editable',
       brandSnapshot: {
         name:     invoiceBrand?.name    || settingsSnap.brandName      || '',
@@ -152,10 +145,6 @@ export default function CustomerDetail({ onMenuClick }) {
     }
   }, [data, orders, showToast, invoiceTemplate, invoiceBrand])
 
-  // ── AUTO-MARK INVOICE AS PAID ────────────────────────────────
-  // Called by PaymentsTab whenever a payment reaches 'paid' status.
-  // Finds the matching invoice by orderId and flips it to 'paid'
-  // automatically — no manual toggle needed.
   const handleInvoicePaid = useCallback(async (orderId) => {
     const matchingInvoice = invoicesState.find(
       inv => String(inv.orderId) === String(orderId) && inv.status !== 'paid'
@@ -180,7 +169,7 @@ export default function CustomerDetail({ onMenuClick }) {
     let settingsSnap = {}
     try { settingsSnap = JSON.parse(localStorage.getItem('tailorbook_settings') || '{}') } catch {}
 
-    const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    const todayStr        = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     const allInstallments = payment.installments || []
 
     if (allInstallments.length === 0) {
@@ -188,7 +177,7 @@ export default function CustomerDetail({ onMenuClick }) {
       return
     }
 
-    // ── Which installments are new (not yet receipted)? ───────
+    // ── Which installments are new (not yet receipted)? ───────────
     const usedInstallmentIds = new Set(
       receipts
         .filter(r => String(r.paymentId) === String(payment.id))
@@ -203,11 +192,21 @@ export default function CustomerDetail({ onMenuClick }) {
       ? newInstallments
       : allInstallments
 
-    // ── FIX: cumulativePaid = running total of ALL installments ──
-    // This is the total the customer has paid so far across every
-    // installment, regardless of which ones appear on this receipt.
-    // It drives the "Amount Paid" and "Balance Remaining" on the receipt,
-    // so it must reflect the true running balance — not just this payment.
+    // ── previousInstallments: everything paid BEFORE this receipt ─
+    // Snapshotted so the receipt is self-contained and never needs to
+    // re-query the payment document to reconstruct its history.
+    const receiptInstallmentIds = new Set(installmentsForReceipt.map(i => String(i.id)))
+    const previousInstallments  = allInstallments
+      .filter(inst => !receiptInstallmentIds.has(String(inst.id)))
+      .map(inst => ({
+        id:     inst.id,
+        amount: inst.amount,
+        method: inst.method || 'cash',
+        date:   inst.date,
+      }))
+
+    // ── Totals ────────────────────────────────────────────────────
+    const previousPaid   = previousInstallments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
     const cumulativePaid = allInstallments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
     const orderTotal     = parseFloat(payment.orderPrice) || 0
     const balance        = Math.max(0, orderTotal - cumulativePaid)
@@ -217,34 +216,38 @@ export default function CustomerDetail({ onMenuClick }) {
 
     const perPaymentCount = receipts.filter(r => String(r.paymentId) === String(payment.id)).length + 1
     const globalCount     = receipts.length + 1
-    const rcptNumber = `RCP-${String(perPaymentCount).padStart(2, '0')}-${String(globalCount).padStart(3, '0')}`
+    const rcptNumber      = `RCP-${String(perPaymentCount).padStart(2, '0')}-${String(globalCount).padStart(3, '0')}`
 
     const newReceipt = {
-      paymentId:      payment.id,
-      orderId:        payment.orderId,
-      orderDesc:      payment.orderDesc,
-      orderPrice:     payment.orderPrice,
-      items:          order?.items || payment.orderItems || [],
-      number:         rcptNumber,
-      date:           todayStr,
-      // payments = only the installment(s) being receipted right now (shown
-      // in the "Payments Received" section of the receipt).
-      payments:       installmentsForReceipt.map(inst => ({
+      paymentId:  payment.id,
+      orderId:    payment.orderId,
+      orderDesc:  payment.orderDesc,
+      orderPrice: payment.orderPrice,
+      items:      order?.items || payment.orderItems || [],
+      number:     rcptNumber,
+      date:       todayStr,
+
+      // payments = only the installment(s) on THIS receipt
+      payments: installmentsForReceipt.map(inst => ({
         id:     inst.id,
         amount: inst.amount,
         method: inst.method || 'cash',
         date:   inst.date,
       })),
       installmentIds: installmentsForReceipt.map(inst => String(inst.id)),
-      // ── THE FIX ──────────────────────────────────────────────
-      // cumulativePaid is the grand running total paid so far.
-      // ReceiptView uses this (not receipt.payments) to compute
-      // "Amount Paid" and "Balance Remaining" so every receipt
-      // in a part-payment chain shows the correct balance.
+
+      // previousInstallments = snapshot of all payments made before this receipt.
+      // Empty array means this is the very first receipt for this order.
+      previousInstallments,
+      previousPaid,
+
+      // cumulativePaid = previousPaid + this receipt's payments combined.
+      // Used by ReceiptView to show correct "Amount Paid" and "Balance Remaining".
       cumulativePaid,
-      isFullPayment:  isFullPay,
+      isFullPayment: isFullPay,
       balance,
-      notes:          payment.notes || '',
+      notes: payment.notes || '',
+
       brandSnapshot: {
         name:     invoiceBrand?.name    || settingsSnap.brandName      || '',
         tagline:  invoiceBrand?.tagline || settingsSnap.brandTagline   || '',
@@ -314,9 +317,6 @@ export default function CustomerDetail({ onMenuClick }) {
 
   const showFab = ['dress', 'orders', 'payments'].includes(activeTab)
 
-  // Determine whether the active tab has any content cards.
-  // When empty AND the tabs are stuck (isScrolled), the tab content must not
-  // overflow the viewport — so the empty-state can't be scrolled under the header.
   const tabItemCounts = {
     dress:    data.measurements?.length ?? 0,
     orders:   orders?.length            ?? 0,
@@ -420,11 +420,6 @@ export default function CustomerDetail({ onMenuClick }) {
         </div>
       </div>
 
-      {/*
-        data-empty is true when the active tab has no cards.
-        The CSS uses this to clamp the height to the remaining viewport
-        so the empty state cannot scroll beneath the sticky header + tabs.
-      */}
       <div
         className={styles.tabContent}
         data-empty={activeTabIsEmpty ? 'true' : 'false'}
