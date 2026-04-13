@@ -17,14 +17,11 @@ function calcTax(subtotal, taxRate, showTax) {
   return subtotal * (taxRate / 100)
 }
 
-// ── Resolve the cumulative amount paid for a receipt ──────────
-// New receipts store cumulativePaid directly (the running total of
-// all installments up to and including this receipt).
-// Old receipts (before the fix) fall back to summing receipt.payments.
+// Resolve the running total paid up to and including this receipt.
+// New receipts store cumulativePaid directly.
+// Old receipts (pre-fix) fall back to summing receipt.payments.
 function resolveCumulativePaid(receipt) {
-  if (receipt.cumulativePaid != null) {
-    return parseFloat(receipt.cumulativePaid)
-  }
+  if (receipt.cumulativePaid != null) return parseFloat(receipt.cumulativePaid)
   return (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
 }
 
@@ -37,26 +34,38 @@ function ReceiptItemsTable({ receipt, brand }) {
     ? receipt.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
     : (parseFloat(receipt.orderPrice) || 0)
 
-  const tax = calcTax(orderTotal, taxRate, showTax)
-
-  // cumulativePaid = total paid across ALL installments up to this receipt.
-  // This is what drives the balance and summary — NOT just this receipt's payments array.
+  const tax            = calcTax(orderTotal, taxRate, showTax)
   const cumulativePaid = resolveCumulativePaid(receipt)
-  const balance        = Math.max(0, orderTotal - cumulativePaid)
-  const isFullPayment  = balance <= 0
+  const previousPaid   = parseFloat(receipt.previousPaid) || 0
+  const hasPrevious    = (receipt.previousInstallments?.length > 0) || previousPaid > 0
+
+  // "New Balance Value" = what was still owed before this receipt's payment
+  // i.e. orderTotal minus everything paid in previous receipts
+  const newBalanceValue = Math.max(0, orderTotal - previousPaid)
+
+  // This receipt's payment amount
+  const thisPaymentTotal = (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
+
+  // Final balance after this receipt
+  const balanceRemaining = Math.max(0, orderTotal - cumulativePaid)
+  const isFullPayment    = balanceRemaining <= 0
 
   return (
     <div className={styles.tableWrapper}>
+
+      {/* ── Column headers ── */}
       <div className={styles.tHead}>
         <span className={styles.tColDesc}>Description</span>
         <span className={styles.tColNum}>Amount</span>
       </div>
 
+      {/* ── Order description + total ── */}
       <div className={styles.tRowMain}>
         <div className={styles.tColDesc}>{receipt.orderDesc || 'Garment Order'}</div>
         <div className={styles.tColNum}>{fmt(currency, orderTotal)}</div>
       </div>
 
+      {/* ── Garment itemisation (if any) ── */}
       {receipt.items?.length > 0 && (
         <div className={styles.itemizedSection}>
           <div className={styles.itemizedLabel}>Garments:</div>
@@ -69,7 +78,34 @@ function ReceiptItemsTable({ receipt, brand }) {
         </div>
       )}
 
-      {/* Payments Received — shows only the installment(s) on this receipt */}
+      {/* ── PREVIOUS PAYMENTS section (only on 2nd receipt onwards) ── */}
+      {hasPrevious && (
+        <div className={styles.itemizedSection} style={{ marginTop: 8 }}>
+          <div className={styles.itemizedLabel}>Previous Payments:</div>
+          {(receipt.previousInstallments || []).map((p, idx) => (
+            <div key={idx} className={styles.tRowSub}>
+              <span className={styles.tColDesc}>
+                {p.date}
+                {p.method ? ` · ${p.method.charAt(0).toUpperCase() + p.method.slice(1)}` : ''}
+              </span>
+              <span className={styles.tColNum} style={{ color: '#6b7280', fontWeight: 600 }}>
+                {fmt(currency, p.amount)}
+              </span>
+            </div>
+          ))}
+          {/* If old receipt had no previousInstallments array but has previousPaid */}
+          {!receipt.previousInstallments?.length && previousPaid > 0 && (
+            <div className={styles.tRowSub}>
+              <span className={styles.tColDesc}>Prior payments</span>
+              <span className={styles.tColNum} style={{ color: '#6b7280', fontWeight: 600 }}>
+                {fmt(currency, previousPaid)}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── PAYMENTS RECEIVED on this receipt ── */}
       <div className={styles.itemizedSection} style={{ marginTop: 8 }}>
         <div className={styles.itemizedLabel}>Payments Received:</div>
         {(receipt.payments || []).map((p, idx) => (
@@ -86,34 +122,56 @@ function ReceiptItemsTable({ receipt, brand }) {
         ))}
       </div>
 
-      {/* Summary — uses cumulativePaid so balance is always correct */}
+      {/* ── SUMMARY ── */}
       <div className={styles.summary}>
-        <div className={styles.sumRow}>
-          <span>Order Value</span>
-          <span>{fmt(currency, orderTotal)}</span>
-        </div>
+
         {showTax && taxRate > 0 && (
           <div className={styles.sumRow}>
             <span>Tax ({taxRate}%)</span>
             <span>{fmt(currency, tax)}</span>
           </div>
         )}
-        <div className={styles.sumRow}>
-          <span>Amount Paid</span>
-          <span style={{ color: '#16a34a', fontWeight: 700 }}>{fmt(currency, cumulativePaid)}</span>
-        </div>
+
+        {hasPrevious ? (
+          // Part-payment chain: show "New Balance Value" (what was owed before this payment)
+          <>
+            <div className={styles.sumRow}>
+              <span>New Balance Value</span>
+              <span>{fmt(currency, newBalanceValue)}</span>
+            </div>
+            <div className={styles.sumRow}>
+              <span>Amount Paid</span>
+              <span style={{ color: '#16a34a', fontWeight: 700 }}>{fmt(currency, thisPaymentTotal)}</span>
+            </div>
+          </>
+        ) : (
+          // First receipt: show plain "Order Value" then amount paid
+          <>
+            <div className={styles.sumRow}>
+              <span>Order Value</span>
+              <span>{fmt(currency, orderTotal)}</span>
+            </div>
+            <div className={styles.sumRow}>
+              <span>Amount Paid</span>
+              <span style={{ color: '#16a34a', fontWeight: 700 }}>{fmt(currency, thisPaymentTotal)}</span>
+            </div>
+          </>
+        )}
+
         {!isFullPayment && (
           <div className={styles.sumRow}>
             <span>Balance Remaining</span>
-            <span style={{ color: '#ef4444', fontWeight: 700 }}>{fmt(currency, balance)}</span>
+            <span style={{ color: '#ef4444', fontWeight: 700 }}>{fmt(currency, balanceRemaining)}</span>
           </div>
         )}
+
         <div className={`${styles.sumRow} ${styles.sumTotal}`}>
           <span>{isFullPayment ? 'PAID IN FULL' : 'AMOUNT RECEIVED'}</span>
           <span style={{ color: isFullPayment ? '#16a34a' : '#1a1a1a' }}>
-            {fmt(currency, cumulativePaid)}
+            {fmt(currency, thisPaymentTotal)}
           </span>
         </div>
+
       </div>
     </div>
   )
@@ -128,7 +186,7 @@ function LogoOrName({ brand, darkBg = false }) {
   )
 }
 
-// ── TEMPLATES ────────────────────────────────────────────────
+// ── TEMPLATES ─────────────────────────────────────────────────
 
 function EditableTemplate({ receipt, customer, brand }) {
   return (
@@ -268,27 +326,21 @@ const TEMPLATE_MAP = {
   free:      FreeTemplate,
 }
 
-// Fixed generatePDF function
 async function generatePDF(paperEl, filename) {
-  const canvas = await html2canvas(paperEl, { 
-    scale: 2, 
-    useCORS: true, 
-    backgroundColor: '#ffffff', 
+  const canvas = await html2canvas(paperEl, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff',
     logging: false,
-    height: paperEl.scrollHeight, 
-    windowHeight: paperEl.scrollHeight
+    height: paperEl.scrollHeight,
+    windowHeight: paperEl.scrollHeight,
   })
 
   const imgData = canvas.toDataURL('image/png')
-  const pdfW = 450
-  const pdfH = (canvas.height * pdfW) / canvas.width
+  const pdfW    = 450
+  const pdfH    = (canvas.height * pdfW) / canvas.width
 
-  const pdf = new jsPDF({ 
-    orientation: 'portrait', 
-    unit: 'px', 
-    format: [pdfW, pdfH] 
-  })
-
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [pdfW, pdfH] })
   pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH)
   pdf.save(filename)
 }
@@ -319,7 +371,6 @@ export default function ReceiptView({ receipt: initialReceipt, customer, onClose
     }
   }
 
-  // Use cumulativePaid for the status badge — same logic as the table
   const cumulativePaid = resolveCumulativePaid(receipt)
   const orderTotal     = receipt.orderPrice ? parseFloat(receipt.orderPrice) : cumulativePaid
   const isFullPay      = cumulativePaid >= orderTotal && orderTotal > 0
