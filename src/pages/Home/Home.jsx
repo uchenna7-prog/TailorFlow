@@ -299,7 +299,7 @@ function NotifBanner({ onEnable, onDismiss }) {
 function MobileQuickActions({ navigate }) {
   const path = window.location.pathname
   const navItems = [
-    { icon: 'home',         label: 'Home',         route: '/'             },
+    { icon: 'dashboard',         label: 'Dashboard',         route: '/'             },
     { icon: 'groups',       label: 'Customers',    route: '/customers'    },
     { icon: 'event',        label: 'Appointments', route: '/appointments' },
     { icon: 'shopping_cart',label: 'Orders',       route: '/orders'       },
