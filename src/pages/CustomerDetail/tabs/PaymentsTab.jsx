@@ -53,6 +53,9 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
 
   const handleClose = () => { reset(); onClose() }
 
+  // FIX 1b: Always derive final status from the actual amount vs order price.
+  // The chip is a hint but never overrides the math — so saving "Full Payment"
+  // with a partial amount will correctly produce 'part', not 'paid'.
   const handleSave = () => {
     if (!selectedOrder || !amount) return
 
@@ -63,15 +66,16 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
       id:     Date.now(),
     }]
 
-    // full → always 'paid'
-    // part → upgrade to 'paid' automatically if amount covers full price
+    const entered   = parseFloat(amount) || 0
+    const fullPrice = parseFloat(selectedOrder.price) || 0
+
     let finalStatus
-    if (paymentType === 'full') {
-      finalStatus = 'paid'
+    if (fullPrice > 0) {
+      // Order price known — derive from math, ignore the chip
+      finalStatus = entered >= fullPrice ? 'paid' : 'part'
     } else {
-      const total     = parseFloat(amount) || 0
-      const fullPrice = parseFloat(selectedOrder.price) || 0
-      finalStatus = fullPrice > 0 && total >= fullPrice ? 'paid' : 'part'
+      // No order price set — trust the chip as fallback
+      finalStatus = paymentType === 'full' ? 'paid' : 'part'
     }
 
     onSave({
@@ -167,6 +171,7 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
         </div>
 
         {/* Amount — label adapts to payment type */}
+        {/* FIX 1a: onChange auto-switches the chip based on amount vs order price */}
         <div className={styles.fieldGroup}>
           <label className={styles.fieldLabel}>
             {paymentType === 'part' ? 'Initial Amount Paid (₦)' : 'Amount (₦)'}
@@ -177,7 +182,19 @@ function AddPaymentModal({ isOpen, onClose, orders, onSave }) {
             placeholder={selectedOrder ? `of ${fmt(selectedOrder.price)}` : '0.00'}
             inputMode="decimal"
             value={amount}
-            onChange={e => setAmount(e.target.value)}
+            onChange={e => {
+              const val = e.target.value
+              setAmount(val)
+              // Auto-flip the payment type chip based on whether the entered
+              // amount covers the full order price or not
+              if (selectedOrder) {
+                const fullPrice = parseFloat(selectedOrder.price) || 0
+                const entered   = parseFloat(val) || 0
+                if (fullPrice > 0) {
+                  setPaymentType(entered > 0 && entered < fullPrice ? 'part' : 'full')
+                }
+              }
+            }}
           />
         </div>
 
@@ -285,11 +302,15 @@ function AddInstallmentModal({ payment, onClose, onSave }) {
 
 function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstallment, onGenerateReceipt }) {
   const [showInstallmentModal, setShowInstallmentModal] = useState(false)
-  const sm     = statusMeta(payment.status)
+  const sm        = statusMeta(payment.status)
   const totalPaid = (payment.installments || []).reduce((s, i) => s + i.amount, 0)
   const fullPrice = parseFloat(payment.orderPrice) || 0
   const remaining = fullPrice > 0 ? fullPrice - totalPaid : null
   const isPaid    = payment.status === 'paid'
+
+  // FIX 3: Smart status chip logic
+  const hasPartPayments = (payment.installments || []).length > 0
+  const isNowFullyPaid  = fullPrice > 0 && totalPaid >= fullPrice
 
   return (
     <div className={styles.overlay}>
@@ -325,22 +346,59 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           )}
         </div>
 
-        {/* Payment Status — 3 chips live here on the detail modal */}
+        {/* FIX 3: Smart Payment Status chips */}
         <div className={styles.fieldGroup} style={{ marginTop: 18 }}>
           <label className={styles.fieldLabel}>Payment Status</label>
+
+          {/* Contextual hint when part payments exist */}
+          {hasPartPayments && (
+            <div style={{
+              fontSize: '0.7rem',
+              color: 'var(--text3)',
+              marginBottom: 8,
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 8,
+              padding: '6px 10px',
+            }}>
+              {isNowFullyPaid
+                ? '✓ All payments received — status upgraded to Paid.'
+                : 'Part payments recorded. Only Part Payment is available.'}
+            </div>
+          )}
+
           <div className={styles.statusRow}>
-            {PAY_STATUS.map(s => (
-              <button
-                key={s.value}
-                className={`${styles.statusChip} ${payment.status === s.value ? styles.statusChipActive : ''}`}
-                style={payment.status === s.value
-                  ? { borderColor: s.color, color: s.color, background: `${s.color}18` }
-                  : {}}
-                onClick={() => onStatusChange(payment.id, s.value)}
-              >
-                {s.label}
-              </button>
-            ))}
+            {PAY_STATUS.map(s => {
+              // When part payments exist:
+              //   - If balance is cleared → only 'paid' is active/selectable
+              //   - If balance still remains → only 'part' is active/selectable
+              //   - 'not_paid' and the other irrelevant chip are locked
+              const isLocked = hasPartPayments && (
+                isNowFullyPaid
+                  ? s.value !== 'paid'
+                  : s.value !== 'part'
+              )
+
+              // Active chip: if fully paid, force 'paid' highlight regardless of stored status
+              const isActive = isNowFullyPaid
+                ? s.value === 'paid'
+                : payment.status === s.value
+
+              return (
+                <button
+                  key={s.value}
+                  className={`${styles.statusChip} ${isActive ? styles.statusChipActive : ''}`}
+                  style={{
+                    ...(isActive ? { borderColor: s.color, color: s.color, background: `${s.color}18` } : {}),
+                    ...(isLocked ? { opacity: 0.3, cursor: 'not-allowed' } : {}),
+                  }}
+                  disabled={isLocked}
+                  onClick={() => !isLocked && onStatusChange(payment.id, s.value)}
+                >
+                  {s.label}
+                </button>
+              )
+            })}
           </div>
         </div>
 
@@ -500,7 +558,7 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
     }
   }
 
-  // ── FIX: build a receipt snapshot with correct cumulativePaid ──
+  // Build a receipt snapshot with correct cumulativePaid.
   // Each receipt only stores the single installment being receipted,
   // but we also store cumulativePaid = sum of ALL installments up to
   // this point so the receipt can show the correct running balance.
@@ -511,12 +569,19 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
     // The latest installment is the one being receipted right now
     const latestInstallment = allInstallments[allInstallments.length - 1] ?? null
 
+    // previousInstallments = all installments EXCEPT the latest one
+    const previousInstallments = allInstallments.slice(0, -1)
+    const previousPaid         = previousInstallments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
+
     const receiptPayload = {
       ...payment,
       // payments array on the receipt = only the installment being receipted
-      payments: latestInstallment ? [latestInstallment] : allInstallments,
+      payments:             latestInstallment ? [latestInstallment] : allInstallments,
       // cumulativePaid = running total of everything paid so far (including this one)
       cumulativePaid,
+      // previousInstallments & previousPaid so ReceiptView can show the payment chain
+      previousInstallments,
+      previousPaid,
     }
 
     setDetailPay(null)
