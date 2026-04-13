@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth }      from '../../contexts/AuthContext'
 import { useCustomers } from '../../contexts/CustomerContext'
 import { useSettings }  from '../../contexts/SettingsContext'
+import { useOrders }    from '../../contexts/OrdersContext'
 import { subscribeToInvoices, updateInvoiceStatus, deleteInvoice } from '../../services/invoiceService'
 import InvoiceView from '../CustomerDetail/tabs/InvoiceView'
 import Header from '../../components/Header/Header'
@@ -54,7 +55,7 @@ const STATUS_STYLES = {
 
 // ── Invoice List Item ─────────────────────────────────────────
 
-function InvoiceCard({ invoice, currency, onTap, isLast }) {
+function InvoiceCard({ invoice, currency, onTap, isLast, orderImageUrl }) {
   const total = invoice.items?.length > 0
     ? invoice.items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0)
     : (parseFloat(invoice.price) || 0)
@@ -70,9 +71,17 @@ function InvoiceCard({ invoice, currency, onTap, isLast }) {
       {/* Left: grey outer box with white inner box */}
       <div className={styles.invoiceListOuter}>
         <div className={styles.invoiceListInner}>
-          <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : 'var(--text3)' }}>
-            receipt_long
-          </span>
+          {orderImageUrl ? (
+            <img
+              src={orderImageUrl}
+              alt={invoice.orderDesc || 'Order'}
+              className={styles.orderImg}
+            />
+          ) : (
+            <span className="mi" style={{ fontSize: '1.5rem', color: overdue ? '#ef4444' : 'var(--text3)' }}>
+              receipt_long
+            </span>
+          )}
         </div>
       </div>
 
@@ -113,6 +122,7 @@ export default function Invoices({ onMenuClick }) {
   const { user }      = useAuth()
   const { customers } = useCustomers()
   const { settings }  = useSettings()
+  const { allOrders } = useOrders()
   const currency      = settings.invoiceCurrency || '₦'
 
   const [allInvoices, setAllInvoices] = useState([])
@@ -163,6 +173,15 @@ export default function Invoices({ onMenuClick }) {
       unsubsRef.current = {}
     }
   }, [user, customers])
+
+  // ── Build order image lookup: "customerId__orderId" → imgSrc ──
+  const orderImageMap = {}
+  for (const order of allOrders) {
+    const imgSrc = order.items?.[0]?.imgSrc
+    if (imgSrc && order.customerId && order.id) {
+      orderImageMap[`${order.customerId}__${order.id}`] = imgSrc
+    }
+  }
 
   // ── Filter ───────────────────────────────────────────────
   const filtered = allInvoices.filter(inv => {
@@ -305,6 +324,7 @@ export default function Invoices({ onMenuClick }) {
                   currency={currency}
                   isLast={idx === dateInvoices.length - 1}
                   onTap={() => setViewing(inv)}
+                  orderImageUrl={orderImageMap[`${inv.customerId}__${inv.orderId}`] ?? null}
                 />
               ))}
             </div>
