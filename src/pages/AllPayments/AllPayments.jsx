@@ -442,7 +442,7 @@ export default function AllPayments({ onMenuClick }) {
         {/* Total received — sits under search bar */}
         <div className={styles.totalRow}>
           <span className={styles.totalLabel}>Total Received</span>
-          <span className={styles.totalVal} style={{ color: '#22c55e' }}>{fmt(totalReceived)}</span>
+          <span className={styles.totalVal} style={{ color: '#15803d' }}>{fmt(totalReceived)}</span>
         </div>
 
         {filterOpen && (
