@@ -104,28 +104,40 @@ function flattenPayments(allPayments) {
       // installment tips the overall payment to "paid".
       let runningTotal = 0
       installments.forEach((inst, idx) => {
+        const previousPaid = runningTotal  // what was paid BEFORE this installment
         runningTotal += parseFloat(inst.amount) || 0
 
-        const rowStatus = fullPrice > 0
-          ? (runningTotal >= fullPrice ? 'paid' : 'part')
-          : (idx === installments.length - 1 ? p.status : 'part')
+        // Every installment row always shows 'part' status and a partial bar —
+        // even the last one that clears the balance. The N/N badge already
+        // signals it's the final payment; the status pill stays "Part Payment"
+        // so each row is independent and self-consistent.
+        const rowStatus = 'part'
+
+        // previousInstallments = all installments before this one (for detail sheet)
+        const previousInstallments = installments.slice(0, idx).map(i => ({
+          amount: i.amount,
+          method: i.method || 'cash',
+          date:   i.date || p.date || '',
+        }))
 
         rows.push({
-          rowKey:            `${p.id}__${inst.id ?? idx}`,
-          paymentId:         p.id,
-          customerId:        p.customerId,
-          customerName:      p.customerName,
-          orderId:           p.orderId,
-          orderDesc:         p.orderDesc,
-          orderPrice:        p.orderPrice,
-          paymentStatus:     rowStatus,
-          amount:            inst.amount,
-          method:            inst.method || 'cash',
-          date:              inst.date || p.date || 'Unknown Date',
-          installIndex:      idx + 1,
-          totalInstallments: installments.length,
-          totalPaid:         runningTotal,
-          notes:             p.notes,
+          rowKey:                `${p.id}__${inst.id ?? idx}`,
+          paymentId:             p.id,
+          customerId:            p.customerId,
+          customerName:          p.customerName,
+          orderId:               p.orderId,
+          orderDesc:             p.orderDesc,
+          orderPrice:            p.orderPrice,
+          paymentStatus:         rowStatus,
+          amount:                inst.amount,
+          method:                inst.method || 'cash',
+          date:                  inst.date || p.date || 'Unknown Date',
+          installIndex:          idx + 1,
+          totalInstallments:     installments.length,
+          totalPaid:             runningTotal,
+          previousPaid,
+          previousInstallments,
+          notes:                 p.notes,
         })
       })
     }
@@ -158,12 +170,14 @@ const TABS = [
 // ── PAYMENT ROW ───────────────────────────────────────────────
 
 function PaymentRow({ row, isLast, onTap }) {
-  const sm     = STATUS_META[row.paymentStatus] ?? STATUS_META.not_paid
-  const mIcon  = METHOD_ICONS[row.method] ?? 'payments'
-  const mLabel = METHOD_LABELS[row.method] ?? 'Cash'
+  const sm        = STATUS_META[row.paymentStatus] ?? STATUS_META.not_paid
+  const mIcon     = METHOD_ICONS[row.method] ?? 'payments'
+  const mLabel    = METHOD_LABELS[row.method] ?? 'Cash'
   const fullPrice = parseFloat(row.orderPrice) || 0
-  const pct    = fullPrice > 0 && row.totalPaid > 0
-    ? Math.min(100, (row.totalPaid / fullPrice) * 100)
+
+  // Progress bar shows cumulative up to this installment (not 100% even for last)
+  const pct = fullPrice > 0 && row.totalPaid > 0
+    ? Math.min(99, (row.totalPaid / fullPrice) * 100)  // cap at 99% — each row is a part payment
     : 0
 
   const isPartInstall = row.totalInstallments > 1
@@ -251,12 +265,30 @@ function PaymentRow({ row, isLast, onTap }) {
 function PaymentDetail({ row, onClose, onNavigateToCustomer }) {
   if (!row) return null
 
-  const sm        = STATUS_META[row.paymentStatus] ?? STATUS_META.not_paid
-  const mLabel    = METHOD_LABELS[row.method] ?? '—'
-  const fullPrice = parseFloat(row.orderPrice) || 0
-  const pct       = fullPrice > 0 && row.totalPaid > 0
-    ? Math.min(100, (row.totalPaid / fullPrice) * 100)
-    : 0
+  const sm              = STATUS_META[row.paymentStatus] ?? STATUS_META.not_paid
+  const mLabel          = METHOD_LABELS[row.method] ?? '—'
+  const fullPrice       = parseFloat(row.orderPrice) || 0
+  const thisAmount      = parseFloat(row.amount) || 0
+  const previousPaid    = parseFloat(row.previousPaid) || 0
+  const totalPaid       = parseFloat(row.totalPaid) || 0
+  const balanceBefore   = fullPrice > 0 ? Math.max(0, fullPrice - previousPaid) : 0
+  const balanceAfter    = fullPrice > 0 ? Math.max(0, fullPrice - totalPaid)    : 0
+  const hasPrevious     = (row.previousInstallments?.length > 0) || previousPaid > 0
+  const pct             = fullPrice > 0 ? Math.min(99, (totalPaid / fullPrice) * 100) : 0
+
+  const cellStyle = {
+    background: 'var(--bg)',
+    border: '1px solid var(--border)',
+    borderRadius: 12,
+    padding: '12px 14px',
+  }
+  const cellLbl = {
+    fontSize: '0.58rem', fontWeight: 800, color: 'var(--text3)',
+    textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4,
+  }
+  const cellVal = {
+    fontSize: '0.88rem', fontWeight: 700, color: 'var(--text)', lineHeight: 1.3,
+  }
 
   return (
     <div className={styles.sheetOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
@@ -272,7 +304,7 @@ function PaymentDetail({ row, onClose, onNavigateToCustomer }) {
 
         <div className={styles.sheetBody}>
 
-          {/* Amount hero */}
+          {/* ── Amount hero ── */}
           <div className={styles.amountHero}>
             <div className={styles.heroAmount} style={{ color: sm.color }}>
               {row.amount !== null ? fmt(row.amount) : '₦ —'}
@@ -282,56 +314,105 @@ function PaymentDetail({ row, onClose, onNavigateToCustomer }) {
               style={{ background: `${sm.color}18`, color: sm.color, borderColor: `${sm.color}40` }}
             >
               {sm.label}
+              {row.totalInstallments > 1 && ` · ${row.installIndex}/${row.totalInstallments}`}
             </div>
           </div>
 
-          {/* Cells grid */}
+          {/* ── Info cells ── */}
           <div className={styles.cellGrid}>
-            <div className={styles.cell}>
-              <div className={styles.cellLabel}>Customer</div>
-              <div className={styles.cellVal}>{row.customerName}</div>
+            <div style={cellStyle}>
+              <div style={cellLbl}>Customer</div>
+              <div style={cellVal}>{row.customerName}</div>
             </div>
-            <div className={styles.cell}>
-              <div className={styles.cellLabel}>Date</div>
-              <div className={styles.cellVal}>{row.date}</div>
+            <div style={cellStyle}>
+              <div style={cellLbl}>Date</div>
+              <div style={cellVal}>{row.date}</div>
             </div>
-            <div className={styles.cell}>
-              <div className={styles.cellLabel}>Order</div>
-              <div className={styles.cellVal}>{row.orderDesc || '—'}</div>
+            <div style={cellStyle}>
+              <div style={cellLbl}>Order</div>
+              <div style={cellVal}>{row.orderDesc || '—'}</div>
             </div>
-            <div className={styles.cell}>
-              <div className={styles.cellLabel}>Method</div>
-              <div className={styles.cellVal}>{row.method ? mLabel : '—'}</div>
+            <div style={cellStyle}>
+              <div style={cellLbl}>Method</div>
+              <div style={cellVal}>{row.method ? mLabel : '—'}</div>
             </div>
-            {fullPrice > 0 && (
-              <div className={styles.cell}>
-                <div className={styles.cellLabel}>Order Value</div>
-                <div className={styles.cellVal}>{fmt(row.orderPrice)}</div>
-              </div>
-            )}
-            {row.totalInstallments > 1 && (
-              <div className={styles.cell}>
-                <div className={styles.cellLabel}>Instalment</div>
-                <div className={styles.cellVal}>{row.installIndex} of {row.totalInstallments}</div>
-              </div>
-            )}
           </div>
 
-          {/* Progress — total paid vs order price */}
+          {/* ── Smart payment breakdown (like ReceiptView) ── */}
           {fullPrice > 0 && (
             <div className={styles.progressSection}>
+
+              {/* Order value */}
               <div className={styles.progressLabelRow}>
-                <span className={styles.progressLabel}>Total Paid</span>
-                <span className={styles.progressFigure}>
-                  <span style={{ color: '#22c55e', fontWeight: 700 }}>{fmt(row.totalPaid)}</span>
-                  <span style={{ color: 'var(--text3)' }}> of {fmt(row.orderPrice)}</span>
+                <span className={styles.progressLabel}>Order Value</span>
+                <span className={styles.progressFigure} style={{ color: 'var(--text)', fontWeight: 700 }}>
+                  {fmt(row.orderPrice)}
                 </span>
               </div>
-              <div className={styles.progressTrack}>
+
+              {/* Previous payments (2nd installment onwards) */}
+              {hasPrevious && (
+                <>
+                  {(row.previousInstallments || []).map((p, i) => (
+                    <div key={i} className={styles.progressLabelRow} style={{ marginTop: 6 }}>
+                      <span className={styles.progressLabel} style={{ color: '#6b7280' }}>
+                        Payment {i + 1} · {p.date}{p.method ? ` · ${p.method.charAt(0).toUpperCase() + p.method.slice(1)}` : ''}
+                      </span>
+                      <span className={styles.progressFigure} style={{ color: '#6b7280' }}>
+                        {fmt(p.amount)}
+                      </span>
+                    </div>
+                  ))}
+                  {/* Balance before this payment */}
+                  <div className={styles.progressLabelRow} style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
+                    <span className={styles.progressLabel}>Balance Before This Payment</span>
+                    <span className={styles.progressFigure} style={{ color: '#f59e0b', fontWeight: 700 }}>
+                      {fmt(balanceBefore)}
+                    </span>
+                  </div>
+                </>
+              )}
+
+              {/* This payment */}
+              <div className={styles.progressLabelRow} style={{ marginTop: 8 }}>
+                <span className={styles.progressLabel}>This Payment</span>
+                <span className={styles.progressFigure} style={{ color: '#22c55e', fontWeight: 700 }}>
+                  {fmt(thisAmount)}
+                </span>
+              </div>
+
+              {/* Balance remaining after this payment */}
+              {balanceAfter > 0 && (
+                <div className={styles.progressLabelRow} style={{ marginTop: 6 }}>
+                  <span className={styles.progressLabel}>Balance Remaining</span>
+                  <span className={styles.progressFigure} style={{ color: '#ef4444', fontWeight: 700 }}>
+                    {fmt(balanceAfter)}
+                  </span>
+                </div>
+              )}
+              {balanceAfter === 0 && (
+                <div className={styles.progressLabelRow} style={{ marginTop: 6 }}>
+                  <span className={styles.progressLabel}>Balance Remaining</span>
+                  <span className={styles.progressFigure} style={{ color: '#22c55e', fontWeight: 700 }}>
+                    Fully Paid ✓
+                  </span>
+                </div>
+              )}
+
+              {/* Progress bar — cumulative up to this installment */}
+              <div className={styles.progressTrack} style={{ marginTop: 12 }}>
                 <div
                   className={styles.progressFill}
                   style={{ width: `${pct}%`, background: sm.color }}
                 />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                <span style={{ fontSize: '0.62rem', color: 'var(--text3)', fontWeight: 600 }}>
+                  {fmt(totalPaid)} paid
+                </span>
+                <span style={{ fontSize: '0.62rem', color: 'var(--text3)', fontWeight: 600 }}>
+                  {fmt(fullPrice)} total
+                </span>
               </div>
             </div>
           )}
