@@ -33,11 +33,6 @@
 .status_overdue   { background: #fee2e2; color: #991b1b; }
 .status_part_paid { background: #ffedd5; color: #9a3412; }
 
-/* ── HEADER DELETE BUTTON ── */
-.headerDeleteBtn {
-  color: #ef4444 !important;
-}
-
 .scrollArea { 
   flex: 1; 
   overflow-y: auto; 
@@ -229,3 +224,139 @@
   color: var(--text2); 
   line-height: 1.5; 
 }
+
+/* ── SHARE SHEET ─────────────────────────────────────────── */
+
+.sheetBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 7000;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sheet {
+  width: 100%;
+  background: var(--surface, #1c1c1e);
+  border-radius: 20px 20px 0 0;
+  padding: 12px 20px 40px;
+  animation: sheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheetHandle {
+  width: 36px;
+  height: 4px;
+  background: var(--text3, #555);
+  border-radius: 2px;
+  margin: 0 auto 18px;
+}
+
+.sheetTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text1, #fff);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.sheetSub {
+  font-size: 0.78rem;
+  color: var(--text3, #888);
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* 3-column icon grid */
+.shareGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px 4px;
+  margin-bottom: 20px;
+}
+
+.shareItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 6px 10px;
+  background: var(--surface2, #2c2c2e);
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.shareItem:active {
+  opacity: 0.65;
+}
+
+.shareItem:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.shareIconWrap {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.shareLabel {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text2, #ccc);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.sheetDownloadBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent, #eab308);
+  color: var(--bg, #000);
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: opacity 0.15s;
+}
+
+.sheetDownloadBtn:active  { opacity: 0.8; }
+.sheetDownloadBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.sheetCancelBtn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 14px;
+  border: none;
+  background: var(--surface2, #2c2c2e);
+  color: var(--text1, #fff);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.sheetCancelBtn:active { opacity: 0.7; }
