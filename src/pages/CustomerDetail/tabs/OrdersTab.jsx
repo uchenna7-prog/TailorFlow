@@ -101,19 +101,23 @@ function OrderMosaic({ items }) {
     )
   }
 
-  // 2 items → two halves
+  // 2 items → two halves inside the inner box
   if (total === 2) {
     return (
-      <div className={styles.mosaicOuter}>
-        <div className={styles.mosaicHalf}>
-          <img src={covers[0]} alt="" className={styles.mosaicImg} />
-        </div>
-        <div className={styles.mosaicDivider} />
-        <div className={styles.mosaicHalf}>
-          {covers[1]
-            ? <img src={covers[1]} alt="" className={styles.mosaicImg} />
-            : <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>checkroom</span>
-          }
+      <div className={styles.orderListOuter}>
+        <div className={styles.orderListInner} style={{ padding: 0 }}>
+          <div className={styles.mosaicInner}>
+            <div className={styles.mosaicHalf}>
+              <img src={covers[0]} alt="" className={styles.mosaicImg} />
+            </div>
+            <div className={styles.mosaicDivider} />
+            <div className={styles.mosaicHalf}>
+              {covers[1]
+                ? <img src={covers[1]} alt="" className={styles.mosaicImg} />
+                : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
+              }
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -122,44 +126,52 @@ function OrderMosaic({ items }) {
   // 3 items → three equal columns
   if (total === 3) {
     return (
-      <div className={styles.mosaicOuter}>
-        {[0, 1, 2].map((i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'row' }}>
-            {i > 0 && <div className={styles.mosaicDivider} />}
-            <div className={styles.mosaicThird}>
-              {covers[i]
-                ? <img src={covers[i]} alt="" className={styles.mosaicImg} />
-                : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
-              }
-            </div>
+      <div className={styles.orderListOuter}>
+        <div className={styles.orderListInner} style={{ padding: 0 }}>
+          <div className={styles.mosaicInner}>
+            {[0, 1, 2].map((i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'row', flex: 1, minWidth: 0 }}>
+                {i > 0 && <div className={styles.mosaicDivider} />}
+                <div className={styles.mosaicThird}>
+                  {covers[i]
+                    ? <img src={covers[i]} alt="" className={styles.mosaicImg} />
+                    : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
+                  }
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     )
   }
 
-  // 4+ items → first 3 + overlay on last slot
+  // 4+ items → first 3 + "+N more" overlay on third slot
   const extra = total - 3
   return (
-    <div className={styles.mosaicOuter}>
-      {[0, 1].map((i) => (
-        <div key={i} style={{ display: 'flex', flexDirection: 'row' }}>
-          {i > 0 && <div className={styles.mosaicDivider} />}
-          <div className={styles.mosaicThird}>
-            {covers[i]
-              ? <img src={covers[i]} alt="" className={styles.mosaicImg} />
-              : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
+    <div className={styles.orderListOuter}>
+      <div className={styles.orderListInner} style={{ padding: 0 }}>
+        <div className={styles.mosaicInner}>
+          {[0, 1].map((i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'row', flex: 1, minWidth: 0 }}>
+              {i > 0 && <div className={styles.mosaicDivider} />}
+              <div className={styles.mosaicThird}>
+                {covers[i]
+                  ? <img src={covers[i]} alt="" className={styles.mosaicImg} />
+                  : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
+                }
+              </div>
+            </div>
+          ))}
+          <div className={styles.mosaicDivider} />
+          <div className={`${styles.mosaicThird} ${styles.mosaicOverlayWrap}`}>
+            {covers[2]
+              ? <img src={covers[2]} alt="" className={styles.mosaicImg} />
+              : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
             }
+            <div className={styles.mosaicOverlay}>+{extra}</div>
           </div>
         </div>
-      ))}
-      <div className={styles.mosaicDivider} />
-      <div className={`${styles.mosaicThird} ${styles.mosaicOverlayWrap}`}>
-        {covers[2]
-          ? <img src={covers[2]} alt="" className={styles.mosaicImg} />
-          : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
-        }
-        <div className={styles.mosaicOverlay}>+{extra}</div>
       </div>
     </div>
   )
