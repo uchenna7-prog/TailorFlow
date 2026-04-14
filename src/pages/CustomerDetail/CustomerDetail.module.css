@@ -194,27 +194,12 @@
   background: var(--accent);
 }
 
-/*
-  Tab content sizing strategy:
-  ─────────────────────────────────────────────────────────────────────────────
-  • data-empty="false"  → tab has cards → let it grow freely (min-height: 100vh)
-    so the page stays scrollable and the tabs remain stuck to the header.
-
-  • data-empty="true"   → tab is empty → clamp to exactly the remaining
-    visible viewport below the sticky header (56px) + sticky tabs bar (48px).
-    This prevents the empty-state from being scroll-reachable beneath those
-    bars, while still keeping the page tall enough that the tabs don't
-    un-stick when switching from a populated tab.
-
-  The --tab-bar-height custom property (default 48px) matches the min-height
-  set on .tab above. If you ever change that, update the fallback here too.
-*/
 .tabContent {
   padding: 12px 20px 120px;
   flex: 1;
 }
 
-/* Empty tab: fill exactly the remaining viewport — no overflow, no scroll */
+/* Empty tab: fill exactly the remaining viewport */
 .tabContent[data-empty='true'] {
   min-height: calc(100dvh - 56px - 48px);
   max-height: calc(100dvh - 56px - 48px);
@@ -243,3 +228,283 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   font-size: 1.8rem;
 }
+
+/* ────────────────────────────────────────────────────────────
+   SHARED MODAL OVERLAY
+   Both the Edit and Delete modals use this as a backdrop.
+   ──────────────────────────────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 5000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  /* Smooth fade-in */
+  animation: overlayIn 0.22s ease;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ────────────────────────────────────────────────────────────
+   EDIT CUSTOMER MODAL
+   Slides up from the bottom, full-height scrollable sheet.
+   ──────────────────────────────────────────────────────────── */
+.modalSheet {
+  background: var(--bg);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-height: 92dvh;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+  animation: sheetUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Drag-handle pill */
+.modalSheet::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border2);
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modalCloseBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface2);
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.modalCloseBtn:active { background: var(--surface); }
+
+.modalTitle {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.modalSaveBtn {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.modalSaveBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.modalSaveBtn:not(:disabled):active { opacity: 0.75; }
+
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 18px calc(32px + var(--sb, 0px));
+}
+
+.modalGroup {
+  margin-bottom: 16px;
+}
+
+.modalLabel {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.modalInput {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 13px 15px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+}
+
+.modalInput:focus { border-color: var(--text2); }
+.modalInput::placeholder { color: var(--text3); }
+
+.modalTextarea {
+  resize: none;
+  line-height: 1.5;
+}
+
+/* Gender chips inside the modal */
+.modalSexRow {
+  display: flex;
+  gap: 10px;
+}
+
+.modalSexChip {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--text3);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modalSexChipActive {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+/* ────────────────────────────────────────────────────────────
+   DELETE CONFIRM MODAL
+   Compact bottom sheet with strong warning language.
+   ──────────────────────────────────────────────────────────── */
+.deleteSheet {
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 28px 22px calc(28px + var(--sb, 0px));
+  width: 100%;
+  border-top: 1px solid var(--border);
+  animation: sheetUp 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Drag handle */
+.deleteSheet::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border2);
+  margin: -12px auto 20px;
+}
+
+.deleteIconWrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  border: 1.5px solid rgba(239, 68, 68, 0.20);
+}
+
+.deleteTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+  margin: 0 0 10px;
+}
+
+.deleteMessage {
+  font-size: 0.82rem;
+  color: var(--text2);
+  text-align: center;
+  line-height: 1.55;
+  margin: 0 0 10px;
+}
+
+.deleteWarning {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--danger);
+  text-align: center;
+  margin: 0 0 24px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.07);
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.deleteActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.deleteCancelBtn {
+  background: var(--surface2);
+  color: var(--text2);
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.deleteCancelBtn:active { background: var(--surface); }
+
+.deleteConfirmBtn {
+  background: var(--danger);
+  color: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: opacity 0.15s;
+}
+
+.deleteConfirmBtn:active { opacity: 0.82; }
