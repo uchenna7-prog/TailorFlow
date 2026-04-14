@@ -318,19 +318,27 @@
    NEW STYLES — Multi-image upload, carousel, mosaic, +N badge
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── +N VIEWS BADGE on measurement list cards ── */
-.extraViewsBadge {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.62rem;
+/* ── +N VIEWS OVERLAY on measurement thumbnail ── */
+.thumbViewsOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.52);
+  color: #fff;
+  font-size: 0.55rem;
   font-weight: 800;
-  color: var(--accent);
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  border-radius: 20px;
-  padding: 2px 7px;
+  text-align: center;
+  padding: 3px 2px;
+  border-radius: 0 0 10px 10px;
   letter-spacing: 0.2px;
+  pointer-events: none;
   white-space: nowrap;
+}
+
+/* ── kept for any legacy reference ── */
+.extraViewsBadge {
+  display: none;
 }
 
 /* ── MULTI-IMAGE UPLOAD WRAPPER ── */
@@ -489,9 +497,9 @@
 /* ── ORDER MOSAIC THUMBNAIL ── */
 
 /*
-  The mosaic outer container matches orderListOuter in size
-  (80×80) but removes the inner white box constraint so we can
-  fill it with sub-cells directly.
+  mosaicOuter is kept for reference but mosaic now lives inside
+  orderListOuter → orderListInner → mosaicInner so it matches
+  the padding/border style of single-image cards exactly.
 */
 .mosaicOuter {
   width: 80px;
@@ -503,6 +511,19 @@
   display: flex;
   flex-direction: row;
   flex-shrink: 0;
+}
+
+/*
+  mosaicInner fills the 58×58 inner white box and arranges
+  sub-cells side by side.
+*/
+.mosaicInner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  border-radius: 10px;
 }
 
 /* Half for 2-item layout */
