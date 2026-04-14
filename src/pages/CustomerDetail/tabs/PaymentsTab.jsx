@@ -33,6 +33,102 @@ function statusMeta(value) {
   return PAY_STATUS.find(s => s.value === value) ?? PAY_STATUS[0]
 }
 
+// ─────────────────────────────────────────────────────────────
+// ORDER MOSAIC THUMBNAIL  (same pattern as OrdersTab)
+// orderItems = order.items[] — each has imgSrc
+// Layout:
+//   0 imgs  → icon placeholder
+//   1 img   → single full thumb
+//   2 imgs  → left half | right half
+//   3+ imgs → large left | right column (top + bottom stacked)
+//             4+ shows "+N" overlay on bottom-right
+// ─────────────────────────────────────────────────────────────
+function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
+  const covers = (orderItems || [])
+    .map(item => item.imgSrc ?? null)
+    .filter(Boolean)
+
+  const total = (orderItems || []).length
+
+  if (covers.length === 0) {
+    return (
+      <div className={styles.payListOuter}>
+        <div className={styles.payListInner}>
+          <span className="mi" style={{ fontSize: '1.5rem', color: fallbackColor || 'var(--text3)' }}>
+            {fallbackIcon || 'payments'}
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  if (total === 1) {
+    return (
+      <div className={styles.payListOuter}>
+        <div className={styles.payListInner}>
+          <img src={covers[0]} alt="" className={styles.orderImg} />
+        </div>
+      </div>
+    )
+  }
+
+  if (total === 2) {
+    return (
+      <div className={styles.payListOuter}>
+        <div className={`${styles.payListInner} ${styles.mosaicInner}`}>
+          <div className={styles.mosaicLeft}>
+            <img src={covers[0]} alt="" className={styles.mosaicImg} />
+          </div>
+          <div className={styles.mosaicDividerV} />
+          <div className={styles.mosaicRight}>
+            <div className={styles.mosaicRightCell}>
+              {covers[1]
+                ? <img src={covers[1]} alt="" className={styles.mosaicImg} />
+                : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // 3+ items → large left + two stacked right
+  const extra = total > 3 ? total - 3 : 0
+
+  return (
+    <div className={styles.payListOuter}>
+      <div className={`${styles.payListInner} ${styles.mosaicInner}`}>
+        <div className={styles.mosaicLeft}>
+          {covers[0]
+            ? <img src={covers[0]} alt="" className={styles.mosaicImg} />
+            : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
+          }
+        </div>
+        <div className={styles.mosaicDividerV} />
+        <div className={styles.mosaicRight}>
+          <div className={styles.mosaicRightCell}>
+            {covers[1]
+              ? <img src={covers[1]} alt="" className={styles.mosaicImg} />
+              : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+            }
+          </div>
+          <div className={styles.mosaicDividerH} />
+          <div className={`${styles.mosaicRightCell} ${extra > 0 ? styles.mosaicOverlayWrap : ''}`}>
+            {covers[2]
+              ? <img src={covers[2]} alt="" className={styles.mosaicImg} />
+              : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+            }
+            {extra > 0 && (
+              <div className={styles.mosaicOverlay}>+{extra}</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── ADD PAYMENT MODAL ─────────────────────────────────────────
 // Shows "Payment Type" (Full / Part) — NOT the status chips.
 // Status chips (Not Paid / Part / Paid) belong in PaymentDetail only.
@@ -569,12 +665,12 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
     return unsub
   }, [user, customerId])
 
-  // Build order image lookup: orderId → imgSrc
-  const orderImageMap = {}
+  // Build order items lookup: orderId → items[]
+  // We pass the full items array so the mosaic can use all cover images
+  const orderItemsMap = {}
   for (const order of (orders || [])) {
-    const imgSrc = order.items?.[0]?.imgSrc
-    if (imgSrc && order.id) {
-      orderImageMap[order.id] = imgSrc
+    if (order.id && order.items?.length > 0) {
+      orderItemsMap[order.id] = order.items
     }
   }
 
@@ -692,7 +788,7 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
             const pct            = fullPrice > 0
               ? (p.status === 'part' ? Math.min(99, (totalPaid / fullPrice) * 100) : Math.min(100, (totalPaid / fullPrice) * 100))
               : 0
-            const orderImgSrc    = orderImageMap[p.orderId] ?? null
+            const orderItems     = orderItemsMap[p.orderId] ?? []
 
             return (
               <div
@@ -700,19 +796,11 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
                 className={`${styles.payListItem} ${isLast ? styles.payListItemLast : ''}`}
                 onClick={() => setDetailPay(p)}
               >
-                <div className={styles.payListOuter}>
-                  <div className={styles.payListInner}>
-                    {orderImgSrc ? (
-                      <img
-                        src={orderImgSrc}
-                        alt={p.orderDesc || 'Order'}
-                        className={styles.orderImg}
-                      />
-                    ) : (
-                      <span className="mi" style={{ fontSize: '1.5rem', color: sm.color }}>payments</span>
-                    )}
-                  </div>
-                </div>
+                <OrderMosaic
+                  orderItems={orderItems}
+                  fallbackIcon="payments"
+                  fallbackColor={sm.color}
+                />
                 <div className={styles.payListInfo}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                     <span className={styles.payListDesc} style={{ flex: 1 }}>{p.orderDesc || 'Payment'}</span>
