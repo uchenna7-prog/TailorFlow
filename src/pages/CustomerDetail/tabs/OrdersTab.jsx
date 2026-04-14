@@ -64,15 +64,20 @@ function todayReadable() {
 
 // ─────────────────────────────────────────────────────────────
 // ORDER MOSAIC THUMBNAIL
-// Uses ONLY cover images (imgSrc) from each measurement item.
-// Layout rules:
-//   1 item  → single image
-//   2 items → side by side
-//   3 items → three equal columns
-//   4+      → show first 3 + "+N more" overlay on third
+//
+// Layout (matches Image 1 reference):
+//   0 images  → icon placeholder
+//   1 image   → single full image (standard thumb)
+//   2 images  → left half + right half (side by side)
+//   3+ images → left large (full height) + right column with
+//               top-right and bottom-right stacked
+//               If total > 3, bottom-right shows "+N" overlay
+//
+// All layouts live inside orderListOuter → orderListInner so
+// the outer card size NEVER changes — images are just smaller.
 // ─────────────────────────────────────────────────────────────
 function OrderMosaic({ items }) {
-  // Collect cover images only (imgSrc is the cover, first of imgSrcs)
+  // Collect cover images only
   const covers = items
     .map(item => item.imgSrc ?? null)
     .filter(Boolean)
@@ -80,6 +85,7 @@ function OrderMosaic({ items }) {
   const total     = items.length
   const hasImages = covers.length > 0
 
+  // ── No images at all ──
   if (!hasImages) {
     return (
       <div className={styles.orderListOuter}>
@@ -90,7 +96,7 @@ function OrderMosaic({ items }) {
     )
   }
 
-  // 1 item → standard single thumb
+  // ── 1 item → standard single thumb ──
   if (total === 1) {
     return (
       <div className={styles.orderListOuter}>
@@ -101,20 +107,20 @@ function OrderMosaic({ items }) {
     )
   }
 
-  // 2 items → two halves inside the inner box
+  // ── 2 items → two halves side by side ──
   if (total === 2) {
     return (
       <div className={styles.orderListOuter}>
-        <div className={styles.orderListInner} style={{ padding: 0 }}>
-          <div className={styles.mosaicInner}>
-            <div className={styles.mosaicHalf}>
-              <img src={covers[0]} alt="" className={styles.mosaicImg} />
-            </div>
-            <div className={styles.mosaicDivider} />
-            <div className={styles.mosaicHalf}>
+        <div className={`${styles.orderListInner} ${styles.mosaicInner}`} style={{ padding: 0 }}>
+          <div className={styles.mosaicLeft}>
+            <img src={covers[0]} alt="" className={styles.mosaicImg} />
+          </div>
+          <div className={styles.mosaicDividerV} />
+          <div className={styles.mosaicRight}>
+            <div className={styles.mosaicRightCell}>
               {covers[1]
                 ? <img src={covers[1]} alt="" className={styles.mosaicImg} />
-                : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
+                : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
               }
             </div>
           </div>
@@ -123,53 +129,44 @@ function OrderMosaic({ items }) {
     )
   }
 
-  // 3 items → three equal columns
-  if (total === 3) {
-    return (
-      <div className={styles.orderListOuter}>
-        <div className={styles.orderListInner} style={{ padding: 0 }}>
-          <div className={styles.mosaicInner}>
-            {[0, 1, 2].map((i) => (
-              <div key={i} style={{ display: 'flex', flexDirection: 'row', flex: 1, minWidth: 0 }}>
-                {i > 0 && <div className={styles.mosaicDivider} />}
-                <div className={styles.mosaicThird}>
-                  {covers[i]
-                    ? <img src={covers[i]} alt="" className={styles.mosaicImg} />
-                    : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
-                  }
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // ── 3+ items → large left + two stacked right ──
+  // extra = items beyond the 3 shown slots
+  const extra = total > 3 ? total - 3 : 0
 
-  // 4+ items → first 3 + "+N more" overlay on third slot
-  const extra = total - 3
   return (
     <div className={styles.orderListOuter}>
-      <div className={styles.orderListInner} style={{ padding: 0 }}>
-        <div className={styles.mosaicInner}>
-          {[0, 1].map((i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'row', flex: 1, minWidth: 0 }}>
-              {i > 0 && <div className={styles.mosaicDivider} />}
-              <div className={styles.mosaicThird}>
-                {covers[i]
-                  ? <img src={covers[i]} alt="" className={styles.mosaicImg} />
-                  : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
-                }
-              </div>
-            </div>
-          ))}
-          <div className={styles.mosaicDivider} />
-          <div className={`${styles.mosaicThird} ${styles.mosaicOverlayWrap}`}>
+      <div className={`${styles.orderListInner} ${styles.mosaicInner}`} style={{ padding: 0 }}>
+        {/* Large left image — full height */}
+        <div className={styles.mosaicLeft}>
+          {covers[0]
+            ? <img src={covers[0]} alt="" className={styles.mosaicImg} />
+            : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
+          }
+        </div>
+
+        <div className={styles.mosaicDividerV} />
+
+        {/* Right column: two stacked cells */}
+        <div className={styles.mosaicRight}>
+          {/* Top-right */}
+          <div className={styles.mosaicRightCell}>
+            {covers[1]
+              ? <img src={covers[1]} alt="" className={styles.mosaicImg} />
+              : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+            }
+          </div>
+
+          <div className={styles.mosaicDividerH} />
+
+          {/* Bottom-right — shows "+N" overlay when there are more than 3 */}
+          <div className={`${styles.mosaicRightCell} ${extra > 0 ? styles.mosaicOverlayWrap : ''}`}>
             {covers[2]
               ? <img src={covers[2]} alt="" className={styles.mosaicImg} />
-              : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
+              : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
             }
-            <div className={styles.mosaicOverlay}>+{extra}</div>
+            {extra > 0 && (
+              <div className={styles.mosaicOverlay}>+{extra}</div>
+            )}
           </div>
         </div>
       </div>
@@ -179,7 +176,6 @@ function OrderMosaic({ items }) {
 
 // ─────────────────────────────────────────────────────────────
 // ORDER FORM MODAL
-// imgSrc stored on each item is the cover image of the measurement
 // ─────────────────────────────────────────────────────────────
 function OrderModal({ isOpen, onClose, measurements, onSave }) {
   const [selectedItems, setSelectedItems] = useState([])
@@ -197,7 +193,6 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
 
   const toggleId = (m) => {
     const idStr = String(m.id)
-    // Use cover image only: first of imgSrcs or legacy imgSrc
     const coverImg = m.imgSrcs?.[0] ?? m.imgSrc ?? null
     setSelectedItems(prev => {
       const exists = prev.find(item => item.id === idStr)
@@ -235,7 +230,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
         id:     i.id,
         price:  parseFloat(i.price) || 0,
         name:   i.name,
-        imgSrc: i.imgSrc || null,   // cover image only
+        imgSrc: i.imgSrc || null,
       })),
       qty:            dynamicQty,
       due:            dueDisplay,
@@ -641,7 +636,7 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
                 className={`${styles.orderListItem} ${idx === dateOrders.length - 1 ? styles.orderListItemLast : ''}`}
                 onClick={() => setDetailOrder(o)}
               >
-                {/* Mosaic thumbnail using cover images only */}
+                {/* Mosaic thumbnail */}
                 <OrderMosaic items={itemsList} />
 
                 <div className={styles.orderListInfo}>
