@@ -514,6 +514,10 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
                       ? <img src={coverImg} alt={m.name} className={styles.orderListThumbImg} />
                       : <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>straighten</span>
                     }
+                    {/* +N views overlay on thumbnail */}
+                    {extraCount > 0 && coverImg && (
+                      <div className={styles.thumbViewsOverlay}>+{extraCount} view{extraCount !== 1 ? 's' : ''}</div>
+                    )}
                   </div>
                 </div>
 
@@ -521,12 +525,8 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
                 <div className={styles.orderListInfo}>
                   <div className={styles.orderListDesc}>{m.name}</div>
                   <div className={styles.orderListOrdRow}>{m.date}</div>
-                  <div className={styles.orderListOrdRow} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div className={styles.orderListOrdRow}>
                     {unitLabel} · {m.fields.length} field{m.fields.length !== 1 ? 's' : ''}
-                    {/* +N views indicator */}
-                    {extraCount > 0 && (
-                      <span className={styles.extraViewsBadge}>+{extraCount} view{extraCount !== 1 ? 's' : ''}</span>
-                    )}
                   </div>
                 </div>
 
