@@ -720,7 +720,7 @@ export default function CustomerDetail({ onMenuClick }) {
           <ReceiptTab
             receipts={receipts}
             customer={customer}
-            onDelete={handleDeleteReceipt}
+            orders={orders} onDelete={handleDeleteReceipt}
             showToast={showToast}
           />
         )}
