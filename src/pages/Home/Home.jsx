@@ -420,8 +420,8 @@ function periodLabel(period) {
 
 // ─────────────────────────────────────────────────────────────
 // HOME ORDER MOSAIC THUMBNAIL
-// Same layout logic as OrdersTab's OrderMosaic, adapted to the
-// Home list card size (listOuter 68px / listInner 50px).
+// Same layout logic as OrdersTab's OrderMosaic, using the same
+// card size as the Orders page (listOuter 80px / listInner 58px).
 //   0 images  → scissors icon
 //   1 image   → single full image
 //   2 images  → left half | right half
