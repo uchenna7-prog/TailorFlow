@@ -8,6 +8,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useAuth }      from '../../contexts/AuthContext'
 import { useTasks }     from '../../contexts/TaskContext'
 import { useCustomers } from '../../contexts/CustomerContext'
+import { useOrders }    from '../../contexts/OrdersContext'
 import { subscribeToOrders } from '../../services/orderService'
 import Header       from '../../components/Header/Header'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
@@ -320,26 +321,122 @@ function AddTaskModal({ isOpen, onClose, onSave, customers }) {
   )
 }
 
+// ── Task Thumbnail Mosaic ─────────────────────────────────────
+// Uses the linked order's items array when the task has an orderId.
+// Falls back to the category icon when no order is linked or
+// the linked order has no images.
+//
+//   1 image  → single full image
+//   2 images → left half | right half
+//   3+ images → large left | right column (top + bottom stacked)
+//               bottom-right shows "+N" overlay when total > 3
+
+function TaskMosaic({ task, orderItemsMap, overdue }) {
+  const catIcon   = CATEGORY_ICONS[task.category] || 'assignment'
+  const iconColor = overdue ? '#ef4444' : task.done ? '#22c55e' : '#818cf8'
+
+  // Only use images when an order was explicitly linked
+  const covers = task.orderId
+    ? (orderItemsMap[task.orderId] || []).map(i => i.imgSrc ?? null).filter(Boolean)
+    : []
+  const total = task.orderId ? (orderItemsMap[task.orderId]?.length ?? 0) : 0
+
+  // ── No linked order images → category icon ──
+  if (!covers.length) {
+    return (
+      <div
+        className={styles.taskListOuter}
+        style={overdue
+          ? { borderColor: 'rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.05)' }
+          : task.done
+          ? { borderColor: 'rgba(34,197,94,0.3)', background: 'rgba(34,197,94,0.04)' }
+          : undefined}
+      >
+        <div className={styles.taskListInner}>
+          <span className="mi" style={{ fontSize: '1.5rem', color: iconColor }}>{catIcon}</span>
+        </div>
+      </div>
+    )
+  }
+
+  // ── 1 image ──
+  if (total === 1) {
+    return (
+      <div className={styles.taskListOuter}>
+        <div className={styles.taskListInner}>
+          <img src={covers[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '10px' }} />
+        </div>
+      </div>
+    )
+  }
+
+  // ── 2 images ──
+  if (total === 2) {
+    return (
+      <div className={styles.taskListOuter}>
+        <div className={`${styles.taskListInner} ${styles.tmMosaicInner}`}>
+          <div className={styles.tmMosaicLeft}>
+            <img src={covers[0]} alt="" className={styles.tmMosaicImg} />
+          </div>
+          <div className={styles.tmMosaicDividerV} />
+          <div className={styles.tmMosaicRight}>
+            <div className={styles.tmMosaicRightCell}>
+              {covers[1]
+                ? <img src={covers[1]} alt="" className={styles.tmMosaicImg} />
+                : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── 3+ images ──
+  const extra = total > 3 ? total - 3 : 0
+  return (
+    <div className={styles.taskListOuter}>
+      <div className={`${styles.taskListInner} ${styles.tmMosaicInner}`}>
+        <div className={styles.tmMosaicLeft}>
+          {covers[0]
+            ? <img src={covers[0]} alt="" className={styles.tmMosaicImg} />
+            : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
+          }
+        </div>
+        <div className={styles.tmMosaicDividerV} />
+        <div className={styles.tmMosaicRight}>
+          <div className={styles.tmMosaicRightCell}>
+            {covers[1]
+              ? <img src={covers[1]} alt="" className={styles.tmMosaicImg} />
+              : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+            }
+          </div>
+          <div className={styles.tmMosaicDividerH} />
+          <div className={`${styles.tmMosaicRightCell} ${extra > 0 ? styles.tmMosaicOverlayWrap : ''}`}>
+            {covers[2]
+              ? <img src={covers[2]} alt="" className={styles.tmMosaicImg} />
+              : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+            }
+            {extra > 0 && <div className={styles.tmMosaicOverlay}>+{extra}</div>}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Task List Item ────────────────────────────────────────────
 
-function TaskCard({ task, onToggle, onDelete, onOpen, isLast }) {
+function TaskCard({ task, onToggle, onDelete, onOpen, isLast, orderItemsMap }) {
   const overdue = isOverdue(task)
-  const catIcon = CATEGORY_ICONS[task.category] || 'assignment'
-  const iconColor = overdue ? '#ef4444' : task.done ? '#22c55e' : '#818cf8'
 
   return (
     <div
       className={`${styles.taskListItem} ${isLast ? styles.taskListItemLast : ''} ${task.done ? styles.taskListItemDone : ''} ${overdue ? styles.taskListItemOverdue : ''}`}
       onClick={onOpen}
     >
-      {/* Left: grey outer box with white inner box */}
-      <div className={styles.taskListOuter} style={overdue ? { borderColor: 'rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.05)' } : task.done ? { borderColor: 'rgba(34,197,94,0.3)', background: 'rgba(34,197,94,0.04)' } : undefined}>
-        <div className={styles.taskListInner}>
-          <span className="mi" style={{ fontSize: '1.5rem', color: iconColor }}>
-            {catIcon}
-          </span>
-        </div>
-      </div>
+      {/* Left: mosaic if order linked, else category icon */}
+      <TaskMosaic task={task} orderItemsMap={orderItemsMap} overdue={overdue} />
 
       {/* Info */}
       <div className={styles.taskListInfo}>
@@ -505,6 +602,15 @@ const TABS = [
 export default function Tasks({ onMenuClick }) {
   const { customers }                               = useCustomers()
   const { tasks, addTask, toggleTask, deleteTask }  = useTasks()
+  const { allOrders }                               = useOrders()
+
+  // Build orderId → items[] lookup for mosaic thumbnails
+  const orderItemsMap = {}
+  for (const order of allOrders) {
+    if (order.id && order.items?.length) {
+      orderItemsMap[String(order.id)] = order.items
+    }
+  }
 
   const [activeTab,  setActiveTab]  = useState('all')
   const [modalOpen,  setModalOpen]  = useState(false)
@@ -683,6 +789,7 @@ export default function Tasks({ onMenuClick }) {
                 onToggle={handleToggle}
                 onDelete={(t) => setConfirmDel(t)}
                 onOpen={() => setDetailTask(task)}
+                orderItemsMap={orderItemsMap}
               />
             ))}
           </div>
