@@ -41,11 +41,25 @@ import waistToAnkleMaleImg        from '../../assets/waistToAnkleMale.jpg'
 import wristMaleImg               from '../../assets/wristMale.jpg'
 
 // ── Female measurement image imports ──────────────────────────
+import neckFemaleImg          from '../../assets/female/neckFemale.jpg'
+import backNeckDepthFemaleImg from '../../assets/female/backNeckDepthFemale.jpg'
+import shoulderFemaleImg      from '../../assets/female/shoulderFemale.jpg'
+import halfShoulderFemaleImg  from '../../assets/female/halfShoulderFemale.jpg'
+import frontShoulderFemaleImg from '../../assets/female/frontShoulderFemale.jpg'
+import backShoulderFemaleImg  from '../../assets/female/backShoulderFemale.jpg'
+import upperChestFemaleImg    from '../../assets/female/upperChestFemale.jpg'
+import bustFemaleImg          from '../../assets/female/bustFemale.jpg'
+import chestFemaleImg         from '../../assets/female/chestFemale.jpg'
+import blouseChestFemaleImg   from '../../assets/female/blouseChestFemale.jpg'
+import blouseBelowBustFemaleImg from '../../assets/female/blouseBelowBust.jpg'
+import stomachFemaleImg       from '../../assets/female/stomachFemale.jpg'
+import waistFemaleImg         from '../../assets/female/waistFemale.jpg'
 import blouseLengthFemaleImg  from '../../assets/female/blouseLengthFemale.jpg'
+import shirtLengthFemaleImg   from '../../assets/female/shirtLengthFemale.jpg'
+import hipFemaleImg           from '../../assets/female/hipFemale.jpg'
 import fullHeightFemaleImg    from '../../assets/female/fullHeightFemale.jpg'
 import kurthiHeightFemaleImg  from '../../assets/female/kurthiHeightFemale.jpg'
-import shirtLengthFemaleImg   from '../../assets/female/shirtLengthFemale.jpg'
-import upperChestFemaleImg    from '../../assets/female/upperChestFemale.jpg'
+import fullSleeveLengthFemaleImg from '../../assets/female/fullSleeveLengthFemale.jpg'
 
 // ── Measurement definitions ───────────────────────────────────
 // NOTE: Only update MALE_MEASUREMENT_IMAGES and MALE_MEASUREMENTS when new images are added.
@@ -102,19 +116,40 @@ const MALE_MEASUREMENT_IMAGES = {
   'Shorts Length':  shortsLengthMaleImg,
 }
 
+// ── Female measurements ordered top → middle → lower body ────
 const FEMALE_MEASUREMENTS = [
-  'Bust', 'Waist', 'Hip', 'Shoulder Width', 'Dress Length',
-  'Sleeve Length', 'Neck', 'Thigh', 'Knee', 'Skirt Length',
-  'Trouser Waist', 'Inseam', 'Blouse Length', 'Under Bust', 'Armhole',
-  'Shirt Length', 'Full Height', 'Kurthi Height',
+  // ── Upper body ──
+  'Neck', 'Back Neck Depth', 'Shoulder', 'Half Shoulder', 'Front Shoulder', 'Back Shoulder',
+  'Upper Chest', 'Bust', 'Chest', 'Blouse Chest', 'Blouse Below Bust',
+  // ── Mid body ──
+  'Stomach', 'Waist', 'Blouse Length', 'Shirt Length',
+  // ── Lower body ──
+  'Hip', 'Full Height', 'Kurthi Height', 'Full Sleeve Length',
 ]
 
 const FEMALE_MEASUREMENT_IMAGES = {
-  'Bust':          upperChestFemaleImg,
-  'Blouse Length': blouseLengthFemaleImg,
-  'Shirt Length':  shirtLengthFemaleImg,
-  'Full Height':   fullHeightFemaleImg,
-  'Kurthi Height': kurthiHeightFemaleImg,
+  // ── Upper body ──
+  'Neck':              neckFemaleImg,
+  'Back Neck Depth':   backNeckDepthFemaleImg,
+  'Shoulder':          shoulderFemaleImg,
+  'Half Shoulder':     halfShoulderFemaleImg,
+  'Front Shoulder':    frontShoulderFemaleImg,
+  'Back Shoulder':     backShoulderFemaleImg,
+  'Upper Chest':       upperChestFemaleImg,
+  'Bust':              bustFemaleImg,
+  'Chest':             chestFemaleImg,
+  'Blouse Chest':      blouseChestFemaleImg,
+  'Blouse Below Bust': blouseBelowBustFemaleImg,
+  // ── Mid body ──
+  'Stomach':           stomachFemaleImg,
+  'Waist':             waistFemaleImg,
+  'Blouse Length':     blouseLengthFemaleImg,
+  'Shirt Length':      shirtLengthFemaleImg,
+  // ── Lower body ──
+  'Hip':               hipFemaleImg,
+  'Full Height':       fullHeightFemaleImg,
+  'Kurthi Height':     kurthiHeightFemaleImg,
+  'Full Sleeve Length': fullSleeveLengthFemaleImg,
 }
 
 // ── Load image as base64 AND return its natural dimensions ────
