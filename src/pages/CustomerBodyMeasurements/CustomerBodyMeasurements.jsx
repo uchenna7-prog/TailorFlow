@@ -41,25 +41,54 @@ import waistToAnkleMaleImg        from '../../assets/waistToAnkleMale.jpg'
 import wristMaleImg               from '../../assets/wristMale.jpg'
 
 // ── Female measurement image imports ──────────────────────────
-import neckFemaleImg          from '../../assets/female/neckFemale.jpg'
-import backNeckDepthFemaleImg from '../../assets/female/backNeckDepthFemale.jpg'
-import shoulderFemaleImg      from '../../assets/female/shoulderFemale.jpg'
-import halfShoulderFemaleImg  from '../../assets/female/halfShoulderFemale.jpg'
-import frontShoulderFemaleImg from '../../assets/female/frontShoulderFemale.jpg'
-import backShoulderFemaleImg  from '../../assets/female/backShoulderFemale.jpg'
-import upperChestFemaleImg    from '../../assets/female/upperChestFemale.jpg'
-import bustFemaleImg          from '../../assets/female/bustFemale.jpg'
-import chestFemaleImg         from '../../assets/female/chestFemale.jpg'
-import blouseChestFemaleImg   from '../../assets/female/blouseChestFemale.jpg'
-import blouseBelowBustFemaleImg from '../../assets/female/blouseBelowBust.jpg'
-import stomachFemaleImg       from '../../assets/female/stomachFemale.jpg'
-import waistFemaleImg         from '../../assets/female/waistFemale.jpg'
-import blouseLengthFemaleImg  from '../../assets/female/blouseLengthFemale.jpg'
-import shirtLengthFemaleImg   from '../../assets/female/shirtLengthFemale.jpg'
-import hipFemaleImg           from '../../assets/female/hipFemale.jpg'
-import fullHeightFemaleImg    from '../../assets/female/fullHeightFemale.jpg'
-import kurthiHeightFemaleImg  from '../../assets/female/kurthiHeightFemale.jpg'
-import fullSleeveLengthFemaleImg from '../../assets/female/fullSleeveLengthFemale.jpg'
+// Upper body
+import neckFemaleImg                            from '../../assets/female/neckFemale.jpg'
+import frontNeckDepthFemaleImg                  from '../../assets/female/frontNeckDepthFemale.jpg'
+import backNeckDepthFemaleImg                   from '../../assets/female/backNeckDepthFemale.jpg'
+import shoulderFemaleImg                        from '../../assets/female/shoulderFemale.jpg'
+import halfShoulderFemaleImg                    from '../../assets/female/halfShoulderFemale.jpg'
+import frontShoulderFemaleImg                   from '../../assets/female/frontShoulderFemale.jpg'
+import backShoulderFemaleImg                    from '../../assets/female/backShoulderFemale.jpg'
+import shoulderToApexFemaleImg                  from '../../assets/female/shoulderToApexFemale.jpg'
+import apexToApexFemaleImg                      from '../../assets/female/apexToApexFemale.jpg'
+import upperChestFemaleImg                      from '../../assets/female/upperChestFemale.jpg'
+import bustFemaleImg                            from '../../assets/female/bustFemale.jpg'
+import chestFemaleImg                           from '../../assets/female/chestFemale.jpg'
+import blouseChestFemaleImg                     from '../../assets/female/blouseChestFemale.jpg'
+import blouseBelowBustFemaleImg                 from '../../assets/female/blouseBelowBust.jpg'
+import armHoleFemaleImg                         from '../../assets/female/armHoleFemale.jpg'
+import bicepsFemaleImg                          from '../../assets/female/bicepsFemale.jpg'
+import armLengthFemaleImg                       from '../../assets/female/armLengthFemale.jpg'
+import elbowLengthFemaleImg                     from '../../assets/female/elbowLengthFemale.jpg'
+import sleeveLengthHalfFemaleImg                from '../../assets/female/sleeveLengthHalfFemale.jpg'
+import capSleeveFemaleImg                       from '../../assets/female/capSleeveFemale.jpg'
+import capSleeveCircularFemaleImg               from '../../assets/female/capSleeveCircularFemale.jpg'
+import elbowCircularFemaleImg                   from '../../assets/female/elbowCircularFemale.jpg'
+import threeFourthSleeveLengthFemaleImg         from '../../assets/female/threeFourthSleeveLengthFemale.jpg'
+import threeFourthSleeveLengthCircularFemaleImg from '../../assets/female/threeFourthSleeveLengthCircularFemale.jpg'
+import fullSleeveLengthFemaleImg                from '../../assets/female/fullSleeveLengthFemale.jpg'
+import fullSleeveLengthCircularFemaleImg        from '../../assets/female/fullSleeveLengthCircularFemale.jpg'
+import wristFemaleImg                           from '../../assets/female/wristFemale.jpg'
+// Mid body
+import stomachFemaleImg                         from '../../assets/female/stomachFemale.jpg'
+import waistFemaleImg                           from '../../assets/female/waistFemale.jpg'
+import blouseLengthFemaleImg                    from '../../assets/female/blouseLengthFemale.jpg'
+import shirtLengthFemaleImg                     from '../../assets/female/shirtLengthFemale.jpg'
+import stomachLengthFemaleImg                   from '../../assets/female/stomachLengthFemale.jpg'
+import waistLengthFemaleImg                     from '../../assets/female/waistLengthFemale.jpg'
+// Lower body
+import hipFemaleImg                             from '../../assets/female/hipFemale.jpg'
+import hipLengthFemaleImg                       from '../../assets/female/hipLengthFemale.jpg'
+import crotchFemaleImg                          from '../../assets/female/crotchFemale.jpg'
+import thighFemaleImg                           from '../../assets/female/thighFemale.jpg'
+import thighLengthFemaleImg                     from '../../assets/female/thighLengthFemale.jpg'
+import kneeLengthFemaleImg                      from '../../assets/female/kneeLengthFemale.jpg'
+import calfFemaleImg                            from '../../assets/female/calfFemale.jpg'
+import calfToAnkleFemaleImg                     from '../../assets/female/calfToAnkleFemale.jpg'
+import ankleFemaleImg                           from '../../assets/female/ankleFemale.jpg'
+import wristToAnkleFemaleImg                    from '../../assets/female/wristToAnkleFemale.jpg'
+import fullHeightFemaleImg                      from '../../assets/female/fullHeightFemale.jpg'
+import kurthiHeightFemaleImg                    from '../../assets/female/kurthiHeightFemale.jpg'
 
 // ── Measurement definitions ───────────────────────────────────
 // NOTE: Only update MALE_MEASUREMENT_IMAGES and MALE_MEASUREMENTS when new images are added.
@@ -119,37 +148,76 @@ const MALE_MEASUREMENT_IMAGES = {
 // ── Female measurements ordered top → middle → lower body ────
 const FEMALE_MEASUREMENTS = [
   // ── Upper body ──
-  'Neck', 'Back Neck Depth', 'Shoulder', 'Half Shoulder', 'Front Shoulder', 'Back Shoulder',
+  'Neck', 'Front Neck Depth', 'Back Neck Depth',
+  'Shoulder', 'Half Shoulder', 'Front Shoulder', 'Back Shoulder',
+  'Shoulder To Apex', 'Apex To Apex',
   'Upper Chest', 'Bust', 'Chest', 'Blouse Chest', 'Blouse Below Bust',
+  'Arm Hole', 'Biceps', 'Arm Length',
+  'Elbow Length', 'Sleeve Length Half',
+  'Cap Sleeve', 'Cap Sleeve Circular',
+  'Elbow Circular',
+  'Three Fourth Sleeve Length', 'Three Fourth Sleeve Length Circular',
+  'Full Sleeve Length', 'Full Sleeve Length Circular',
+  'Wrist',
   // ── Mid body ──
-  'Stomach', 'Waist', 'Blouse Length', 'Shirt Length',
+  'Stomach', 'Waist',
+  'Blouse Length', 'Shirt Length', 'Stomach Length', 'Waist Length',
   // ── Lower body ──
-  'Hip', 'Full Height', 'Kurthi Height', 'Full Sleeve Length',
+  'Hip', 'Hip Length', 'Crotch',
+  'Thigh', 'Thigh Length', 'Knee Length',
+  'Calf', 'Calf To Ankle', 'Ankle',
+  'Wrist To Ankle', 'Full Height', 'Kurthi Height',
 ]
 
 const FEMALE_MEASUREMENT_IMAGES = {
   // ── Upper body ──
-  'Neck':              neckFemaleImg,
-  'Back Neck Depth':   backNeckDepthFemaleImg,
-  'Shoulder':          shoulderFemaleImg,
-  'Half Shoulder':     halfShoulderFemaleImg,
-  'Front Shoulder':    frontShoulderFemaleImg,
-  'Back Shoulder':     backShoulderFemaleImg,
-  'Upper Chest':       upperChestFemaleImg,
-  'Bust':              bustFemaleImg,
-  'Chest':             chestFemaleImg,
-  'Blouse Chest':      blouseChestFemaleImg,
-  'Blouse Below Bust': blouseBelowBustFemaleImg,
+  'Neck':                                    neckFemaleImg,
+  'Front Neck Depth':                        frontNeckDepthFemaleImg,
+  'Back Neck Depth':                         backNeckDepthFemaleImg,
+  'Shoulder':                                shoulderFemaleImg,
+  'Half Shoulder':                           halfShoulderFemaleImg,
+  'Front Shoulder':                          frontShoulderFemaleImg,
+  'Back Shoulder':                           backShoulderFemaleImg,
+  'Shoulder To Apex':                        shoulderToApexFemaleImg,
+  'Apex To Apex':                            apexToApexFemaleImg,
+  'Upper Chest':                             upperChestFemaleImg,
+  'Bust':                                    bustFemaleImg,
+  'Chest':                                   chestFemaleImg,
+  'Blouse Chest':                            blouseChestFemaleImg,
+  'Blouse Below Bust':                       blouseBelowBustFemaleImg,
+  'Arm Hole':                                armHoleFemaleImg,
+  'Biceps':                                  bicepsFemaleImg,
+  'Arm Length':                              armLengthFemaleImg,
+  'Elbow Length':                            elbowLengthFemaleImg,
+  'Sleeve Length Half':                      sleeveLengthHalfFemaleImg,
+  'Cap Sleeve':                              capSleeveFemaleImg,
+  'Cap Sleeve Circular':                     capSleeveCircularFemaleImg,
+  'Elbow Circular':                          elbowCircularFemaleImg,
+  'Three Fourth Sleeve Length':              threeFourthSleeveLengthFemaleImg,
+  'Three Fourth Sleeve Length Circular':     threeFourthSleeveLengthCircularFemaleImg,
+  'Full Sleeve Length':                      fullSleeveLengthFemaleImg,
+  'Full Sleeve Length Circular':             fullSleeveLengthCircularFemaleImg,
+  'Wrist':                                   wristFemaleImg,
   // ── Mid body ──
-  'Stomach':           stomachFemaleImg,
-  'Waist':             waistFemaleImg,
-  'Blouse Length':     blouseLengthFemaleImg,
-  'Shirt Length':      shirtLengthFemaleImg,
+  'Stomach':                                 stomachFemaleImg,
+  'Waist':                                   waistFemaleImg,
+  'Blouse Length':                           blouseLengthFemaleImg,
+  'Shirt Length':                            shirtLengthFemaleImg,
+  'Stomach Length':                          stomachLengthFemaleImg,
+  'Waist Length':                            waistLengthFemaleImg,
   // ── Lower body ──
-  'Hip':               hipFemaleImg,
-  'Full Height':       fullHeightFemaleImg,
-  'Kurthi Height':     kurthiHeightFemaleImg,
-  'Full Sleeve Length': fullSleeveLengthFemaleImg,
+  'Hip':                                     hipFemaleImg,
+  'Hip Length':                              hipLengthFemaleImg,
+  'Crotch':                                  crotchFemaleImg,
+  'Thigh':                                   thighFemaleImg,
+  'Thigh Length':                            thighLengthFemaleImg,
+  'Knee Length':                             kneeLengthFemaleImg,
+  'Calf':                                    calfFemaleImg,
+  'Calf To Ankle':                           calfToAnkleFemaleImg,
+  'Ankle':                                   ankleFemaleImg,
+  'Wrist To Ankle':                          wristToAnkleFemaleImg,
+  'Full Height':                             fullHeightFemaleImg,
+  'Kurthi Height':                           kurthiHeightFemaleImg,
 }
 
 // ── Load image as base64 AND return its natural dimensions ────
@@ -207,8 +275,8 @@ async function exportPDF(customer, allEntries, imgMap) {
   const COL_COUNT = 2
   const GAP       = 5
   const COL_W     = (CONTENT_W - GAP) / COL_COUNT
-  const ROW_H     = 28      // card height
-  const IMG_BOX   = 22      // square box reserved for the image (contain inside it)
+  const ROW_H     = 28
+  const IMG_BOX   = 22
   const CARD_PAD  = 4
 
   // ── Header band ──
@@ -231,7 +299,6 @@ async function exportPDF(customer, allEntries, imgMap) {
     const { field, value } = allEntries[i]
     const col = i % COL_COUNT
 
-    // Page break at the start of a new row
     if (col === 0 && i > 0 && y + ROW_H > PAGE_H - 14) {
       doc.addPage()
       y = 14
@@ -240,20 +307,17 @@ async function exportPDF(customer, allEntries, imgMap) {
     const cardX = MARGIN + col * (COL_W + GAP)
     const cardY = y
 
-    // Card background + border
     doc.setFillColor(247, 247, 247)
     doc.setDrawColor(218, 218, 218)
     doc.setLineWidth(0.3)
     doc.roundedRect(cardX, cardY, COL_W, ROW_H, 2.5, 2.5, 'FD')
 
-    // Image — load with natural dimensions, then fit into IMG_BOX × IMG_BOX
     const imgSrc = imgMap[field] || null
     if (imgSrc) {
       const result = await loadImage(imgSrc)
       if (result) {
         try {
           const { w, h } = fitInBox(result.width, result.height, IMG_BOX, IMG_BOX)
-          // Center the fitted image within the reserved IMG_BOX area
           const imgAreaX = cardX + CARD_PAD
           const imgAreaY = cardY + (ROW_H - IMG_BOX) / 2
           const imgX = imgAreaX + (IMG_BOX - w) / 2
@@ -263,23 +327,19 @@ async function exportPDF(customer, allEntries, imgMap) {
       }
     }
 
-    // Text starts after the image area (or at card edge if no image)
     const textX    = imgSrc ? cardX + CARD_PAD + IMG_BOX + 4 : cardX + CARD_PAD
     const maxTextW = COL_W - (imgSrc ? CARD_PAD + IMG_BOX + 4 + CARD_PAD : CARD_PAD * 2)
 
-    // Field label
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(6)
     doc.setTextColor(130, 130, 130)
     doc.text(field.toUpperCase(), textX, cardY + ROW_H / 2 - 2.5, { maxWidth: maxTextW })
 
-    // Value
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(14)
     doc.setTextColor(18, 18, 18)
     doc.text(`${value}"`, textX, cardY + ROW_H / 2 + 6, { maxWidth: maxTextW })
 
-    // Advance row after the second column (or last item)
     if (col === COL_COUNT - 1 || i === allEntries.length - 1) {
       y += ROW_H + 4
     }
@@ -310,7 +370,6 @@ function EditMeasurementsModal({ isOpen, customer, onClose, onSave }) {
   const [customFields, setCustomFields] = useState([])
   const [saving,       setSaving]       = useState(false)
 
-  // Pre-fill standard fields + restore any previously saved custom fields
   useEffect(() => {
     if (!isOpen || !customer) return
     const saved = customer.bodyMeasurements || {}
