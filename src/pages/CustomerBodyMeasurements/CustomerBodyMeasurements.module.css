@@ -113,9 +113,10 @@
 
 .imgRowLast { border-bottom: none; }
 
+/* ↑ UPDATED: was 88px × 88px */
 .measureImg {
-  width: 88px;
-  height: 88px;
+  width: 130px;
+  height: 130px;
   object-fit: cover;
   flex-shrink: 0;
   border-radius: 10px;
@@ -295,9 +296,10 @@
 
 .editImgRowLast { border-bottom: none; }
 
+/* ↑ UPDATED: was 100px × 100px */
 .editMeasureImg {
-  width: 100px;
-  height: 100px;
+  width: 130px;
+  height: 130px;
   object-fit: cover;
   flex-shrink: 0;
   border-radius: 8px;
