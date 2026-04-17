@@ -22,6 +22,11 @@ export const DEFAULTS = {
   brandAddress: '',
   brandWebsite: '',
 
+  // ── Account / Payment Details (shown on invoices) ──
+  accountBank: '',
+  accountNumber: '',
+  accountName: '',
+
   // ── Invoice ──
   invoicePrefix: 'INV',
   invoiceCurrency: '₦',
