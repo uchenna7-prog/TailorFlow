@@ -18,7 +18,7 @@ const TAILOR_ROWS = [
 ]
 
 // ══════════════════════════════════════════════════════════════
-// GROUP A — Clean & Minimal (No Logo, No Signature)
+// TEMPLATE 1 — Centred Line Invoice
 // ══════════════════════════════════════════════════════════════
 
 function EditableTemplate() {
@@ -75,6 +75,10 @@ function EditableTemplate() {
   )
 }
 
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 2 — Three-Column Info Bar
+// ══════════════════════════════════════════════════════════════
+
 function FreeTemplate() {
   return (
     <div className={styles.pBase}>
@@ -125,7 +129,7 @@ function FreeTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// GROUP B — Logo Placeholder + No Signature
+// TEMPLATE 3 — Banner Header
 // ══════════════════════════════════════════════════════════════
 
 function CustomTemplate() {
@@ -185,12 +189,10 @@ function CustomTemplate() {
   )
 }
 
-// ──────────────────────────────────────────────────────────────
-// Template 4 — Printable Clothing Store Style
-// Clean layout: INVOICE title top-left, date/invoice# top-right,
-// Bill From / Bill To side by side, line-item table, totals,
-// payment terms + notes at bottom. Matches invoicequick reference.
-// ──────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 4 — Printable Classic
+// ══════════════════════════════════════════════════════════════
+
 function PrintableTemplate() {
   const items = [
     { desc: 'Custom Agbada Sewing',    price: '₦8,500',  qty: 1, total: '₦8,500'  },
@@ -202,10 +204,7 @@ function PrintableTemplate() {
   ]
   return (
     <div className={styles.p4Base}>
-      {/* Top bar: tan/gold accent line */}
       <div className={styles.p4GoldBar} />
-
-      {/* Header: INVOICE word + meta */}
       <div className={styles.p4Header}>
         <div className={styles.p4InvoiceWord}>INVOICE</div>
         <div className={styles.p4HeaderRight}>
@@ -223,8 +222,6 @@ function PrintableTemplate() {
           </div>
         </div>
       </div>
-
-      {/* Bill From / Bill To */}
       <div className={styles.p4BillRow}>
         <div className={styles.p4BillBlock}>
           <div className={styles.p4BillLabel}>BILL FROM</div>
@@ -240,11 +237,7 @@ function PrintableTemplate() {
           <div className={styles.p4BillInfo}>Port Harcourt, Rivers</div>
         </div>
       </div>
-
-      {/* Divider */}
       <div className={styles.p4Divider} />
-
-      {/* Table */}
       <div className={styles.p4TableHead}>
         <span style={{ flex: 3 }}>Description</span>
         <span>Price</span>
@@ -259,16 +252,12 @@ function PrintableTemplate() {
           <span>{it.total}</span>
         </div>
       ))}
-
-      {/* Totals */}
       <div className={styles.p4TotalsArea}>
         <div className={styles.p4TotRow}><span>Subtotal</span><span>₦56,200</span></div>
         <div className={styles.p4TotRow}><span>Tax</span><span>₦0.00</span></div>
         <div className={styles.p4TotDivider} />
         <div className={styles.p4TotBold}><span>Total Due</span><span>₦56,200</span></div>
       </div>
-
-      {/* Footer: Payment Terms + Notes */}
       <div className={styles.p4Footer}>
         <div className={styles.p4FootBlock}>
           <div className={styles.p4FootLabel}>Payment Terms:</div>
@@ -286,7 +275,7 @@ function PrintableTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// GROUP C — Warm Minimal
+// TEMPLATE 5 — Warm Beige Classic
 // ══════════════════════════════════════════════════════════════
 
 function CanvaTemplate() {
@@ -341,7 +330,7 @@ function CanvaTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// GROUP D — Dark Header Corporate
+// TEMPLATE 6 — Dark Header Corporate
 // ══════════════════════════════════════════════════════════════
 
 function DarkHeaderTemplate() {
@@ -414,7 +403,7 @@ function DarkHeaderTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// GROUP E — Bold From/To
+// TEMPLATE 7 — Bold From/To
 // ══════════════════════════════════════════════════════════════
 
 function RedBoldTemplate() {
@@ -484,7 +473,7 @@ function RedBoldTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// GROUP F — Brand Colour Box
+// TEMPLATE 8 — Green Accent
 // ══════════════════════════════════════════════════════════════
 
 function GreenAccentTemplate() {
@@ -547,6 +536,10 @@ function GreenAccentTemplate() {
   )
 }
 
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 9 — Teal Geometric
+// ══════════════════════════════════════════════════════════════
+
 function TealGeometricTemplate() {
   return (
     <div className={styles.t9Base}>
@@ -607,7 +600,7 @@ function TealGeometricTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// GROUP G — Angular / Diagonal Shapes
+// TEMPLATE 10 — Full-Width Diagonal
 // ══════════════════════════════════════════════════════════════
 
 function PinkDiagonalTemplate() {
@@ -679,119 +672,8 @@ function PinkDiagonalTemplate() {
   )
 }
 
-// ──────────────────────────────────────────────────────────────
-// Template 12 — Black Trapezoid (Angular Header & Corner Shapes)
-// Improved trapezoid shapes to match reference image more closely.
-// Top-left: wide black trapezoid with diagonal right edge.
-// Bottom-right: two overlapping angular black trapezoids.
-// ──────────────────────────────────────────────────────────────
-function BlackGeometricTemplate() {
-  return (
-    <div className={styles.t12Base}>
-      {/* ── Header ── */}
-      <div className={styles.t12Header}>
-        {/* Black trapezoid logo block — wider, more dominant diagonal */}
-        <div className={styles.t12LogoTrap}>
-          <span className="mi" style={{ fontSize:11,color:'#fff',marginRight:3 }}>checkroom</span>
-          <span className={styles.t12LogoText}>LOGO</span>
-        </div>
-        {/* Contact lines right side */}
-        <div className={styles.t12HeaderContacts}>
-          <div className={styles.t12ContactItem}>
-            <span className="mi" style={{ fontSize:7,marginRight:3 }}>call</span>
-            <span>+234 801 234 5678 / +234 803 987 6543</span>
-          </div>
-          <div className={styles.t12ContactItem}>
-            <span className="mi" style={{ fontSize:7,marginRight:3 }}>mail</span>
-            <span>info@adeolacouture.ng · www.adeolacouture.ng</span>
-          </div>
-          <div className={styles.t12ContactItem}>
-            <span className="mi" style={{ fontSize:7,marginRight:3 }}>location_on</span>
-            <span>14 Bode Thomas Street, Surulere, Lagos</span>
-          </div>
-        </div>
-        {/* Top-right corner bracket */}
-        <div className={styles.t12CornerBracketTR} />
-      </div>
-
-      {/* Bottom-left corner bracket */}
-      <div className={styles.t12CornerBracketBL} />
-
-      {/* ── INVOICE Title ── */}
-      <div className={styles.t12TitleRow}>
-        <div className={styles.t12InvoiceTitle}>INVOICE</div>
-      </div>
-
-      {/* ── Client + Balance ── */}
-      <div className={styles.t12ClientRow}>
-        <div>
-          <div className={styles.t12ClientName}>Mrs. Chiamaka Okonkwo</div>
-          <div className={styles.t12ClientInfo}>P. +234 907 654 3210</div>
-          <div className={styles.t12ClientInfo}>E. chiamaka@okonkwoltd.com</div>
-          <div className={styles.t12ClientInfo}>A. 33 Trans-Amadi Rd, Port Harcourt</div>
-        </div>
-        <div style={{ textAlign:'right' }}>
-          <div className={styles.t12BalLabel}>Balance Due</div>
-          <div className={styles.t12BalAmt}>₦56,200/-</div>
-          <div className={styles.t12BalDate}>MONDAY 7th April, 2025</div>
-        </div>
-      </div>
-
-      {/* ── Table ── */}
-      <div className={styles.t12TableHead}>
-        <span style={{ flex:3 }}>DESCRIPTION</span>
-        <span>PRICE</span><span>QTY</span><span>SUBTOTAL</span>
-      </div>
-      {[
-        ['Custom Agbada Sewing','₦8,500','1 pc','₦8,500'],
-        ['Senator Suit Stitching','₦6,200','2 pcs','₦12,400'],
-        ['Ankara Dress Alteration','₦2,500','3 pcs','₦7,500'],
-        ['Bridal Gown Fitting','₦15,000','1 pc','₦15,000'],
-        ['Kaftan Embroidery','₦4,000','2 pcs','₦8,000'],
-      ].map(([d,p,u,s])=>(
-        <div key={d} className={styles.t12TableRow}>
-          <span style={{ flex:3 }}>
-            <div className={styles.t12ItemName}>{d}</div>
-            <div className={styles.t12ItemDesc}>Expert hand-finished tailoring work</div>
-          </span>
-          <span>{p}</span><span>{u}</span><span>{s}</span>
-        </div>
-      ))}
-
-      {/* ── Due Bar ── */}
-      <div className={styles.t12DueBar}>
-        <span>DUE BY 15th April, 2025</span>
-        <span>TOTAL: ₦51,400/-</span>
-      </div>
-
-      {/* ── Footer ── */}
-      <div className={styles.t12FootRow}>
-        <div>
-          <div className={styles.t12FootLabel}>PAYMENT / METHOD</div>
-          <div className={styles.t12FootInfo}>Bank Name: GT Bank Nigeria</div>
-          <div className={styles.t12FootInfo}>Account No: 0123 456 789</div>
-          <div className={styles.t12FootInfo}>Swift Code: GTBINGLA</div>
-          <div style={{ marginTop:8 }}>
-            <div className={styles.t12FootLabel}>TERMS &amp; CONDITIONS</div>
-            <div className={styles.t12FootInfo}>Garments not collected within 30 days become property of studio. Late payments attract 5% fee.</div>
-          </div>
-        </div>
-        <div style={{ textAlign:'right', flexShrink:0 }}>
-          <div className={styles.t12SignScribble}>~ A. Fashola ~</div>
-          <div className={styles.t12SignLine} />
-          <div className={styles.t12SignLabel}>Authorised Sign</div>
-        </div>
-      </div>
-
-      {/* ── Bottom-right angular black shapes — improved trapezoids ── */}
-      <div className={styles.t12CornerOuter} />
-      <div className={styles.t12CornerInner} />
-    </div>
-  )
-}
-
 // ══════════════════════════════════════════════════════════════
-// GROUP H — Blue Professional
+// TEMPLATE 11 — Blue Clean Corporate
 // ══════════════════════════════════════════════════════════════
 
 function BlueCleanTemplate() {
@@ -962,71 +844,42 @@ function FullModal({ title, onBack, onSave, children }) {
 
 const TEMPLATE_GROUPS = [
   {
-    groupLabel: 'Clean & Minimal',
-    groupDesc: 'No logo, no signature',
+    groupLabel: 'Essential',
+    groupDesc: 'Straightforward and clean — nothing in the way',
     groupIcon: 'article',
     templates: [
-      { id:'editable', label:'1. Centred Line Invoice', desc:'Bill To, payment terms and notes', Component:EditableTemplate },
-      { id:'free',     label:'2. Three-Column Info Bar', desc:'Logo placeholder with grey footer', Component:FreeTemplate },
+      { id:'editable',  label:'1. Centred Line Invoice',      desc:'Centred header with flanking lines',                  Component:EditableTemplate },
+      { id:'free',      label:'2. Three-Column Info Bar',     desc:'Big invoice number with three-column info grid',      Component:FreeTemplate },
+      { id:'printable', label:'4. Side-by-Side Classic',      desc:'Side-by-side billing blocks with accent top bar',     Component:PrintableTemplate },
+      { id:'canva',     label:'5. Soft Divider Layout',       desc:'Soft header, dividers, sender details at base',       Component:CanvaTemplate },
     ],
   },
   {
-    groupLabel: 'Logo Placeholder',
-    groupDesc: 'No signature',
-    groupIcon: 'badge',
-    templates: [
-      { id:'custom',    label:'3. Purple Banner', desc:'Dashed logo box, purple header and footer', Component:CustomTemplate },
-      { id:'printable', label:'4. Printable Classic', desc:'Bill From/To side by side, clean totals', Component:PrintableTemplate },
-    ],
-  },
-  {
-    groupLabel: 'Warm Minimal',
-    groupDesc: 'Payment info, no logo',
-    groupIcon: 'receipt',
-    templates: [
-      { id:'canva', label:'5. Warm Beige Classic', desc:'Bold title with sender info footer', Component:CanvaTemplate },
-    ],
-  },
-  {
-    groupLabel: 'Dark Header Corporate',
-    groupDesc: 'Logo with multi-column header',
-    groupIcon: 'business',
-    templates: [
-      { id:'darkheader', label:'6. Black Header Corporate', desc:'Logo, Ship To, Bill To and payment columns', Component:DarkHeaderTemplate },
-    ],
-  },
-  {
-    groupLabel: 'Bold From / To',
-    groupDesc: 'Numbered items with red accent',
+    groupLabel: 'Structured',
+    groupDesc: 'Every detail in its place — easy to scan',
     groupIcon: 'format_list_numbered',
     templates: [
-      { id:'redbold', label:'7. Red Bold From/To', desc:'Numbered rows with red total bar', Component:RedBoldTemplate },
+      { id:'redbold',   label:'7. Field-Labelled From / To',  desc:'Field-labelled From/To with numbered line items',     Component:RedBoldTemplate },
+      { id:'blueclean', label:'11. Info Bar with Payment Tiles', desc:'Three-column header, info bar and payment option tiles', Component:BlueCleanTemplate },
     ],
   },
   {
-    groupLabel: 'Brand Colour Box',
-    groupDesc: 'Logo, colour panel and signature',
+    groupLabel: 'Branded',
+    groupDesc: 'Built around your logo and colours',
     groupIcon: 'palette',
     templates: [
-      { id:'greenaccent',   label:'8. Green Accent', desc:'Teal invoice box with green info panel', Component:GreenAccentTemplate },
-      { id:'tealgeometric', label:'9. Teal Geometric', desc:'Teal table header with dark total bar', Component:TealGeometricTemplate },
+      { id:'custom',        label:'3. Full-Bleed Banner',         desc:'Full-bleed banner header with matching footer',        Component:CustomTemplate },
+      { id:'darkheader',    label:'6. Heavy Header Bar',          desc:'Heavy header bar with three-column info strip',        Component:DarkHeaderTemplate },
+      { id:'greenaccent',   label:'8. Side Panel with Invoice Box', desc:'Inline invoice box, side-by-side totals and client panel', Component:GreenAccentTemplate },
+      { id:'tealgeometric', label:'9. Accent Table Header',       desc:'Accent table header with corner signature block',      Component:TealGeometricTemplate },
     ],
   },
   {
-    groupLabel: 'Angular & Diagonal',
-    groupDesc: 'Full-width colour bands',
+    groupLabel: 'Statement',
+    groupDesc: 'Bold layouts that leave an impression',
     groupIcon: 'style',
     templates: [
-      { id:'pinkdiagonal',   label:'10. Pink Full Diagonal', desc:'Top pink band with sign bottom-right', Component:PinkDiagonalTemplate },
-      { id:'blackgeometric', label:'12. Black Trapezoid', desc:'Angular header and corner shapes with sign', Component:BlackGeometricTemplate },
-    ],
-  },
-  {
-    groupLabel: 'Blue Professional',
-    groupDesc: 'Logo, amount and payment boxes',
-    groupIcon: 'corporate_fare',
-    templates: [
-      { id:'blueclean', label:'11. Blue Clean', desc:'Hex logo, blue info bar and 3 payment boxes', Component:BlueCleanTemplate },
+      { id:'pinkdiagonal', label:'10. Diagonal Header',           desc:'Diagonal full-bleed header with corner signature',     Component:PinkDiagonalTemplate },
     ],
   },
 ]
@@ -1038,9 +891,9 @@ function TemplateModal({ isOpen, currentTemplate, onClose, onSelect }) {
     <div className={styles.fullOverlay}>
       <Header type="back" title="Invoice Templates" onBackClick={onClose} customActions={[{label:'Select',onClick:()=>{onSelect(selected);onClose()}}]} />
       <div className={styles.fullContent}>
-        {TEMPLATE_GROUPS.map(group=>(
+        {TEMPLATE_GROUPS.map((group, groupIndex) => (
           <div key={group.groupLabel}>
-            <div className={styles.groupHeader}>
+            <div className={`${styles.groupHeader} ${groupIndex === 0 ? styles.groupHeaderFirst : ''}`}>
               <div className={styles.groupHeaderInner}>
                 <span className={styles.groupLabel}>{group.groupLabel}</span>
                 {group.groupDesc && <span className={styles.groupDesc}>{group.groupDesc}</span>}
