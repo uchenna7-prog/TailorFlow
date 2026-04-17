@@ -5,37 +5,38 @@
 .sectionHeader { display: flex; align-items: center; gap: 7px; padding: 28px 16px 12px; }
 .sectionLabel { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); }
 
-/* ── GROUP HEADER (template picker) — dark pill with white text ── */
+/* ── GROUP HEADER (template picker) ── */
 .groupHeader {
-  padding: 28px 0 10px;
+  padding: 56px 16px 20px; /* Increased top padding for better separation */
+  text-align: center;
 }
 .groupHeaderInner {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  background: var(--accent);
-  border-radius: 10px;
-  padding: 10px 16px;
-  margin: 0 0;
+  gap: 4px;
+  background: none; /* Removed colored div */
+  border-radius: 0;
+  padding: 0 0 12px;
+  margin: 0;
+  border-bottom: 4px solid var(--accent); /* Thick line below text */
 }
 .groupLabel {
-  font-size: 0.72rem;
-  font-weight: 900;
-  color: var(--bg);
-  letter-spacing: 0.06em;
+  font-size: 1.1rem; /* Bigger font size */
+  font-weight: 900; /* Bolder text */
+  color: var(--text);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .groupDesc {
-  font-size: 2.5rem;
-  text-align:center;
+  font-size: 0.75rem;
   font-weight: 500;
-  color: var(--bg);
-  opacity: 0.65;
+  color: var(--text3);
+  opacity: 0.8;
   letter-spacing: 0.02em;
 }
 
 /* ── PREMIUM BADGE ── */
-.premiumBadge { display:inline-flex;align-items:center;gap:3px;color:var(--bg);font-size:0.55rem;font-weight:900;letter-spacing:0.06em;padding:2px 7px 2px 5px;border-radius:20px;margin-left:2px; }
+.premiumBadge { display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--accent),#b8942a);color:var(--bg);font-size:0.55rem;font-weight:900;letter-spacing:0.06em;padding:2px 7px 2px 5px;border-radius:20px;margin-left:2px; }
 
 /* ── ROW ── */
 .row { display:flex;align-items:center;gap:16px;padding:16px;border-bottom:1px solid var(--border);background:var(--bg); }
@@ -93,7 +94,6 @@
 .pBase { padding:16px;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:8px;min-height:400px;display:flex;flex-direction:column; }
 .pSmallCap { font-size:6.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;margin-bottom:1px; }
 
-/* Shared table header+row (Description | Price | Qty | Total) */
 .pTHead2 { display:flex;align-items:center;font-weight:800;border-bottom:1.5px solid #1a1a1a;padding-bottom:4px;margin-bottom:6px;font-size:7px; }
 .pTHead2 span { flex:1;text-align:right; }
 .pTHead2 span:first-child { flex:3;text-align:left; }
@@ -109,7 +109,6 @@
 .pBold { font-weight:900;font-size:9px;border-top:1px solid #1a1a1a;margin-top:4px;padding-top:3px; }
 .pTotalBox { background:#f8fafc;padding:5px 8px;font-weight:900;font-size:9px;border-left:3px solid #1a1a1a; }
 
-/* Template 1 — centred INVOICE between lines */
 .pBrandCenter { text-align:center; }
 .pBrandName { font-size:13px;font-weight:800; }
 .pBrandSub { color:#666;font-size:7px;margin-top:1px; }
@@ -119,7 +118,6 @@
 .pInvoiceLineTan { flex:1;height:1.5px;background:#c8a96e; }
 .pInvoiceWordCentre { font-size:16px;font-weight:900;letter-spacing:0.12em;white-space:nowrap;padding:0 6px; }
 
-/* Template 2 free elements */
 .pLargeTitle { font-size:20px;font-weight:900; }
 .pSubNo { font-size:8px;color:#666; }
 .pLogoPlaceholderBig { background:#f3f4f6;border:1px solid #e5e7eb;padding:12px 16px;font-weight:800;color:#9ca3af;font-size:7px; }
@@ -131,7 +129,6 @@
 .pFootSection { flex:1;font-size:6.5px;line-height:1.5; }
 .pFooterGray { background:#f2f2f2;padding:8px;text-align:center;font-weight:700;font-size:7.5px;margin-top:auto; }
 
-/* Template 3 — purple banner */
 .pPurpleBanner { background:#b39ddb;color:#fff;padding:18px 16px;display:flex;justify-content:space-between;align-items:center; }
 .pLogoBoxWhite { border:1.5px dashed rgba(255,255,255,0.5);padding:8px 12px;font-size:6.5px;color:rgba(255,255,255,0.9); }
 .pLargeTitleWhite { font-size:18px;font-weight:900; }
@@ -142,199 +139,33 @@
 
 /* ══════════════════════════════════════════════════════════
    TEMPLATE 4 — Printable Clothing Store Classic
-   Matches invoicequick.com reference:
-   - INVOICE word top-left, meta top-right
-   - Bill From / Bill To side by side
-   - Clean divider line
-   - Simple line-item table
-   - Totals right-aligned
-   - Payment terms + notes footer
 ══════════════════════════════════════════════════════════ */
-.p4Base {
-  background: #fff;
-  color: #1a1a1a;
-  font-family: 'Inter', sans-serif;
-  font-size: 7.5px;
-  min-height: 440px;
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-}
-
-.p4GoldBar {
-  height: 6px;
-  background: #c8a96e;
-  width: 100%;
-  flex-shrink: 0;
-}
-
-.p4Header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 12px 16px 8px;
-  border-bottom: 1.5px solid #1a1a1a;
-}
-
-.p4InvoiceWord {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  line-height: 1;
-}
-
-.p4HeaderRight {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  text-align: right;
-}
-
-.p4MetaRow {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.p4MetaKey {
-  font-size: 6px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #888;
-}
-
-.p4MetaVal {
-  font-size: 7px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.p4BillRow {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 16px 8px;
-}
-
-.p4BillBlock {
-  font-size: 7px;
-  line-height: 1.6;
-}
-
-.p4BillLabel {
-  font-size: 6px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #888;
-  margin-bottom: 2px;
-}
-
-.p4BillName {
-  font-size: 8.5px;
-  font-weight: 700;
-  margin-bottom: 1px;
-}
-
-.p4BillInfo {
-  color: #555;
-  font-size: 6.5px;
-}
-
-.p4Divider {
-  height: 1px;
-  background: #ddd;
-  margin: 0 16px 4px;
-}
-
-/* Table */
-.p4TableHead {
-  display: flex;
-  align-items: center;
-  padding: 5px 16px;
-  font-size: 6.5px;
-  font-weight: 700;
-  border-bottom: 1px solid #1a1a1a;
-  border-top: 1px solid #1a1a1a;
-  gap: 4px;
-}
-
-.p4TableHead span,
-.p4TableRow span {
-  flex: 1;
-  text-align: right;
-}
-
-.p4TableHead span:first-child,
-.p4TableRow span:first-child {
-  flex: 3;
-  text-align: left;
-}
-
-.p4TableRow {
-  display: flex;
-  align-items: center;
-  padding: 5px 16px;
-  font-size: 7px;
-  border-bottom: 1px solid #f0f0f0;
-  gap: 4px;
-}
-
-/* Totals */
-.p4TotalsArea {
-  margin-left: auto;
-  width: 42%;
-  padding: 6px 16px 4px 0;
-  margin-top: 4px;
-}
-
-.p4TotRow {
-  display: flex;
-  justify-content: space-between;
-  padding: 2px 0;
-  font-size: 7px;
-  color: #555;
-}
-
-.p4TotDivider {
-  height: 1px;
-  background: #ccc;
-  margin: 3px 0;
-}
-
-.p4TotBold {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 900;
-  font-size: 8.5px;
-  padding-top: 1px;
-}
-
-/* Footer */
-.p4Footer {
-  display: flex;
-  gap: 12px;
-  padding: 10px 16px 14px;
-  margin-top: auto;
-  border-top: 1px solid #eee;
-}
-
-.p4FootBlock {
-  flex: 1;
-  font-size: 6.5px;
-  line-height: 1.6;
-}
-
-.p4FootLabel {
-  font-weight: 700;
-  font-size: 7px;
-  margin-bottom: 2px;
-}
-
-.p4FootInfo {
-  color: #555;
-}
+.p4Base { background: #fff; color: #1a1a1a; font-family: 'Inter', sans-serif; font-size: 7.5px; min-height: 440px; display: flex; flex-direction: column; padding: 0; }
+.p4GoldBar { height: 6px; background: #c8a96e; width: 100%; flex-shrink: 0; }
+.p4Header { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 16px 8px; border-bottom: 1.5px solid #1a1a1a; }
+.p4InvoiceWord { font-size: 22px; font-weight: 900; letter-spacing: 0.04em; line-height: 1; }
+.p4HeaderRight { display: flex; flex-direction: column; gap: 3px; text-align: right; }
+.p4MetaRow { display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+.p4MetaKey { font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #888; }
+.p4MetaVal { font-size: 7px; font-weight: 600; color: #1a1a1a; }
+.p4BillRow { display: flex; justify-content: space-between; padding: 10px 16px 8px; }
+.p4BillBlock { font-size: 7px; line-height: 1.6; }
+.p4BillLabel { font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 2px; }
+.p4BillName { font-size: 8.5px; font-weight: 700; margin-bottom: 1px; }
+.p4BillInfo { color: #555; font-size: 6.5px; }
+.p4Divider { height: 1px; background: #ddd; margin: 0 16px 4px; }
+.p4TableHead { display: flex; align-items: center; padding: 5px 16px; font-size: 6.5px; font-weight: 700; border-bottom: 1px solid #1a1a1a; border-top: 1px solid #1a1a1a; gap: 4px; }
+.p4TableHead span, .p4TableRow span { flex: 1; text-align: right; }
+.p4TableHead span:first-child, .p4TableRow span:first-child { flex: 3; text-align: left; }
+.p4TableRow { display: flex; align-items: center; padding: 5px 16px; font-size: 7px; border-bottom: 1px solid #f0f0f0; gap: 4px; }
+.p4TotalsArea { margin-left: auto; width: 42%; padding: 6px 16px 4px 0; margin-top: 4px; }
+.p4TotRow { display: flex; justify-content: space-between; padding: 2px 0; font-size: 7px; color: #555; }
+.p4TotDivider { height: 1px; background: #ccc; margin: 3px 0; }
+.p4TotBold { display: flex; justify-content: space-between; font-weight: 900; font-size: 8.5px; padding-top: 1px; }
+.p4Footer { display: flex; gap: 12px; padding: 10px 16px 14px; margin-top: auto; border-top: 1px solid #eee; }
+.p4FootBlock { flex: 1; font-size: 6.5px; line-height: 1.6; }
+.p4FootLabel { font-weight: 700; font-size: 7px; margin-bottom: 2px; }
+.p4FootInfo { color: #555; }
 
 /* ══════════════════════════════════════════════════════════
    TEMPLATE 5 — Canva Warm Beige
@@ -477,107 +308,39 @@
 /* ══════════════════════════════════════════════════════════
    TEMPLATE 10 — Pink Full-Width Diagonal
 ══════════════════════════════════════════════════════════ */
-.t10Base {
-  background: #fff;
-  color: #1a1a1a;
-  font-family: 'Inter', sans-serif;
-  font-size: 7px;
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.t10HeaderZone {
-  position: relative;
-  width: 100%;
-  height: 70px;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.t10FullBanner {
-  position: absolute;
-  inset: 0;
-  background: #ff5c8a;
-  clip-path: polygon(0 0, 100% 0, 100% 28px, 0 100%);
-  display: flex;
-  align-items: flex-start;
-  padding: 10px 16px 0;
-}
-.t10BannerTitle {
-  color: #fff;
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  padding-top: 2px;
-}
-
-.t10BrandInBanner {
-  position: absolute;
-  top: 6px;
-  right: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.t10Base { background: #fff; color: #1a1a1a; font-family: 'Inter', sans-serif; font-size: 7px; min-height: 500px; display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
+.t10HeaderZone { position: relative; width: 100%; height: 70px; flex-shrink: 0; overflow: hidden; }
+.t10FullBanner { position: absolute; inset: 0; background: #ff5c8a; clip-path: polygon(0 0, 100% 0, 100% 28px, 0 100%); display: flex; align-items: flex-start; padding: 10px 16px 0; }
+.t10BannerTitle { color: #fff; font-size: 20px; font-weight: 900; letter-spacing: 0.05em; padding-top: 2px; }
+.t10BrandInBanner { position: absolute; top: 6px; right: 12px; display: flex; align-items: center; gap: 6px; }
 .t10BrandName { font-size: 9.5px; font-weight: 700; color: #1a1a1a; }
 .t10BrandSub { font-size: 5.5px; color: #888; letter-spacing: 0.06em; }
-
 .t10MetaRow { display:flex;justify-content:space-between;padding:8px 14px 5px;font-size:6.5px;line-height:1.5; }
 .t10MetaLabel { font-weight:700;font-size:7.5px;margin-bottom:1px; }
 .t10MetaName { font-weight:700;font-size:8px; }
 .t10MetaAddr { color:#555; }
 .t10MetaKey { color:#888; }
-
 .t10TableHead { display:flex;border:1.5px solid #1a1a1a;padding:4px 14px;font-size:6.5px;font-weight:700;gap:4px;margin:0 14px; }
 .t10TableHead span,.t10TableRow span { flex:1;text-align:right; }
 .t10TableHead span:nth-child(2),.t10TableRow span:nth-child(2) { flex:3;text-align:left; }
 .t10TableHead span:first-child,.t10TableRow span:first-child { flex:0.5;text-align:left; }
 .t10TableRow { display:flex;padding:4px 14px;border-bottom:1px solid #f0f0f0;margin:0 14px;font-size:7px;gap:4px; }
 .t10Divider { height:1px;background:#eee;margin:5px 14px; }
-
-.t10Bottom {
-  display: flex;
-  gap: 10px;
-  padding: 4px 14px 52px;
-  font-size: 6.5px;
-  line-height: 1.6;
-  flex: 1;
-}
+.t10Bottom { display: flex; gap: 10px; padding: 4px 14px 52px; font-size: 6.5px; line-height: 1.6; flex: 1; }
 .t10ThankYou { font-weight:700;font-size:7px;margin-bottom:3px; }
 .t10PayLabel { font-weight:700;margin-top:4px;margin-bottom:1px; }
 .t10PayInfo { color:#444;line-height:1.6; }
 .t10TCLabel { font-weight:700;margin-top:5px;margin-bottom:1px; }
 .t10TCText { color:#666; }
-
-.t10RightCol {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-width: 85px;
-  flex-shrink: 0;
-}
+.t10RightCol { display: flex; flex-direction: column; justify-content: space-between; min-width: 85px; flex-shrink: 0; }
 .t10TotalsWrap { font-size:7px; }
 .t10TotRow { display:flex;justify-content:space-between;gap:8px;padding:2px 0; }
 .t10TotDivider { height:1px;background:#1a1a1a;margin:3px 0; }
 .t10TotTotal { display:flex;justify-content:space-between;font-weight:900;font-size:8.5px;gap:8px; }
-
 .t10SignBlock { text-align:center; }
 .t10SignLine { height:1px;background:#aaa;margin-bottom:2px; }
 .t10SignLabel { font-size:6px;color:#666; }
-
-.t10CornerPink {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 65px;
-  height: 55px;
-  background: #ff5c8a;
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-}
+.t10CornerPink { position: absolute; bottom: 0; right: 0; width: 65px; height: 55px; background: #ff5c8a; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
 
 /* ══════════════════════════════════════════════════════════
    TEMPLATE 11 — Blue Clean Corporate
@@ -611,155 +374,36 @@
 
 /* ══════════════════════════════════════════════════════════
    TEMPLATE 12 — Black Trapezoid Bold
-   Improved trapezoids to match reference more closely.
-   Top-left: wide black trapezoid, more aggressive diagonal.
-   Bottom-right: two solid overlapping angular black shapes.
 ══════════════════════════════════════════════════════════ */
-.t12Base {
-  background: #fff;
-  color: #1a1a1a;
-  font-family: 'Inter', sans-serif;
-  font-size: 7px;
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Header row */
-.t12Header {
-  display: flex;
-  align-items: stretch;
-  min-height: 56px;
-  background: #fff;
-  position: relative;
-}
-
-/* Black trapezoid — wider, more dramatic diagonal cut matching reference.
-   Reference has the shape covering roughly 55-60% of header width,
-   with a clear diagonal from full-height at left to ~60% height at right. */
-.t12LogoTrap {
-  background: #1a1a1a;
-  /* TL corner → wide top → diagonal down-right → full-height bottom-right end → BL */
-  clip-path: polygon(0 0, 78% 0, 58% 100%, 0 100%);
-  display: flex;
-  align-items: center;
-  padding: 0 52px 0 14px;
-  min-width: 150px;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-.t12LogoText {
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-}
-
-/* Contact lines right side */
-.t12HeaderContacts {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  padding: 8px 38px 8px 18px;
-}
-.t12ContactItem {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 6px;
-  color: #444;
-}
-
-/* Top-right corner bracket */
-.t12CornerBracketTR {
-  position: absolute;
-  top: 5px;
-  right: 7px;
-  width: 22px;
-  height: 22px;
-  border-top: 1.5px solid #999;
-  border-right: 1.5px solid #999;
-  pointer-events: none;
-}
-
-/* Bottom-left corner bracket */
-.t12CornerBracketBL {
-  position: absolute;
-  bottom: 7px;
-  left: 7px;
-  width: 22px;
-  height: 22px;
-  border-bottom: 1.5px solid #999;
-  border-left: 1.5px solid #999;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Title */
+.t12Base { background: #fff; color: #1a1a1a; font-family: 'Inter', sans-serif; font-size: 7px; min-height: 500px; display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
+.t12Header { display: flex; align-items: stretch; min-height: 56px; background: #fff; position: relative; }
+.t12LogoTrap { background: #1a1a1a; clip-path: polygon(0 0, 78% 0, 58% 100%, 0 100%); display: flex; align-items: center; padding: 0 52px 0 14px; min-width: 150px; flex-shrink: 0; position: relative; z-index: 1; }
+.t12LogoText { color: #fff; font-size: 12px; font-weight: 900; letter-spacing: 0.12em; }
+.t12HeaderContacts { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 8px 38px 8px 18px; }
+.t12ContactItem { display: flex; align-items: center; gap: 4px; font-size: 6px; color: #444; }
+.t12CornerBracketTR { position: absolute; top: 5px; right: 7px; width: 22px; height: 22px; border-top: 1.5px solid #999; border-right: 1.5px solid #999; pointer-events: none; }
+.t12CornerBracketBL { position: absolute; bottom: 7px; left: 7px; width: 22px; height: 22px; border-bottom: 1.5px solid #999; border-left: 1.5px solid #999; pointer-events: none; z-index: 2; }
 .t12TitleRow { display:flex;justify-content:center;padding:9px 14px 4px; }
 .t12InvoiceTitle { font-size:22px;font-weight:900;letter-spacing:0.18em;border-bottom:2px solid #1a1a1a;padding-bottom:2px; }
-
-/* Client + Balance */
 .t12ClientRow { display:flex;justify-content:space-between;padding:5px 14px;font-size:6.5px;line-height:1.6; }
 .t12ClientName { font-size:9px;font-weight:700;margin-bottom:2px; }
 .t12ClientInfo { color:#444; }
 .t12BalLabel { font-size:6.5px;color:#666;font-weight:600; }
 .t12BalAmt { font-size:16px;font-weight:900; }
 .t12BalDate { font-size:6px;color:#666; }
-
-/* Table */
 .t12TableHead { display:flex;background:#1a1a1a;color:#fff;padding:5px 14px;font-size:6.5px;font-weight:700;gap:4px; }
 .t12TableHead span,.t12TableRow span { flex:1;text-align:right; }
 .t12TableHead span:first-child,.t12TableRow span:first-child { flex:3;text-align:left; }
 .t12TableRow { display:flex;padding:5px 14px;border-bottom:1px solid #eee;font-size:6.5px;gap:4px;align-items:flex-start; }
 .t12ItemName { font-weight:700;font-size:7px; }
 .t12ItemDesc { color:#999;font-size:5.5px;margin-top:1px; }
-
-/* Due bar */
 .t12DueBar { display:flex;justify-content:space-between;background:#1a1a1a;color:#fff;padding:5px 14px;font-size:7px;font-weight:700;margin-top:2px; }
-
-/* Footer */
-.t12FootRow {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 14px 60px;
-  font-size: 6.5px;
-  line-height: 1.5;
-  margin-top: auto;
-  gap: 10px;
-}
+.t12FootRow { display: flex; justify-content: space-between; padding: 8px 14px 60px; font-size: 6.5px; line-height: 1.5; margin-top: auto; gap: 10px; }
 .t12FootRow>div:first-child { flex:1; }
 .t12FootLabel { font-weight:700;font-size:7px;margin-bottom:2px; }
 .t12FootInfo { color:#444;margin-bottom:1px; }
 .t12SignScribble { font-size:9px;font-style:italic;color:#333;margin-bottom:4px; }
 .t12SignLine { width:70px;height:1px;background:#bbb;margin:0 0 3px; }
 .t12SignLabel { font-size:6px;color:#666; }
-
-/* Bottom-right shapes — improved to match reference more closely.
-   Outer: large solid black trapezoid, wider and taller.
-   Inner: medium dark-grey trapezoid offset to create clear chevron layering.
-   Together they form the bold angular "stack" seen in the reference. */
-.t12CornerOuter {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 100px;
-  height: 65px;
-  background: #1a1a1a;
-  clip-path: polygon(38% 0, 100% 0, 100% 100%, 0 100%);
-}
-.t12CornerInner {
-  position: absolute;
-  bottom: 0;
-  right: 68px;
-  width: 72px;
-  height: 65px;
-  background: #5a5a5a;
-  clip-path: polygon(38% 0, 100% 0, 100% 100%, 0 100%);
-}
+.t12CornerOuter { position: absolute; bottom: 0; right: 0; width: 100px; height: 65px; background: #1a1a1a; clip-path: polygon(38% 0, 100% 0, 100% 100%, 0 100%); }
+.t12CornerInner { position: absolute; bottom: 0; right: 68px; width: 72px; height: 65px; background: #5a5a5a; clip-path: polygon(38% 0, 100% 0, 100% 100%, 0 100%); }
