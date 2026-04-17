@@ -83,7 +83,7 @@ function buildInvoiceWhatsAppMessage(invoice, customer, brand) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// PDF generator
+// PDF generator — constrained to 96% of screen width
 // ─────────────────────────────────────────────────────────────
 
 async function downloadPDF(paperEl, filename) {
@@ -296,6 +296,7 @@ function LogoOrName({ brand, darkBg = false }) {
   )
 }
 
+// Generic shared items table — used by templates 1, 2, 3, 4, 5, 6
 function ItemsTable({ invoice, brand }) {
   const { currency, showTax, taxRate } = brand
   const subtotal = invoice.items?.length > 0
@@ -481,6 +482,11 @@ function CustomTemplate({ invoice, customer, brand }) {
 function PrintableTemplate({ invoice, customer, brand }) {
   const dueDate  = getDueDate(invoice, brand.dueDays)
   const barColor = brand.colour || '#c8a96e'
+  const { currency, showTax, taxRate } = brand
+  const subtotal = invoice.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? 0
+  const tax      = calcTax(subtotal, taxRate, showTax)
+  const total    = subtotal + tax
+
   return (
     <div className={styles.tplBase}>
       <div className={styles.printBar} style={{ background: barColor }} />
@@ -506,7 +512,29 @@ function PrintableTemplate({ invoice, customer, brand }) {
           {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
         </div>
       </div>
-      <ItemsTable invoice={invoice} brand={brand} />
+      {/* Template 4 unique table: divider-separated rows with gold divider bar */}
+      <div className={styles.p4TableArea}>
+        <div className={styles.p4TableHead} style={{ borderColor: barColor }}>
+          <span style={{ flex: 3 }}>Description</span>
+          <span>Price</span>
+          <span>QTY</span>
+          <span>Total</span>
+        </div>
+        {invoice.items?.map((item, i) => (
+          <div key={i} className={styles.p4TableRow}>
+            <span style={{ flex: 3 }}>{item.name}</span>
+            <span>{fmt(currency, item.price)}</span>
+            <span>1</span>
+            <span>{fmt(currency, item.price)}</span>
+          </div>
+        ))}
+        <div className={styles.p4TotalsArea}>
+          <div className={styles.p4TotRow}><span>Subtotal</span><span>{fmt(currency, subtotal)}</span></div>
+          {showTax && taxRate > 0 && <div className={styles.p4TotRow}><span>Tax ({taxRate}%)</span><span>{fmt(currency, tax)}</span></div>}
+          <div className={styles.p4TotDivider} style={{ background: barColor }} />
+          <div className={styles.p4TotBold}><span>Total Due</span><span>{fmt(currency, total)}</span></div>
+        </div>
+      </div>
       <div className={styles.tplFooterPush} />
       {brand.accountBank && (
         <div className={styles.p4FooterWrap}>
@@ -534,6 +562,11 @@ function PrintableTemplate({ invoice, customer, brand }) {
 // ── 5. Soft Divider Layout (canva) ────────────────────────────
 function CanvaTemplate({ invoice, customer, brand }) {
   const dueDate = getDueDate(invoice, brand.dueDays)
+  const { currency, showTax, taxRate } = brand
+  const subtotal = invoice.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? 0
+  const tax      = calcTax(subtotal, taxRate, showTax)
+  const total    = subtotal + tax
+
   return (
     <div className={styles.t5Wrap}>
       <div className={styles.t5Top}>
@@ -551,7 +584,24 @@ function CanvaTemplate({ invoice, customer, brand }) {
         {customer.address && <div>{customer.address}</div>}
       </div>
       <div className={styles.t5Divider} />
-      <ItemsTable invoice={invoice} brand={brand} />
+      {/* Template 5 unique table: divider-separated rows on beige bg */}
+      <div className={styles.t5TableHead}>
+        <span style={{ flex: 3 }}>Description</span><span>Price</span><span>Qty</span><span>Total</span>
+      </div>
+      {invoice.items?.map((item, i) => (
+        <div key={i} className={styles.t5TableRow}>
+          <span style={{ flex: 3 }}>{item.name}</span>
+          <span>{fmt(currency, item.price)}</span>
+          <span>1</span>
+          <span>{fmt(currency, item.price)}</span>
+        </div>
+      ))}
+      <div className={styles.t5Divider} />
+      <div className={styles.t5TotalsSection}>
+        <div className={styles.t5TotRow}><span>Subtotal</span><span>{fmt(currency, subtotal)}</span></div>
+        {showTax && taxRate > 0 && <div className={styles.t5TotRow}><span>Tax ({taxRate}%)</span><span>{fmt(currency, tax)}</span></div>}
+        <div className={`${styles.t5TotRow} ${styles.t5TotBold}`}><span>Total</span><span>{fmt(currency, total)}</span></div>
+      </div>
       <div className={styles.t5Divider} />
       <div className={styles.t5Footer}>
         {brand.accountBank ? (
@@ -578,6 +628,11 @@ function CanvaTemplate({ invoice, customer, brand }) {
 // ── 6. Heavy Header Bar (darkheader) ─────────────────────────
 function DarkHeaderTemplate({ invoice, customer, brand }) {
   const dueDate = getDueDate(invoice, brand.dueDays)
+  const { currency, showTax, taxRate } = brand
+  const subtotal = invoice.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? 0
+  const tax      = calcTax(subtotal, taxRate, showTax)
+  const total    = subtotal + tax
+
   return (
     <div className={styles.t6Wrap}>
       <div className={styles.t6Header}>
@@ -633,16 +688,38 @@ function DarkHeaderTemplate({ invoice, customer, brand }) {
           {customer.address}
         </div>
       </div>
-      <ItemsTable invoice={invoice} brand={brand} />
+      {/* Template 6 unique table: dark header row, plain rows */}
+      <div className={styles.t6TableHead}>
+        <span style={{ flex: 3 }}>DESCRIPTION</span><span>PRICE</span><span>QTY</span><span>TOTAL</span>
+      </div>
+      {invoice.items?.map((item, i) => (
+        <div key={i} className={styles.t6TableRow}>
+          <span style={{ flex: 3 }}>{item.name}</span>
+          <span>{fmt(currency, item.price)}</span>
+          <span>1</span>
+          <span>{fmt(currency, item.price)}</span>
+        </div>
+      ))}
+      <div className={styles.t6TotalsArea}>
+        <div className={styles.t6TotRow}><span>SUBTOTAL</span><span>{fmt(currency, subtotal)}</span></div>
+        {showTax && taxRate > 0 && <div className={styles.t6TotRow}><span>TAX ({taxRate}%)</span><span>{fmt(currency, tax)}</span></div>}
+        <div className={styles.t6TotTotal}><span>TOTAL</span><span>{fmt(currency, total)}</span></div>
+      </div>
       <div className={styles.t6ThankYou}>{brand.footer || 'THANK YOU FOR YOUR BUSINESS'}</div>
     </div>
   )
 }
 
 // ── 7. Field-Labelled From / To (redbold) ─────────────────────
+// Unique table: numbered rows with red total price
 function RedBoldTemplate({ invoice, customer, brand }) {
   const dueDate = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#cc0000'
+  const { currency, showTax, taxRate } = brand
+  const subtotal = invoice.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? 0
+  const tax      = calcTax(subtotal, taxRate, showTax)
+  const total    = subtotal + tax
+
   return (
     <div className={styles.t7Wrap}>
       <div className={styles.t7Header}>
@@ -698,7 +775,27 @@ function RedBoldTemplate({ invoice, customer, brand }) {
       </div>
       <div className={styles.t7Divider} />
       <div className={styles.t7ForLabel}>FOR:</div>
-      <ItemsTable invoice={invoice} brand={brand} />
+      {/* Template 7 unique: numbered rows, red price column */}
+      <div className={styles.t7TableHead}>
+        <span className={styles.t7NumCol}>No.</span>
+        <span style={{ flex: 3 }}>Description</span>
+        <span style={{ flex: 1, textAlign: 'right' }}>Qty</span>
+        <span style={{ flex: 1, textAlign: 'right' }}>Price</span>
+        <span style={{ flex: 1, textAlign: 'right' }}>Total</span>
+      </div>
+      {invoice.items?.map((item, i) => (
+        <div key={i} className={styles.t7TableRow}>
+          <span className={styles.t7NumCol}>{i + 1}</span>
+          <span style={{ flex: 3 }}>{item.name}</span>
+          <span style={{ flex: 1, textAlign: 'right' }}>1</span>
+          <span style={{ flex: 1, textAlign: 'right' }}>{fmt(currency, item.price)}</span>
+          <span className={styles.t7RedPrice} style={{ color: accentColor }}>{fmt(currency, item.price)}</span>
+        </div>
+      ))}
+      <div className={styles.t7TotalBar} style={{ background: accentColor }}>
+        <span>TOTAL:</span>
+        <span className={styles.t7TotalAmt}>{fmt(currency, total)}</span>
+      </div>
       {brand.accountBank && (
         <div className={styles.t7PayRow}>
           <span className={styles.t7InfoKey}>BANK:</span>
@@ -712,6 +809,7 @@ function RedBoldTemplate({ invoice, customer, brand }) {
 }
 
 // ── 8. Side Panel with Invoice Box (greenaccent) ──────────────
+// Unique table: SL. numbered rows, grey header, green bottom panel
 function GreenAccentTemplate({ invoice, customer, brand }) {
   const dueDate    = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#00c896'
@@ -742,7 +840,21 @@ function GreenAccentTemplate({ invoice, customer, brand }) {
           </div>
         </div>
       </div>
-      <ItemsTable invoice={invoice} brand={brand} />
+      {/* Template 8 unique: SL. numbered, grey bg header */}
+      <div className={styles.t8TableHead}>
+        <span>SL.</span>
+        <span style={{ flex: 3 }}>Description</span>
+        <span>Price</span><span>Qty</span><span>Total</span>
+      </div>
+      {invoice.items?.map((item, i) => (
+        <div key={i} className={styles.t8TableRow}>
+          <span>{i + 1}</span>
+          <span style={{ flex: 3 }}>{item.name}</span>
+          <span>{fmt(currency, item.price)}</span>
+          <span>1</span>
+          <span>{fmt(currency, item.price)}</span>
+        </div>
+      ))}
       <div className={styles.t8Divider} />
       <div className={styles.t8Bottom}>
         <div className={styles.t8GreenBox} style={{ background: accentColor }}>
@@ -776,6 +888,7 @@ function GreenAccentTemplate({ invoice, customer, brand }) {
 }
 
 // ── 9. Accent Table Header (tealgeometric) ────────────────────
+// Unique table: teal header bar, dark number bar, QTY first col, signature footer
 function TealGeometricTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#00b4c8'
@@ -820,7 +933,24 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
           {brand.email && <div>{brand.email}</div>}
         </div>
       </div>
-      <ItemsTable invoice={invoice} brand={brand} />
+      {/* Template 9 unique: teal-bg header, QTY first col */}
+      <div className={styles.t9TableHead} style={{ background: accentColor }}>
+        <span>QTY</span>
+        <span style={{ flex: 3 }}>DESCRIPTION</span>
+        <span>PRICE</span><span>TOTAL</span>
+      </div>
+      {invoice.items?.map((item, i) => (
+        <div key={i} className={styles.t9TableRow}>
+          <span>1</span>
+          <span style={{ flex: 3 }}>{item.name}</span>
+          <span>{fmt(currency, item.price)}</span>
+          <span>{fmt(currency, item.price)}</span>
+        </div>
+      ))}
+      <div className={styles.t9SubArea}>
+        <div className={styles.t9SubRow}><span>Subtotal</span><span>{fmt(currency, subtotal)}</span></div>
+        {showTax && taxRate > 0 && <div className={styles.t9SubRow}><span>Tax ({taxRate}%)</span><span>{fmt(currency, tax)}</span></div>}
+      </div>
       <div className={styles.t9TotalBar} style={{ background: darkBar }}>
         <span>TOTAL</span><span>{fmt(currency, total)}</span>
       </div>
@@ -849,6 +979,8 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
 }
 
 // ── 10. Diagonal Header (pinkdiagonal) ────────────────────────
+// Unique table: bordered header, SL. numbered, right side totals + sign
+// Note: no tagline in brand area (would make it look awkward)
 function PinkDiagonalTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#ff5c8a'
@@ -863,6 +995,7 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
         <div className={styles.t10FullBanner} style={{ background: accentColor }}>
           <span className={styles.t10BannerTitle}>INVOICE</span>
         </div>
+        {/* No tagline here — only brand name + "Tailor Shop" label */}
         <div className={styles.t10BrandInBanner}>
           {brand.logo
             ? <img src={brand.logo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
@@ -870,7 +1003,7 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
           }
           <div>
             <div className={styles.t10BrandName}>{brand.name || brand.ownerName}</div>
-            {brand.tagline && <div className={styles.t10BrandSub}>{brand.tagline.toUpperCase()}</div>}
+            <div className={styles.t10BrandSub}>TAILOR SHOP</div>
           </div>
         </div>
       </div>
@@ -887,7 +1020,21 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
           <div><span className={styles.t10MetaKey}>Due</span> <strong>{dueDate}</strong></div>
         </div>
       </div>
-      <ItemsTable invoice={invoice} brand={brand} />
+      {/* Template 10 unique: bordered header, SL. numbered */}
+      <div className={styles.t10TableHead}>
+        <span>SL.</span>
+        <span style={{ flex: 3 }}>Description</span>
+        <span>Price</span><span>Qty</span><span>Total</span>
+      </div>
+      {invoice.items?.map((item, i) => (
+        <div key={i} className={styles.t10TableRow}>
+          <span>{i + 1}</span>
+          <span style={{ flex: 3 }}>{item.name}</span>
+          <span>{fmt(currency, item.price)}</span>
+          <span>1</span>
+          <span>{fmt(currency, item.price)}</span>
+        </div>
+      ))}
       <div className={styles.t10Divider} />
       <div className={styles.t10Bottom}>
         <div style={{ flex: 1 }}>
@@ -931,6 +1078,7 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
 }
 
 // ── 11. Info Bar with Payment Tiles (blueclean) ───────────────
+// Unique table: black header bar, bullet items, blue amount display
 function BlueCleanTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#5da0d0'
@@ -981,7 +1129,26 @@ function BlueCleanTemplate({ invoice, customer, brand }) {
         </div>
       </div>
       {invoice.orderDesc && <div className={styles.t11ProjectName}>{invoice.orderDesc}</div>}
-      <ItemsTable invoice={invoice} brand={brand} />
+      {/* Template 11 unique: black header, bullet items, right-aligned totals */}
+      <div className={styles.t11TableHead}>
+        <span style={{ flex: 3 }}>Description</span>
+        <span>Qty</span><span>Price</span><span>Subtotal</span>
+      </div>
+      {invoice.items?.map((item, i) => (
+        <div key={i} className={styles.t11TableRow}>
+          <span style={{ flex: 3 }}>• {item.name}</span>
+          <span>1</span>
+          <span>{fmt(currency, item.price)}</span>
+          <span>{fmt(currency, item.price)}</span>
+        </div>
+      ))}
+      <div className={styles.t11TotArea}>
+        <div className={styles.t11TotRow}><span>Subtotal</span><span>{fmt(currency, subtotal)}</span></div>
+        {showTax && taxRate > 0 && (
+          <div className={styles.t11TotRow}><span>Tax ({taxRate}%)</span><span>{fmt(currency, tax)}</span></div>
+        )}
+        <div className={styles.t11TotBold}><span>TOTAL</span><span>{fmt(currency, total)}</span></div>
+      </div>
       {(brand.accountBank || brand.phone) && (
         <>
           <div className={styles.t11PayTitle}>Payment Information</div>
@@ -1104,8 +1271,10 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
             {STATUS_LABELS[invoice.status] || invoice.status}
           </div>
         </div>
-        <div className={styles.paperWrap} ref={paperRef}>
-          <Template invoice={invoice} customer={customer} brand={effectiveBrand} />
+        <div className={styles.paperWrap}>
+          <div className={styles.paperInner} ref={paperRef}>
+            <Template invoice={invoice} customer={customer} brand={effectiveBrand} />
+          </div>
         </div>
         {invoice.notes && (
           <div className={styles.notesBox}>
