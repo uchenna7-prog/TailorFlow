@@ -581,10 +581,13 @@ function TealGeometricTemplate() {
 function PinkDiagonalTemplate() {
   return (
     <div className={styles.t10Base}>
-      {/* Full-width pink diagonal band */}
-      <div className={styles.t10FullBanner}>
-        <span className={styles.t10BannerTitle}>INVOICE</span>
-        {/* Brand sits inside the banner area, right side on white */}
+      {/* Header zone: pink diagonal left, white brand area right */}
+      <div className={styles.t10HeaderZone}>
+        {/* Pink diagonal band — covers left + most of width, diagonal bottom-right */}
+        <div className={styles.t10FullBanner}>
+          <span className={styles.t10BannerTitle}>INVOICE</span>
+        </div>
+        {/* Brand sits in white top-right area above the diagonal */}
         <div className={styles.t10BrandInBanner}>
           <span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span>
           <div>
@@ -688,12 +691,12 @@ function BlackGeometricTemplate() {
             <span>14 Bode Thomas Street, Surulere, Lagos</span>
           </div>
         </div>
-        {/* Thin vertical deco lines at far right */}
-        <div className={styles.t12DecoLines}>
-          <div className={styles.t12DecoLine} />
-          <div className={styles.t12DecoLine} />
-        </div>
+        {/* Top-right corner bracket */}
+        <div className={styles.t12CornerBracketTR} />
       </div>
+
+      {/* Bottom-left corner bracket */}
+      <div className={styles.t12CornerBracketBL} />
 
       {/* ── INVOICE Title ── */}
       <div className={styles.t12TitleRow}>
@@ -761,7 +764,7 @@ function BlackGeometricTemplate() {
         </div>
       </div>
 
-      {/* ── Bottom-right angular black shapes ── */}
+      {/* ── Bottom-right angular black shapes (trapezoids like reference) ── */}
       <div className={styles.t12CornerOuter} />
       <div className={styles.t12CornerInner} />
     </div>
@@ -1011,7 +1014,6 @@ function TemplateModal({ isOpen, currentTemplate, onClose, onSelect }) {
         {TEMPLATE_GROUPS.map(group=>(
           <div key={group.groupLabel}>
             <div className={styles.groupHeader}>
-              <span className="mi" style={{ fontSize:'1rem',color:'var(--accent)' }}>{group.groupIcon}</span>
               <span className={styles.groupLabel}>{group.groupLabel}</span>
             </div>
             {group.templates.map(t=>(
