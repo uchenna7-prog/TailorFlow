@@ -25,7 +25,7 @@ function EditableTemplate() {
   return (
     <div className={styles.pBase}>
       <div className={styles.pBrandCenter}>
-        <div className={styles.pBrandName}>Adeola Couture House</div>
+        <div className={styles.pBrandName}>Adeola Stitches</div>
         <div className={styles.pBrandSub}>14 Bode Thomas St, Surulere, Lagos</div>
       </div>
       <div className={styles.pInvoiceCentred}>
@@ -92,7 +92,7 @@ function FreeTemplate() {
       <div className={styles.pFreeGrid}>
         <div className={styles.pFreeBox}>
           <div className={styles.pSmallCap}>BILL FROM:</div>
-          <strong>Adeola Couture House</strong><br />14 Bode Thomas St, Lagos<br />+234 801 234 5678
+          <strong>Adeola Stitches</strong><br />14 Bode Thomas St, Lagos<br />+234 801 234 5678
         </div>
         <div className={styles.pFreeBox}>
           <div className={styles.pSmallCap}>BILL TO:</div>
@@ -120,7 +120,7 @@ function FreeTemplate() {
       <div className={styles.pFooter}>
         <div className={styles.pFootSection}>
           <strong>Payment Information:</strong><br />
-          GT Bank — Adeola Couture House, Account: 0123456789
+          GT Bank — Adeola Stitches, Account: 0123456789
         </div>
       </div>
       <div className={styles.pFooterGray}>Thank you for your business!</div>
@@ -145,7 +145,7 @@ function CustomTemplate() {
       <div style={{ display: 'flex', gap: 8, padding: '10px 14px 6px', fontSize: '7px' }}>
         <div style={{ flex: 1 }}>
           <div className={styles.pSmallCap}>BILL FROM:</div>
-          <strong>Adeola Couture House</strong><br />14 Bode Thomas St<br />Surulere, Lagos<br />+234 801 234 5678
+          <strong>Adeola Stitches</strong><br />14 Bode Thomas St<br />Surulere, Lagos<br />+234 801 234 5678
         </div>
         <div style={{ flex: 1 }}>
           <div className={styles.pSmallCap}>BILL TO:</div>
@@ -225,7 +225,7 @@ function PrintableTemplate() {
       <div className={styles.p4BillRow}>
         <div className={styles.p4BillBlock}>
           <div className={styles.p4BillLabel}>BILL FROM</div>
-          <div className={styles.p4BillName}>Adeola Couture House</div>
+          <div className={styles.p4BillName}>Adeola Stitches</div>
           <div className={styles.p4BillInfo}>14 Bode Thomas Street</div>
           <div className={styles.p4BillInfo}>Surulere, Lagos</div>
           <div className={styles.p4BillInfo}>+234 801 234 5678</div>
@@ -261,7 +261,7 @@ function PrintableTemplate() {
       <div className={styles.p4Footer}>
         <div className={styles.p4FootBlock}>
           <div className={styles.p4FootLabel}>Payment Terms:</div>
-          <div className={styles.p4FootInfo}>GT Bank — Adeola Couture House</div>
+          <div className={styles.p4FootInfo}>GT Bank — Adeola Stitches</div>
           <div className={styles.p4FootInfo}>Account No: 0123456789</div>
           <div className={styles.p4FootInfo}>Routing #: 058152522</div>
         </div>
@@ -314,7 +314,7 @@ function CanvaTemplate() {
       <div className={styles.t5Footer}>
         <div>
           <div className={styles.t5FootLabel}>Payment Information</div>
-          <div>Adeola Couture House</div>
+          <div>Adeola Stitches</div>
           <div>Bank: GT Bank Nigeria</div>
           <div>Account No: 0123 4567 89</div>
         </div>
@@ -342,12 +342,12 @@ function DarkHeaderTemplate() {
             <span className="mi" style={{ fontSize: 13, color: '#1a1a1a' }}>checkroom</span>
           </div>
           <div>
-            <div className={styles.t6CompanyName}>ADEOLA COUTURE</div>
+            <div className={styles.t6CompanyName}>ADEOLA STITCHES</div>
             <div className={styles.t6CompanySub}>PREMIUM TAILORING STUDIO</div>
           </div>
         </div>
         <div className={styles.t6HeaderRight}>
-          <div>Adeola Couture House</div>
+          <div>Adeola Stitches</div>
           <div>14 Bode Thomas Street</div>
           <div>Surulere, Lagos</div>
         </div>
@@ -371,9 +371,9 @@ function DarkHeaderTemplate() {
         <div>
           <div className={styles.t6InfoLabel}>PAYMENT:</div>
           <strong>GT BANK</strong><br />
-          Adeola Couture House<br />Acct: 0123456789<br />
+          Adeola Stitches<br />Acct: 0123456789<br />
           <strong style={{ display: 'block', marginTop: 3 }}>TRANSFER</strong>
-          adeola@couture.ng
+          adeola@stitches.ng
         </div>
         <div>
           <div className={styles.t6InfoLabel}>SHIP TO:</div>
@@ -434,7 +434,7 @@ function RedBoldTemplate() {
         <div className={styles.t7FromToBlock}>
           <div className={styles.t7FromLabel}>FROM:</div>
           <div className={styles.t7FromDivider} />
-          {[['NAME:','ADEOLA FASHOLA'],['COMPANY:','ADEOLA COUTURE HOUSE'],['ADDRESS:','14 BODE THOMAS ST'],['CITY:','SURULERE, LAGOS'],['PHONE:','+234 801 234 5678']].map(([l,v])=>(
+          {[['NAME:','ADEOLA FASHOLA'],['COMPANY:','ADEOLA STITCHES'],['ADDRESS:','14 BODE THOMAS ST'],['CITY:','SURULERE, LAGOS'],['PHONE:','+234 801 234 5678']].map(([l,v])=>(
             <div key={l} className={styles.t7InfoRow}><span className={styles.t7InfoKey}>{l}</span><span className={styles.t7InfoVal}>{v}</span></div>
           ))}
         </div>
@@ -483,7 +483,7 @@ function GreenAccentTemplate() {
         <div className={styles.t8LogoArea}>
           <span className="mi" style={{ fontSize: 20, color: '#333' }}>checkroom</span>
           <div>
-            <div className={styles.t8BrandName}>Adeola Couture</div>
+            <div className={styles.t8BrandName}>Adeola Stitches</div>
             <div className={styles.t8BrandSub}>PREMIUM TAILORING STUDIO</div>
           </div>
         </div>
@@ -520,7 +520,7 @@ function GreenAccentTemplate() {
         <div className={styles.t8PaymentInfo}>
           <div className={styles.t8PayLabel}>Payment Info:</div>
           <div>Account #: 0123 4567 89</div>
-          <div>A/C Name: Adeola Couture</div>
+          <div>A/C Name: Adeola Stitches</div>
           <div>Bank: GT Bank Nigeria</div>
           <div className={styles.t8ThankYou}>Thank you for your business</div>
         </div>
@@ -547,7 +547,7 @@ function TealGeometricTemplate() {
         <div>
           <div className={styles.t9LogoRow}>
             <span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span>
-            <span className={styles.t9CompanyName}>ADEOLA COUTURE</span>
+            <span className={styles.t9CompanyName}>ADEOLA STITCHES</span>
           </div>
           <div className={styles.t9CompanySub}>PREMIUM TAILORING STUDIO</div>
           <div className={styles.t9CompanyAddr}>14 Bode Thomas St,<br />Surulere, Lagos</div>
@@ -613,8 +613,8 @@ function PinkDiagonalTemplate() {
         <div className={styles.t10BrandInBanner}>
           <span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span>
           <div>
-            <div className={styles.t10BrandName}>Adeola Couture</div>
-            <div className={styles.t10BrandSub}>TAILORING STUDIO</div>
+            <div className={styles.t10BrandName}>Adeola Stitches</div>
+            <div className={styles.t10BrandSub}>TAILORING SHOP</div>
           </div>
         </div>
       </div>
@@ -648,7 +648,7 @@ function PinkDiagonalTemplate() {
           <div className={styles.t10PayLabel}>Payment Info:</div>
           <div className={styles.t10PayInfo}>
             Account #: 0123 4567 89<br />
-            A/C Name: Adeola Couture House<br />
+            A/C Name: Adeola Stitches<br />
             Bank: GT Bank Nigeria
           </div>
           <div className={styles.t10TCLabel}>Terms &amp; Conditions</div>
@@ -685,17 +685,17 @@ function BlueCleanTemplate() {
             <span className="mi" style={{ fontSize:11,color:'#fff' }}>checkroom</span>
           </div>
           <div>
-            <div className={styles.t11CompanyName}>ADEOLA COUTURE</div>
+            <div className={styles.t11CompanyName}>ADEOLA STITCHES</div>
             <div className={styles.t11CompanySub}>Premium Tailoring Studio</div>
           </div>
         </div>
         <div className={styles.t11CompanyInfo}>
-          <div>Adeola Couture House</div>
+          <div>Adeola Stitches</div>
           <div>14 Bode Thomas Street</div>
           <div>Surulere, Lagos</div>
         </div>
         <div className={styles.t11CompanyInfo} style={{ textAlign:'right' }}>
-          <div>www.adeolacouture.ng</div>
+          <div>www.adeolastitches.ng</div>
           <div>info@adeolacouture.ng</div>
           <div>+234 801 234 5678</div>
         </div>
@@ -850,8 +850,8 @@ const TEMPLATE_GROUPS = [
     templates: [
       { id:'editable',  label:'1. Centred Line Invoice',      desc:'Centred header with flanking lines',                  Component:EditableTemplate },
       { id:'free',      label:'2. Three-Column Info Bar',     desc:'Big invoice number with three-column info grid',      Component:FreeTemplate },
-      { id:'printable', label:'4. Side-by-Side Classic',      desc:'Side-by-side billing blocks with accent top bar',     Component:PrintableTemplate },
-      { id:'canva',     label:'5. Soft Divider Layout',       desc:'Soft header, dividers, sender details at base',       Component:CanvaTemplate },
+      { id:'printable', label:'3. Side-by-Side Classic',      desc:'Side-by-side billing blocks with accent top bar',     Component:PrintableTemplate },
+      { id:'canva',     label:'4. Soft Divider Layout',       desc:'Soft header, dividers, sender details at base',       Component:CanvaTemplate },
     ],
   },
   {
@@ -859,8 +859,8 @@ const TEMPLATE_GROUPS = [
     groupDesc: 'Every detail in its place — easy to scan',
     groupIcon: 'format_list_numbered',
     templates: [
-      { id:'redbold',   label:'7. Field-Labelled From / To',  desc:'Field-labelled From/To with numbered line items',     Component:RedBoldTemplate },
-      { id:'blueclean', label:'11. Info Bar with Payment Tiles', desc:'Three-column header, info bar and payment option tiles', Component:BlueCleanTemplate },
+      { id:'redbold',   label:'5. Field-Labelled From / To',  desc:'Field-labelled From/To with numbered line items',     Component:RedBoldTemplate },
+      { id:'blueclean', label:'6. Info Bar with Payment Tiles', desc:'Three-column header, info bar and payment option tiles', Component:BlueCleanTemplate },
     ],
   },
   {
@@ -868,10 +868,10 @@ const TEMPLATE_GROUPS = [
     groupDesc: 'Built around your logo and colours',
     groupIcon: 'palette',
     templates: [
-      { id:'custom',        label:'3. Full-Bleed Banner',         desc:'Full-bleed banner header with matching footer',        Component:CustomTemplate },
-      { id:'darkheader',    label:'6. Heavy Header Bar',          desc:'Heavy header bar with three-column info strip',        Component:DarkHeaderTemplate },
-      { id:'greenaccent',   label:'8. Side Panel with Invoice Box', desc:'Inline invoice box, side-by-side totals and client panel', Component:GreenAccentTemplate },
-      { id:'tealgeometric', label:'9. Accent Table Header',       desc:'Accent table header with corner signature block',      Component:TealGeometricTemplate },
+      { id:'custom',        label:'7. Full-Bleed Banner',         desc:'Full-bleed banner header with matching footer',        Component:CustomTemplate },
+      { id:'darkheader',    label:'8. Heavy Header Bar',          desc:'Heavy header bar with three-column info strip',        Component:DarkHeaderTemplate },
+      { id:'greenaccent',   label:'9. Side Panel with Invoice Box', desc:'Inline invoice box, side-by-side totals and client panel', Component:GreenAccentTemplate },
+      { id:'tealgeometric', label:'10. Accent Table Header',       desc:'Accent table header with corner signature block',      Component:TealGeometricTemplate },
     ],
   },
   {
@@ -879,7 +879,7 @@ const TEMPLATE_GROUPS = [
     groupDesc: 'Bold layouts that leave an impression',
     groupIcon: 'style',
     templates: [
-      { id:'pinkdiagonal', label:'10. Diagonal Header',           desc:'Diagonal full-bleed header with corner signature',     Component:PinkDiagonalTemplate },
+      { id:'pinkdiagonal', label:'11. Diagonal Header',           desc:'Diagonal full-bleed header with corner signature',     Component:PinkDiagonalTemplate },
     ],
   },
 ]
