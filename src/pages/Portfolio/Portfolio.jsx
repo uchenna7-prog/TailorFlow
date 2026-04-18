@@ -118,7 +118,6 @@ function Lightbox({ photo, photos, onClose }) {
         <button className={styles.lbClose} onClick={onClose}>
           <span className="mi">close</span>
         </button>
-        {/* No grayscale — show the actual colours */}
         <img src={current.src || current.storageUrl} alt={current.caption} className={styles.lbImg} />
         {photos.length > 1 && (
           <>
@@ -158,12 +157,15 @@ export default function Portfolio() {
   const [bookingOpen, setBookingOpen] = useState(false)
   const [navScrolled, setNavScrolled] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
+  // Light mode — default true (light)
+  const [lightMode, setLightMode] = useState(true)
   // Saved hero/footer image IDs from portfolioSettings
   const [heroImageId,   setHeroImageId]   = useState(null)
   const [footerImageId, setFooterImageId] = useState(null)
   const worksRef = useRef(null)
   const aboutRef = useRef(null)
   const bookRef  = useRef(null)
+  const filterScrollRef = useRef(null)
 
   useEffect(() => {
     if (!uid) { setNotFound(true); setLoading(false); return }
@@ -207,6 +209,18 @@ export default function Portfolio() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  // Smooth scroll to filter tab when switching
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId)
+    // Smooth scroll the filter bar to keep active tab visible
+    if (filterScrollRef.current) {
+      const activeBtn = filterScrollRef.current.querySelector(`[data-tab="${tabId ?? 'all'}"]`)
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
+    }
+  }
+
   const scrollTo = (ref) => {
     setNavOpen(false)
     ref?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -214,11 +228,11 @@ export default function Portfolio() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#080808' }}>
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f6f1' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-          <div style={{ width: 1, height: 60, background: 'linear-gradient(to bottom, transparent, #fff)', animation: 'grow 1.2s ease infinite' }} />
+          <div style={{ width: 1, height: 60, background: 'linear-gradient(to bottom, transparent, #999)', animation: 'grow 1.2s ease infinite' }} />
           <style>{`@keyframes grow { 0%,100%{opacity:0.2;transform:scaleY(0.3)} 50%{opacity:1;transform:scaleY(1)} }`}</style>
-          <p style={{ color: '#555', fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', fontFamily: 'Georgia, serif' }}>Loading</p>
+          <p style={{ color: '#888', fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', fontFamily: 'Georgia, serif' }}>Loading</p>
         </div>
       </div>
     )
@@ -226,10 +240,10 @@ export default function Portfolio() {
 
   if (notFound) {
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#080808', gap: '16px' }}>
-        <span className="mi" style={{ fontSize: '3rem', color: '#333' }}>content_cut</span>
-        <p style={{ color: '#fff', fontFamily: 'Georgia, serif', fontSize: '1.2rem', letterSpacing: '1px' }}>Portfolio not found</p>
-        <p style={{ color: '#555', fontSize: '0.8rem', letterSpacing: '1px' }}>This tailor hasn't set up their portfolio yet.</p>
+      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8f6f1', gap: '16px' }}>
+        <span className="mi" style={{ fontSize: '3rem', color: '#bbb' }}>content_cut</span>
+        <p style={{ color: '#222', fontFamily: 'Georgia, serif', fontSize: '1.2rem', letterSpacing: '1px' }}>Portfolio not found</p>
+        <p style={{ color: '#888', fontSize: '0.8rem', letterSpacing: '1px' }}>This tailor hasn't set up their portfolio yet.</p>
       </div>
     )
   }
@@ -245,7 +259,7 @@ export default function Portfolio() {
   const footerPhoto = (footerImageId ? completedPhotos.find(p => p.id === footerImageId) : null) ?? completedPhotos[1]   ?? null
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${lightMode ? styles.lightMode : ''}`}>
 
       {/* ── NAV ── */}
       <nav className={`${styles.nav} ${navScrolled ? styles.navScrolled : ''}`}>
@@ -256,12 +270,31 @@ export default function Portfolio() {
             <button onClick={() => scrollTo(aboutRef)} className={styles.navLink}>About</button>
             <button onClick={() => scrollTo(worksRef)} className={styles.navLink}>Works</button>
             <button onClick={() => scrollTo(bookRef)}  className={styles.navLink}>Book</button>
+            {/* Light / Dark toggle — inside the dropdown on mobile */}
+            <button
+              className={styles.themeToggle}
+              onClick={() => setLightMode(m => !m)}
+              aria-label={lightMode ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              <span className="mi">{lightMode ? 'dark_mode' : 'light_mode'}</span>
+              <span className={styles.themeToggleLabel}>{lightMode ? 'Dark Mode' : 'Light Mode'}</span>
+            </button>
             <button onClick={() => { setNavOpen(false); setBookingOpen(true) }} className={styles.navCta}>Order Now</button>
           </div>
-          <button className={styles.navHamburger} onClick={() => setNavOpen(o => !o)} aria-label="Menu">
-            <span className={navOpen ? styles.hamLineOpen1 : styles.hamLine} />
-            <span className={navOpen ? styles.hamLineOpen2 : styles.hamLine} />
-          </button>
+          <div className={styles.navRight}>
+            {/* Theme toggle visible on desktop outside hamburger */}
+            <button
+              className={`${styles.themeToggleDesktop}`}
+              onClick={() => setLightMode(m => !m)}
+              aria-label={lightMode ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              <span className="mi">{lightMode ? 'dark_mode' : 'light_mode'}</span>
+            </button>
+            <button className={styles.navHamburger} onClick={() => setNavOpen(o => !o)} aria-label="Menu">
+              <span className={navOpen ? styles.hamLineOpen1 : styles.hamLine} />
+              <span className={navOpen ? styles.hamLineOpen2 : styles.hamLine} />
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -276,7 +309,6 @@ export default function Portfolio() {
           <div className={styles.heroBgFallback} />
         )}
         <div className={styles.heroContent}>
-          {/* Personal identity line — shows the brand name as the eyebrow identity marker */}
           <p className={styles.heroEyebrow}>— {brandName} —</p>
           <h1 className={styles.heroName}>{brandName}</h1>
           {tagline && <p className={styles.heroTagline}>{tagline}</p>}
@@ -290,6 +322,7 @@ export default function Portfolio() {
             </button>
           </div>
         </div>
+        {/* Scroll indicator — bottom-center, clean vertical layout */}
         <div className={styles.heroScroll}>
           <span className={styles.heroScrollLine} />
           <span className={styles.heroScrollText}>Scroll</span>
@@ -309,7 +342,7 @@ export default function Portfolio() {
         </div>
         <div className={styles.statDivider} />
         <div className={styles.statItem}>
-          <span className="mi" style={{ fontSize: '1.1rem', color: '#fff' }}>verified</span>
+          <span className="mi" style={{ fontSize: '1.1rem' }} >verified</span>
           <span className={styles.statLabel}>Bespoke Only</span>
         </div>
       </div>
@@ -319,7 +352,6 @@ export default function Portfolio() {
         <div className={styles.aboutInner}>
           <div className={styles.aboutLeft}>
             <p className={styles.sectionEyebrow}>01 — About</p>
-            {/* Heading is now personalised to the brand */}
             <h2 className={styles.aboutHeading}>
               {brandName}
             </h2>
@@ -338,12 +370,10 @@ export default function Portfolio() {
               <p className={styles.aboutName}>{brandName}</p>
               {tagline && <p className={styles.aboutTagline}>"{tagline}"</p>}
 
-              {/* Bio / description — shown if the tailor has filled it in */}
               {brandBio && (
                 <p className={styles.aboutBio}>{brandBio}</p>
               )}
 
-              {/* Specialties pill list in the about card */}
               {dressTypes.length > 0 && (
                 <div className={styles.aboutSpecialties}>
                   <p className={styles.aboutSpecialtiesLabel}>Specialises in</p>
@@ -358,25 +388,25 @@ export default function Portfolio() {
               <div className={styles.aboutMeta}>
                 {brand.brandAddress && (
                   <div className={styles.aboutMetaRow}>
-                    <span className="mi" style={{ fontSize: '0.95rem', color: '#555', flexShrink: 0 }}>location_on</span>
+                    <span className="mi" style={{ fontSize: '0.95rem', flexShrink: 0 }}>location_on</span>
                     <span>{brand.brandAddress}</span>
                   </div>
                 )}
                 {brand.brandPhone && (
                   <a href={`tel:${brand.brandPhone}`} className={styles.aboutMetaRow}>
-                    <span className="mi" style={{ fontSize: '0.95rem', color: '#555', flexShrink: 0 }}>call</span>
+                    <span className="mi" style={{ fontSize: '0.95rem', flexShrink: 0 }}>call</span>
                     <span>{brand.brandPhone}</span>
                   </a>
                 )}
                 {brand.brandEmail && (
                   <a href={`mailto:${brand.brandEmail}`} className={styles.aboutMetaRow}>
-                    <span className="mi" style={{ fontSize: '0.95rem', color: '#555', flexShrink: 0 }}>mail</span>
+                    <span className="mi" style={{ fontSize: '0.95rem', flexShrink: 0 }}>mail</span>
                     <span>{brand.brandEmail}</span>
                   </a>
                 )}
                 {brand.brandWebsite && (
                   <a href={brand.brandWebsite} target="_blank" rel="noopener noreferrer" className={styles.aboutMetaRow}>
-                    <span className="mi" style={{ fontSize: '0.95rem', color: '#555', flexShrink: 0 }}>language</span>
+                    <span className="mi" style={{ fontSize: '0.95rem', flexShrink: 0 }}>language</span>
                     <span>{brand.brandWebsite}</span>
                   </a>
                 )}
@@ -421,16 +451,18 @@ export default function Portfolio() {
 
         {dressTypes.length > 0 && (
           <div className={styles.filterBar}>
-            <div className={styles.filterScroll}>
+            <div className={styles.filterScroll} ref={filterScrollRef}>
               <button
+                data-tab="all"
                 className={`${styles.filterPill} ${!activeTab ? styles.filterPillActive : ''}`}
-                onClick={() => setActiveTab(null)}
+                onClick={() => handleTabChange(null)}
               >All</button>
               {dressTypes.map(t => (
                 <button
                   key={t.id}
+                  data-tab={t.id}
                   className={`${styles.filterPill} ${activeTab === t.id ? styles.filterPillActive : ''}`}
-                  onClick={() => setActiveTab(t.id)}
+                  onClick={() => handleTabChange(t.id)}
                 >{t.label}</button>
               ))}
             </div>
@@ -450,7 +482,6 @@ export default function Portfolio() {
                 style={{ animationDelay: `${i * 0.05}s` }}
                 onClick={() => setLightbox(photo)}
               >
-                {/* Images shown in full colour — no grayscale filter */}
                 <img
                   src={photo.src || photo.storageUrl}
                   alt={photo.caption || 'Completed work'}
@@ -540,14 +571,29 @@ export default function Portfolio() {
         </div>
         <div className={styles.footerDivider} />
         <div className={styles.footerBottom}>
-          <p className={styles.footerPowered}>Powered by TailorFlow</p>
           <div className={styles.footerLinks}>
-            {brand.brandPhone && <a href={`tel:${brand.brandPhone}`} className={styles.footerLink}>Call</a>}
-            {brand.brandEmail && <a href={`mailto:${brand.brandEmail}`} className={styles.footerLink}>Email</a>}
             {brand.brandPhone && (
-              <a href={`https://wa.me/${brand.brandPhone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" className={styles.footerLink}>WhatsApp</a>
+              <a href={`tel:${brand.brandPhone}`} className={styles.footerLink}>
+                <span className="mi">call</span>
+                Call
+              </a>
+            )}
+            {brand.brandEmail && (
+              <a href={`mailto:${brand.brandEmail}`} className={styles.footerLink}>
+                <span className="mi">mail</span>
+                Email
+              </a>
+            )}
+            {brand.brandPhone && (
+              <a href={`https://wa.me/${brand.brandPhone.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" className={styles.footerLink}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp
+              </a>
             )}
           </div>
+        </div>
+        <div className={styles.footerPoweredRow}>
+          <p className={styles.footerPowered}>Powered by TailorFlow</p>
         </div>
       </footer>
 
