@@ -1,695 +1,956 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
-import { useCustomers } from '../../contexts/CustomerContext'
-import Header from '../../components/Header/Header'
-import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
-import Toast from '../../components/Toast/Toast'
-import styles from './Gallery.module.css'
-
-// ── STORAGE ──
-const GALLERY_KEY = 'tailorbook_gallery'
-const SUB_TABS_KEY = 'tailorbook_gallery_subtabs'
-
-function loadPhotos() {
-  try {
-    const raw = localStorage.getItem(GALLERY_KEY)
-    return raw ? JSON.parse(raw) : []
-  } catch { return [] }
+.page {
+  background: var(--bg);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
-function savePhotos(photos) {
-  try { localStorage.setItem(GALLERY_KEY, JSON.stringify(photos)) }
-  catch { /* quota exceeded — base64 images are large */ }
+/* ── TAB ACTION BAR (tabs left + context button right) ── */
+.tabActionBar {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 56px;
+  z-index: 50;
+  flex-shrink: 0;
 }
 
-function loadSubTabs() {
-  try {
-    const raw = localStorage.getItem(SUB_TABS_KEY)
-    return raw ? JSON.parse(raw) : DEFAULT_SUB_TABS
-  } catch { return DEFAULT_SUB_TABS }
+/* ── MAIN TABS (underline) ── */
+.tabs {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 13px 14px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  transition: color 0.2s;
+  flex-shrink: 0;
 }
 
-function saveSubTabs(subTabs) {
-  try { localStorage.setItem(SUB_TABS_KEY, JSON.stringify(subTabs)) }
-  catch {}
+.tabActive {
+  color: var(--accent);
+  font-weight: 800;
 }
 
-// ── TABS ──
-const TABS = [
-  { id: 'completed_works', label: 'Completed Works', icon: 'check_circle' },
-  { id: 'designs',         label: 'Designs',         icon: 'content_cut' },
-  { id: 'inspiration',     label: 'Inspiration',     icon: 'lightbulb' },
-]
-
-const CATEGORY_MAP = {
-  designs:         { label: 'Design Reference', icon: 'content_cut' },
-  completed_works: { label: 'Completed Work',   icon: 'check_circle' },
-  inspiration:     { label: 'Inspiration',      icon: 'lightbulb' },
+.tabActive::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(255,255,255,0.3);
 }
 
-// Default sub-tabs for each main tab
-const DEFAULT_SUB_TABS = {
-  completed_works: [{ id: 'kaftan', label: 'Kaftan' }, { id: 'gown', label: 'Gown' }],
-  designs:         [{ id: 'kaftan', label: 'Kaftan' }, { id: 'gown', label: 'Gown' }],
-  inspiration:     [{ id: 'kaftan', label: 'Kaftan' }, { id: 'gown', label: 'Gown' }],
+.tabIcon { font-size: 0.9rem; }
+
+.tabBadge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  font-size: 0.6rem;
+  font-weight: 800;
+  border-radius: 20px;
+  padding: 1px 5px;
+  min-width: 16px;
+  text-align: center;
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric'
-  })
+/* Context action button — right side of tab bar */
+.tabAction {
+  display: flex;
+  align-items: center;
+  padding: 0 12px 0 8px;
+  border-left: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
-// ── MANAGE SUB-TABS MODAL ──
-function ManageSubTabsModal({ isOpen, onClose, tabId, subTabs, onSave }) {
-  const [items, setItems] = useState([...(subTabs || [])])
-  const [newLabel, setNewLabel] = useState('')
+.tabActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: var(--text);
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.1px;
+  transition: opacity 0.15s;
+}
+.tabActionBtn:active { opacity: 0.75; }
 
-  useEffect(() => {
-    if (isOpen) setItems([...(subTabs || [])])
-  }, [isOpen, subTabs])
-
-  if (!isOpen) return null
-
-  const addItem = () => {
-    const trimmed = newLabel.trim()
-    if (!trimmed) return
-    const id = trimmed.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now()
-    setItems(prev => [...prev, { id, label: trimmed }])
-    setNewLabel('')
-  }
-
-  const removeItem = (id) => setItems(prev => prev.filter(t => t.id !== id))
-
-  const handleSave = () => {
-    onSave(tabId, items)
-    onClose()
-  }
-
-  return (
-    <div className={styles.sheetOverlay} onClick={onClose}>
-      <div className={styles.sheet} onClick={e => e.stopPropagation()}>
-        <div className={styles.sheetHandle} />
-        <div className={styles.sheetHeader}>
-          <span className={styles.sheetTitle}>Manage Categories</span>
-          <button className={styles.sheetClose} onClick={onClose}>
-            <span className="mi" style={{ fontSize: '1.2rem' }}>close</span>
-          </button>
-        </div>
-
-        <div className={styles.sheetBody}>
-          {items.map(item => (
-            <div key={item.id} className={styles.manageRow}>
-              <span className={styles.manageLabel}>{item.label}</span>
-              <button className={styles.manageRemove} onClick={() => removeItem(item.id)}>
-                <span className="mi" style={{ fontSize: '1rem', color: 'var(--danger)' }}>delete_outline</span>
-              </button>
-            </div>
-          ))}
-
-          <div className={styles.manageAddRow}>
-            <input
-              type="text"
-              className={styles.manageInput}
-              placeholder="New category (e.g. Agbada)"
-              value={newLabel}
-              onChange={e => setNewLabel(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') addItem() }}
-            />
-            <button
-              className={styles.manageAddBtn}
-              onClick={addItem}
-              disabled={!newLabel.trim()}
-            >
-              <span className="mi" style={{ fontSize: '1.1rem' }}>add</span>
-            </button>
-          </div>
-        </div>
-
-        <div className={styles.sheetFooter}>
-          <button className={styles.sheetSaveBtn} onClick={handleSave}>Save Changes</button>
-        </div>
-      </div>
-    </div>
-  )
+/* ── SUB TABS (rounded pills) ── */
+.subTabsBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 8px;
+  background: var(--bg);
+  position: sticky;
+  top: calc(56px + 45px); /* header + tabActionBar */
+  z-index: 49;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
-// ── ADD PHOTO MODAL ──
-function AddPhotoModal({ isOpen, onClose, onSave, customers, subTabs, activeMainTab }) {
-  const [category, setCategory]         = useState(activeMainTab || 'completed_works')
-  const [selectedCust, setSelectedCust] = useState(null)
-  const [custQuery, setCustQuery]       = useState('')
-  const [custDropOpen, setCustDropOpen] = useState(false)
-  const [photos, setPhotos]             = useState([]) // array of { src, name, caption, clothingType }
-  const [captionErrors, setCaptionErrors] = useState({})
-  const fileInputRef   = useRef(null)
-  const cameraInputRef = useRef(null)
+.subTabsScroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex: 1;
+  scroll-behavior: smooth;
+}
+.subTabsScroll::-webkit-scrollbar { display: none; }
 
-  const currentSubTabs = subTabs[category] || []
-
-  const filteredCusts = custQuery.trim()
-    ? customers.filter(c =>
-        c.name.toLowerCase().includes(custQuery.toLowerCase()) ||
-        c.phone?.includes(custQuery)
-      )
-    : customers
-
-  const handleFiles = (files) => {
-    const defaultType = currentSubTabs[0]?.id || ''
-    Array.from(files).forEach(file => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setPhotos(prev => [...prev, {
-          src: e.target.result,
-          name: file.name,
-          caption: '',
-          clothingType: defaultType,
-        }])
-      }
-      reader.readAsDataURL(file)
-    })
-  }
-
-  const removePhoto = (idx) => setPhotos(prev => prev.filter((_, i) => i !== idx))
-
-  const updatePhoto = (idx, field, value) => {
-    setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, [field]: value } : p))
-    if (field === 'caption') {
-      setCaptionErrors(prev => ({ ...prev, [idx]: false }))
-    }
-  }
-
-  const reset = () => {
-    setCategory(activeMainTab || 'completed_works')
-    setSelectedCust(null)
-    setCustQuery(''); setCustDropOpen(false)
-    setPhotos([])
-    setCaptionErrors({})
-  }
-
-  const handleClose = () => { reset(); onClose() }
-
-  const handleSave = () => {
-    if (photos.length === 0) return
-    // Validate all captions are filled
-    const errors = {}
-    photos.forEach((p, i) => {
-      if (!p.caption.trim()) errors[i] = true
-    })
-    if (Object.keys(errors).length > 0) {
-      setCaptionErrors(errors)
-      return
-    }
-    const dateStr = new Date().toISOString()
-    photos.forEach(p => {
-      onSave({
-        id: Date.now() + Math.random(),
-        src: p.src,
-        category,
-        caption: p.caption.trim(),
-        clothingType: p.clothingType,
-        customerId:   selectedCust ? String(selectedCust.id) : null,
-        customerName: selectedCust ? selectedCust.name : null,
-        date: dateStr,
-      })
-    })
-    reset()
-    onClose()
-  }
-
-  // When category changes, reset clothingType for all photos
-  useEffect(() => {
-    const defaultType = (subTabs[category] || [])[0]?.id || ''
-    setPhotos(prev => prev.map(p => ({ ...p, clothingType: defaultType })))
-  }, [category, subTabs])
-
-  if (!isOpen) return null
-
-  return (
-    <div className={styles.modalOverlay}>
-      <Header
-        type="back"
-        title="Add Photo"
-        onBackClick={handleClose}
-        customActions={[{
-          label: 'Save',
-          onClick: handleSave,
-          disabled: photos.length === 0
-        }]}
-      />
-
-      <div className={styles.modalBody}>
-        {/* Photo picker area */}
-        {photos.length === 0 ? (
-          <div className={styles.uploadArea}>
-            <div className={styles.uploadIcon}>
-              <span className="mi" style={{ fontSize: '3rem', opacity: 0.3 }}>add_a_photo</span>
-            </div>
-            <p className={styles.uploadText}>Add photos from your camera or files</p>
-            <div className={styles.uploadBtns}>
-              <button className={styles.uploadBtn} onClick={() => cameraInputRef.current?.click()}>
-                <span className="mi" style={{ fontSize: '1.2rem' }}>photo_camera</span>
-                Camera
-              </button>
-              <button className={styles.uploadBtn} onClick={() => fileInputRef.current?.click()}>
-                <span className="mi" style={{ fontSize: '1.2rem' }}>photo_library</span>
-                Gallery
-              </button>
-            </div>
-            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" hidden onChange={e => handleFiles(e.target.files)} />
-            <input ref={fileInputRef}   type="file" accept="image/*" multiple          hidden onChange={e => handleFiles(e.target.files)} />
-          </div>
-        ) : (
-          <div className={styles.previewSection}>
-            {/* Per-image caption + clothing type */}
-            {photos.map((p, i) => (
-              <div key={i} className={styles.photoEntry}>
-                <div className={styles.photoEntryTop}>
-                  <div className={styles.previewThumb}>
-                    <img src={p.src} alt={p.name} className={styles.previewImg} />
-                    <button className={styles.previewRemove} onClick={() => removePhoto(i)}>
-                      <span className="mi" style={{ fontSize: '0.9rem' }}>close</span>
-                    </button>
-                  </div>
-                  <div className={styles.photoEntryFields}>
-                    <div className={styles.fieldGroup}>
-                      <label className={styles.fieldLabel}>
-                        Caption <span className={styles.required}>*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`${styles.input} ${captionErrors[i] ? styles.inputError : ''}`}
-                        placeholder="e.g. Senator suit for Emeka"
-                        value={p.caption}
-                        onChange={e => updatePhoto(i, 'caption', e.target.value)}
-                      />
-                      {captionErrors[i] && (
-                        <span className={styles.errorMsg}>Caption is required</span>
-                      )}
-                    </div>
-                    {currentSubTabs.length > 0 && (
-                      <div className={styles.fieldGroup}>
-                        <label className={styles.fieldLabel}>Category</label>
-                        <div className={styles.clothingTypeRow}>
-                          {currentSubTabs.map(st => (
-                            <button
-                              key={st.id}
-                              className={`${styles.clothingTypeChip} ${p.clothingType === st.id ? styles.clothingTypeActive : ''}`}
-                              onClick={() => updatePhoto(i, 'clothingType', st.id)}
-                            >
-                              {st.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* Add more button */}
-            <button className={styles.addMoreBtn} onClick={() => fileInputRef.current?.click()}>
-              <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>add_photo_alternate</span>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text3)', fontWeight: 700 }}>Add more photos</span>
-            </button>
-
-            <input ref={fileInputRef}   type="file" accept="image/*" multiple          hidden onChange={e => handleFiles(e.target.files)} />
-            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" hidden onChange={e => handleFiles(e.target.files)} />
-          </div>
-        )}
-
-        {/* Category (main tab) */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Section</label>
-          <div className={styles.categoryRow}>
-            {Object.entries(CATEGORY_MAP).map(([key, val]) => (
-              <button
-                key={key}
-                className={`${styles.categoryChip} ${category === key ? styles.categoryActive : ''}`}
-                onClick={() => setCategory(key)}
-              >
-                <span className="mi" style={{ fontSize: '1rem' }}>{val.icon}</span>
-                <span className={styles.categoryLabel}>{val.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Related client */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Related Client <span className={styles.optional}>(optional)</span></label>
-          {selectedCust ? (
-            <div className={styles.selectedChip}>
-              <div className={styles.chipAvatar}>
-                {selectedCust.name.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase()}
-              </div>
-              <span className={styles.chipName}>{selectedCust.name}</span>
-              <button className={styles.chipRemove} onClick={() => setSelectedCust(null)}>
-                <span className="mi" style={{ fontSize: '1rem' }}>close</span>
-              </button>
-            </div>
-          ) : (
-            <div className={styles.searchWrap}>
-              <span className="mi" style={{ color: 'var(--text3)', fontSize: '1.1rem' }}>search</span>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Search client…"
-                value={custQuery}
-                onChange={e => { setCustQuery(e.target.value); setCustDropOpen(true) }}
-                onFocus={() => setCustDropOpen(true)}
-              />
-              {custDropOpen && custQuery && (
-                <div className={styles.dropdown}>
-                  {filteredCusts.length === 0 ? (
-                    <div className={styles.dropEmpty}>No clients found</div>
-                  ) : (
-                    filteredCusts.slice(0, 5).map(c => (
-                      <button key={c.id} className={styles.dropItem}
-                        onClick={() => { setSelectedCust(c); setCustQuery(''); setCustDropOpen(false) }}>
-                        <div className={styles.dropAvatar}>
-                          {c.name.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase()}
-                        </div>
-                        <div>
-                          <div className={styles.dropName}>{c.name}</div>
-                          <div className={styles.dropMeta}>{c.phone}</div>
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
+.subTab {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  color: var(--text3);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
 }
 
-// ── LIGHTBOX ──
-function Lightbox({ photo, photos, onClose, onDelete }) {
-  const [current, setCurrent] = useState(photo)
-
-  const idx     = photos.findIndex(p => p.id === current.id)
-  const hasPrev = idx > 0
-  const hasNext = idx < photos.length - 1
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.key === 'ArrowLeft'  && hasPrev) setCurrent(photos[idx - 1])
-      if (e.key === 'ArrowRight' && hasNext) setCurrent(photos[idx + 1])
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [idx, hasPrev, hasNext, photos, onClose])
-
-  const cat = CATEGORY_MAP[current.category]
-
-  return (
-    <div className={styles.lightboxOverlay} onClick={onClose}>
-      <div className={styles.lightboxContent} onClick={e => e.stopPropagation()}>
-        {/* Top bar */}
-        <div className={styles.lightboxBar}>
-          <button className={styles.lightboxBtn} onClick={onClose}>
-            <span className="mi" style={{ fontSize: '1.6rem' }}>close</span>
-          </button>
-          <div className={styles.lightboxCounter}>{idx + 1} / {photos.length}</div>
-          <button className={styles.lightboxBtn} onClick={() => onDelete(current)} style={{ color: 'var(--danger)' }}>
-            <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--danger)' }}>delete_outline</span>
-          </button>
-        </div>
-
-        {/* Image */}
-        <div className={styles.lightboxImgWrap}>
-          {hasPrev && (
-            <button className={`${styles.navBtn} ${styles.navLeft}`} onClick={() => setCurrent(photos[idx - 1])}>
-              <span className="mi" style={{ fontSize: '1.6rem' }}>chevron_left</span>
-            </button>
-          )}
-          <img src={current.src} alt={current.caption || 'Photo'} className={styles.lightboxImg} />
-          {hasNext && (
-            <button className={`${styles.navBtn} ${styles.navRight}`} onClick={() => setCurrent(photos[idx + 1])}>
-              <span className="mi" style={{ fontSize: '1.6rem' }}>chevron_right</span>
-            </button>
-          )}
-        </div>
-
-        {/* Info */}
-        <div className={styles.lightboxInfo}>
-          {current.caption && <div className={styles.lightboxCaption}>{current.caption}</div>}
-          <div className={styles.lightboxMeta}>
-            {cat && (
-              <span className={styles.lightboxChip}>
-                <span className="mi" style={{ fontSize: '0.85rem' }}>{cat.icon}</span>
-                {cat.label}
-              </span>
-            )}
-            {current.customerName && (
-              <span className={styles.lightboxChip}>
-                <span className="mi" style={{ fontSize: '0.75rem' }}>person</span>
-                {current.customerName}
-              </span>
-            )}
-            <span className={styles.lightboxChip}>
-              <span className="mi" style={{ fontSize: '0.75rem' }}>calendar_today</span>
-              {formatDate(current.date)}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+.subTabActive {
+  border-color: var(--text);
+  color: var(--bg);
+  background: var(--text);
 }
 
-// ── MAIN PAGE ──
-export default function Gallery({ onMenuClick }) {
-  const { customers } = useCustomers()
+.subTabActions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  padding-left: 8px;
+  margin-left: 2px;
+}
 
-  const [photos, setPhotos]                     = useState(() => loadPhotos())
-  const [activeTab, setActiveTab]               = useState('completed_works')
-  const [activeSubTabs, setActiveSubTabs]       = useState({}) // { tabId: subTabId }
-  const [subTabs, setSubTabs]                   = useState(() => loadSubTabs())
-  const [manageTabId, setManageTabId]           = useState(null)
-  const [modalOpen, setModalOpen]               = useState(false)
-  const [lightboxPhoto, setLightboxPhoto]       = useState(null)
-  const [confirmDel, setConfirmDel]             = useState(null)
-  const [toastMsg, setToastMsg]                 = useState('')
-  const toastTimer = useRef(null)
-  const tabsRef    = useRef(null)
+.subTabIconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.subTabIconBtn:active { background: var(--surface2); color: var(--text); }
 
-  const showToast = useCallback((msg) => {
-    setToastMsg(msg)
-    clearTimeout(toastTimer.current)
-    toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
-  }, [])
+/* ── SHARE PORTFOLIO BANNER ── */
+.portfolioBanner {
+  padding: 10px 14px 8px;
+  display: flex;
+  flex-shrink: 0;
+}
 
-  useEffect(() => { savePhotos(photos) }, [photos])
-  useEffect(() => { saveSubTabs(subTabs) }, [subTabs])
+.portfolioBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 10px;
+  border: none;
+  background: var(--text);
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: opacity 0.15s;
+}
+.portfolioBtn:active { opacity: 0.75; }
 
-  const addPhoto = (photo) => setPhotos(prev => [photo, ...prev])
+/* ── PHOTO GRID ── */
+.gridArea {
+  flex: 1;
+  padding: 12px 12px calc(90px + var(--sb));
+}
 
-  const handleDeleteConfirm = () => {
-    if (!confirmDel) return
-    setPhotos(prev => prev.filter(p => p.id !== confirmDel.id))
-    if (lightboxPhoto?.id === confirmDel.id) setLightboxPhoto(null)
-    showToast('Photo deleted')
-    setConfirmDel(null)
-  }
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+}
 
-  const handleSaveSubTabs = (tabId, newTabs) => {
-    setSubTabs(prev => ({ ...prev, [tabId]: newTabs }))
-    // Reset active sub-tab for this main tab if it no longer exists
-    const ids = newTabs.map(t => t.id)
-    setActiveSubTabs(prev => ({
-      ...prev,
-      [tabId]: ids.includes(prev[tabId]) ? prev[tabId] : (ids[0] || null)
-    }))
-  }
+.photoThumb {
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--surface2);
+  animation: fadeIn 0.3s ease both;
+}
 
-  const currentSubTabs = subTabs[activeTab] || []
-  const activeSubTab   = activeSubTabs[activeTab] || currentSubTabs[0]?.id || null
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
 
-  // Filter by main tab then by sub-tab
-  const filteredByMain = photos.filter(p => p.category === activeTab)
-  const filtered = activeSubTab
-    ? filteredByMain.filter(p => p.clothingType === activeSubTab)
-    : filteredByMain
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.2s;
+}
+.photoThumb:active .thumbImg { transform: scale(0.97); }
 
-  const counts = Object.fromEntries(
-    TABS.map(t => [t.id, photos.filter(p => p.category === t.id).length])
-  )
+.thumbBadge {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  font-size: 0.75rem;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border-radius: 6px;
+  padding: 2px 5px;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  const lightboxList = lightboxPhoto ? filtered : []
+.thumbCaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 6px 5px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  return (
-    <div className={styles.page}>
-      <Header title="Gallery" onMenuClick={onMenuClick} />
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+  gap: 10px;
+  text-align: center;
+}
+.emptyState p {
+  font-size: 0.85rem;
+  color: var(--text3);
+}
+.emptyHint {
+  font-size: 0.75rem;
+  color: var(--text3);
+  opacity: 0.6;
+}
 
-      {/* MAIN TABS + CONTEXT ACTION (same sticky row) */}
-      <div className={styles.tabActionBar}>
-        <div className={styles.tabs} ref={tabsRef}>
-          {TABS.map(tab => (
-            <div
-              key={tab.id}
-              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-              onClick={(e) => {
-                setActiveTab(tab.id)
-                e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-              }}
-            >
-              <span>{tab.label}</span>
-              {counts[tab.id] > 0 && (
-                <span className={styles.tabBadge}>{counts[tab.id]}</span>
-              )}
-            </div>
-          ))}
-        </div>
+/* ── FAB ── */
+.fab {
+  position: fixed;
+  bottom: calc(28px + var(--sb));
+  right: 22px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  z-index: 150;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.fab:active { transform: scale(0.93); }
 
-        {/* Per-tab action button — top right */}
-        <div className={styles.tabAction}>
-          {activeTab === 'completed_works' && (
-            <button
-              className={styles.tabActionBtn}
-              onClick={() => showToast('Portfolio link coming soon!')}
-            >
-              <span className="mi" style={{ fontSize: '0.95rem' }}>share</span>
-              <span className={styles.tabActionLabel}>Share</span>
-            </button>
-          )}
-          {activeTab === 'designs' && (
-            <button
-              className={styles.tabActionBtn}
-              onClick={() => showToast('Export lookbook coming soon!')}
-            >
-              <span className="mi" style={{ fontSize: '0.95rem' }}>picture_as_pdf</span>
-              <span className={styles.tabActionLabel}>Lookbook</span>
-            </button>
-          )}
-          {activeTab === 'inspiration' && (
-            <button
-              className={styles.tabActionBtn}
-              onClick={() => showToast('Share board coming soon!')}
-            >
-              <span className="mi" style={{ fontSize: '0.95rem' }}>send</span>
-              <span className={styles.tabActionLabel}>Send Board</span>
-            </button>
-          )}
-        </div>
-      </div>
+/* ── ADD PHOTO MODAL ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-      {/* SUB-TABS (rounded pill style) */}
-      <div className={styles.subTabsBar}>
-        <div className={styles.subTabsScroll}>
-          {currentSubTabs.map(st => (
-            <button
-              key={st.id}
-              className={`${styles.subTab} ${activeSubTab === st.id ? styles.subTabActive : ''}`}
-              onClick={() => setActiveSubTabs(prev => ({ ...prev, [activeTab]: st.id }))}
-            >
-              {st.label}
-            </button>
-          ))}
-        </div>
-        {/* Action icons */}
-        <div className={styles.subTabActions}>
-          <button
-            className={styles.subTabIconBtn}
-            onClick={() => setManageTabId(activeTab)}
-            title="Edit categories"
-          >
-            <span className="mi" style={{ fontSize: '1.1rem' }}>edit</span>
-          </button>
-          <button
-            className={styles.subTabIconBtn}
-            onClick={() => setManageTabId(activeTab)}
-            title="Add category"
-          >
-            <span className="mi" style={{ fontSize: '1.1rem' }}>add</span>
-          </button>
-        </div>
-      </div>
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
 
-      {/* GRID */}
-      <div className={styles.gridArea}>
-        {filtered.length === 0 ? (
-          <div className={styles.emptyState}>
-            <span className="mi" style={{ fontSize: '3rem', opacity: 0.15 }}>
-              {CATEGORY_MAP[activeTab]?.icon ?? 'image'}
-            </span>
-            <p>No photos here yet.</p>
-            <span className={styles.emptyHint}>Tap + to add your first photo</span>
-          </div>
-        ) : (
-          <div className={styles.photoGrid}>
-            {filtered.map((photo, i) => (
-              <div
-                key={photo.id}
-                className={styles.photoThumb}
-                style={{ animationDelay: `${i * 0.03}s` }}
-                onClick={() => setLightboxPhoto(photo)}
-              >
-                <img src={photo.src} alt={photo.caption || 'photo'} className={styles.thumbImg} />
-                <div className={styles.thumbBadge}>
-                  <span className="mi" style={{ fontSize: '0.8rem' }}>{CATEGORY_MAP[photo.category]?.icon}</span>
-                </div>
-                {photo.caption && (
-                  <div className={styles.thumbCaption}>{photo.caption}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+.modalHeader {
+  padding: calc(14px + var(--st)) 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
 
-      {/* FAB */}
-      <button className={styles.fab} onClick={() => setModalOpen(true)}>
-        <span className="mi">add</span>
-      </button>
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-      {/* ADD PHOTO MODAL */}
-      {modalOpen && (
-        <AddPhotoModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSave={addPhoto}
-          customers={customers}
-          subTabs={subTabs}
-          activeMainTab={activeTab}
-        />
-      )}
+.modalBack {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
 
-      {/* MANAGE SUB-TABS */}
-      <ManageSubTabsModal
-        isOpen={!!manageTabId}
-        onClose={() => setManageTabId(null)}
-        tabId={manageTabId}
-        subTabs={subTabs[manageTabId] || []}
-        onSave={handleSaveSubTabs}
-      />
+.modalTitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text);
+}
 
-      {/* LIGHTBOX */}
-      {lightboxPhoto && (
-        <Lightbox
-          photo={lightboxPhoto}
-          photos={lightboxList}
-          onClose={() => setLightboxPhoto(null)}
-          onDelete={(p) => { setLightboxPhoto(null); setConfirmDel(p) }}
-        />
-      )}
+.headerSaveBtn {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.headerSaveBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 
-      {/* CONFIRM DELETE */}
-      <ConfirmSheet
-        open={!!confirmDel}
-        title="Delete Photo?"
-        message="This photo will be permanently removed."
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setConfirmDel(null)}
-      />
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 20px 50px;
+  -webkit-overflow-scrolling: touch;
+}
 
-      <Toast message={toastMsg} />
-    </div>
-  )
+/* Upload area */
+.uploadArea {
+  border: 1.5px dashed var(--border2);
+  border-radius: 18px;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.uploadIcon { font-size: 2.5rem; opacity: 0.4; }
+
+.uploadText {
+  font-size: 0.85rem;
+  color: var(--text3);
+  font-weight: 600;
+}
+
+.uploadBtns {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.uploadBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.uploadBtn:active { background: var(--surface2); }
+
+/* Preview section — per-image entries */
+.previewSection { margin-bottom: 20px; }
+
+.photoEntry {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.photoEntryTop {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.previewThumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.previewRemove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.65);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.photoEntryFields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.addMoreBtn {
+  width: 100%;
+  border-radius: 12px;
+  border: 1.5px dashed var(--border2);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text);
+  padding: 14px;
+  margin-top: 4px;
+}
+
+/* Clothing type chips in modal */
+.clothingTypeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.clothingTypeChip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text3);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.clothingTypeActive {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(255,255,255,0.04);
+}
+
+/* Fields */
+.fieldGroup { margin-bottom: 14px; }
+.fieldLabel {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 6px;
+}
+.required {
+  color: var(--danger, #e53e3e);
+  font-size: 0.65rem;
+}
+.optional {
+  color: var(--text3);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 11px 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+}
+.input:focus { border-color: var(--text2); }
+.input::placeholder { color: var(--text3); }
+
+.inputError { border-color: var(--danger, #e53e3e) !important; }
+.errorMsg {
+  font-size: 0.65rem;
+  color: var(--danger, #e53e3e);
+  margin-top: 4px;
+  display: block;
+}
+
+/* Category chips */
+.categoryRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.categoryChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.categoryActive {
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.05);
+  color: var(--accent);
+}
+.categoryLabel { flex: 1; }
+
+/* Search */
+.searchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 0 12px;
+  position: relative;
+}
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  padding: 13px 0;
+}
+.searchInput::placeholder { color: var(--text3); }
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  z-index: 100;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.dropItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.dropItem:active { background: var(--surface2); }
+.dropAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text2);
+  flex-shrink: 0;
+}
+.dropName  { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+.dropMeta  { font-size: 0.7rem; color: var(--text3); margin-top: 1px; }
+.dropEmpty { padding: 14px; font-size: 0.8rem; color: var(--text3); text-align: center; }
+
+/* Selected chip */
+.selectedChip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.chipAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--text2);
+  flex-shrink: 0;
+}
+.chipName { flex: 1; font-size: 0.88rem; font-weight: 700; color: var(--text); }
+.chipRemove {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* ── MANAGE SUB-TABS SHEET ── */
+.sheetOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 3000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg);
+  border-radius: 20px 20px 0 0;
+  padding: 0 0 calc(20px + var(--sb));
+  animation: sheetUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheetHandle {
+  width: 36px;
+  height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sheetTitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.sheetClose {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.sheetBody {
+  padding: 14px 20px;
+  max-height: 50vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.manageRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  background: var(--surface);
+}
+
+.manageLabel {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.manageRemove {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.manageAddRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.manageInput {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 11px 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  -webkit-appearance: none;
+}
+.manageInput::placeholder { color: var(--text3); }
+.manageInput:focus { border-color: var(--text2); }
+
+.manageAddBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.manageAddBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+.manageAddBtn:not(:disabled):active { background: var(--surface2); }
+
+.sheetFooter {
+  padding: 0 20px;
+  margin-top: 4px;
+}
+
+.sheetSaveBtn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.sheetSaveBtn:active { opacity: 0.85; }
+
+/* ── LIGHTBOX ── */
+.lightboxOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightboxContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.lightboxBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(14px + var(--st)) 16px 10px;
+  flex-shrink: 0;
+}
+
+.lightboxBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightboxCounter {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+}
+
+.lightboxImgWrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lightboxImg {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.navBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.navLeft  { left: 12px; }
+.navRight { right: 12px; }
+
+.lightboxInfo {
+  padding: 14px 20px calc(20px + var(--sb));
+  flex-shrink: 0;
+}
+
+.lightboxCaption {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.lightboxMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lightboxChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
 }
