@@ -170,8 +170,15 @@
 
 /* ── Image section ── */
 .imageSection {
-  padding: 16px 20px 4px;
+  padding: 16px 20px 14px;
   border-bottom: 1px solid var(--border);
+}
+
+.imageSectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 14px;
 }
 
 .imageLabel {
@@ -180,7 +187,18 @@
   text-transform: uppercase;
   letter-spacing: 0.8px;
   color: var(--text3);
-  margin: 0 0 14px;
+  margin: 0;
+}
+
+.imageRequired {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text3);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 2px 8px;
+  margin: 0;
 }
 
 .imageEmptyHint {
@@ -197,6 +215,22 @@
   line-height: 1.4;
 }
 
+/* Validation banner */
+.validationBanner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin: 0 0 14px;
+  animation: fadeIn 0.2s ease;
+}
+
 /* ── Image Dropdown ── */
 .imgDropWrap {
   margin-bottom: 14px;
@@ -210,6 +244,10 @@
   letter-spacing: 0.5px;
   color: var(--text2);
   margin: 0 0 7px;
+}
+
+.imgDropRequired {
+  color: #ef4444;
 }
 
 .imgDropTrigger {
@@ -230,6 +268,20 @@
 
 .imgDropTriggerOpen {
   border-color: var(--text2);
+}
+
+.imgDropTriggerError {
+  border-color: #ef4444;
+}
+
+.imgDropErrorHint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #ef4444;
+  margin: 5px 0 0 2px;
 }
 
 .imgDropPlaceholder {
@@ -397,6 +449,47 @@
   color: var(--text3);
 }
 
+/* ── Save images button ── */
+.saveImagesBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: var(--text);
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, opacity 0.15s;
+  margin-top: 4px;
+}
+
+.saveImagesBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveImagesBtn:not(:disabled):active {
+  opacity: 0.8;
+}
+
+.saveImagesBtnDone {
+  background: #22c55e;
+  color: #fff;
+}
+
+.settingsLoading {
+  font-size: 0.7rem;
+  color: var(--text3);
+  text-align: center;
+  margin: 6px 0 0;
+}
+
 /* ── Share options ── */
 .shareSection {
   padding: 16px 20px 8px;
@@ -463,6 +556,10 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── Footer ── */
