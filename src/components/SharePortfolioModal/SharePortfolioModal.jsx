@@ -108,7 +108,6 @@ function ImageDropdown({ label, photos, value, onChange, required, hasError }) {
         {required && <span className={styles.imgDropRequired}> *</span>}
       </p>
 
-      {/* Trigger */}
       <button
         type="button"
         className={`${styles.imgDropTrigger} ${isOpen ? styles.imgDropTriggerOpen : ''} ${hasError ? styles.imgDropTriggerError : ''}`}
@@ -137,7 +136,6 @@ function ImageDropdown({ label, photos, value, onChange, required, hasError }) {
         </span>
       </button>
 
-      {/* Error hint */}
       {hasError && (
         <p className={styles.imgDropErrorHint}>
           <span className="mi" style={{ fontSize: '0.8rem' }}>error_outline</span>
@@ -145,7 +143,6 @@ function ImageDropdown({ label, photos, value, onChange, required, hasError }) {
         </p>
       )}
 
-      {/* Panel */}
       {isOpen && (
         <div className={styles.imgDropPanel}>
           <div className={styles.imgDropSearch}>
@@ -212,31 +209,26 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
   const [settingsLoaded,  setSettingsLoaded]  = useState(false)
   const [saving,          setSaving]          = useState(false)
   const [saved,           setSaved]           = useState(false)
-  // Validation error flags — only shown after a save attempt
+  const [saveError,       setSaveError]       = useState(false)
   const [showErrors,      setShowErrors]      = useState(false)
 
-  const hasPhotos      = completedWorksPhotos.length > 0
-  // Both required only when photos exist
-  const heroError      = hasPhotos && showErrors && !heroImageId
-  const footerError    = hasPhotos && showErrors && !footerImageId
-  const bothSelected   = !hasPhotos || (!!heroImageId && !!footerImageId)
+  const hasPhotos   = completedWorksPhotos.length > 0
+  const heroError   = hasPhotos && showErrors && !heroImageId
+  const footerError = hasPhotos && showErrors && !footerImageId
 
   const portfolioLink = user
     ? `${window.location.origin}/portfolio/${user.uid}`
     : ''
 
-  // Animate overlay in/out
   useEffect(() => {
     if (isOpen) {
       requestAnimationFrame(() => setVisible(true))
     } else {
       setVisible(false)
-      // Reset error state when modal closes
       setShowErrors(false)
     }
   }, [isOpen])
 
-  // Load existing saved settings when modal opens
   useEffect(() => {
     if (!isOpen || !user) return
     setSettingsLoaded(false)
@@ -253,27 +245,37 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
 
   if (!isOpen) return null
 
-  // ── Explicit save (replaces auto-save) ──────────────────────
+  // ── Save with 8s timeout so it never hangs on slow mobile ───
   const handleSaveImages = async () => {
-    // If photos exist, both must be selected
     if (hasPhotos && (!heroImageId || !footerImageId)) {
       setShowErrors(true)
       return
     }
     if (!user) return
+
     setSaving(true)
+    setSaveError(false)
+
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('timeout')), 8000)
+    )
+
     try {
-      await savePortfolioSettings(user.uid, { heroImageId, footerImageId })
+      await Promise.race([
+        savePortfolioSettings(user.uid, { heroImageId, footerImageId }),
+        timeout,
+      ])
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
     } catch (err) {
       console.error('[SharePortfolioModal] save failed', err)
+      setSaveError(true)
+      setTimeout(() => setSaveError(false), 3000)
     } finally {
       setSaving(false)
     }
   }
 
-  // Clear errors as soon as both are filled
   const handleHeroChange = (id) => {
     setHeroImageId(id)
     if (id && footerImageId) setShowErrors(false)
@@ -314,6 +316,12 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) onClose()
   }
+
+  const saveBtnClass = [
+    styles.saveImagesBtn,
+    saved      ? styles.saveImagesBtnDone  : '',
+    saveError  ? styles.saveImagesBtnError : '',
+  ].join(' ')
 
   return (
     <div
@@ -374,7 +382,6 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
             </p>
           ) : (
             <>
-              {/* Validation banner — shown after failed save attempt */}
               {showErrors && (
                 <div className={styles.validationBanner}>
                   <span className="mi" style={{ fontSize: '0.9rem' }}>warning</span>
@@ -399,9 +406,8 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
                 hasError={footerError}
               />
 
-              {/* Save button */}
               <button
-                className={`${styles.saveImagesBtn} ${saved ? styles.saveImagesBtnDone : ''}`}
+                className={saveBtnClass}
                 onClick={handleSaveImages}
                 disabled={saving}
               >
@@ -415,6 +421,11 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
                     <span className="mi" style={{ fontSize: '1rem' }}>check</span>
                     Saved to portfolio!
                   </>
+                ) : saveError ? (
+                  <>
+                    <span className="mi" style={{ fontSize: '1rem' }}>wifi_off</span>
+                    Failed — check connection
+                  </>
                 ) : (
                   <>
                     <span className="mi" style={{ fontSize: '1rem' }}>save</span>
@@ -423,7 +434,6 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
                 )}
               </button>
 
-              {/* Loading skeleton while settings are fetching */}
               {!settingsLoaded && (
                 <p className={styles.settingsLoading}>Loading saved selections…</p>
               )}
