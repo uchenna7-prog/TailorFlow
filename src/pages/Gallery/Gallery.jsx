@@ -17,10 +17,13 @@ const TABS = [
 ]
 
 const CATEGORY_MAP = {
-  completed_works: { label: 'Completed Work',   icon: 'check_circle' },
-  designs:         { label: 'Design Reference', icon: 'content_cut'  },
-  inspiration:     { label: 'Inspiration',      icon: 'lightbulb'    },
+  completed_works: { label: 'Completed Work', icon: 'check_circle' },
+  designs:         { label: 'Design',         icon: 'content_cut'  },
+  inspiration:     { label: 'Inspiration',    icon: 'lightbulb'    },
 }
+
+// The virtual "All" sub-tab — always first, never editable
+const ALL_SUB_TAB = { id: '__all__', label: 'All' }
 
 function formatDate(ts) {
   if (!ts) return ''
@@ -99,11 +102,8 @@ function ManageDressTypesSheet({ isOpen, onClose, tabId, types, onSave }) {
 
 // ── ADD PHOTO MODAL ─────────────────────────────────────────────
 
-function AddPhotoModal({ isOpen, onClose, onSave, customers, dressTypes, activeMainTab }) {
+function AddPhotoModal({ isOpen, onClose, onSave, dressTypes, activeMainTab }) {
   const [category,      setCategory]     = useState(activeMainTab || 'completed_works')
-  const [selectedCust,  setSelectedCust] = useState(null)
-  const [custQuery,     setCustQuery]    = useState('')
-  const [custDropOpen,  setCustDropOpen] = useState(false)
   const [photos,        setPhotos]       = useState([])
   const [captionErrors, setCaptionErrors] = useState({})
   const [typeErrors,    setTypeErrors]   = useState({})
@@ -111,12 +111,6 @@ function AddPhotoModal({ isOpen, onClose, onSave, customers, dressTypes, activeM
   const cameraInputRef = useRef(null)
 
   const typeOptions = dressTypes[category] || []
-
-  const filteredCusts = custQuery.trim()
-    ? customers.filter(c =>
-        c.name.toLowerCase().includes(custQuery.toLowerCase()) ||
-        c.phone?.includes(custQuery))
-    : customers
 
   const handleFiles = (files) => {
     const defaultType = typeOptions[0]?.id || ''
@@ -139,7 +133,6 @@ function AddPhotoModal({ isOpen, onClose, onSave, customers, dressTypes, activeM
 
   const reset = () => {
     setCategory(activeMainTab || 'completed_works')
-    setSelectedCust(null); setCustQuery(''); setCustDropOpen(false)
     setPhotos([]); setCaptionErrors({}); setTypeErrors({})
   }
 
@@ -164,8 +157,8 @@ function AddPhotoModal({ isOpen, onClose, onSave, customers, dressTypes, activeM
         caption: p.caption.trim(),
         clothingType: p.clothingType,
         clothingTypeLabel: typeLabel,
-        customerId:   selectedCust ? String(selectedCust.id) : null,
-        customerName: selectedCust ? selectedCust.name : null,
+        customerId:   null,
+        customerName: null,
         date: dateStr,
       })
     })
@@ -290,52 +283,6 @@ function AddPhotoModal({ isOpen, onClose, onSave, customers, dressTypes, activeM
           </div>
         </div>
 
-        {/* Related client */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>Related Client <span className={styles.optional}>(optional)</span></label>
-          {selectedCust ? (
-            <div className={styles.selectedChip}>
-              <div className={styles.chipAvatar}>
-                {selectedCust.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}
-              </div>
-              <span className={styles.chipName}>{selectedCust.name}</span>
-              <button className={styles.chipRemove} onClick={() => setSelectedCust(null)}>
-                <span className="mi" style={{ fontSize: '1rem' }}>close</span>
-              </button>
-            </div>
-          ) : (
-            <div className={styles.searchWrap}>
-              <span className="mi" style={{ color: 'var(--text3)', fontSize: '1.1rem' }}>search</span>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="Search client…"
-                value={custQuery}
-                onChange={e => { setCustQuery(e.target.value); setCustDropOpen(true) }}
-                onFocus={() => setCustDropOpen(true)}
-              />
-              {custDropOpen && custQuery && (
-                <div className={styles.dropdown}>
-                  {filteredCusts.length === 0 ? (
-                    <div className={styles.dropEmpty}>No clients found</div>
-                  ) : filteredCusts.slice(0, 5).map(c => (
-                    <button key={c.id} className={styles.dropItem}
-                      onClick={() => { setSelectedCust(c); setCustQuery(''); setCustDropOpen(false) }}>
-                      <div className={styles.dropAvatar}>
-                        {c.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()}
-                      </div>
-                      <div>
-                        <div className={styles.dropName}>{c.name}</div>
-                        <div className={styles.dropMeta}>{c.phone}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
       </div>
     </div>
   )
@@ -434,9 +381,10 @@ export default function Gallery({ onMenuClick }) {
   const [lightboxPhoto, setLightboxPhoto] = useState(null)
   const [confirmDel,    setConfirmDel]    = useState(null)
   const [toastMsg,      setToastMsg]      = useState('')
-  const [shareOpen,     setShareOpen]     = useState(false)   // ← NEW
+  const [shareOpen,     setShareOpen]     = useState(false)
   const toastTimer = useRef(null)
   const tabsRef    = useRef(null)
+  const subTabsRef = useRef(null)
 
   const showToast = useCallback((msg) => {
     setToastMsg(msg)
@@ -445,13 +393,20 @@ export default function Gallery({ onMenuClick }) {
   }, [])
 
   const currentDressTypes = dressTypes[activeTab] || []
-  const activeSubTab      = activeSubTabs[activeTab] || currentDressTypes[0]?.id || null
-  const filteredByMain    = photos.filter(p => p.category === activeTab)
-  const filtered          = activeSubTab
-    ? filteredByMain.filter(p => p.clothingType === activeSubTab)
-    : filteredByMain
+
+  // Active sub-tab: default to '__all__' (the All tab)
+  const activeSubTab = activeSubTabs[activeTab] ?? '__all__'
+
+  const filteredByMain = photos.filter(p => p.category === activeTab)
+  const filtered = activeSubTab === '__all__'
+    ? filteredByMain
+    : filteredByMain.filter(p => p.clothingType === activeSubTab)
+
   const counts = Object.fromEntries(TABS.map(t => [t.id, photos.filter(p => p.category === t.id).length]))
   const lightboxList = lightboxPhoto ? filtered : []
+
+  // Photos from completed_works for the Share Portfolio Modal
+  const completedWorksPhotos = photos.filter(p => p.category === 'completed_works')
 
   const handleAddPhoto = async (photoData) => {
     try { await addPhoto(photoData) }
@@ -471,13 +426,21 @@ export default function Gallery({ onMenuClick }) {
   const handleSaveDressTypes = async (tabId, types) => {
     try {
       await saveDressTypes(tabId, types)
+      // After saving, reset sub-tab to __all__ if current sub-tab no longer exists
       const ids = types.map(t => t.id)
       setActiveSubTabs(prev => ({
         ...prev,
-        [tabId]: ids.includes(prev[tabId]) ? prev[tabId] : (ids[0] || null)
+        [tabId]: ids.includes(prev[tabId]) ? prev[tabId] : '__all__'
       }))
     } catch { showToast('Failed to save dress types') }
   }
+
+  // Scroll active sub-tab into view on change
+  useEffect(() => {
+    if (!subTabsRef.current) return
+    const activeEl = subTabsRef.current.querySelector(`.${styles.subTabActive}`)
+    if (activeEl) activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+  }, [activeSubTab, activeTab])
 
   // Expandable pill — "Share Portfolio Link" now opens the modal
   const TAB_ACTIONS = {
@@ -543,7 +506,15 @@ export default function Gallery({ onMenuClick }) {
 
       {/* DRESS TYPE SUB-TABS */}
       <div className={styles.subTabsBar}>
-        <div className={styles.subTabsScroll}>
+        <div className={styles.subTabsScroll} ref={subTabsRef}>
+          {/* All tab — always first, never editable */}
+          <button
+            key="__all__"
+            className={`${styles.subTab} ${activeSubTab === '__all__' ? styles.subTabActive : ''}`}
+            onClick={() => setActiveSubTabs(prev => ({ ...prev, [activeTab]: '__all__' }))}
+          >
+            All
+          </button>
           {currentDressTypes.map(st => (
             <button
               key={st.id}
@@ -555,11 +526,9 @@ export default function Gallery({ onMenuClick }) {
           ))}
         </div>
         <div className={styles.subTabActions}>
+          {/* Only the edit button — add button removed */}
           <button className={styles.subTabIconBtn} onClick={() => setManageTabId(activeTab)} title="Edit dress types">
             <span className="mi" style={{ fontSize: '1.1rem' }}>edit</span>
-          </button>
-          <button className={styles.subTabIconBtn} onClick={() => setManageTabId(activeTab)} title="Add dress type">
-            <span className="mi" style={{ fontSize: '1.1rem' }}>add</span>
           </button>
         </div>
       </div>
@@ -606,7 +575,6 @@ export default function Gallery({ onMenuClick }) {
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           onSave={handleAddPhoto}
-          customers={customers}
           dressTypes={dressTypes}
           activeMainTab={activeTab}
         />
@@ -642,6 +610,7 @@ export default function Gallery({ onMenuClick }) {
         isOpen={shareOpen}
         onClose={() => setShareOpen(false)}
         brandName={brand.name}
+        completedWorksPhotos={completedWorksPhotos}
       />
 
       <Toast message={toastMsg} />
