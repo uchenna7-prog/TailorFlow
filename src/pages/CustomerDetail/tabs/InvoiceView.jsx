@@ -87,8 +87,17 @@ function buildInvoiceWhatsAppMessage(invoice, customer, brand) {
 // ─────────────────────────────────────────────────────────────
 
 async function downloadPDF(paperEl, filename) {
-  // Force a fixed document width for capture so PDF is never full phone-screen width.
-  // We temporarily override the element width, capture, then restore.
+  const blob = await generatePDFBlob(paperEl)
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href     = url
+  a.download = filename
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 10000)
+}
+
+// Returns a PDF Blob without triggering a download — used for direct sharing
+async function generatePDFBlob(paperEl) {
   const PDF_W = 380
   const prevWidth  = paperEl.style.width
   const prevMaxW   = paperEl.style.maxWidth
@@ -96,7 +105,6 @@ async function downloadPDF(paperEl, filename) {
   paperEl.style.width    = `${PDF_W}px`
   paperEl.style.maxWidth = 'none'
 
-  // Let the browser reflow before measuring height
   await new Promise(r => setTimeout(r, 60))
   const elH = paperEl.scrollHeight
 
@@ -111,87 +119,120 @@ async function downloadPDF(paperEl, filename) {
     windowHeight: elH,
   })
 
-  // Restore original styles
   paperEl.style.width    = prevWidth
   paperEl.style.maxWidth = prevMaxW
 
   const imgData = canvas.toDataURL('image/png')
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [PDF_W, elH] })
+  const pdf     = new jsPDF({ orientation: 'portrait', unit: 'px', format: [PDF_W, elH] })
   pdf.addImage(imgData, 'PNG', 0, 0, PDF_W, elH)
-  pdf.save(filename)
+  return pdf.output('blob')
 }
 
 // ─────────────────────────────────────────────────────────────
 // Share Sheet
 // ─────────────────────────────────────────────────────────────
 
-function ShareSheet({ open, onClose, onDownload, docNumber, customer, brand, docType, buildMessage }) {
-  const [copied,       setCopied]       = useState(false)
-  const [sharing,      setSharing]      = useState(false)
-  const [pdfReady,     setPdfReady]     = useState(false)
-  const [showPdfHint,  setShowPdfHint]  = useState(false)
+function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, brand, docType, buildMessage }) {
+  const [status, setStatus] = useState('idle') // idle | generating | done | error
 
   if (!open) return null
 
-  const phoneRaw    = customer?.phone || ''
-  const phoneClean  = sanitizePhone(phoneRaw)
-  const hasPhone    = phoneClean.length >= 7
-  const message     = buildMessage()
-  const shareText   = `${docType} ${docNumber} for ${customer?.name}`
+  const phoneRaw   = customer?.phone || ''
+  const phoneClean = sanitizePhone(phoneRaw)
+  const hasPhone   = phoneClean.length >= 7
+  const message    = buildMessage()
 
-  const handleMessagingApp = async (openUrl) => {
-    setSharing(true)
-    setShowPdfHint(false)
+  const canShareFiles = typeof navigator.share === 'function' &&
+    typeof navigator.canShare === 'function' &&
+    navigator.canShare({ files: [new File([''], 'test.pdf', { type: 'application/pdf' })] })
+
+  // ── Generate blob then call a callback ──────────────────────
+  const withBlob = async (cb) => {
+    if (!paperRef?.current) return
+    setStatus('generating')
     try {
-      await onDownload()
-      setPdfReady(true)
-      setShowPdfHint(true)
-    } catch {
-      // PDF failed — still open the app
-    } finally {
-      setSharing(false)
+      const blob = await generatePDFBlob(paperRef.current)
+      const file = new File([blob], filename, { type: 'application/pdf' })
+      await cb(blob, file)
+      setStatus('done')
+    } catch (err) {
+      console.error(err)
+      setStatus('error')
     }
-    window.open(openUrl, '_blank', 'noopener')
   }
 
-  const handleWhatsApp = () => {
-    const url = hasPhone
-      ? `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`
-      : `https://wa.me/?text=${encodeURIComponent(message)}`
-    handleMessagingApp(url)
-  }
+  // ── WhatsApp: share PDF file directly via Web Share API ─────
+  const handleWhatsApp = () => withBlob(async (blob, file) => {
+    if (canShareFiles) {
+      // Native share sheet opens → user picks WhatsApp → picks contact
+      await navigator.share({ files: [file], text: message })
+    } else {
+      // Fallback: download PDF + open wa.me link
+      const url = URL.createObjectURL(blob)
+      const a   = document.createElement('a')
+      a.href = url; a.download = filename; a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 10000)
+      const waUrl = hasPhone
+        ? `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`
+        : `https://wa.me/?text=${encodeURIComponent(message)}`
+      window.open(waUrl, '_blank', 'noopener')
+    }
+  })
+
+  // ── Other apps: download PDF then open app link ──────────────
+  const handleWithDownload = (appUrl) => withBlob(async (blob) => {
+    const url = URL.createObjectURL(blob)
+    const a   = document.createElement('a')
+    a.href = url; a.download = filename; a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 10000)
+    window.open(appUrl, '_blank', 'noopener')
+  })
 
   const handleTelegram = () => {
-    handleMessagingApp(`https://t.me/share/url?url=${encodeURIComponent(shareText)}&text=${encodeURIComponent(message)}`)
+    const shareText = `${docType} ${docNumber} for ${customer?.name}`
+    handleWithDownload(`https://t.me/share/url?url=${encodeURIComponent(shareText)}&text=${encodeURIComponent(message)}`)
   }
 
-  const handleSMS = () => {
-    handleMessagingApp(`sms:${phoneRaw}?body=${encodeURIComponent(message)}`)
-  }
+  const handleSMS = () =>
+    handleWithDownload(`sms:${phoneRaw}?body=${encodeURIComponent(message)}`)
 
   const handleEmail = () => {
     const subject = `${docType} ${docNumber} — ${customer?.name}`
     const body    = `${message}\n\n(PDF attached separately)`
-    handleMessagingApp(`mailto:${customer?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`)
+    handleWithDownload(`mailto:${customer?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`)
   }
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(message)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setStatus('done')
+      setTimeout(() => setStatus('idle'), 2000)
     } catch { /* silent */ }
   }
 
-  const handleNative = async () => {
-    if (navigator.share) {
-      try { await navigator.share({ title: shareText, text: message }) } catch { /* cancelled */ }
-    }
-  }
+  // ── Native share (PDF file if supported, else text) ─────────
+  const handleNativeShare = () => withBlob(async (blob, file) => {
+    const shareData = canShareFiles
+      ? { files: [file], text: message }
+      : { title: `${docType} ${docNumber}`, text: message }
+    await navigator.share(shareData)
+  })
+
+  // ── Download only ────────────────────────────────────────────
+  const handleDownloadOnly = () => withBlob(async (blob) => {
+    const url = URL.createObjectURL(blob)
+    const a   = document.createElement('a')
+    a.href = url; a.download = filename; a.click()
+    setTimeout(() => URL.revokeObjectURL(url), 10000)
+  })
+
+  const isGenerating = status === 'generating'
 
   const APPS = [
     {
-      id: 'whatsapp', label: 'WhatsApp', onClick: handleWhatsApp,
+      id: 'whatsapp',
+      label: isGenerating ? 'Preparing…' : canShareFiles ? 'WhatsApp' : 'WhatsApp',
+      onClick: handleWhatsApp,
       icon: (
         <svg viewBox="0 0 32 32" width="30" height="30">
           <circle cx="16" cy="16" r="16" fill="#25D366"/>
@@ -230,7 +271,7 @@ function ShareSheet({ open, onClose, onDownload, docNumber, customer, brand, doc
       ),
     },
     {
-      id: 'copy', label: copied ? 'Copied!' : 'Copy Text', onClick: handleCopy,
+      id: 'copy', label: status === 'done' ? 'Copied!' : 'Copy Text', onClick: handleCopy,
       icon: (
         <svg viewBox="0 0 32 32" width="30" height="30">
           <circle cx="16" cy="16" r="16" fill="#6366f1"/>
@@ -239,7 +280,7 @@ function ShareSheet({ open, onClose, onDownload, docNumber, customer, brand, doc
       ),
     },
     {
-      id: 'native', label: 'More', onClick: handleNative,
+      id: 'native', label: 'More', onClick: handleNativeShare,
       icon: (
         <svg viewBox="0 0 32 32" width="30" height="30">
           <circle cx="16" cy="16" r="16" fill="#8e8e93"/>
@@ -258,10 +299,24 @@ function ShareSheet({ open, onClose, onDownload, docNumber, customer, brand, doc
         <div className={styles.sheetTitle}>Share {docType}</div>
         <div className={styles.sheetSub}>{docNumber} · {customer?.name}</div>
 
-        {showPdfHint && (
+        {isGenerating && (
           <div className={styles.pdfHint}>
-            <span className="mi" style={{ fontSize: '1rem', flexShrink: 0 }}>info</span>
-            <span>PDF downloaded to your device. Open your Files app, find the PDF and attach it to this conversation.</span>
+            <span className="mi" style={{ fontSize: '1rem', flexShrink: 0 }}>hourglass_top</span>
+            <span>Generating PDF — this takes a moment…</span>
+          </div>
+        )}
+
+        {status === 'error' && (
+          <div className={styles.pdfHint} style={{ borderColor: '#ef4444', color: '#ef4444' }}>
+            <span className="mi" style={{ fontSize: '1rem', flexShrink: 0 }}>error</span>
+            <span>PDF generation failed. Please try again.</span>
+          </div>
+        )}
+
+        {canShareFiles && status === 'idle' && (
+          <div className={styles.pdfHint} style={{ background: 'color-mix(in srgb, #25D366 10%, transparent)', borderColor: 'color-mix(in srgb, #25D366 35%, transparent)', color: '#166534' }}>
+            <span className="mi" style={{ fontSize: '1rem', flexShrink: 0 }}>share</span>
+            <span>Tap WhatsApp to send the PDF directly — pick your contact inside WhatsApp.</span>
           </div>
         )}
 
@@ -271,10 +326,10 @@ function ShareSheet({ open, onClose, onDownload, docNumber, customer, brand, doc
               key={app.id}
               className={styles.shareItem}
               onClick={app.onClick}
-              disabled={sharing}
+              disabled={isGenerating}
             >
               <div className={styles.shareIconWrap}>
-                {sharing && ['whatsapp','telegram','sms','email'].includes(app.id)
+                {isGenerating && ['whatsapp','telegram','sms','email','native'].includes(app.id)
                   ? <span className="mi" style={{ fontSize: 26, color: 'var(--text3)' }}>hourglass_top</span>
                   : app.icon
                 }
@@ -286,11 +341,11 @@ function ShareSheet({ open, onClose, onDownload, docNumber, customer, brand, doc
 
         <button
           className={styles.sheetDownloadBtn}
-          onClick={async () => { await onDownload(); onClose() }}
-          disabled={sharing}
+          onClick={handleDownloadOnly}
+          disabled={isGenerating}
         >
           <span className="mi" style={{ fontSize: '1.1rem' }}>download</span>
-          Download PDF
+          {isGenerating ? 'Generating…' : 'Download PDF'}
         </button>
 
         <button className={styles.sheetCancelBtn} onClick={onClose}>
@@ -1320,7 +1375,8 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
       <ShareSheet
         open={showShare}
         onClose={() => setShowShare(false)}
-        onDownload={handleDownload}
+        paperRef={paperRef}
+        filename={filename}
         docNumber={invoice.number}
         customer={customer}
         brand={effectiveBrand}
