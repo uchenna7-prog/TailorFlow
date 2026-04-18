@@ -600,7 +600,7 @@ export default function AllPayments({ onMenuClick }) {
 
   return (
     <div className={styles.page}>
-      <Header onMenuClick={onMenuClick} title="Payments" />
+      <Header onMenuClick={onMenuClick} title="All Payments" />
 
       {/* ── Search + filter ── */}
       <div className={styles.searchContainer}>
