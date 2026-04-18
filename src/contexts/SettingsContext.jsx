@@ -49,12 +49,6 @@ export const DEFAULTS = {
   notifyUnpaidInvoices: true,
 }
 
-// Brand-related keys — changes to these trigger a Firestore sync
-const BRAND_KEYS = new Set([
-  'brandName', 'brandTagline', 'brandColour', 'brandLogo',
-  'brandPhone', 'brandEmail', 'brandAddress', 'brandWebsite',
-])
-
 function loadSettings() {
   try {
     const raw  = localStorage.getItem(SETTINGS_KEY)
@@ -106,6 +100,15 @@ export function SettingsProvider({ children }) {
       }
     } catch { /* ignore quota errors */ }
   }, [settings])
+
+  // One-time sync on login: push whatever is in localStorage to Firestore
+  // immediately so the public portfolio doc exists even if the user never
+  // changed a brand setting in this session.
+  useEffect(() => {
+    if (!user?.uid) return
+    saveBrandToFirestore(user.uid, settings).catch(console.error)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid])
 
   // Sync brand fields to Firestore whenever they change and user is logged in.
   // Debounced 1.5 s to avoid hammering Firestore on rapid typing.
