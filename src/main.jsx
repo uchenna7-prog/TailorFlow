@@ -12,6 +12,7 @@ import { PaymentProvider }         from './contexts/PaymentContext'
 import { AppointmentProvider }     from './contexts/AppointmentContext'
 import { NotificationProvider }    from './contexts/NotificationContext'
 import { PremiumProvider }         from './contexts/PremiumContext'
+import { GalleryProvider }         from './contexts/GalleryContext'
 import App from './App'
 import './index.css'
 import { registerSW } from 'virtual:pwa-register'
@@ -23,6 +24,7 @@ import { registerSW } from 'virtual:pwa-register'
 //  BrandProvider         → reads SettingsContext
 //  PremiumProvider       → reads AuthContext
 //  CustomerProvider      → reads AuthContext
+//  GalleryProvider       → reads AuthContext
 //  OrdersProvider        → reads AuthContext + CustomerContext
 //  TaskProvider          → reads AuthContext
 //  InvoiceProvider       → reads AuthContext + SettingsContext + CustomerContext
@@ -38,19 +40,21 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <BrandProvider>
             <PremiumProvider>
               <CustomerProvider>
-                <OrdersProvider>
-                  <TaskProvider>
-                    <InvoiceProvider>
-                      <PaymentProvider>
-                        <AppointmentProvider>
-                          <NotificationProvider>
-                            <App />
-                          </NotificationProvider>
-                        </AppointmentProvider>
-                      </PaymentProvider>
-                    </InvoiceProvider>
-                  </TaskProvider>
-                </OrdersProvider>
+                <GalleryProvider>
+                  <OrdersProvider>
+                    <TaskProvider>
+                      <InvoiceProvider>
+                        <PaymentProvider>
+                          <AppointmentProvider>
+                            <NotificationProvider>
+                              <App />
+                            </NotificationProvider>
+                          </AppointmentProvider>
+                        </PaymentProvider>
+                      </InvoiceProvider>
+                    </TaskProvider>
+                  </OrdersProvider>
+                </GalleryProvider>
               </CustomerProvider>
             </PremiumProvider>
           </BrandProvider>
