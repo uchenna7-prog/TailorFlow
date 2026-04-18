@@ -128,7 +128,9 @@ export default function Portfolio() {
     if (!uid) { setNotFound(true); setLoading(false); return }
     getBrandFromFirestore(uid)
       .then(data => {
-        if (!data || (!data.brandName && !data.brandEmail && !data.brandPhone)) {
+        // Only show "not found" if the Firestore doc truly doesn't exist.
+        // If the doc exists but some fields are empty, still show the portfolio.
+        if (!data) {
           setNotFound(true)
         } else {
           setBrand(data)
@@ -167,13 +169,14 @@ export default function Portfolio() {
 
   if (loading) {
     return (
-      <div className={styles.loadingPage}>
-        <div className={styles.spinner} />
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a' }}>
+        <div style={{ width: 32, height: 32, border: '3px solid #333', borderTopColor: '#D4AF37', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
       </div>
     )
   }
 
-  if (notFound || !brand) {
+  if (notFound) {
     return (
       <div className={styles.notFound}>
         <p className={styles.nfEmoji}>🧵</p>
