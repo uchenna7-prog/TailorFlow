@@ -524,11 +524,23 @@ export default function Gallery({ onMenuClick }) {
 
   const lightboxList = lightboxPhoto ? filtered : []
 
+  // Context action per tab — lives in the Header right side
+  const TAB_ACTIONS = {
+    completed_works: { icon: 'share',          label: 'Share Portfolio Link', onPress: () => showToast('Portfolio link coming soon!') },
+    designs:         { icon: 'picture_as_pdf', label: 'Export Lookbook',      onPress: () => showToast('Export lookbook coming soon!') },
+    inspiration:     { icon: 'send',           label: 'Send Board',           onPress: () => showToast('Share board coming soon!') },
+  }
+  const tabAction = TAB_ACTIONS[activeTab]
+
   return (
     <div className={styles.page}>
-      <Header title="Gallery" onMenuClick={onMenuClick} />
+      <Header
+        title="Gallery"
+        onMenuClick={onMenuClick}
+        customActions={tabAction ? [{ icon: tabAction.icon, onClick: tabAction.onPress, title: tabAction.label }] : []}
+      />
 
-      {/* MAIN TABS + CONTEXT ACTION (same sticky row) */}
+      {/* MAIN TABS — full width, clean */}
       <div className={styles.tabActionBar}>
         <div className={styles.tabs} ref={tabsRef}>
           {TABS.map(tab => (
@@ -546,37 +558,6 @@ export default function Gallery({ onMenuClick }) {
               )}
             </div>
           ))}
-        </div>
-
-        {/* Per-tab action button — top right */}
-        <div className={styles.tabAction}>
-          {activeTab === 'completed_works' && (
-            <button
-              className={styles.tabActionBtn}
-              onClick={() => showToast('Portfolio link coming soon!')}
-            >
-              <span className="mi" style={{ fontSize: '0.95rem' }}>share</span>
-              <span className={styles.tabActionLabel}>Share Portfolio Link</span>
-            </button>
-          )}
-          {activeTab === 'designs' && (
-            <button
-              className={styles.tabActionBtn}
-              onClick={() => showToast('Export lookbook coming soon!')}
-            >
-              <span className="mi" style={{ fontSize: '0.95rem' }}>picture_as_pdf</span>
-              <span className={styles.tabActionLabel}>Lookbook</span>
-            </button>
-          )}
-          {activeTab === 'inspiration' && (
-            <button
-              className={styles.tabActionBtn}
-              onClick={() => showToast('Share board coming soon!')}
-            >
-              <span className="mi" style={{ fontSize: '0.95rem' }}>send</span>
-              <span className={styles.tabActionLabel}>Send Board</span>
-            </button>
-          )}
         </div>
       </div>
 
