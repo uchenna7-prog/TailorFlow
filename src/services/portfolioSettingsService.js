@@ -2,7 +2,7 @@
 // Stores portfolio display settings: heroImageId, footerImageId
 // Path: users/{uid}/portfolioSettings/main
 
-import { doc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore'
+import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 
 function settingsDoc(uid) {
@@ -11,22 +11,18 @@ function settingsDoc(uid) {
 
 /**
  * Save portfolio image selections.
- * @param {string} uid
- * @param {{ heroImageId: string|null, footerImageId: string|null }} settings
+ * Uses a local ISO timestamp instead of serverTimestamp() to avoid
+ * blocking the write on a server round-trip (which hangs on slow mobile connections).
  */
 export async function savePortfolioSettings(uid, settings) {
   await setDoc(settingsDoc(uid), {
     ...settings,
-    updatedAt: serverTimestamp(),
+    updatedAt: new Date().toISOString(),
   }, { merge: true })
 }
 
 /**
  * Real-time listener for portfolio settings.
- * @param {string} uid
- * @param {(data: { heroImageId: string|null, footerImageId: string|null }) => void} callback
- * @param {(err: Error) => void} [onError]
- * @returns unsubscribe function
  */
 export function subscribeToPortfolioSettings(uid, callback, onError) {
   return onSnapshot(
@@ -47,7 +43,6 @@ export function subscribeToPortfolioSettings(uid, callback, onError) {
  * One-time fetch for portfolio settings (used by public Portfolio page).
  */
 export async function getPortfolioSettings(uid) {
-  const { getDoc } = await import('firebase/firestore')
   const snap = await getDoc(settingsDoc(uid))
   if (!snap.exists()) return { heroImageId: null, footerImageId: null }
   const { heroImageId = null, footerImageId = null } = snap.data()
