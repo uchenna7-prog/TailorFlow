@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import RequireAuth    from './components/RequireAuth/RequireAuth'
 import SideBar        from './components/SideBar/SideBar'
 
@@ -25,6 +25,7 @@ import Reports                  from './pages/Reports/Reports'
 function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const menuClick = () => setSidebarOpen(true)
+  const navigate  = useNavigate()
 
   return (
     <>
@@ -36,7 +37,7 @@ function AppShell() {
         <Route path="/customers/:id"                       element={<CustomerDetail           onMenuClick={menuClick} />} />
         <Route path="/customers/:id/body-measurements"     element={<CustomerBodyMeasurements onMenuClick={menuClick} />} />
         <Route path="/tasks"                               element={<Tasks                    onMenuClick={menuClick} />} />
-        <Route path="/orders"                              element={<Orders                   onMenuClick={menuClick} />} />
+        <Route path="/orders"                              element={<Orders                   onMenuClick={menuClick} onGoToCustomer={id => navigate(`/customers/${id}`)} />} />
         <Route path="/invoices"                            element={<Invoices                 onMenuClick={menuClick} />} />
         <Route path="/payments"                            element={<AllPayments              onMenuClick={menuClick} />} />
         <Route path="/inventory"                           element={<Inventory                onMenuClick={menuClick} />} />
