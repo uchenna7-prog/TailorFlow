@@ -1,6 +1,10 @@
 // src/components/SharePortfolioModal/SharePortfolioModal.jsx
 import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+import {
+  savePortfolioSettings,
+  subscribeToPortfolioSettings,
+} from '../../services/portfolioSettingsService'
 import styles from './SharePortfolioModal.module.css'
 
 const SHARE_OPTIONS = [
@@ -194,11 +198,14 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
   const [visible,         setVisible]         = useState(false)
   const [heroImageId,     setHeroImageId]     = useState(null)
   const [footerImageId,   setFooterImageId]   = useState(null)
+  // Track whether we've loaded existing settings so we don't overwrite with null on mount
+  const [settingsLoaded,  setSettingsLoaded]  = useState(false)
 
   const portfolioLink = user
     ? `${window.location.origin}/portfolio/${user.uid}`
     : ''
 
+  // Animate overlay in/out
   useEffect(() => {
     if (isOpen) {
       requestAnimationFrame(() => setVisible(true))
@@ -206,6 +213,26 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
       setVisible(false)
     }
   }, [isOpen])
+
+  // Load existing saved settings when modal opens
+  useEffect(() => {
+    if (!isOpen || !user) return
+    const unsub = subscribeToPortfolioSettings(
+      user.uid,
+      ({ heroImageId: h, footerImageId: f }) => {
+        setHeroImageId(h)
+        setFooterImageId(f)
+        setSettingsLoaded(true)
+      }
+    )
+    return () => unsub()
+  }, [isOpen, user])
+
+  // Auto-save to Firestore whenever a selection changes (after initial load)
+  useEffect(() => {
+    if (!settingsLoaded || !user) return
+    savePortfolioSettings(user.uid, { heroImageId, footerImageId }).catch(console.error)
+  }, [heroImageId, footerImageId, settingsLoaded, user])
 
   if (!isOpen) return null
 
@@ -215,6 +242,7 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName, comple
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
+      // fallback
       const el = document.createElement('textarea')
       el.value = portfolioLink
       document.body.appendChild(el)
