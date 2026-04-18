@@ -1,28 +1,31 @@
+// src/contexts/SettingsContext.jsx
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useAuth } from './AuthContext'
+import { saveBrandToFirestore } from '../services/brandService'
 
 const SETTINGS_KEY = 'tailorbook_settings'
 const LOGO_KEY     = 'tailorbook_brand_logo'
 
 export const DEFAULTS = {
   // ── Appearance ──
-  theme: 'light',                    // 'dark' | 'light' | 'system'
-  dateFormat: 'DD/MM/YYYY',          // 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD'
+  theme: 'light',
+  dateFormat: 'DD/MM/YYYY',
 
   // ── Measurements ──
-  measureUnit: 'in',                 // 'in' | 'cm' | 'yd'
-  measureFormat: 'decimal',          // 'decimal' | 'fraction'
+  measureUnit: 'in',
+  measureFormat: 'decimal',
 
   // ── Brand / Business ──
   brandName: '',
   brandTagline: '',
   brandColour: '#D4AF37',
-  brandLogo: null,                   // base64 data-URL or null (stored separately)
+  brandLogo: null,
   brandPhone: '',
   brandEmail: '',
   brandAddress: '',
   brandWebsite: '',
 
-  // ── Account / Payment Details (shown on invoices) ──
+  // ── Account / Payment Details ──
   accountBank: '',
   accountNumber: '',
   accountName: '',
@@ -46,11 +49,16 @@ export const DEFAULTS = {
   notifyUnpaidInvoices: true,
 }
 
+// Brand-related keys — changes to these trigger a Firestore sync
+const BRAND_KEYS = new Set([
+  'brandName', 'brandTagline', 'brandColour', 'brandLogo',
+  'brandPhone', 'brandEmail', 'brandAddress', 'brandWebsite',
+])
+
 function loadSettings() {
   try {
     const raw  = localStorage.getItem(SETTINGS_KEY)
     const data = raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS }
-    // Logo lives in its own key to avoid quota issues with large base64 strings
     const logo = localStorage.getItem(LOGO_KEY)
     if (logo) data.brandLogo = logo
     return data
@@ -72,6 +80,7 @@ function applyTheme(theme) {
 }
 
 export function SettingsProvider({ children }) {
+  const { user } = useAuth()
   const [settings, setSettings] = useState(loadSettings)
 
   // Apply theme on mount and whenever it changes
@@ -85,7 +94,7 @@ export function SettingsProvider({ children }) {
     }
   }, [settings.theme])
 
-  // Persist on every change (logo stored separately)
+  // Persist to localStorage on every change
   useEffect(() => {
     try {
       const { brandLogo, ...rest } = settings
@@ -98,11 +107,31 @@ export function SettingsProvider({ children }) {
     } catch { /* ignore quota errors */ }
   }, [settings])
 
+  // Sync brand fields to Firestore whenever they change and user is logged in.
+  // Debounced 1.5 s to avoid hammering Firestore on rapid typing.
+  useEffect(() => {
+    if (!user?.uid) return
+    const timer = setTimeout(() => {
+      saveBrandToFirestore(user.uid, settings).catch(console.error)
+    }, 1500)
+    return () => clearTimeout(timer)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    user?.uid,
+    settings.brandName,
+    settings.brandTagline,
+    settings.brandColour,
+    settings.brandLogo,
+    settings.brandPhone,
+    settings.brandEmail,
+    settings.brandAddress,
+    settings.brandWebsite,
+  ])
+
   const updateSetting = useCallback((key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }))
   }, [])
 
-  // Update multiple keys at once — used by sub-modals on Save
   const updateMany = useCallback((partial) => {
     setSettings(prev => ({ ...prev, ...partial }))
   }, [])
