@@ -1,5 +1,5 @@
 // src/components/SharePortfolioModal/SharePortfolioModal.jsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import styles from './SharePortfolioModal.module.css'
 
@@ -68,11 +68,132 @@ const SHARE_OPTIONS = [
   },
 ]
 
-export default function SharePortfolioModal({ isOpen, onClose, brandName }) {
+// ── IMAGE DROPDOWN ──────────────────────────────────────────────
+
+function ImageDropdown({ label, photos, value, onChange }) {
+  const [query,  setQuery]  = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return photos
+    return photos.filter(p =>
+      (p.caption || '').toLowerCase().includes(q) ||
+      (p.clothingTypeLabel || '').toLowerCase().includes(q)
+    )
+  }, [photos, query])
+
+  const selected = photos.find(p => p.id === value) || null
+
+  const handleSelect = (photo) => {
+    onChange(photo.id)
+    setIsOpen(false)
+    setQuery('')
+  }
+
+  const handleClear = (e) => {
+    e.stopPropagation()
+    onChange(null)
+    setQuery('')
+  }
+
+  return (
+    <div className={styles.imgDropWrap}>
+      <p className={styles.imgDropLabel}>{label}</p>
+
+      {/* Trigger */}
+      <button
+        type="button"
+        className={`${styles.imgDropTrigger} ${isOpen ? styles.imgDropTriggerOpen : ''}`}
+        onClick={() => setIsOpen(prev => !prev)}
+      >
+        {selected ? (
+          <div className={styles.imgDropSelected}>
+            <img
+              src={selected.src || selected.storageUrl}
+              alt={selected.caption}
+              className={styles.imgDropThumb}
+            />
+            <span className={styles.imgDropSelectedName}>{selected.caption || 'Untitled'}</span>
+            <button type="button" className={styles.imgDropClear} onClick={handleClear}>
+              <span className="mi" style={{ fontSize: '1rem' }}>close</span>
+            </button>
+          </div>
+        ) : (
+          <span className={styles.imgDropPlaceholder}>
+            <span className="mi" style={{ fontSize: '1rem', opacity: 0.45 }}>image_search</span>
+            Choose an image…
+          </span>
+        )}
+        <span className={`mi ${styles.imgDropChevron} ${isOpen ? styles.imgDropChevronOpen : ''}`}>
+          expand_more
+        </span>
+      </button>
+
+      {/* Panel */}
+      {isOpen && (
+        <div className={styles.imgDropPanel}>
+          <div className={styles.imgDropSearch}>
+            <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>search</span>
+            <input
+              type="text"
+              className={styles.imgDropSearchInput}
+              placeholder="Search by name or type…"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              autoFocus
+            />
+            {query && (
+              <button type="button" className={styles.imgDropSearchClear} onClick={() => setQuery('')}>
+                <span className="mi" style={{ fontSize: '0.9rem' }}>close</span>
+              </button>
+            )}
+          </div>
+
+          <div className={styles.imgDropList}>
+            {filtered.length === 0 ? (
+              <div className={styles.imgDropEmpty}>No images found</div>
+            ) : filtered.map(photo => (
+              <button
+                type="button"
+                key={photo.id}
+                className={`${styles.imgDropOption} ${value === photo.id ? styles.imgDropOptionActive : ''}`}
+                onClick={() => handleSelect(photo)}
+              >
+                <img
+                  src={photo.src || photo.storageUrl}
+                  alt={photo.caption}
+                  className={styles.imgDropOptionThumb}
+                />
+                <div className={styles.imgDropOptionInfo}>
+                  <span className={styles.imgDropOptionName}>{photo.caption || 'Untitled'}</span>
+                  {photo.clothingTypeLabel && (
+                    <span className={styles.imgDropOptionMeta}>{photo.clothingTypeLabel}</span>
+                  )}
+                </div>
+                {value === photo.id && (
+                  <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--accent)', flexShrink: 0 }}>
+                    check_circle
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── MAIN MODAL ──────────────────────────────────────────────────
+
+export default function SharePortfolioModal({ isOpen, onClose, brandName, completedWorksPhotos = [] }) {
   const { user } = useAuth()
-  const [copied, setCopied] = useState(false)
+  const [copied,          setCopied]          = useState(false)
   const [instagramCopied, setInstagramCopied] = useState(false)
-  const [visible, setVisible] = useState(false)
+  const [visible,         setVisible]         = useState(false)
+  const [heroImageId,     setHeroImageId]     = useState(null)
+  const [footerImageId,   setFooterImageId]   = useState(null)
 
   const portfolioLink = user
     ? `${window.location.origin}/portfolio/${user.uid}`
@@ -94,7 +215,6 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName }) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // fallback
       const el = document.createElement('textarea')
       el.value = portfolioLink
       document.body.appendChild(el)
@@ -161,6 +281,32 @@ export default function SharePortfolioModal({ isOpen, onClose, brandName }) {
               <span>{copied ? 'Copied!' : 'Copy'}</span>
             </button>
           </div>
+        </div>
+
+        {/* Hero & Footer image pickers */}
+        <div className={styles.imageSection}>
+          <p className={styles.imageLabel}>Portfolio images</p>
+          {completedWorksPhotos.length === 0 ? (
+            <p className={styles.imageEmptyHint}>
+              <span className="mi" style={{ fontSize: '0.9rem' }}>info</span>
+              Add photos to Completed Works to choose hero and footer images.
+            </p>
+          ) : (
+            <>
+              <ImageDropdown
+                label="Hero Image"
+                photos={completedWorksPhotos}
+                value={heroImageId}
+                onChange={setHeroImageId}
+              />
+              <ImageDropdown
+                label="Footer Image"
+                photos={completedWorksPhotos}
+                value={footerImageId}
+                onChange={setFooterImageId}
+              />
+            </>
+          )}
         </div>
 
         {/* Share via */}
