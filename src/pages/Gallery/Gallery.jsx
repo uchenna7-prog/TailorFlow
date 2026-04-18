@@ -528,33 +528,56 @@ export default function Gallery({ onMenuClick }) {
     <div className={styles.page}>
       <Header title="Gallery" onMenuClick={onMenuClick} />
 
-      {/* SHARE PORTFOLIO LINK — above tabs, only on Completed Works */}
-      {activeTab === 'completed_works' && (
-        <div className={styles.portfolioBanner}>
-          <button className={styles.portfolioBtn} onClick={() => showToast('Portfolio link coming soon!')}>
-            <span className="mi" style={{ fontSize: '0.95rem' }}>share</span>
-            Share Portfolio Link
-          </button>
+      {/* MAIN TABS + CONTEXT ACTION (same sticky row) */}
+      <div className={styles.tabActionBar}>
+        <div className={styles.tabs} ref={tabsRef}>
+          {TABS.map(tab => (
+            <div
+              key={tab.id}
+              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+              onClick={(e) => {
+                setActiveTab(tab.id)
+                e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+              }}
+            >
+              <span>{tab.label}</span>
+              {counts[tab.id] > 0 && (
+                <span className={styles.tabBadge}>{counts[tab.id]}</span>
+              )}
+            </div>
+          ))}
         </div>
-      )}
 
-      {/* MAIN TABS (underline style) */}
-      <div className={styles.tabs} ref={tabsRef}>
-        {TABS.map(tab => (
-          <div
-            key={tab.id}
-            className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-            onClick={(e) => {
-              setActiveTab(tab.id)
-              e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-            }}
-          >
-            <span>{tab.label}</span>
-            {counts[tab.id] > 0 && (
-              <span className={styles.tabBadge}>{counts[tab.id]}</span>
-            )}
-          </div>
-        ))}
+        {/* Per-tab action button — top right */}
+        <div className={styles.tabAction}>
+          {activeTab === 'completed_works' && (
+            <button
+              className={styles.tabActionBtn}
+              onClick={() => showToast('Portfolio link coming soon!')}
+            >
+              <span className="mi" style={{ fontSize: '0.95rem' }}>share</span>
+              <span className={styles.tabActionLabel}>Share</span>
+            </button>
+          )}
+          {activeTab === 'designs' && (
+            <button
+              className={styles.tabActionBtn}
+              onClick={() => showToast('Export lookbook coming soon!')}
+            >
+              <span className="mi" style={{ fontSize: '0.95rem' }}>picture_as_pdf</span>
+              <span className={styles.tabActionLabel}>Lookbook</span>
+            </button>
+          )}
+          {activeTab === 'inspiration' && (
+            <button
+              className={styles.tabActionBtn}
+              onClick={() => showToast('Share board coming soon!')}
+            >
+              <span className="mi" style={{ fontSize: '0.95rem' }}>send</span>
+              <span className={styles.tabActionLabel}>Send Board</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* SUB-TABS (rounded pill style) */}
