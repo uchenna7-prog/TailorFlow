@@ -24,6 +24,9 @@
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
+  max-height: 92dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sheetVisible {
@@ -164,6 +167,235 @@
 }
 
 .copyBtn:active { opacity: 0.8; }
+
+/* ── Image section ── */
+.imageSection {
+  padding: 16px 20px 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.imageLabel {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  margin: 0 0 14px;
+}
+
+.imageEmptyHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0 0 14px;
+  line-height: 1.4;
+}
+
+/* ── Image Dropdown ── */
+.imgDropWrap {
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.imgDropLabel {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text2);
+  margin: 0 0 7px;
+}
+
+.imgDropTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.15s;
+  min-height: 52px;
+}
+
+.imgDropTriggerOpen {
+  border-color: var(--text2);
+}
+
+.imgDropPlaceholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text3);
+  font-weight: 500;
+}
+
+.imgDropChevron {
+  font-size: 1.1rem;
+  color: var(--text3);
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: transform 0.2s;
+}
+.imgDropChevronOpen {
+  transform: rotate(180deg);
+}
+
+.imgDropSelected {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.imgDropThumb {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--surface2);
+}
+
+.imgDropSelectedName {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imgDropClear {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.imgDropPanel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 14px;
+  z-index: 200;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.imgDropSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.imgDropSearchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  padding: 2px 0;
+}
+.imgDropSearchInput::placeholder { color: var(--text3); }
+
+.imgDropSearchClear {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.imgDropList {
+  max-height: 200px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.imgDropOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.12s;
+}
+.imgDropOption:active { background: var(--surface2); }
+
+.imgDropOptionActive {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.imgDropOptionThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--surface2);
+}
+
+.imgDropOptionInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.imgDropOptionName {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imgDropOptionMeta {
+  font-size: 0.7rem;
+  color: var(--text3);
+  font-weight: 500;
+}
+
+.imgDropEmpty {
+  padding: 18px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text3);
+}
 
 /* ── Share options ── */
 .shareSection {
