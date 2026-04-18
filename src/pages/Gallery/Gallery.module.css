@@ -84,7 +84,7 @@
 
 /* Expanded state */
 .pillExpanded {
-  width: 180px;
+  width: fit-content;
   gap: 2px;
 }
 
