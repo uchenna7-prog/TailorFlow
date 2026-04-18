@@ -2,6 +2,21 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── Slug registry ──────────────────────────────────────────
+    // Public readable so Portfolio.jsx can resolve slug → uid without auth.
+    // Only the owner of a slug may write/overwrite it (the uid stored in the
+    // doc must match the authenticated user).
+    match /slugs/{slug} {
+      allow read: if true;
+      // Allow create: anyone authenticated can claim an unclaimed slug
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid;
+      // Allow update/delete: only the uid recorded in the doc can touch it
+      allow update, delete: if request.auth != null
+                            && resource.data.uid == request.auth.uid;
+    }
+
+    // ── Per-user data ──────────────────────────────────────────
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
 
