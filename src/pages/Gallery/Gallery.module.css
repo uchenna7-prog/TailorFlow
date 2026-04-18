@@ -34,7 +34,7 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding: 0 10px 0 6px;
+  padding: 0 10px 0 8px; /* FIX: was 6px — now matches subTabActions padding-left */
   border-left: 1px solid var(--border);
   height: 100%;
 }
