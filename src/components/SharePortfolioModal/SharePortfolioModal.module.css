@@ -580,3 +580,7 @@
   margin: 0;
   line-height: 1.4;
 }
+.saveImagesBtnError {
+  background: #ef4444;
+  color: #fff;
+}
