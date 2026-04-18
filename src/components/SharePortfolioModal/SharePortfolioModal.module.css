@@ -1,0 +1,253 @@
+/* src/components/SharePortfolioModal/SharePortfolioModal.module.css */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 4000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.overlayVisible {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg);
+  border-radius: 24px 24px 0 0;
+  padding: 0 0 calc(24px + var(--sb, 0px));
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.sheetVisible {
+  transform: translateY(0);
+}
+
+.handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.headerSub {
+  font-size: 0.72rem;
+  color: var(--text3);
+  margin: 2px 0 0;
+}
+
+.closeBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+.closeBtn:active { background: var(--surface2); }
+
+/* ── Link section ── */
+.linkSection {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.linkLabel {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  margin: 0 0 10px;
+}
+
+.linkRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.linkBox {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 10px 12px;
+  overflow: hidden;
+}
+
+.linkText {
+  font-size: 0.75rem;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: none;
+  background: var(--text);
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+  min-height: 42px;
+}
+
+.copyBtnDone {
+  background: #22c55e;
+  color: #fff;
+}
+
+.copyBtn:active { opacity: 0.8; }
+
+/* ── Share options ── */
+.shareSection {
+  padding: 16px 20px 8px;
+}
+
+.shareLabel {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  margin: 0 0 14px;
+}
+
+.shareGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.shareOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shareOption:active .shareIconWrap {
+  transform: scale(0.9);
+}
+
+.shareIconWrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+}
+
+.shareOptionLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text2);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.igHint {
+  font-size: 0.72rem;
+  color: var(--text3);
+  text-align: center;
+  padding: 8px 0 0;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Footer ── */
+.footer {
+  padding: 12px 20px 0;
+}
+
+.footerNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0;
+  line-height: 1.4;
+}
