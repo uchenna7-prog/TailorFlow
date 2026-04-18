@@ -87,19 +87,25 @@ function buildInvoiceWhatsAppMessage(invoice, customer, brand) {
 // ─────────────────────────────────────────────────────────────
 
 async function downloadPDF(paperEl, filename) {
+  // Capture at the element's exact rendered width so the PDF matches the preview
+  const elW = paperEl.offsetWidth
+  const elH = paperEl.scrollHeight
+
   const canvas = await html2canvas(paperEl, {
-    scale: 2,
+    scale: 3,
     useCORS: true,
     backgroundColor: '#ffffff',
     logging: false,
-    height: paperEl.scrollHeight,
-    windowHeight: paperEl.scrollHeight,
+    width: elW,
+    height: elH,
+    windowWidth: elW,
+    windowHeight: elH,
   })
+
   const imgData = canvas.toDataURL('image/png')
-  const pdfW = 450
-  const pdfH = (canvas.height * pdfW) / canvas.width
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [pdfW, pdfH] })
-  pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH)
+  // Keep PDF the same pixel dimensions as the captured element
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [elW, elH] })
+  pdf.addImage(imgData, 'PNG', 0, 0, elW, elH)
   pdf.save(filename)
 }
 
@@ -992,7 +998,15 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
   return (
     <div className={styles.t10Wrap}>
       <div className={styles.t10HeaderZone}>
-        <div className={styles.t10FullBanner} style={{ background: accentColor }}>
+        {/* SVG diagonal banner — replaces clip-path which html2canvas cannot render */}
+        <svg
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+          viewBox="0 0 400 72"
+          preserveAspectRatio="none"
+        >
+          <polygon points="0,0 400,0 400,28 0,72" fill={accentColor} />
+        </svg>
+        <div style={{ position: 'absolute', top: 10, left: 18, zIndex: 1 }}>
           <span className={styles.t10BannerTitle}>INVOICE</span>
         </div>
         {/* No tagline here — only brand name + "Tailor Shop" label */}
@@ -1072,7 +1086,13 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
           </div>
         </div>
       </div>
-      <div className={styles.t10CornerAccent} style={{ background: accentColor }} />
+      {/* SVG corner accent — replaces clip-path which html2canvas cannot render */}
+      <svg
+        style={{ position: 'absolute', bottom: 0, right: 0, width: 68, height: 58 }}
+        viewBox="0 0 68 58"
+      >
+        <polygon points="68,0 68,58 0,58" fill={accentColor} />
+      </svg>
     </div>
   )
 }
