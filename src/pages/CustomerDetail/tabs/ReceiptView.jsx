@@ -87,8 +87,17 @@ function buildReceiptWhatsAppMessage(receipt, customer, brand) {
 // ── PDF generator ─────────────────────────────────────────────
 
 async function downloadPDF(paperEl, filename) {
-  // Capture at the element's exact rendered width so the PDF matches the preview
-  const elW = paperEl.offsetWidth
+  // Force a fixed document width for capture so PDF is never full phone-screen width.
+  // We temporarily override the element width, capture, then restore.
+  const PDF_W = 380
+  const prevWidth  = paperEl.style.width
+  const prevMaxW   = paperEl.style.maxWidth
+
+  paperEl.style.width    = `${PDF_W}px`
+  paperEl.style.maxWidth = 'none'
+
+  // Let the browser reflow before measuring height
+  await new Promise(r => setTimeout(r, 60))
   const elH = paperEl.scrollHeight
 
   const canvas = await html2canvas(paperEl, {
@@ -96,16 +105,19 @@ async function downloadPDF(paperEl, filename) {
     useCORS: true,
     backgroundColor: '#ffffff',
     logging: false,
-    width: elW,
+    width: PDF_W,
     height: elH,
-    windowWidth: elW,
+    windowWidth: PDF_W,
     windowHeight: elH,
   })
 
+  // Restore original styles
+  paperEl.style.width    = prevWidth
+  paperEl.style.maxWidth = prevMaxW
+
   const imgData = canvas.toDataURL('image/png')
-  // Keep PDF the same pixel dimensions as the captured element
-  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [elW, elH] })
-  pdf.addImage(imgData, 'PNG', 0, 0, elW, elH)
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [PDF_W, elH] })
+  pdf.addImage(imgData, 'PNG', 0, 0, PDF_W, elH)
   pdf.save(filename)
 }
 
