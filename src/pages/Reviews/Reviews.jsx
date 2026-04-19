@@ -1,4 +1,4 @@
-// src/pages/Review/Review.jsx
+// src/pages/Reviews/Reviews.jsx
 // ─────────────────────────────────────────────────────────────
 // Public page — no auth required.
 // Route: /review/:uid/:token
@@ -58,7 +58,7 @@ const RATING_LABELS = {
 
 // ── Main Page ─────────────────────────────────────────────────
 
-export default function Review() {
+export default function Reviews() {
   // URL: /review/:uid/:token
   const { uid, token } = useParams()
 
