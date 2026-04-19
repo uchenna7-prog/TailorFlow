@@ -394,3 +394,19 @@
 .markAllBtn:active {
   background: var(--surface);
 }
+/* ── Review notification item ── */
+.notifItemReview {
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  background: rgba(245, 158, 11, 0.06) !important;
+}
+
+.notifReviewHint {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #f59e0b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
