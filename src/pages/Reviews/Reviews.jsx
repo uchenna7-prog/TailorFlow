@@ -1,40 +1,23 @@
-// src/pages/Reviews/Reviews.jsx
+// src/pages/Review/Review.jsx
+// ─────────────────────────────────────────────────────────────
+// Public page — no auth required.
+// Route: /review/:uid/:token
+//
+// The tailor sends this link via WhatsApp. The customer opens
+// it, fills in their name, rating and review, and submits.
+// The submission writes directly to Firestore with status:'pending'.
+// The tailor is then notified and can approve or reject.
+// ─────────────────────────────────────────────────────────────
 
-import { useState, useCallback, useRef } from 'react'
-import Header    from '../../components/Header/Header'
-import Toast     from '../../components/Toast/Toast'
-import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
-import { useReviews } from '../../contexts/ReviewContext'
-import styles    from './Reviews.module.css'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import { collection, addDoc, getDocs, query, where, serverTimestamp } from 'firebase/firestore'
+import { db } from '../../firebase'
+import styles from './Review.module.css'
 
-// ── Helpers ───────────────────────────────────────────────────
+// ── Star Picker ───────────────────────────────────────────────
 
-function formatDate(ts) {
-  if (!ts) return ''
-  const d = ts?.toDate ? ts.toDate() : new Date(ts)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
-function StarDisplay({ rating, size = '1rem' }) {
-  return (
-    <div className={styles.stars}>
-      {[1, 2, 3, 4, 5].map(n => (
-        <span
-          key={n}
-          className="material-icons"
-          style={{
-            fontSize: size,
-            color: n <= rating ? '#f59e0b' : 'var(--border2)',
-          }}
-        >
-          star
-        </span>
-      ))}
-    </div>
-  )
-}
-
-function StarPicker({ value, onChange }) {
+function StarPicker({ value, onChange, disabled }) {
   const [hovered, setHovered] = useState(0)
   return (
     <div className={styles.starPicker}>
@@ -42,16 +25,18 @@ function StarPicker({ value, onChange }) {
         <button
           key={n}
           type="button"
-          className={styles.starPickerBtn}
-          onMouseEnter={() => setHovered(n)}
-          onMouseLeave={() => setHovered(0)}
-          onClick={() => onChange(n)}
+          className={styles.starBtn}
+          disabled={disabled}
+          onMouseEnter={() => !disabled && setHovered(n)}
+          onMouseLeave={() => !disabled && setHovered(0)}
+          onClick={() => !disabled && onChange(n)}
+          aria-label={`${n} star${n !== 1 ? 's' : ''}`}
         >
           <span
             className="material-icons"
             style={{
-              fontSize: '2rem',
-              color: n <= (hovered || value) ? '#f59e0b' : 'var(--border2)',
+              fontSize: '2.2rem',
+              color: n <= (hovered || value) ? '#f59e0b' : '#d1d5db',
               transition: 'color 0.15s',
             }}
           >
@@ -63,459 +48,267 @@ function StarPicker({ value, onChange }) {
   )
 }
 
-// ── Status config ─────────────────────────────────────────────
-
-const STATUS_CONFIG = {
-  pending:  { label: 'Pending',  color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.35)',  icon: 'schedule'      },
-  approved: { label: 'Approved', color: '#22c55e', bg: 'rgba(34,197,94,0.12)',   border: 'rgba(34,197,94,0.35)',   icon: 'check_circle'  },
-  rejected: { label: 'Rejected', color: '#94a3b8', bg: 'rgba(148,163,184,0.12)', border: 'rgba(148,163,184,0.35)', icon: 'cancel'        },
-}
-
-const TABS = [
-  { id: 'all',      label: 'All'      },
-  { id: 'pending',  label: 'Pending'  },
-  { id: 'approved', label: 'Approved' },
-  { id: 'rejected', label: 'Rejected' },
-]
-
-// ── Add Review Sheet ──────────────────────────────────────────
-
-function AddReviewSheet({ isOpen, onClose, onSave }) {
-  const [customerName,  setCustomerName]  = useState('')
-  const [customerPhone, setCustomerPhone] = useState('')
-  const [reviewText,    setReviewText]    = useState('')
-  const [rating,        setRating]        = useState(0)
-  const [errors,        setErrors]        = useState({})
-
-  const reset = () => {
-    setCustomerName(''); setCustomerPhone('')
-    setReviewText(''); setRating(0); setErrors({})
-  }
-
-  const handleClose = () => { reset(); onClose() }
-
-  const handleSave = () => {
-    const errs = {}
-    if (!customerName.trim()) errs.customerName = 'Name is required'
-    if (!reviewText.trim())   errs.reviewText   = 'Review text is required'
-    if (rating === 0)         errs.rating       = 'Please select a rating'
-    if (Object.keys(errs).length) { setErrors(errs); return }
-
-    onSave({
-      customerName:  customerName.trim(),
-      customerPhone: customerPhone.trim(),
-      customerId:    null,
-      review:        reviewText.trim(),
-      rating,
-      token:         crypto.randomUUID(),
-    })
-    reset()
-    onClose()
-  }
-
-  if (!isOpen) return null
-
-  return (
-    <div className={styles.sheetOverlay} onClick={handleClose}>
-      <div className={styles.sheet} onClick={e => e.stopPropagation()}>
-        <div className={styles.sheetHandle} />
-        <div className={styles.sheetHeader}>
-          <span className={styles.sheetTitle}>Add Review Manually</span>
-          <button className={styles.sheetClose} onClick={handleClose}>
-            <span className="material-icons" style={{ fontSize: '1.2rem' }}>close</span>
-          </button>
-        </div>
-
-        <div className={styles.sheetBody}>
-          {/* Customer name */}
-          <label className={styles.fieldLabel}>Customer Name <span className={styles.req}>*</span></label>
-          <input
-            className={`${styles.input} ${errors.customerName ? styles.inputError : ''}`}
-            placeholder="e.g. Emeka Okafor"
-            value={customerName}
-            onChange={e => { setCustomerName(e.target.value); setErrors(p => ({ ...p, customerName: '' })) }}
-          />
-          {errors.customerName && <span className={styles.errorMsg}>{errors.customerName}</span>}
-
-          {/* Phone (optional) */}
-          <label className={styles.fieldLabel} style={{ marginTop: 16 }}>WhatsApp Number <span className={styles.optional}>(optional)</span></label>
-          <input
-            className={styles.input}
-            placeholder="e.g. 08012345678"
-            value={customerPhone}
-            type="tel"
-            onChange={e => setCustomerPhone(e.target.value)}
-          />
-
-          {/* Rating */}
-          <label className={styles.fieldLabel} style={{ marginTop: 16 }}>
-            Rating <span className={styles.req}>*</span>
-          </label>
-          <StarPicker value={rating} onChange={(v) => { setRating(v); setErrors(p => ({ ...p, rating: '' })) }} />
-          {errors.rating && <span className={styles.errorMsg}>{errors.rating}</span>}
-
-          {/* Review text */}
-          <label className={styles.fieldLabel} style={{ marginTop: 16 }}>
-            Review <span className={styles.req}>*</span>
-          </label>
-          <textarea
-            className={`${styles.textarea} ${errors.reviewText ? styles.inputError : ''}`}
-            placeholder="Write the customer's review here…"
-            value={reviewText}
-            rows={4}
-            onChange={e => { setReviewText(e.target.value); setErrors(p => ({ ...p, reviewText: '' })) }}
-          />
-          {errors.reviewText && <span className={styles.errorMsg}>{errors.reviewText}</span>}
-        </div>
-
-        <div className={styles.sheetFooter}>
-          <button className={styles.sheetSaveBtn} onClick={handleSave}>Save Review</button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── Review Detail Sheet ───────────────────────────────────────
-
-function ReviewDetailSheet({ review, onClose, onApprove, onReject, onDelete }) {
-  if (!review) return null
-  const sc = STATUS_CONFIG[review.status] ?? STATUS_CONFIG.pending
-
-  return (
-    <div className={styles.sheetOverlay} onClick={onClose}>
-      <div className={styles.sheet} onClick={e => e.stopPropagation()}>
-        <div className={styles.sheetHandle} />
-        <div className={styles.sheetHeader}>
-          <span className={styles.sheetTitle}>Review Details</span>
-          <button className={styles.sheetClose} onClick={onClose}>
-            <span className="material-icons" style={{ fontSize: '1.2rem' }}>close</span>
-          </button>
-        </div>
-
-        <div className={styles.sheetBody}>
-          {/* Customer info */}
-          <div className={styles.detailCustomerRow}>
-            <div className={styles.detailAvatar}>
-              {review.customerName?.charAt(0)?.toUpperCase() ?? '?'}
-            </div>
-            <div>
-              <div className={styles.detailCustomerName}>{review.customerName}</div>
-              {review.customerPhone && (
-                <div className={styles.detailCustomerPhone}>
-                  <span className="material-icons" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>phone</span>
-                  {review.customerPhone}
-                </div>
-              )}
-            </div>
-            {/* Status pill */}
-            <span
-              className={styles.statusPill}
-              style={{ color: sc.color, background: sc.bg, borderColor: sc.border, marginLeft: 'auto' }}
-            >
-              <span className="material-icons" style={{ fontSize: '0.75rem' }}>{sc.icon}</span>
-              {sc.label}
-            </span>
-          </div>
-
-          {/* Rating + date */}
-          <div className={styles.detailMeta}>
-            <StarDisplay rating={review.rating} size="1.1rem" />
-            <span className={styles.detailDate}>{formatDate(review.createdAt)}</span>
-          </div>
-
-          {/* Review text */}
-          <div className={styles.detailReviewBox}>
-            <span className="material-icons" style={{ fontSize: '1.2rem', color: 'var(--text3)', flexShrink: 0 }}>format_quote</span>
-            <p className={styles.detailReviewText}>{review.review}</p>
-          </div>
-
-          {/* Approval actions — only show for pending */}
-          {review.status === 'pending' && (
-            <div className={styles.detailActions}>
-              <button className={styles.approveBtn} onClick={() => onApprove(review.id)}>
-                <span className="material-icons" style={{ fontSize: '1.1rem' }}>check_circle</span>
-                Approve
-              </button>
-              <button className={styles.rejectBtn} onClick={() => onReject(review.id)}>
-                <span className="material-icons" style={{ fontSize: '1.1rem' }}>cancel</span>
-                Reject
-              </button>
-            </div>
-          )}
-
-          {/* Re-approve if rejected */}
-          {review.status === 'rejected' && (
-            <button className={styles.approveBtn} style={{ width: '100%', marginTop: 8 }} onClick={() => onApprove(review.id)}>
-              <span className="material-icons" style={{ fontSize: '1.1rem' }}>check_circle</span>
-              Approve Anyway
-            </button>
-          )}
-
-          {/* Reject if approved */}
-          {review.status === 'approved' && (
-            <button className={styles.rejectBtn} style={{ width: '100%', marginTop: 8 }} onClick={() => onReject(review.id)}>
-              <span className="material-icons" style={{ fontSize: '1.1rem' }}>cancel</span>
-              Remove from Portfolio
-            </button>
-          )}
-
-          {/* Delete */}
-          <button className={styles.deleteBtn} onClick={() => onDelete(review)}>
-            <span className="material-icons" style={{ fontSize: '1rem' }}>delete_outline</span>
-            Delete Review
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── Review Card ───────────────────────────────────────────────
-
-function ReviewCard({ review, onTap, isLast }) {
-  const sc = STATUS_CONFIG[review.status] ?? STATUS_CONFIG.pending
-  return (
-    <div
-      className={`${styles.reviewCard} ${isLast ? styles.reviewCardLast : ''}`}
-      onClick={onTap}
-    >
-      {/* Left — avatar */}
-      <div className={styles.cardAvatar}>
-        {review.customerName?.charAt(0)?.toUpperCase() ?? '?'}
-      </div>
-
-      {/* Middle — info */}
-      <div className={styles.cardInfo}>
-        <div className={styles.cardName}>{review.customerName}</div>
-        <StarDisplay rating={review.rating} size="0.85rem" />
-        <p className={styles.cardReviewSnippet}>
-          {review.review?.length > 80
-            ? review.review.slice(0, 80) + '…'
-            : review.review}
-        </p>
-        <span className={styles.cardDate}>{formatDate(review.createdAt)}</span>
-      </div>
-
-      {/* Right — status */}
-      <span
-        className={styles.statusPill}
-        style={{ color: sc.color, background: sc.bg, borderColor: sc.border }}
-      >
-        <span className="material-icons" style={{ fontSize: '0.7rem' }}>{sc.icon}</span>
-        {sc.label}
-      </span>
-    </div>
-  )
-}
-
-// ── Summary Stats ─────────────────────────────────────────────
-
-function StatsSummary({ reviews }) {
-  const approved = reviews.filter(r => r.status === 'approved')
-  const avg = approved.length
-    ? (approved.reduce((s, r) => s + (r.rating || 0), 0) / approved.length).toFixed(1)
-    : '—'
-
-  return (
-    <div className={styles.statsRow}>
-      <div className={styles.statCell}>
-        <div className={styles.statValue}>{reviews.length}</div>
-        <div className={styles.statLabel}>Total</div>
-      </div>
-      <div className={styles.statDivider} />
-      <div className={styles.statCell}>
-        <div className={styles.statValue} style={{ color: '#f59e0b' }}>{avg}</div>
-        <div className={styles.statLabel}>Avg Rating</div>
-      </div>
-      <div className={styles.statDivider} />
-      <div className={styles.statCell}>
-        <div className={styles.statValue} style={{ color: '#22c55e' }}>
-          {approved.length}
-        </div>
-        <div className={styles.statLabel}>Approved</div>
-      </div>
-      <div className={styles.statDivider} />
-      <div className={styles.statCell}>
-        <div
-          className={styles.statValue}
-          style={{ color: reviews.filter(r => r.status === 'pending').length > 0 ? '#f59e0b' : 'var(--text3)' }}
-        >
-          {reviews.filter(r => r.status === 'pending').length}
-        </div>
-        <div className={styles.statLabel}>Pending</div>
-      </div>
-    </div>
-  )
+const RATING_LABELS = {
+  1: 'Poor',
+  2: 'Fair',
+  3: 'Good',
+  4: 'Great',
+  5: 'Excellent',
 }
 
 // ── Main Page ─────────────────────────────────────────────────
 
-export default function Reviews({ onMenuClick }) {
-  const { reviews, loading, addReview, approveReview, rejectReview, deleteReview } = useReviews()
+export default function Review() {
+  // URL: /review/:uid/:token
+  const { uid, token } = useParams()
 
-  const [activeTab,     setActiveTab]     = useState('all')
-  const [addSheetOpen,  setAddSheetOpen]  = useState(false)
-  const [detailReview,  setDetailReview]  = useState(null)
-  const [confirmDel,    setConfirmDel]    = useState(null)
-  const [toastMsg,      setToastMsg]      = useState('')
-  const toastTimer = useRef(null)
+  const [tailorName,    setTailorName]    = useState('')
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false)
+  const [loading,       setLoading]       = useState(true)
+  const [submitting,    setSubmitting]    = useState(false)
+  const [submitted,     setSubmitted]     = useState(false)
+  const [error,         setError]         = useState('')
 
-  const showToast = useCallback((msg) => {
-    setToastMsg(msg)
-    clearTimeout(toastTimer.current)
-    toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
-  }, [])
+  // Form state
+  const [customerName,  setCustomerName]  = useState('')
+  const [rating,        setRating]        = useState(0)
+  const [reviewText,    setReviewText]    = useState('')
+  const [fieldErrors,   setFieldErrors]   = useState({})
 
-  // ── Filtering ──────────────────────────────────────────────
+  // ── Load tailor brand name + check if token already used ──
+  useEffect(() => {
+    if (!uid || !token) { setLoading(false); return }
 
-  const filtered = activeTab === 'all'
-    ? reviews
-    : reviews.filter(r => r.status === activeTab)
+    async function init() {
+      try {
+        // Load brand name from publicProfile
+        const { getBrandFromFirestore } = await import('../../services/brandService')
+        const brand = await getBrandFromFirestore(uid)
+        setTailorName(brand?.brandName || brand?.name || 'Your tailor')
 
-  const counts = {
-    all:      reviews.length,
-    pending:  reviews.filter(r => r.status === 'pending').length,
-    approved: reviews.filter(r => r.status === 'approved').length,
-    rejected: reviews.filter(r => r.status === 'rejected').length,
-  }
+        // Check if a review with this token already exists
+        const q = query(
+          collection(db, 'users', uid, 'reviews'),
+          where('token', '==', token)
+        )
+        const snap = await getDocs(q)
+        if (!snap.empty) setAlreadyReviewed(true)
+      } catch {
+        // Silently ignore — the tailor name just won't show
+        setTailorName('Your tailor')
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  // ── Handlers ──────────────────────────────────────────────
+    init()
+  }, [uid, token])
 
-  const handleAddReview = async (data) => {
+  // ── Submit ────────────────────────────────────────────────
+  const handleSubmit = async () => {
+    const errs = {}
+    if (!customerName.trim()) errs.customerName = 'Please enter your name'
+    if (rating === 0)         errs.rating       = 'Please select a rating'
+    if (!reviewText.trim())   errs.reviewText   = 'Please write a short review'
+    if (Object.keys(errs).length) { setFieldErrors(errs); return }
+
+    setSubmitting(true)
+    setError('')
+
     try {
-      await addReview(data)
-      showToast('Review added ✓')
-    } catch {
-      showToast('Failed to add review')
+      await addDoc(collection(db, 'users', uid, 'reviews'), {
+        customerName:  customerName.trim(),
+        customerPhone: '',
+        customerId:    null,
+        review:        reviewText.trim(),
+        rating,
+        token,
+        status:        'pending',
+        approvedAt:    null,
+        createdAt:     serverTimestamp(),
+        updatedAt:     serverTimestamp(),
+      })
+      setSubmitted(true)
+    } catch (err) {
+      console.error('[ReviewPage] submit error:', err)
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
-  const handleApprove = async (id) => {
-    try {
-      await approveReview(id)
-      setDetailReview(prev => prev?.id === id ? { ...prev, status: 'approved' } : prev)
-      showToast('Review approved ✓')
-    } catch {
-      showToast('Failed to approve review')
-    }
+  // ── States ────────────────────────────────────────────────
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.loadingWrap}>
+          <span className="material-icons" style={{ fontSize: '2rem', opacity: 0.2, animation: 'spin 1.2s linear infinite' }}>
+            autorenew
+          </span>
+        </div>
+      </div>
+    )
   }
 
-  const handleReject = async (id) => {
-    try {
-      await rejectReview(id)
-      setDetailReview(prev => prev?.id === id ? { ...prev, status: 'rejected' } : prev)
-      showToast('Review rejected')
-    } catch {
-      showToast('Failed to reject review')
-    }
+  if (!uid || !token) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <span className="material-icons" style={{ fontSize: '3rem', color: '#d1d5db' }}>link_off</span>
+          <h2 className={styles.title}>Invalid Link</h2>
+          <p className={styles.subtitle}>This review link is not valid. Please ask your tailor to resend the link.</p>
+        </div>
+      </div>
+    )
   }
 
-  const handleDeleteConfirm = async () => {
-    if (!confirmDel) return
-    try {
-      await deleteReview(confirmDel.id)
-      showToast('Review deleted')
-    } catch {
-      showToast('Failed to delete review')
-    }
-    setConfirmDel(null)
-    setDetailReview(null)
+  if (alreadyReviewed) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <div className={styles.successIcon}>
+            <span className="material-icons" style={{ fontSize: '2rem', color: '#22c55e' }}>check_circle</span>
+          </div>
+          <h2 className={styles.title}>Already Submitted</h2>
+          <p className={styles.subtitle}>
+            You've already submitted a review for this order. Thank you! 🙏
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (submitted) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <div className={styles.successIcon}>
+            <span className="material-icons" style={{ fontSize: '2.5rem', color: '#22c55e' }}>check_circle</span>
+          </div>
+          <h2 className={styles.title}>Thank You! 🎉</h2>
+          <p className={styles.subtitle}>
+            Your review has been submitted and is being reviewed by {tailorName}.
+            It may appear on their portfolio soon.
+          </p>
+          <div className={styles.starRow}>
+            {[1,2,3,4,5].map(n => (
+              <span
+                key={n}
+                className="material-icons"
+                style={{ fontSize: '1.6rem', color: n <= rating ? '#f59e0b' : '#d1d5db' }}
+              >
+                star
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className={styles.page}>
-      <Header title="Reviews" onMenuClick={onMenuClick} />
+      <div className={styles.card}>
 
-      {/* Stats */}
-      {reviews.length > 0 && <StatsSummary reviews={reviews} />}
+        {/* Header */}
+        <div className={styles.header}>
+          <div className={styles.brandBadge}>
+            <span className="material-icons" style={{ fontSize: '1.4rem', color: '#6366f1' }}>content_cut</span>
+          </div>
+          <h1 className={styles.title}>Leave a Review</h1>
+          <p className={styles.subtitle}>
+            How was your experience with <strong>{tailorName}</strong>?
+            Your honest feedback helps them grow. ✂️
+          </p>
+        </div>
 
-      {/* Tabs */}
-      <div className={styles.tabs}>
-        {TABS.map(tab => (
-          <div
-            key={tab.id}
-            className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+        {/* Form */}
+        <div className={styles.form}>
+
+          {/* Name */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.fieldLabel}>Your Name *</label>
+            <input
+              className={`${styles.input} ${fieldErrors.customerName ? styles.inputError : ''}`}
+              placeholder="e.g. Emeka Okafor"
+              value={customerName}
+              onChange={e => {
+                setCustomerName(e.target.value)
+                setFieldErrors(p => ({ ...p, customerName: '' }))
+              }}
+              disabled={submitting}
+            />
+            {fieldErrors.customerName && (
+              <span className={styles.errorMsg}>{fieldErrors.customerName}</span>
+            )}
+          </div>
+
+          {/* Rating */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.fieldLabel}>Rating *</label>
+            <StarPicker value={rating} onChange={v => { setRating(v); setFieldErrors(p => ({ ...p, rating: '' })) }} disabled={submitting} />
+            {rating > 0 && (
+              <span className={styles.ratingLabel}>{RATING_LABELS[rating]}</span>
+            )}
+            {fieldErrors.rating && (
+              <span className={styles.errorMsg}>{fieldErrors.rating}</span>
+            )}
+          </div>
+
+          {/* Review text */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.fieldLabel}>Your Review *</label>
+            <textarea
+              className={`${styles.textarea} ${fieldErrors.reviewText ? styles.inputError : ''}`}
+              placeholder="Tell others about the quality, fit, communication and delivery…"
+              value={reviewText}
+              rows={5}
+              onChange={e => {
+                setReviewText(e.target.value)
+                setFieldErrors(p => ({ ...p, reviewText: '' }))
+              }}
+              disabled={submitting}
+            />
+            {fieldErrors.reviewText && (
+              <span className={styles.errorMsg}>{fieldErrors.reviewText}</span>
+            )}
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className={styles.submitError}>
+              <span className="material-icons" style={{ fontSize: '1rem' }}>error_outline</span>
+              {error}
+            </div>
+          )}
+
+          {/* Submit */}
+          <button
+            className={styles.submitBtn}
+            onClick={handleSubmit}
+            disabled={submitting}
           >
-            {tab.label}
-            {counts[tab.id] > 0 && (
-              <span className={`${styles.tabBadge} ${tab.id === 'pending' && counts.pending > 0 ? styles.tabBadgePending : ''}`}>
-                {counts[tab.id]}
-              </span>
+            {submitting ? (
+              <>
+                <span className="material-icons" style={{ fontSize: '1rem', animation: 'spin 1s linear infinite' }}>autorenew</span>
+                Submitting…
+              </>
+            ) : (
+              <>
+                <span className="material-icons" style={{ fontSize: '1rem' }}>send</span>
+                Submit Review
+              </>
             )}
-          </div>
-        ))}
+          </button>
+
+        </div>
+
+        <p className={styles.disclaimer}>
+          Your review will be visible on {tailorName}'s portfolio only after they approve it.
+        </p>
+
       </div>
-
-      {/* List */}
-      <div className={styles.listArea}>
-        {loading ? (
-          <div className={styles.emptyState}>
-            <span className="material-icons" style={{ fontSize: '2.5rem', opacity: 0.2 }}>hourglass_empty</span>
-            <p>Loading…</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className={styles.emptyState}>
-            <span className="material-icons" style={{ fontSize: '3rem', opacity: 0.15 }}>rate_review</span>
-            <p>
-              {activeTab === 'all'
-                ? 'No reviews yet.'
-                : `No ${activeTab} reviews.`}
-            </p>
-            {activeTab === 'all' && (
-              <span className={styles.emptyHint}>
-                Send review links to customers from their order detail,{'\n'}or add one manually below.
-              </span>
-            )}
-          </div>
-        ) : (
-          <div className={styles.reviewList}>
-            {filtered.map((review, idx) => (
-              <ReviewCard
-                key={review.id}
-                review={review}
-                isLast={idx === filtered.length - 1}
-                onTap={() => setDetailReview(review)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* FAB — add review manually */}
-      <button className={styles.fab} onClick={() => setAddSheetOpen(true)}>
-        <span className="material-icons">add</span>
-      </button>
-
-      {/* Add Review Sheet */}
-      <AddReviewSheet
-        isOpen={addSheetOpen}
-        onClose={() => setAddSheetOpen(false)}
-        onSave={handleAddReview}
-      />
-
-      {/* Detail Sheet */}
-      {detailReview && (
-        <ReviewDetailSheet
-          review={detailReview}
-          onClose={() => setDetailReview(null)}
-          onApprove={(id) => { handleApprove(id) }}
-          onReject={(id)  => { handleReject(id) }}
-          onDelete={(r)   => { setDetailReview(null); setConfirmDel(r) }}
-        />
-      )}
-
-      {/* Confirm delete */}
-      <ConfirmSheet
-        open={!!confirmDel}
-        title="Delete Review?"
-        message="This review will be permanently removed."
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setConfirmDel(null)}
-      />
-
-      <Toast message={toastMsg} />
     </div>
   )
 }
