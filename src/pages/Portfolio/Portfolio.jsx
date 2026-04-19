@@ -296,13 +296,15 @@ export default function Portfolio() {
         <div className={styles.navInner}>
           <span className={styles.navBrand}>{brandName}</span>
           <div className={`${styles.navLinks} ${navOpen ? styles.navLinksOpen : ''}`}>
-            <button className={styles.themeToggleMobileInline} onClick={() => setLightMode(m => !m)} aria-label="Toggle theme">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M12 2 A10 10 0 0 1 12 22 Z" fill="currentColor"/>
-              </svg>
-            </button>
-            <button onClick={() => { setNavOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={`${styles.navLink} ${styles.navLinkActive}`}>Home</button>
+            <div className={styles.navHomeRow}>
+              <button className={styles.themeToggleMobileInline} onClick={() => setLightMode(m => !m)} aria-label="Toggle theme">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M12 2 A10 10 0 0 1 12 22 Z" fill="currentColor"/>
+                </svg>
+              </button>
+              <button onClick={() => { setNavOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={`${styles.navLink} ${styles.navLinkActive}`}>Home</button>
+            </div>
             <button onClick={() => scrollTo(aboutRef)} className={styles.navLink}>About</button>
             <button onClick={() => scrollTo(worksRef)} className={styles.navLink}>Works</button>
             <button onClick={() => scrollTo(bookRef)}  className={styles.navLink}>Book</button>
@@ -465,11 +467,11 @@ export default function Portfolio() {
             {filteredPhotos.map((photo, i) => (
               <div key={photo.id} className={`${styles.photoCard} ${i === 0 ? styles.photoCardFeatured : ''}`} style={{ animationDelay: `${i * 0.05}s` }} onClick={() => setLightbox(photo)}>
                 <img src={photo.src || photo.storageUrl} alt={photo.caption || 'Completed work'} className={styles.photoImg} loading="lazy" />
+                {photo.price && (
+                  <span className={styles.photoPrice}>₦{photo.price}</span>
+                )}
                 <div className={styles.photoOverlay}>
                   <span className={`mi ${styles.photoZoom}`}>open_in_full</span>
-                  {photo.price && (
-                    <span className={styles.photoPrice}>From ₦{photo.price}</span>
-                  )}
                   {photo.caption && <p className={styles.photoCaption}>{photo.caption}</p>}
                   {photo.clothingTypeLabel && <span className={styles.photoType}>{photo.clothingTypeLabel}</span>}
                 </div>
