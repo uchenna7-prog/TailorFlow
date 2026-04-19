@@ -40,9 +40,9 @@ function dressTypesDoc(uid, tabId) {
 // ── Default dress types if none saved yet ─────────────────────
 
 const DEFAULT_DRESS_TYPES = {
-  completed_works: [{ id: 'kaftan', label: 'Kaftan' }, { id: 'gown', label: 'Gown' }],
-  designs:         [{ id: 'kaftan', label: 'Kaftan' }, { id: 'gown', label: 'Gown' }],
-  inspiration:     [{ id: 'kaftan', label: 'Kaftan' }, { id: 'gown', label: 'Gown' }],
+  completed_works: [{ id: 'kaftan', label: 'Kaftan' }, { id: 'agbada', label: 'Agbada' }],
+  designs:         [{ id: 'sketches', label: 'Sketches' }, { id: 'patterns', label: 'Patterns' }],
+  inspiration:     [{ id: 'styles', label: 'Styles' }, { id: 'fabrics', label: 'Fabrics' }],
 }
 
 // ── Photos CRUD ───────────────────────────────────────────────
