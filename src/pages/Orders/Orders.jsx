@@ -288,7 +288,7 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
                 fontSize: '0.82rem',
                 fontWeight: 800,
                 cursor: 'pointer',
-                marginBottom: 18,
+                marginBottom: 10,
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
                 transition: 'border-color 0.2s',
@@ -297,6 +297,49 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
               <span className="material-icons" style={{ fontSize: '1.1rem' }}>account_circle</span>
               Go to Customer Profile
               <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto' }}>arrow_forward_ios</span>
+            </button>
+          )}
+
+          {/* Share Review Link — only visible when order is completed or delivered */}
+          {(localOrder.status === 'completed' || localOrder.status === 'delivered') && (
+            <button
+              disabled
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                width: '100%',
+                background: 'rgba(34,197,94,0.06)',
+                border: '1px dashed rgba(34,197,94,0.4)',
+                borderRadius: 12,
+                padding: '12px 14px',
+                color: '#22c55e',
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '0.82rem',
+                fontWeight: 800,
+                cursor: 'not-allowed',
+                marginBottom: 18,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                opacity: 0.75,
+              }}
+            >
+              <span className="material-icons" style={{ fontSize: '1.1rem' }}>rate_review</span>
+              Share Review Link
+              <span style={{
+                marginLeft: 'auto',
+                fontSize: '0.55rem',
+                fontWeight: 700,
+                background: 'rgba(34,197,94,0.15)',
+                border: '1px solid rgba(34,197,94,0.3)',
+                borderRadius: 6,
+                padding: '2px 7px',
+                color: '#22c55e',
+                letterSpacing: '0.6px',
+                textTransform: 'uppercase',
+              }}>
+                Coming Soon
+              </span>
             </button>
           )}
 
