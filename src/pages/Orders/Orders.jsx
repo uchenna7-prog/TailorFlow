@@ -185,7 +185,7 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
 
   const handleShareReviewLink = () => {
     const token      = localOrder.reviewToken || crypto.randomUUID()
-    const reviewUrl  = `https://YOUR_DOMAIN/review/${user?.uid}/${token}`
+    const reviewUrl  = `https://tailorflow-62b0a.web.app/review/${user?.uid}/${token}`
     const name       = localOrder.customerName || 'there'
     const message    = encodeURIComponent(
       `Hi ${name}! 🙏 Thank you for your order.\n\n` +
@@ -296,67 +296,7 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
             </div>
           )}
 
-          {/* Go to Customer Profile */}
-          {localOrder.customerId && onGoToCustomer && (
-            <button
-              onClick={() => { onClose(); onGoToCustomer(localOrder.customerId) }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                width: '100%',
-                background: 'var(--surface)',
-                border: '1px solid var(--border2)',
-                borderRadius: 12,
-                padding: '12px 14px',
-                color: 'var(--accent)',
-                fontFamily: 'DM Sans, sans-serif',
-                fontSize: '0.82rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                marginBottom: 10,
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                transition: 'border-color 0.2s',
-              }}
-            >
-              <span className="material-icons" style={{ fontSize: '1.1rem' }}>account_circle</span>
-              Go to Customer Profile
-              <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto' }}>arrow_forward_ios</span>
-            </button>
-          )}
-
-          {/* Share Review Link — only when completed or delivered */}
-          {(localOrder.status === 'completed' || localOrder.status === 'delivered') && (
-            <button
-              onClick={handleShareReviewLink}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                width: '100%',
-                background: 'rgba(34,197,94,0.07)',
-                border: '1px solid rgba(34,197,94,0.4)',
-                borderRadius: 12,
-                padding: '12px 14px',
-                color: '#22c55e',
-                fontFamily: 'DM Sans, sans-serif',
-                fontSize: '0.82rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                marginBottom: 18,
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                transition: 'opacity 0.15s',
-              }}
-            >
-              <span className="material-icons" style={{ fontSize: '1.1rem' }}>rate_review</span>
-              Share Review Link
-              <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto' }}>open_in_new</span>
-            </button>
-          )}
-
-                    {/* Status + priority + stage pills */}
+          {/* Status + priority + stage pills */}
           <div className={styles.detailPillRow}>
             <span className={styles.detailPill} style={{ color: sc.color, background: sc.bg, borderColor: sc.border }}>
               {overdue ? 'Overdue' : (localOrder.status ? localOrder.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Pending')}
@@ -439,7 +379,7 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
             </div>
             <div className={styles.detailCell}>
               <div className={styles.detailCellLabel}>Due Date</div>
-              <div className={styles.detailCellVal} style={{ fontSize: '0.8rem', color: overdue ? '#ef4444' : localOrder.dueDate ? undefined : 'var(--text3)' }}>
+              <div className={styles.detailCellVal} style={{ fontSize: '0.8rem', color: localOrder.dueDate ? '#ef4444' : 'var(--text3)' }}>
                 {localOrder.dueDate
                   ? `${formatDate(localOrder.dueDate)}${due ? ` · ${due}` : ''}`
                   : localOrder.due || '—'}
@@ -462,6 +402,43 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
               <div className={styles.detailLinkedNames}>{localOrder.linkedNames.join(', ')}</div>
             </div>
           )}
+
+          {/* ── Change Stage ── */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 14, marginBottom: 14 }}>
+            <div style={{ fontSize: '0.6rem', fontWeight: 800, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>
+              Change Stage
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0 }}>
+              {STAGES.map(s => (
+                <button
+                  key={s.value}
+                  onClick={() => handleStageChange(s.value)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    padding: '8px 12px',
+                    borderRadius: 20,
+                    border: localOrder.stage === s.value ? '1px solid var(--accent)' : '1px solid var(--border2)',
+                    background: localOrder.stage === s.value ? 'rgba(99,102,241,0.1)' : 'transparent',
+                    color: localOrder.stage === s.value ? 'var(--accent)' : 'var(--text3)',
+                    fontSize: '0.7rem',
+                    lineHeight: 1.4,
+                    fontWeight: 800,
+                    fontFamily: 'DM Sans, sans-serif',
+                    cursor: 'pointer',
+                    transition: 'all 0.18s',
+                    whiteSpace: 'nowrap',
+                    verticalAlign: 'top',
+                    margin: '0 6px 8px 0',
+                  }}
+                >
+                  <span className="material-icons" style={{ fontSize: '0.85rem' }}>{s.icon}</span>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* ── Change Status ── */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 14, marginBottom: 14 }}>
@@ -488,43 +465,6 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
                     background: localOrder.status === s.value ? 'var(--surface2)' : 'transparent',
                   }}
                 >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Change Stage ── */}
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 14, marginBottom: 14 }}>
-            <div style={{ fontSize: '0.6rem', fontWeight: 800, color: 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 10 }}>
-              Change Stage
-            </div>
-            <div style={{ display: 'block', lineHeight: 0 }}>
-              {STAGES.map(s => (
-                <button
-                  key={s.value}
-                  onClick={() => handleStageChange(s.value)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    padding: '8px 12px',
-                    borderRadius: 20,
-                    border: localOrder.stage === s.value ? '1px solid var(--accent)' : '1px solid var(--border2)',
-                    background: localOrder.stage === s.value ? 'rgba(99,102,241,0.1)' : 'transparent',
-                    color: localOrder.stage === s.value ? 'var(--accent)' : 'var(--text3)',
-                    fontSize: '0.7rem',
-                    lineHeight: 1.4,
-                    fontWeight: 800,
-                    fontFamily: 'DM Sans, sans-serif',
-                    cursor: 'pointer',
-                    transition: 'all 0.18s',
-                    whiteSpace: 'nowrap',
-                    verticalAlign: 'top',
-                    margin: '0 6px 8px 0',
-                  }}
-                >
-                  <span className="material-icons" style={{ fontSize: '0.85rem' }}>{s.icon}</span>
                   {s.label}
                 </button>
               ))}
@@ -571,7 +511,65 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
             </div>
           </div>
 
-        </div>
+          {/* Go to Customer Profile */}
+          {localOrder.customerId && onGoToCustomer && (
+            <button
+              onClick={() => { onClose(); onGoToCustomer(localOrder.customerId) }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                width: '100%',
+                background: 'var(--surface)',
+                border: '1px solid var(--border2)',
+                borderRadius: 12,
+                padding: '12px 14px',
+                color: 'var(--accent)',
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                marginBottom: 10,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                transition: 'border-color 0.2s',
+              }}
+            >
+              <span className="material-icons" style={{ fontSize: '1.1rem' }}>account_circle</span>
+              Go to {localOrder.customerName || 'Customer'}'s Profile
+              <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto' }}>arrow_forward_ios</span>
+            </button>
+          )}
+
+          {/* Share Review Link — only when completed or delivered */}
+          {(localOrder.status === 'completed' || localOrder.status === 'delivered') && (
+            <button
+              onClick={handleShareReviewLink}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                width: '100%',
+                background: 'rgba(34,197,94,0.07)',
+                border: '1px solid rgba(34,197,94,0.4)',
+                borderRadius: 12,
+                padding: '12px 14px',
+                color: '#22c55e',
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                marginBottom: 18,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                transition: 'opacity 0.15s',
+              }}
+            >
+              <span className="material-icons" style={{ fontSize: '1.1rem' }}>rate_review</span>
+              Share Review Link via WhatsApp
+              <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto' }}>open_in_new</span>
+            </button>
+          )}
       </div>
     </div>
   )
