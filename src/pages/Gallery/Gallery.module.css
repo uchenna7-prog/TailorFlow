@@ -689,6 +689,65 @@
   padding: 8px 0 2px;
 }
 
+/* Price input with currency prefix */
+.priceWrap {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.priceWrap:focus-within { border-color: var(--text2); }
+
+.priceCurrency {
+  padding: 0 10px 0 12px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text3);
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.priceInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 11px 12px 11px 0;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+}
+.priceInput::placeholder { color: var(--text3); }
+
+/* Price badge on grid thumbnail */
+.thumbPrice {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border-radius: 6px;
+  padding: 2px 6px;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.3px;
+}
+
+/* Price chip in lightbox — slightly highlighted */
+.lightboxPriceChip {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  font-weight: 700;
+}
+
 .sheetEmpty {
   font-size: 0.82rem;
   color: var(--text3);
