@@ -33,7 +33,7 @@ function formatDate(ts) {
 
 // ── MANAGE DRESS TYPES SHEET ────────────────────────────────────
 
-function ManageDressTypesSheet({ isOpen, onClose, tabId, types, onSave }) {
+function ManageDressTypesSheet({ isOpen, onClose, tabId, types, onSave, photos }) {
   const [items,    setItems]    = useState([...(types || [])])
   const [newLabel, setNewLabel] = useState('')
 
@@ -53,6 +53,13 @@ function ManageDressTypesSheet({ isOpen, onClose, tabId, types, onSave }) {
 
   const removeItem = (id) => setItems(prev => prev.filter(t => t.id !== id))
   const handleSave = () => { onSave(tabId, items); onClose() }
+
+  // Count how many photos will be deleted for each type that was removed
+  const survivingIds = new Set(items.map(t => t.id))
+  const removedTypes = (types || []).filter(t => !survivingIds.has(t.id))
+  const affectedCount = removedTypes.reduce((sum, t) => {
+    return sum + (photos || []).filter(p => p.category === tabId && p.clothingType === t.id).length
+  }, 0)
 
   return (
     <div className={styles.sheetOverlay} onClick={onClose}>
@@ -90,6 +97,13 @@ function ManageDressTypesSheet({ isOpen, onClose, tabId, types, onSave }) {
               <span className="mi" style={{ fontSize: '1.1rem' }}>add</span>
             </button>
           </div>
+
+          {affectedCount > 0 && (
+            <div className={styles.deleteWarning}>
+              <span className="mi" style={{ fontSize: '1rem', flexShrink: 0 }}>warning</span>
+              <span>{affectedCount} photo{affectedCount > 1 ? 's' : ''} under removed type{removedTypes.length > 1 ? 's' : ''} will also be deleted.</span>
+            </div>
+          )}
         </div>
 
         <div className={styles.sheetFooter}>
@@ -398,7 +412,7 @@ function Lightbox({ photo, photos, onClose, onDelete }) {
 
 export default function Gallery({ onMenuClick }) {
   const { customers } = useCustomers()
-  const { photos, dressTypes, loading, addPhoto, deletePhoto, saveDressTypes } = useGallery()
+  const { photos, dressTypes, loading, addPhoto, deletePhoto, updatePhoto, saveDressTypes } = useGallery()
   const { brand }     = useBrand()
 
   const [activeTab,     setActiveTab]     = useState('completed_works')
@@ -476,8 +490,24 @@ export default function Gallery({ onMenuClick }) {
 
   const handleSaveDressTypes = async (tabId, types) => {
     try {
+      // Find which type IDs were removed
+      const survivingIds = new Set(types.map(t => t.id))
+      const removedIds   = (dressTypes[tabId] || [])
+        .map(t => t.id)
+        .filter(id => !survivingIds.has(id))
+
+      // Delete every photo in this tab whose clothingType no longer exists
+      if (removedIds.length > 0) {
+        const orphans = photos.filter(
+          p => p.category === tabId && removedIds.includes(p.clothingType)
+        )
+        await Promise.all(orphans.map(p => deletePhoto(p.id)))
+        if (orphans.length > 0) showToast(`${orphans.length} photo${orphans.length > 1 ? 's' : ''} removed`)
+      }
+
       await saveDressTypes(tabId, types)
-      // After saving, reset sub-tab to __all__ if current sub-tab no longer exists
+
+      // Reset sub-tab to __all__ if the active one was removed
       const ids = types.map(t => t.id)
       setActiveSubTabs(prev => ({
         ...prev,
@@ -667,6 +697,7 @@ export default function Gallery({ onMenuClick }) {
         tabId={manageTabId}
         types={dressTypes[manageTabId] || []}
         onSave={handleSaveDressTypes}
+        photos={photos}
       />
 
       {lightboxPhoto && (
