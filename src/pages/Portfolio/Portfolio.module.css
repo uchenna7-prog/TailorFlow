@@ -153,7 +153,7 @@
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--text-primary);
+  /* colour applied inline via accentColour */
 }
 
 .navLinks {
@@ -250,9 +250,9 @@
   flex-shrink: 0;
 }
 
+/* navLinkActive — brand colour applied inline */
 .navLinkActive {
-  color: var(--text-primary) !important;
-  border-bottom: 1.5px solid var(--text-primary);
+  border-bottom: 1.5px solid currentColor;
   padding-bottom: 8px;
 }
 
@@ -285,7 +285,7 @@
 }
 .themeToggleDesktop .mi { font-size: 1.1rem; line-height: 1; }
 
-/* navCta — base styles; brand colour applied inline */
+/* navCta — brand colour applied inline */
 .navCta {
   background: var(--accent);
   color: var(--accent-inv);
@@ -396,13 +396,13 @@
   width: 100%;
 }
 
+/* heroEyebrow — brand colour applied inline */
 .heroEyebrow {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 0.72rem;
   font-weight: 400;
   font-style: italic;
   letter-spacing: 4px;
-  color: rgba(255,255,255,0.6);
   margin-bottom: 16px;
 }
 
@@ -481,7 +481,7 @@
 }
 .heroSecondary:active { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
 
-/* ── Availability badge ── */
+/* ── Availability badge — green/grey are semantic, never brand colour ── */
 .availBadge {
   display: inline-flex;
   align-items: center;
@@ -519,7 +519,7 @@
   color: rgba(255,255,255,0.5);
 }
 
-/* ── SCROLL INDICATOR ── */
+/* ── SCROLL INDICATOR — brand colour applied inline ── */
 .heroScroll {
   position: absolute;
   bottom: 32px;
@@ -553,7 +553,7 @@
   font-family: 'DM Sans', sans-serif;
 }
 
-/* ── STATS STRIP ── */
+/* ── STATS STRIP — numbers coloured inline ── */
 .statsStrip {
   background: var(--bg-alt);
   border-top: 1px solid var(--border);
@@ -573,11 +573,11 @@
   gap: 5px;
 }
 
+/* statNum — brand colour applied inline */
 .statNum {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.8rem;
   font-weight: 300;
-  color: var(--text-primary);
   line-height: 1;
 }
 
@@ -595,7 +595,7 @@
   flex-shrink: 0;
 }
 
-/* ── SECTION EYEBROW ── */
+/* ── SECTION EYEBROW — brand colour applied inline ── */
 .sectionEyebrow {
   font-size: 0.6rem;
   letter-spacing: 3px;
@@ -640,9 +640,11 @@
 
 .aboutRight {}
 
+/* aboutCard — top border uses brand colour inline */
 .aboutCard {
   background: var(--bg-card);
   border: 1px solid var(--border);
+  border-top-width: 2px;
   border-radius: 16px;
   padding: 32px 28px;
   box-shadow: 0 2px 24px rgba(0,0,0,0.04);
@@ -664,6 +666,7 @@
   filter: grayscale(100%);
 }
 
+/* aboutInitials — brand colour border + text applied inline */
 .aboutInitials {
   width: 72px;
   height: 72px;
@@ -676,7 +679,6 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.5rem;
   font-weight: 300;
-  color: var(--text-muted);
   letter-spacing: 2px;
 }
 
@@ -698,7 +700,7 @@
   line-height: 1.5;
 }
 
-/* Style statement — personal signature, below tagline */
+/* Style statement — brand colour left border applied inline */
 .aboutStyleStatement {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.82rem;
@@ -944,7 +946,7 @@
   background: var(--bg-deep);
 }
 
-/* filterPillActive — base fallback; brand colour applied inline */
+/* filterPillActive — brand colour applied inline */
 .filterPillActive {
   background: var(--pill-active-bg);
   color: var(--pill-active-color);
@@ -996,6 +998,7 @@
   transform: scale(1.04);
 }
 
+/* photoOverlay — brand colour gradient applied inline */
 .photoOverlay {
   position: absolute;
   inset: 0;
@@ -1071,7 +1074,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
-/* ── PROCESS ── */
+/* ── PROCESS — step numbers + icons coloured inline ── */
 .process {
   background: var(--process-bg);
   border-top: 1px solid var(--border-soft);
@@ -1115,19 +1118,21 @@
   gap: 6px;
 }
 
+/* processNum — brand colour applied inline */
 .processNum {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 0.75rem;
   font-weight: 300;
-  color: var(--text-faint);
   letter-spacing: 1px;
 }
 
+/* processIcon — brand colour applied inline */
 .processIcon {
   font-size: 1rem;
   color: var(--text-faint);
 }
 
+/* processLine — brand colour gradient applied inline */
 .processLine {
   width: 1px;
   background: var(--border);
@@ -1210,7 +1215,7 @@
   margin-bottom: 20px;
 }
 
-/* Turnaround line inside book section */
+/* bookTurnaround — brand colour applied inline */
 .bookTurnaround {
   display: flex;
   align-items: center;
@@ -1283,13 +1288,13 @@
   gap: 6px;
 }
 
+/* footerBrand — brand colour applied inline */
 .footerBrand {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.5rem;
   font-weight: 300;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--footer-brand);
   margin: 0;
 }
 
@@ -1310,7 +1315,7 @@
   margin: 0;
 }
 
-/* Social icons in footer */
+/* Social icons in footer — hover to brand colour via CSS custom property */
 .footerSocials {
   display: flex;
   gap: 10px;
@@ -1331,8 +1336,8 @@
   transition: color 0.2s, border-color 0.2s;
 }
 .footerSocialIcon:hover {
-  color: #ccc;
-  border-color: rgba(255,255,255,0.3);
+  color: var(--accent-brand, #ccc);
+  border-color: var(--accent-brand, rgba(255,255,255,0.3));
 }
 
 /* Two-column contact + links section */
@@ -1349,12 +1354,12 @@
   gap: 10px;
 }
 
+/* footerColLabel — brand colour applied inline */
 .footerColLabel {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.58rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: #3a3a3a;
   margin: 0 0 4px;
 }
 
@@ -1386,6 +1391,7 @@
 }
 .footerColLink:hover { color: var(--footer-link-hover); }
 
+/* footerDivider — brand colour tint applied inline */
 .footerDivider {
   height: 1px;
   background: var(--footer-div);
@@ -1460,6 +1466,7 @@
   transform: translateY(0);
 }
 
+/* drawerHandle — brand colour + opacity applied inline */
 .drawerHandle {
   width: 36px;
   height: 3px;
@@ -1476,6 +1483,7 @@
   border-bottom: 1px solid var(--drawer-border);
 }
 
+/* drawerLabel — brand colour applied inline */
 .drawerLabel {
   font-size: 0.58rem;
   letter-spacing: 3px;
@@ -1535,6 +1543,7 @@
   margin-top: 2px;
 }
 
+/* fieldInput — focus uses --field-focus-border CSS var set inline */
 .fieldInput {
   background: var(--field-bg);
   border: 1px solid var(--field-border);
@@ -1550,13 +1559,14 @@
   box-sizing: border-box;
 }
 .fieldInput::placeholder { color: var(--field-placeholder); }
-.fieldInput:focus { border-color: var(--text-muted); }
+.fieldInput:focus { border-color: var(--field-focus-border, var(--text-muted)); }
 
 /* Date input styling */
 .fieldInput[type="date"] {
   cursor: pointer;
 }
 
+/* fieldTextarea — focus uses --field-focus-border CSS var set inline */
 .fieldTextarea {
   background: var(--field-bg);
   border: 1px solid var(--field-border);
@@ -1574,7 +1584,7 @@
   box-sizing: border-box;
 }
 .fieldTextarea::placeholder { color: var(--field-placeholder); }
-.fieldTextarea:focus { border-color: var(--text-muted); }
+.fieldTextarea:focus { border-color: var(--field-focus-border, var(--text-muted)); }
 
 .drawerFooter {
   padding: 16px 24px 28px;
@@ -1607,6 +1617,7 @@
   gap: 12px;
 }
 
+/* sentCheck — brand colour applied inline */
 .sentCheck {
   width: 52px;
   height: 52px;
@@ -1735,6 +1746,7 @@
   color: #aaa;
 }
 
+/* lbPrice — brand colour tint applied inline */
 .lbPrice {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.62rem;
@@ -1747,7 +1759,7 @@
   padding: 3px 10px;
 }
 
-/* ── TESTIMONIALS ── */
+/* ── TESTIMONIALS — top border + avatar coloured inline ── */
 .testimonials {
   padding: 90px 0;
   background: var(--bg-alt);
@@ -1776,9 +1788,11 @@
   gap: 16px;
 }
 
+/* testimonialCard — top border uses brand colour inline */
 .testimonialCard {
   background: var(--bg-card);
   border: 1px solid var(--border);
+  border-top-width: 2px;
   border-radius: 16px;
   padding: 24px 22px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
@@ -1811,6 +1825,7 @@
   gap: 10px;
 }
 
+/* testimonialAvatar — brand colour border + text applied inline */
 .testimonialAvatar {
   width: 36px;
   height: 36px;
@@ -1823,7 +1838,6 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1rem;
   font-weight: 400;
-  color: var(--text-muted);
   flex-shrink: 0;
 }
 
