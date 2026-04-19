@@ -383,9 +383,11 @@ export default function Gallery({ onMenuClick }) {
   const [toastMsg,      setToastMsg]      = useState('')
   const [shareOpen,     setShareOpen]     = useState(false)
   const [searchQuery,   setSearchQuery]   = useState('')
-  const toastTimer = useRef(null)
-  const tabsRef    = useRef(null)
-  const subTabsRef = useRef(null)
+  const toastTimer       = useRef(null)
+  const tabsRef          = useRef(null)
+  const subTabsRef       = useRef(null)
+  const tabActionBarRef  = useRef(null)
+  const pageRef          = useRef(null)
 
   const showToast = useCallback((msg) => {
     setToastMsg(msg)
@@ -394,6 +396,20 @@ export default function Gallery({ onMenuClick }) {
   }, [])
 
   const currentDressTypes = dressTypes[activeTab] || []
+
+  // Measure tabActionBar height and expose as CSS var so subTabsBar top is exact
+  useEffect(() => {
+    const el = tabActionBarRef.current
+    const page = pageRef.current
+    if (!el || !page) return
+    const update = () => {
+      page.style.setProperty('--tab-bar-h', `${el.offsetHeight}px`)
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   // Active sub-tab: default to '__all__' (the All tab)
   const activeSubTab = activeSubTabs[activeTab] ?? '__all__'
@@ -478,68 +494,70 @@ export default function Gallery({ onMenuClick }) {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} ref={pageRef}>
       <Header title="Gallery" onMenuClick={onMenuClick} />
 
-      {/* MAIN TABS + PILL */}
-      <div className={styles.tabActionBar}>
-        <div className={styles.tabs} ref={tabsRef}>
-          {TABS.map(tab => (
-            <div
-              key={tab.id}
-              className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-              onClick={(e) => {
-                setActiveTab(tab.id)
-                e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-              }}
-            >
-              <span>{tab.label}</span>
-              {counts[tab.id] > 0 && <span className={styles.tabBadge}>{counts[tab.id]}</span>}
+      {/* STICKY HEADER — both bars in one container so they never gap */}
+      <div className={styles.stickyHeader}>
+        {/* MAIN TABS + PILL */}
+        <div className={styles.tabActionBar} ref={tabActionBarRef}>
+          <div className={styles.tabs} ref={tabsRef}>
+            {TABS.map(tab => (
+              <div
+                key={tab.id}
+                className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+                onClick={(e) => {
+                  setActiveTab(tab.id)
+                  e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+                }}
+              >
+                <span>{tab.label}</span>
+                {counts[tab.id] > 0 && <span className={styles.tabBadge}>{counts[tab.id]}</span>}
+              </div>
+            ))}
+          </div>
+          {tabAction && (
+            <div className={styles.pillWrap}>
+              <button
+                className={`${styles.pill} ${pillExpanded ? styles.pillExpanded : ''}`}
+                onClick={handlePillClick}
+                aria-label={tabAction.label}
+              >
+                <span className={`mi ${styles.pillIcon}`}>{tabAction.icon}</span>
+                <span className={styles.pillLabel}>{tabAction.label}</span>
+              </button>
             </div>
-          ))}
+          )}
         </div>
-        {tabAction && (
-          <div className={styles.pillWrap}>
+
+        {/* DRESS TYPE SUB-TABS */}
+        <div className={styles.subTabsBar}>
+          <div className={styles.subTabsScroll} ref={subTabsRef}>
             <button
-              className={`${styles.pill} ${pillExpanded ? styles.pillExpanded : ''}`}
-              onClick={handlePillClick}
-              aria-label={tabAction.label}
+              key="__all__"
+              className={`${styles.subTab} ${activeSubTab === '__all__' ? styles.subTabActive : ''}`}
+              onClick={() => setActiveSubTabs(prev => ({ ...prev, [activeTab]: '__all__' }))}
             >
-              <span className={`mi ${styles.pillIcon}`}>{tabAction.icon}</span>
-              <span className={styles.pillLabel}>{tabAction.label}</span>
+              All
+            </button>
+            {currentDressTypes.map(st => (
+              <button
+                key={st.id}
+                className={`${styles.subTab} ${activeSubTab === st.id ? styles.subTabActive : ''}`}
+                onClick={() => setActiveSubTabs(prev => ({ ...prev, [activeTab]: st.id }))}
+              >
+                {st.label}
+              </button>
+            ))}
+            {/* Edit button — lives as last item in the scroll row */}
+            <button
+              className={styles.subTabEditBtn}
+              onClick={() => setManageTabId(activeTab)}
+              title="Edit dress types"
+            >
+              <span className="mi" style={{ fontSize: '1.1rem' }}>edit</span>
             </button>
           </div>
-        )}
-      </div>
-
-      {/* DRESS TYPE SUB-TABS */}
-      <div className={styles.subTabsBar}>
-        <div className={styles.subTabsScroll} ref={subTabsRef}>
-          {/* All tab — always first, never editable */}
-          <button
-            key="__all__"
-            className={`${styles.subTab} ${activeSubTab === '__all__' ? styles.subTabActive : ''}`}
-            onClick={() => setActiveSubTabs(prev => ({ ...prev, [activeTab]: '__all__' }))}
-          >
-            All
-          </button>
-          {currentDressTypes.map(st => (
-            <button
-              key={st.id}
-              className={`${styles.subTab} ${activeSubTab === st.id ? styles.subTabActive : ''}`}
-              onClick={() => setActiveSubTabs(prev => ({ ...prev, [activeTab]: st.id }))}
-            >
-              {st.label}
-            </button>
-          ))}
-          {/* Edit button — lives as last item in the scroll row */}
-          <button
-            className={styles.subTabEditBtn}
-            onClick={() => setManageTabId(activeTab)}
-            title="Edit dress types"
-          >
-            <span className="mi" style={{ fontSize: '1.1rem' }}>edit</span>
-          </button>
         </div>
       </div>
 
