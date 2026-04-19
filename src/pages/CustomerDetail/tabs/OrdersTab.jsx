@@ -406,7 +406,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave }) {
 // ─────────────────────────────────────────────────────────────
 // ORDER DETAIL
 // ─────────────────────────────────────────────────────────────
-function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, onStageChange, onGenerateInvoice }) {
+function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, onStageChange, onGenerateInvoice, onShareReviewLink }) {
   if (!order) return null
   const banner   = PRIORITY_BANNER[order.priority] ?? PRIORITY_BANNER.normal
   const placedOn = order.takenAt || order.date || formatDate(order.createdAt)
@@ -515,12 +515,12 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
         {/* Share Review Link — only when completed or delivered */}
         {(order.status === 'completed' || order.status === 'delivered') && (
           <button
-            disabled
             className={styles.shareReviewBtn}
+            onClick={() => onShareReviewLink(order)}
           >
-            <span className="material-icons" style={{ fontSize: '1.15rem' }}>rate_review</span>
+            <span className="mi" style={{ fontSize: '1.15rem' }}>rate_review</span>
             Share Review Link
-            <span className={styles.shareReviewBadge}>Coming Soon</span>
+            <span className="mi" style={{ fontSize: '1rem', marginLeft: 'auto', color: '#22c55e' }}>open_in_new</span>
           </button>
         )}
 
@@ -616,6 +616,37 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
     }
   }
 
+  // ── Share Review Link via WhatsApp ──────────────────────────
+  const handleShareReviewLink = (order) => {
+    // Build a unique review token scoped to this order
+    const token = order.reviewToken || crypto.randomUUID()
+
+    // Public review submission URL — adjust YOUR_DOMAIN to match your deployed URL
+    const reviewUrl = `https://YOUR_DOMAIN/review/${token}`
+
+    const customerName = order.customerName || 'there'
+    const message = encodeURIComponent(
+      `Hi ${customerName}! 🙏 Thank you for your order.\n\n` +
+      `We'd love to hear your feedback — it only takes a minute:\n${reviewUrl}\n\n` +
+      `Your review means a lot to us! ⭐`
+    )
+
+    // Clean the phone number — strip spaces, dashes, leading zeros, add country code
+    const rawPhone   = order.customerPhone || ''
+    const cleanPhone = rawPhone.replace(/[\s\-()]/g, '')
+    const waPhone    = cleanPhone.startsWith('+')
+      ? cleanPhone.replace('+', '')
+      : cleanPhone.startsWith('0')
+        ? `234${cleanPhone.slice(1)}`   // Nigerian default — adjust if needed
+        : cleanPhone
+
+    const waUrl = waPhone
+      ? `https://wa.me/${waPhone}?text=${message}`
+      : `https://wa.me/?text=${message}`
+
+    window.open(waUrl, '_blank', 'noopener,noreferrer')
+  }
+
   // Group by takenAt (human date) or createdAt
   const grouped = orders.reduce((acc, o) => {
     const key = o.takenAt || formatDate(o.createdAt) || o.date || 'Unknown Date'
@@ -697,6 +728,7 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
           onDelete={() => setConfirmDel(detailOrder)}
           onStatusChange={handleStatusChange}
           onStageChange={handleStageChange}
+          onShareReviewLink={handleShareReviewLink}
           onGenerateInvoice={(orderId) => {
             setDetailOrder(null)
             onGenerateInvoice(orderId)
