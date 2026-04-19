@@ -181,6 +181,30 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
     }
   }
 
+  const handleShareReviewLink = () => {
+    const token      = localOrder.reviewToken || crypto.randomUUID()
+    const reviewUrl  = `https://YOUR_DOMAIN/review/${token}`
+    const name       = localOrder.customerName || 'there'
+    const message    = encodeURIComponent(
+      `Hi ${name}! 🙏 Thank you for your order.\n\n` +
+      `We'd love to hear your feedback — it only takes a minute:\n${reviewUrl}\n\n` +
+      `Your review means a lot to us! ⭐`
+    )
+    const rawPhone   = localOrder.customerPhone || ''
+    const cleanPhone = rawPhone.replace(/[\s\-()]/g, '')
+    const waPhone    = cleanPhone.startsWith('+')
+      ? cleanPhone.replace('+', '')
+      : cleanPhone.startsWith('0')
+        ? `234${cleanPhone.slice(1)}`
+        : cleanPhone
+
+    const waUrl = waPhone
+      ? `https://wa.me/${waPhone}?text=${message}`
+      : `https://wa.me/?text=${message}`
+
+    window.open(waUrl, '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <div className={styles.detailOverlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={styles.detailPanel}>
@@ -300,50 +324,37 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
             </button>
           )}
 
-          {/* Share Review Link — only visible when order is completed or delivered */}
+          {/* Share Review Link — only when completed or delivered */}
           {(localOrder.status === 'completed' || localOrder.status === 'delivered') && (
             <button
-              disabled
+              onClick={handleShareReviewLink}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
                 width: '100%',
-                background: 'rgba(34,197,94,0.06)',
-                border: '1px dashed rgba(34,197,94,0.4)',
+                background: 'rgba(34,197,94,0.07)',
+                border: '1px solid rgba(34,197,94,0.4)',
                 borderRadius: 12,
                 padding: '12px 14px',
                 color: '#22c55e',
                 fontFamily: 'DM Sans, sans-serif',
                 fontSize: '0.82rem',
                 fontWeight: 800,
-                cursor: 'not-allowed',
+                cursor: 'pointer',
                 marginBottom: 18,
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
-                opacity: 0.75,
+                transition: 'opacity 0.15s',
               }}
             >
               <span className="material-icons" style={{ fontSize: '1.1rem' }}>rate_review</span>
               Share Review Link
-              <span style={{
-                marginLeft: 'auto',
-                fontSize: '0.55rem',
-                fontWeight: 700,
-                background: 'rgba(34,197,94,0.15)',
-                border: '1px solid rgba(34,197,94,0.3)',
-                borderRadius: 6,
-                padding: '2px 7px',
-                color: '#22c55e',
-                letterSpacing: '0.6px',
-                textTransform: 'uppercase',
-              }}>
-                Coming Soon
-              </span>
+              <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto' }}>open_in_new</span>
             </button>
           )}
 
-          {/* Status + priority + stage pills */}
+                    {/* Status + priority + stage pills */}
           <div className={styles.detailPillRow}>
             <span className={styles.detailPill} style={{ color: sc.color, background: sc.bg, borderColor: sc.border }}>
               {overdue ? 'Overdue' : (localOrder.status ? localOrder.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Pending')}
