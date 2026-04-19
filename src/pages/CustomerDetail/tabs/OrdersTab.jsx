@@ -533,13 +533,6 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           </button>
         )}
 
-        {/* Footer dates */}
-        <div className={styles.detailDate}>
-          Order Taken: {placedOn}
-          {order.due && <> &nbsp;•&nbsp; Due: {order.due}</>}
-          &nbsp;•&nbsp; Qty: {order.qty}
-        </div>
-
         {/* Generate Invoice */}
         <button
           className={styles.generateInvoiceBtn}
@@ -549,6 +542,13 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           <span className="material-icons" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: 6 }}>receipt_long</span>
           Generate Invoice
         </button>
+
+        {/* Footer dates — always the very last element */}
+        <div className={styles.detailDate}>
+          Order Taken: {placedOn}
+          {order.due && <> &nbsp;•&nbsp; Due: {order.due}</>}
+          &nbsp;•&nbsp; Qty: {order.qty}
+        </div>
       </div>
     </div>
   )
