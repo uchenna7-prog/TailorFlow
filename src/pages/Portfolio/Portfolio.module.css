@@ -52,6 +52,9 @@
   --close-bg:     rgba(0,0,0,0.07);
   --sent-border:  #ddd8cf;
   --ham-color:    #1a1814;
+  --info-bg:      #f0ede6;
+  --info-border:  #e0dbd2;
+  --info-text:    #5a5550;
 
   background: var(--bg);
   color: var(--text-primary);
@@ -109,6 +112,9 @@
   --close-bg:     rgba(255,255,255,0.06);
   --sent-border:  #2a2a2a;
   --ham-color:    #fff;
+  --info-bg:      #111;
+  --info-border:  #222;
+  --info-text:    #666;
 }
 
 /* ── NAV ── */
@@ -224,7 +230,6 @@
   width: 100%;
 }
 
-/* Inline contrast icon — close to HOME but not touching, no padding gap on right */
 .themeToggleMobileInline {
   background: none;
   border: none;
@@ -240,13 +245,11 @@
 .themeToggleMobileInline:hover { color: var(--text-primary); }
 .themeToggleMobileInline svg { display: block; }
 
-/* Invisible spacer mirrors the icon width so HOME text lands dead-center */
 .navHomeRowSpacer {
   width: 34px;
   flex-shrink: 0;
 }
 
-/* Active nav link — underlined like the reference */
 .navLinkActive {
   color: var(--text-primary) !important;
   border-bottom: 1.5px solid var(--text-primary);
@@ -257,7 +260,6 @@
   font-size: 0.7rem;
 }
 
-/* Theme toggle — desktop only (outside hamburger) */
 .navRight {
   display: flex;
   align-items: center;
@@ -283,6 +285,7 @@
 }
 .themeToggleDesktop .mi { font-size: 1.1rem; line-height: 1; }
 
+/* navCta — base styles; brand colour applied inline */
 .navCta {
   background: var(--accent);
   color: var(--accent-inv);
@@ -373,7 +376,6 @@
   background: linear-gradient(135deg, #2a2520 0%, #1a1614 50%, #252018 100%);
 }
 
-/* Light mode fallback */
 .lightMode .heroBgFallback {
   background: linear-gradient(135deg, #e8e4dc 0%, #d8d3c8 50%, #e0dbd0 100%);
 }
@@ -420,16 +422,30 @@
   font-style: italic;
   font-weight: 300;
   color: rgba(255,255,255,0.65);
-  margin-bottom: 32px;
+  margin-bottom: 12px;
   line-height: 1.6;
+}
+
+/* Style statement — one step below tagline, more personal */
+.heroStyleStatement {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  max-width: 400px;
 }
 
 .heroCtas {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
+/* heroPrimary — brand colour applied inline */
 .heroPrimary {
   background: #fff;
   color: #1a1814;
@@ -465,7 +481,44 @@
 }
 .heroSecondary:active { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
 
-/* ── SCROLL INDICATOR — bottom-center, clean ── */
+/* ── Availability badge ── */
+.availBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.availDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: pulse 2s ease infinite;
+}
+
+.availDotBusy {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #888;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.85); }
+}
+
+.availText {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ── SCROLL INDICATOR ── */
 .heroScroll {
   position: absolute;
   bottom: 32px;
@@ -640,8 +693,22 @@
   font-style: italic;
   font-size: 0.95rem;
   color: var(--text-muted);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   line-height: 1.5;
+}
+
+/* Style statement — personal signature, below tagline */
+.aboutStyleStatement {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-body);
+  line-height: 1.7;
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  background: var(--bg-deep);
+  border-left: 2px solid var(--border);
+  border-radius: 0 6px 6px 0;
 }
 
 .aboutBio {
@@ -650,6 +717,34 @@
   line-height: 1.75;
   margin: 0 0 20px;
   font-family: 'DM Sans', sans-serif;
+}
+
+/* Business info grid — turnaround, service area, technique, founded year */
+.aboutInfoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--info-bg);
+  border: 1px solid var(--info-border);
+  border-radius: 10px;
+}
+
+.aboutInfoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--info-text);
+  line-height: 1.5;
+}
+
+.aboutInfoItem .material-icons {
+  color: var(--text-faint);
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .aboutSpecialties {
@@ -782,7 +877,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
-/* ── FILTER TABS — smooth scroll, 10px radius ── */
+/* ── FILTER TABS ── */
 .filterBar {
   padding: 0 24px 28px;
 }
@@ -820,6 +915,7 @@
   background: var(--bg-deep);
 }
 
+/* filterPillActive — base fallback; brand colour applied inline */
 .filterPillActive {
   background: var(--pill-active-bg);
   color: var(--pill-active-color);
@@ -1026,7 +1122,7 @@
   margin: 0;
 }
 
-/* ── BOOK SECTION ── always dark, full-bleed ── */
+/* ── BOOK SECTION — always dark, full-bleed ── */
 .bookSection {
   position: relative;
   min-height: 80vh;
@@ -1082,9 +1178,22 @@
   font-size: 1rem;
   color: #888;
   line-height: 1.7;
-  margin-bottom: 36px;
+  margin-bottom: 20px;
 }
 
+/* Turnaround line inside book section */
+.bookTurnaround {
+  display: flex;
+  align-items: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 28px;
+}
+
+/* bookCta — brand colour applied inline */
 .bookCta {
   background: #fff;
   color: #1a1814;
@@ -1122,7 +1231,7 @@
 }
 .bookContact:hover { color: #bbb; }
 
-/* ── FOOTER ── always dark for premium contrast ── */
+/* ── FOOTER — always dark ── */
 .footer {
   background: var(--footer-bg);
   border-top: 1px solid rgba(255,255,255,0.06);
@@ -1148,6 +1257,16 @@
   font-style: italic;
   font-size: 0.85rem;
   color: var(--footer-tag);
+  margin-bottom: 4px;
+}
+
+.footerFounded {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--footer-powered);
+  margin: 0;
 }
 
 .footerDivider {
@@ -1165,7 +1284,6 @@
   padding-bottom: 24px;
 }
 
-/* Footer links with icons */
 .footerLinks {
   display: flex;
   gap: 20px;
@@ -1189,7 +1307,6 @@
   line-height: 1;
 }
 
-/* Powered row — absolute last thing in footer */
 .footerPoweredRow {
   border-top: 1px solid var(--footer-div);
   padding: 16px 0 calc(20px + env(safe-area-inset-bottom));
@@ -1303,6 +1420,13 @@
   color: var(--text-faint);
 }
 
+.fieldHint {
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  font-style: italic;
+  margin-top: 2px;
+}
+
 .fieldInput {
   background: var(--field-bg);
   border: 1px solid var(--field-border);
@@ -1319,6 +1443,11 @@
 }
 .fieldInput::placeholder { color: var(--field-placeholder); }
 .fieldInput:focus { border-color: var(--text-muted); }
+
+/* Date input styling */
+.fieldInput[type="date"] {
+  cursor: pointer;
+}
 
 .fieldTextarea {
   background: var(--field-bg);
@@ -1343,6 +1472,7 @@
   padding: 16px 24px 28px;
 }
 
+/* sendBtn — brand colour applied inline */
 .sendBtn {
   width: 100%;
   background: var(--send-bg);
@@ -1509,52 +1639,6 @@
   padding: 3px 10px;
 }
 
-/* ── DESKTOP ADJUSTMENTS ── */
-@media (min-width: 640px) {
-  .navLinks { display: flex; }
-  .navHamburger { display: none; }
-  .themeToggleDesktop { display: flex; }
-  .navLinksOpen {
-    display: flex;
-    flex-direction: row;
-    position: static;
-    background: none;
-    border: none;
-    padding: 0;
-    gap: 6px;
-    animation: none;
-  }
-  /* Hide theme toggle from dropdown on desktop (it's in navRight) */
-  .navLinksOpen .themeToggle { display: none; }
-  .navLinksOpen .themeToggleMobileInline { display: none; }
-  .navLinksOpen .navHomeRow { display: contents; }
-  .navCta { margin-top: 0; }
-  .aboutInner {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 60px;
-  }
-  .aboutLeft, .aboutRight { flex: 1; }
-  .photoGrid { grid-template-columns: repeat(3, 1fr); }
-  .photoCardFeatured {
-    grid-column: span 2;
-    aspect-ratio: 16/9;
-  }
-  .processSteps {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .processStep:nth-child(odd) {
-    border-right: 1px solid var(--border-soft);
-    padding-right: 32px;
-  }
-  .processStep:nth-child(even) { padding-left: 32px; }
-}
-
-/* Hide theme toggle desktop button on mobile (handled in dropdown) */
-@media (max-width: 639px) {
-  .themeToggleDesktop { display: none; }
-}
 /* ── TESTIMONIALS ── */
 .testimonials {
   padding: 90px 0;
@@ -1642,8 +1726,45 @@
   letter-spacing: 0.5px;
 }
 
-/* Desktop: 2-column testimonials grid */
+/* ── DESKTOP ADJUSTMENTS ── */
 @media (min-width: 640px) {
+  .navLinks { display: flex; }
+  .navHamburger { display: none; }
+  .themeToggleDesktop { display: flex; }
+  .navLinksOpen {
+    display: flex;
+    flex-direction: row;
+    position: static;
+    background: none;
+    border: none;
+    padding: 0;
+    gap: 6px;
+    animation: none;
+  }
+  .navLinksOpen .themeToggle { display: none; }
+  .navLinksOpen .themeToggleMobileInline { display: none; }
+  .navLinksOpen .navHomeRow { display: contents; }
+  .navCta { margin-top: 0; }
+  .aboutInner {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 60px;
+  }
+  .aboutLeft, .aboutRight { flex: 1; }
+  .photoGrid { grid-template-columns: repeat(3, 1fr); }
+  .photoCardFeatured {
+    grid-column: span 2;
+    aspect-ratio: 16/9;
+  }
+  .processSteps {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .processStep:nth-child(odd) {
+    border-right: 1px solid var(--border-soft);
+    padding-right: 32px;
+  }
+  .processStep:nth-child(even) { padding-left: 32px; }
   .testimonialsInner {
     max-width: 1100px;
   }
@@ -1652,4 +1773,9 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
+}
+
+/* Hide theme toggle desktop button on mobile */
+@media (max-width: 639px) {
+  .themeToggleDesktop { display: none; }
 }
