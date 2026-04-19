@@ -9,9 +9,10 @@
 .stickyHeader {
   position: sticky;
   top: 56px;
-  z-index: 50;
+  z-index: 200;
   background: var(--bg);
   flex-shrink: 0;
+  overflow: visible;
 }
 
 /* ── TAB BAR ── */
