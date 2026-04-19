@@ -354,8 +354,245 @@ function AccountDetailsModal({ onBack, showToast }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Misc components
+// MODAL: Business Info
 // ─────────────────────────────────────────────────────────────
+
+const TURNAROUND_OPTIONS = [
+  { value: '1 week',    label: '1 week' },
+  { value: '1-2 weeks', label: '1–2 weeks' },
+  { value: '2-3 weeks', label: '2–3 weeks' },
+  { value: '3-4 weeks', label: '3–4 weeks' },
+  { value: '4-6 weeks', label: '4–6 weeks' },
+  { value: '6+ weeks',  label: '6+ weeks' },
+]
+
+const SERVICE_AREA_OPTIONS = [
+  { value: 'Lagos only',    label: 'Lagos only' },
+  { value: 'Nationwide',    label: 'Nationwide' },
+  { value: 'International', label: 'International' },
+]
+
+function SelectChips({ options, value, onChange }) {
+  return (
+    <div className={styles.chipsRow}>
+      {options.map(opt => (
+        <button
+          key={opt.value}
+          className={`${styles.chip} ${value === opt.value ? styles.chipActive : ''}`}
+          onClick={() => onChange(opt.value)}
+          type="button"
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function BusinessInfoModal({ onBack, showToast }) {
+  const { settings, updateMany } = useSettings()
+
+  const [local, setLocal] = useState({
+    brandFoundedYear:       settings.brandFoundedYear       || '',
+    brandTurnaround:        settings.brandTurnaround        || '',
+    brandServiceArea:       settings.brandServiceArea       || '',
+    brandAvailability:      settings.brandAvailability      || 'open',
+    brandAvailableUntil:    settings.brandAvailableUntil    || '',
+    brandStyleStatement:    settings.brandStyleStatement    || '',
+    brandFeaturedTechnique: settings.brandFeaturedTechnique || '',
+    brandMilestone:         settings.brandMilestone         || '',
+  })
+
+  const set = key => val => setLocal(p => ({ ...p, [key]: val }))
+
+  const save = () => {
+    updateMany(local)
+    showToast('Business info saved')
+    onBack()
+  }
+
+  return (
+    <FullModal title="Business Info" onBack={onBack} onSave={save}>
+
+      {/* Availability */}
+      <FieldGroup>
+        <Field label="Availability" hint="Clients will see this on your portfolio.">
+          <div className={styles.availabilityRow}>
+            <button
+              type="button"
+              className={`${styles.availBtn} ${local.brandAvailability === 'open' ? styles.availBtnOpen : ''}`}
+              onClick={() => set('brandAvailability')('open')}
+            >
+              <span className="mi" style={{ fontSize: '1rem' }}>check_circle</span>
+              Accepting Orders
+            </button>
+            <button
+              type="button"
+              className={`${styles.availBtn} ${local.brandAvailability === 'booked' ? styles.availBtnBooked : ''}`}
+              onClick={() => set('brandAvailability')('booked')}
+            >
+              <span className="mi" style={{ fontSize: '1rem' }}>block</span>
+              Fully Booked
+            </button>
+          </div>
+        </Field>
+        {local.brandAvailability === 'booked' && (
+          <Field label="Available again from" hint="Optional — lets clients know when to check back.">
+            <TextInput
+              type="date"
+              value={local.brandAvailableUntil}
+              onChange={set('brandAvailableUntil')}
+              placeholder=""
+            />
+          </Field>
+        )}
+      </FieldGroup>
+
+      {/* Business history */}
+      <FieldGroup>
+        <Field label="Year Founded" hint="e.g. 2018 — shown as 'Crafting since 2018'">
+          <TextInput
+            value={local.brandFoundedYear}
+            onChange={set('brandFoundedYear')}
+            placeholder="e.g. 2018"
+            type="tel"
+          />
+        </Field>
+        <Field label="Client Milestone" hint="e.g. 200+ garments delivered">
+          <TextInput
+            value={local.brandMilestone}
+            onChange={set('brandMilestone')}
+            placeholder="e.g. 200+ garments delivered"
+          />
+        </Field>
+      </FieldGroup>
+
+      {/* Style & operations */}
+      <FieldGroup>
+        <Field label="Signature Style Statement" hint="One sentence about what makes your work unique. Max 100 characters.">
+          <Textarea
+            value={local.brandStyleStatement}
+            onChange={v => set('brandStyleStatement')(v.slice(0, 100))}
+            placeholder="e.g. I specialise in Yoruba ceremonial wear for weddings and naming ceremonies."
+            rows={2}
+          />
+          <span className={styles.charCount}>{local.brandStyleStatement.length}/100</span>
+        </Field>
+        <Field label="Featured Technique" hint="e.g. Hand-embroidered agbada, French-seam finishing">
+          <TextInput
+            value={local.brandFeaturedTechnique}
+            onChange={set('brandFeaturedTechnique')}
+            placeholder="e.g. Hand-embroidered agbada"
+          />
+        </Field>
+      </FieldGroup>
+
+      {/* Turnaround & service area */}
+      <FieldGroup>
+        <Field label="Standard Turnaround Time">
+          <SelectChips
+            options={TURNAROUND_OPTIONS}
+            value={local.brandTurnaround}
+            onChange={set('brandTurnaround')}
+          />
+        </Field>
+        <Field label="Service Area">
+          <SelectChips
+            options={SERVICE_AREA_OPTIONS}
+            value={local.brandServiceArea}
+            onChange={set('brandServiceArea')}
+          />
+        </Field>
+      </FieldGroup>
+
+    </FullModal>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// MODAL: Social Media Links
+// ─────────────────────────────────────────────────────────────
+
+const SOCIAL_PLATFORMS = [
+  { id: 'instagram', label: 'Instagram',  placeholder: 'yourbrand',         icon: 'photo_camera' },
+  { id: 'tiktok',    label: 'TikTok',     placeholder: 'yourbrand',         icon: 'play_circle'  },
+  { id: 'facebook',  label: 'Facebook',   placeholder: 'yourbrand',         icon: 'groups'       },
+  { id: 'twitter',   label: 'Twitter / X', placeholder: 'yourbrand',        icon: 'tag'          },
+  { id: 'youtube',   label: 'YouTube',    placeholder: 'YourBrandChannel',  icon: 'smart_display'},
+  { id: 'pinterest', label: 'Pinterest',  placeholder: 'yourbrand',         icon: 'push_pin'     },
+  { id: 'threads',   label: 'Threads',    placeholder: 'yourbrand',         icon: 'forum'        },
+]
+
+function SocialsModal({ onBack, showToast }) {
+  const { settings, updateMany } = useSettings()
+
+  // Build a map of platform → handle from saved socials array
+  const toMap = arr => Object.fromEntries((arr || []).map(s => [s.platform, s.handle]))
+  const [handles, setHandles] = useState(() => toMap(settings.brandSocials || []))
+  const [expanded, setExpanded] = useState(() => {
+    const active = new Set((settings.brandSocials || []).map(s => s.platform))
+    // Pre-open any already-saved platforms
+    return Object.fromEntries(SOCIAL_PLATFORMS.map(p => [p.id, active.has(p.id)]))
+  })
+
+  const togglePlatform = (id) => {
+    setExpanded(prev => {
+      const next = { ...prev, [id]: !prev[id] }
+      // Clear handle if collapsing
+      if (prev[id]) setHandles(h => { const n = { ...h }; delete n[id]; return n })
+      return next
+    })
+  }
+
+  const save = () => {
+    const brandSocials = SOCIAL_PLATFORMS
+      .filter(p => expanded[p.id] && handles[p.id]?.trim())
+      .map(p => ({ platform: p.id, handle: handles[p.id].trim() }))
+    updateMany({ brandSocials })
+    showToast('Social links saved')
+    onBack()
+  }
+
+  return (
+    <FullModal title="Social Media" onBack={onBack} onSave={save}>
+      <FieldGroup>
+        {SOCIAL_PLATFORMS.map(platform => (
+          <div key={platform.id} className={styles.socialRow}>
+            <button
+              type="button"
+              className={`${styles.socialToggle} ${expanded[platform.id] ? styles.socialToggleActive : ''}`}
+              onClick={() => togglePlatform(platform.id)}
+            >
+              <div className={styles.socialToggleLeft}>
+                <div className={`${styles.socialIconWrap} ${expanded[platform.id] ? styles.socialIconActive : ''}`}>
+                  <span className="mi" style={{ fontSize: '1.1rem' }}>{platform.icon}</span>
+                </div>
+                <span className={styles.socialPlatformLabel}>{platform.label}</span>
+              </div>
+              <span className={`mi ${styles.socialChevron} ${expanded[platform.id] ? styles.socialChevronOpen : ''}`} style={{ fontSize: '1rem' }}>
+                expand_more
+              </span>
+            </button>
+            {expanded[platform.id] && (
+              <div className={styles.socialHandleWrap}>
+                <span className={styles.socialAt}>@</span>
+                <input
+                  className={styles.socialHandleInput}
+                  type="text"
+                  placeholder={platform.placeholder}
+                  value={handles[platform.id] || ''}
+                  onChange={e => setHandles(h => ({ ...h, [platform.id]: e.target.value }))}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                />
+              </div>
+            )}
+          </div>
+        ))}
+      </FieldGroup>
+    </FullModal>
+  )
+}
 
 function PlanBadge({ isPremium }) {
   return (
@@ -540,6 +777,56 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
           divider={false}
         />
 
+        {/* ── Business Info ── */}
+        <SectionHeader icon="storefront" label="Business Info" />
+        <InfoRow icon="schedule"     label="Turnaround Time"    value={settings.brandTurnaround}        placeholder="Not set" />
+        <InfoRow icon="public"       label="Service Area"       value={settings.brandServiceArea}       placeholder="Not set" />
+        <InfoRow icon="history"      label="Founded"            value={settings.brandFoundedYear ? `Since ${settings.brandFoundedYear}` : ''} placeholder="Not set" />
+        <InfoRow icon="emoji_events" label="Milestone"          value={settings.brandMilestone}         placeholder="Not set" />
+        <InfoRow
+          icon={settings.brandAvailability === 'booked' ? 'block' : 'check_circle'}
+          label="Availability"
+          value={settings.brandAvailability === 'booked'
+            ? `Fully Booked${settings.brandAvailableUntil ? ` · Available from ${settings.brandAvailableUntil}` : ''}`
+            : 'Accepting Orders'}
+          placeholder="Not set"
+        />
+        <TappableRow
+          icon="edit"
+          label="Edit Business Info"
+          sub="Availability, turnaround, style statement, service area"
+          onClick={() => setActiveModal('businessInfo')}
+          divider={false}
+        />
+
+        {/* ── Social Media ── */}
+        <SectionHeader icon="share" label="Social Media" />
+        {settings.brandSocials?.length > 0 ? (
+          <div className={styles.socialsPreview}>
+            {settings.brandSocials.map(s => {
+              const p = SOCIAL_PLATFORMS.find(pl => pl.id === s.platform)
+              return p ? (
+                <div key={s.platform} className={styles.socialPreviewChip}>
+                  <span className="mi" style={{ fontSize: '0.9rem' }}>{p.icon}</span>
+                  <span className={styles.socialPreviewLabel}>@{s.handle}</span>
+                </div>
+              ) : null
+            })}
+          </div>
+        ) : (
+          <div className={`${styles.row} ${styles.brandEmpty}`}>
+            <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>share</span>
+            <span className={styles.brandEmptyText}>No social links yet</span>
+          </div>
+        )}
+        <TappableRow
+          icon="edit"
+          label="Edit Social Links"
+          sub="Instagram, TikTok, Facebook and more"
+          onClick={() => setActiveModal('socials')}
+          divider={false}
+        />
+
         {/* ── Plan ── */}
         <SectionHeader icon="workspace_premium" label="My Plan" />
         <div className={styles.row}>
@@ -594,6 +881,12 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
       )}
       {activeModal === 'accountDetails' && (
         <AccountDetailsModal onBack={() => setActiveModal(null)} showToast={showToast} />
+      )}
+      {activeModal === 'businessInfo' && (
+        <BusinessInfoModal onBack={() => setActiveModal(null)} showToast={showToast} />
+      )}
+      {activeModal === 'socials' && (
+        <SocialsModal onBack={() => setActiveModal(null)} showToast={showToast} />
       )}
 
       <ConfirmSheet
