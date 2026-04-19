@@ -1,72 +1,82 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {
-
-    // ── Slug registry ──────────────────────────────────────────
-    // Public readable so Portfolio.jsx can resolve slug → uid without auth.
-    // Only the owner of a slug may write/overwrite it (the uid stored in the
-    // doc must match the authenticated user).
-    match /slugs/{slug} {
-      allow read: if true;
-      // Allow create: anyone authenticated can claim an unclaimed slug
-      allow create: if request.auth != null
-                    && request.resource.data.uid == request.auth.uid;
-      // Allow update/delete: only the uid recorded in the doc can touch it
-      allow update, delete: if request.auth != null
-                            && resource.data.uid == request.auth.uid;
-    }
-
-    // ── Per-user data ──────────────────────────────────────────
-    match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-
-      match /publicProfile/{docId} {
-        allow read: if true;
-        allow write: if request.auth != null && request.auth.uid == uid;
-      }
-
-      match /galleryPhotos/{photoId} {
-        allow read: if true;
-        allow write: if request.auth != null && request.auth.uid == uid;
-      }
-
-      match /galleryDressTypes/{docId} {
-        allow read: if true;
-        allow write: if request.auth != null && request.auth.uid == uid;
-      }
-
-      match /portfolioSettings/{docId} {
-        allow read: if true;
-        allow write: if request.auth != null && request.auth.uid == uid;
-      }
-
-      match /customers/{customerId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
-
-        match /orders/{orderId} {
-          allow read, write: if request.auth != null && request.auth.uid == uid;
-        }
-
-        match /invoices/{invoiceId} {
-          allow read, write: if request.auth != null && request.auth.uid == uid;
-        }
-
-        match /measurements/{measurementId} {
-          allow read, write: if request.auth != null && request.auth.uid == uid;
-        }
-      }
-
-      match /tasks/{taskId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
-      }
-
-      match /gallery/{itemId} {
-        allow read, write: if request.auth != null && request.auth.uid == uid;
-      }
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
+match /databases/{database}/documents {  
+​// ── Slug registry ──────────────────────────────────────────
+// Public readable so Portfolio.jsx can resolve slug → uid without auth.
+// Only the owner of a slug may write/overwrite it.
+match /slugs/{slug} {
+allow read: if true;
+allow create: if request.auth != null
+&& request.resource.data.uid == request.auth.uid;
+allow update, delete: if request.auth != null
+&& resource.data.uid == request.auth.uid;
+}  
+​// ── Per-user data ──────────────────────────────────────────
+match /users/{uid} {
+allow read, write: if request.auth != null && request.auth.uid == uid;  
+​match /publicProfile/{docId} {
+allow read: if true;
+allow write: if request.auth != null && request.auth.uid == uid;
+}  
+​match /galleryPhotos/{photoId} {
+allow read: if true;
+allow write: if request.auth != null && request.auth.uid == uid;
+}  
+​match /galleryDressTypes/{docId} {
+allow read: if true;
+allow write: if request.auth != null && request.auth.uid == uid;
+}  
+​match /portfolioSettings/{docId} {
+allow read: if true;
+allow write: if request.auth != null && request.auth.uid == uid;
+}  
+​match /customers/{customerId} {
+allow read, write: if request.auth != null && request.auth.uid == uid;  
+​match /orders/{orderId} {
+allow read, write: if request.auth != null && request.auth.uid == uid;
+}  
+​match /invoices/{invoiceId} {
+allow read, write: if request.auth != null && request.auth.uid == uid;
+}  
+​match /measurements/{measurementId} {
+allow read, write: if request.auth != null && request.auth.uid == uid;
 }
+}  
+​match /tasks/{taskId} {
+allow read, write: if request.auth != null && request.auth.uid == uid;
+}  
+​match /gallery/{itemId} {
+allow read, write: if request.auth != null && request.auth.uid == uid;
+}  
+​// ── Reviews ───────────────────────────────────────────────
+// Authenticated owner: full read/write (approve, reject, delete).
+// Unauthenticated public: may only CREATE a review if the request
+//   carries a valid token field (non-empty string) and includes all
+//   required fields — this is how the customer-facing review link
+//   submits a review without logging in.
+//   They may NOT read, update, or delete any review doc.
+match /reviews/{reviewId} {
+// Owner has full access
+allow read, write: if request.auth != null && request.auth.uid == uid;  
+​// Public (unauthenticated) can only create — customer submitting
+// via the review link.
+// We validate required fields and a non-empty
+// token to prevent blank spam submissions.
+allow create: if request.auth == null
+&& request.resource.data.token is string
+&& request.resource.data.token.size() > 0
+&& request.resource.data.customerName is string
+&& request.resource.data.customerName.size() > 0
+&& request.resource.data.review is string
+&& request.resource.data.review.size() > 0
+&& request.resource.data.rating is number
+&& request.resource.data.rating >= 1
+&& request.resource.data.rating <= 5
+&& request.resource.data.status == 'pending';
+}
+}  
+​match /{document=**} {
+allow read, write: if false;
+}
+}
+}  
