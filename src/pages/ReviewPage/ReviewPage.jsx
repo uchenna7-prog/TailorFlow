@@ -62,18 +62,18 @@ export default function ReviewPage() {
   // URL: /review/:uid/:token
   const { uid, token } = useParams()
 
-  const [tailorName,    setTailorName]    = useState('')
+  const [tailorName,      setTailorName]      = useState('')
   const [alreadyReviewed, setAlreadyReviewed] = useState(false)
-  const [loading,       setLoading]       = useState(true)
-  const [submitting,    setSubmitting]    = useState(false)
-  const [submitted,     setSubmitted]     = useState(false)
-  const [error,         setError]         = useState('')
+  const [loading,         setLoading]         = useState(true)
+  const [submitting,      setSubmitting]      = useState(false)
+  const [submitted,       setSubmitted]       = useState(false)
+  const [error,           setError]           = useState('')
 
   // Form state
-  const [customerName,  setCustomerName]  = useState('')
-  const [rating,        setRating]        = useState(0)
-  const [reviewText,    setReviewText]    = useState('')
-  const [fieldErrors,   setFieldErrors]   = useState({})
+  const [customerName, setCustomerName] = useState('')
+  const [rating,       setRating]       = useState(0)
+  const [reviewText,   setReviewText]   = useState('')
+  const [fieldErrors,  setFieldErrors]  = useState({})
 
   // ── Load tailor brand name + check if token already used ──
   useEffect(() => {
@@ -143,7 +143,7 @@ export default function ReviewPage() {
     return (
       <div className={styles.page}>
         <div className={styles.loadingWrap}>
-          <span className="material-icons" style={{ fontSize: '2rem', opacity: 0.2, animation: 'spin 1.2s linear infinite' }}>
+          <span className="material-icons" style={{ fontSize: '2rem', color: 'var(--text3)', animation: 'spin 1.2s linear infinite' }}>
             autorenew
           </span>
         </div>
@@ -155,8 +155,8 @@ export default function ReviewPage() {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
-          <span className="material-icons" style={{ fontSize: '3rem', color: '#d1d5db' }}>link_off</span>
-          <h2 className={styles.title}>Invalid Link</h2>
+          <span className="material-icons" style={{ fontSize: '3rem', color: 'var(--text3)' }}>link_off</span>
+          <h2 className={styles.title} style={{ marginTop: 16 }}>Invalid Link</h2>
           <p className={styles.subtitle}>This review link is not valid. Please ask your tailor to resend the link.</p>
         </div>
       </div>
@@ -214,7 +214,7 @@ export default function ReviewPage() {
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.brandBadge}>
-            <span className="material-icons" style={{ fontSize: '1.4rem', color: '#6366f1' }}>content_cut</span>
+            <span className="material-icons" style={{ fontSize: '1.4rem', color: 'var(--text)' }}>content_cut</span>
           </div>
           <h1 className={styles.title}>Leave a Review</h1>
           <p className={styles.subtitle}>
