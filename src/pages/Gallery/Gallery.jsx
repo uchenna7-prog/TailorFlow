@@ -382,6 +382,7 @@ export default function Gallery({ onMenuClick }) {
   const [confirmDel,    setConfirmDel]    = useState(null)
   const [toastMsg,      setToastMsg]      = useState('')
   const [shareOpen,     setShareOpen]     = useState(false)
+  const [searchQuery,   setSearchQuery]   = useState('')
   const toastTimer = useRef(null)
   const tabsRef    = useRef(null)
   const subTabsRef = useRef(null)
@@ -398,9 +399,16 @@ export default function Gallery({ onMenuClick }) {
   const activeSubTab = activeSubTabs[activeTab] ?? '__all__'
 
   const filteredByMain = photos.filter(p => p.category === activeTab)
-  const filtered = activeSubTab === '__all__'
+  const filteredBySub = activeSubTab === '__all__'
     ? filteredByMain
     : filteredByMain.filter(p => p.clothingType === activeSubTab)
+  const filtered = searchQuery.trim()
+    ? filteredBySub.filter(p =>
+        p.caption?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.clothingTypeLabel?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.customerName?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : filteredBySub
 
   const counts = Object.fromEntries(TABS.map(t => [t.id, photos.filter(p => p.category === t.id).length]))
   const lightboxList = lightboxPhoto ? filtered : []
@@ -535,6 +543,25 @@ export default function Gallery({ onMenuClick }) {
         </div>
       </div>
 
+      {/* SEARCH BAR */}
+      <div className={styles.searchBarWrap}>
+        <div className={styles.gallerySearchWrap}>
+          <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)', flexShrink: 0 }}>search</span>
+          <input
+            className={styles.gallerySearchInput}
+            type="text"
+            placeholder="Search photos…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
+          {searchQuery.length > 0 && (
+            <button className={styles.gallerySearchClear} onClick={() => setSearchQuery('')}>
+              <span className="mi" style={{ fontSize: '1rem' }}>close</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* GRID */}
       <div className={styles.gridArea}>
         {loading ? (
@@ -545,23 +572,27 @@ export default function Gallery({ onMenuClick }) {
         ) : filtered.length === 0 ? (
           <div className={styles.emptyState}>
             <span className="mi" style={{ fontSize: '3rem', opacity: 0.15 }}>{CATEGORY_MAP[activeTab]?.icon ?? 'image'}</span>
-            <p>No photos here yet.</p>
-            <span className={styles.emptyHint}>Tap + to add your first photo</span>
+            <p>{searchQuery ? 'No results found.' : 'No photos here yet.'}</p>
+            {!searchQuery && <span className={styles.emptyHint}>Tap + to add your first photo</span>}
           </div>
         ) : (
-          <div className={styles.photoGrid}>
-            {filtered.map((photo, i) => (
-              <div
-                key={photo.id}
-                className={styles.photoThumb}
-                style={{ animationDelay: `${i * 0.03}s` }}
-                onClick={() => setLightboxPhoto(photo)}
-              >
-                <img src={photo.src || photo.storageUrl} alt={photo.caption || 'photo'} className={styles.thumbImg} />
-                <div className={styles.thumbBadge}>
-                  <span className="mi" style={{ fontSize: '0.8rem' }}>{CATEGORY_MAP[photo.category]?.icon}</span>
-                </div>
-                {photo.caption && <div className={styles.thumbCaption}>{photo.caption}</div>}
+          <div className={styles.masonryGrid}>
+            {[0, 1].map(col => (
+              <div key={col} className={styles.masonryCol}>
+                {filtered.filter((_, i) => i % 2 === col).map((photo, i) => (
+                  <div
+                    key={photo.id}
+                    className={styles.photoThumb}
+                    style={{ animationDelay: `${i * 0.03}s` }}
+                    onClick={() => setLightboxPhoto(photo)}
+                  >
+                    <img src={photo.src || photo.storageUrl} alt={photo.caption || 'photo'} className={styles.thumbImg} />
+                    <div className={styles.thumbBadge}>
+                      <span className="mi" style={{ fontSize: '0.8rem' }}>{CATEGORY_MAP[photo.category]?.icon}</span>
+                    </div>
+                    {photo.caption && <div className={styles.thumbCaption}>{photo.caption}</div>}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
