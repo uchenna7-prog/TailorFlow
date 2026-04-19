@@ -1481,3 +1481,101 @@
 @media (max-width: 639px) {
   .themeToggleDesktop { display: none; }
 }
+/* ── TESTIMONIALS ── */
+.testimonials {
+  padding: 90px 0;
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.testimonialsInner {
+  padding: 0 24px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.testimonialsTitle {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.2rem, 8vw, 3.5rem);
+  font-weight: 300;
+  color: var(--text-primary);
+  margin: 0 0 40px;
+  line-height: 1.1;
+}
+
+.testimonialsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.testimonialCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 22px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s;
+}
+
+.lightMode .testimonialCard {
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+
+.testimonialStars {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.testimonialText {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--text-body);
+  line-height: 1.75;
+  margin: 0 0 18px;
+}
+
+.testimonialAuthor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.testimonialAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.testimonialName {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+/* Desktop: 2-column testimonials grid */
+@media (min-width: 640px) {
+  .testimonialsInner {
+    max-width: 1100px;
+  }
+  .testimonialsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
