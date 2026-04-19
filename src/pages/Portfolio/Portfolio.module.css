@@ -233,12 +233,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 6px 10px 0;
+  padding: 10px 10px 10px 0;
   transition: color 0.2s;
   flex-shrink: 0;
 }
 .themeToggleMobileInline:hover { color: var(--text-primary); }
 .themeToggleMobileInline svg { display: block; }
+
+/* Invisible spacer mirrors the icon width so HOME text lands dead-center */
+.navHomeRowSpacer {
+  width: 34px;
+  flex-shrink: 0;
+}
 
 /* Active nav link — underlined like the reference */
 .navLinkActive {
