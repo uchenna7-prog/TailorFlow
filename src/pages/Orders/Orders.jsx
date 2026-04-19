@@ -536,7 +536,7 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
               }}
             >
               <span className="material-icons" style={{ fontSize: '1.1rem' }}>account_circle</span>
-              Go to {localOrder.customerName ? localOrder.customerName + "'s Profile" : "Customer's Profile"}
+              Go to {localOrder.customerName || 'Customer'}'s Profile
               <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto' }}>arrow_forward_ios</span>
             </button>
           )}
@@ -571,9 +571,9 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
             </button>
           )}
 
-        </div> {/* closes detailBody */}
-      </div> {/* closes detailPanel */}
-    </div> {/* closes detailOverlay */}
+        </div>
+      </div>
+    </div>
   )
 }
 
