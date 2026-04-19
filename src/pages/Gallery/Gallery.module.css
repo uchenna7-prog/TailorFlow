@@ -233,26 +233,73 @@
 }
 .portfolioBtn:active { opacity: 0.75; }
 
+/* ── SEARCH BAR ── */
+.searchBarWrap {
+  padding: 10px 12px 8px;
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.gallerySearchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 0 12px;
+}
+
+.gallerySearchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  padding: 11px 0;
+}
+.gallerySearchInput::placeholder { color: var(--text3); }
+
+.gallerySearchClear {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
 /* ── PHOTO GRID ── */
 .gridArea {
   flex: 1;
-  padding: 12px 12px calc(90px + var(--sb));
+  padding: 8px 8px calc(90px + var(--sb));
 }
 
-.photoGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 3px;
+.masonryGrid {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.masonryCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .photoThumb {
-  aspect-ratio: 1;
   position: relative;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   background: var(--surface2);
   animation: fadeIn 0.3s ease both;
+  width: 100%;
 }
 
 @keyframes fadeIn {
@@ -262,8 +309,7 @@
 
 .thumbImg {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
   display: block;
   transition: transform 0.2s;
 }
