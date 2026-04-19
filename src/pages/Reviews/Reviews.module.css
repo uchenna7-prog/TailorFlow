@@ -7,46 +7,66 @@
   background: var(--bg);
 }
 
-/* ── STATS ROW ── */
-.statsRow {
+/* ── SEARCH ROW ── */
+.searchRow {
   display: flex;
   align-items: center;
-  margin: 14px 16px 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 0;
+  gap: 10px;
+  padding: 12px 16px 0;
 }
 
-.statCell {
+.searchWrap {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 14px;
 }
 
-.statValue {
-  font-size: 1.3rem;
-  font-weight: 800;
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
   color: var(--text);
-  line-height: 1;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  min-width: 0;
 }
 
-.statLabel {
-  font-size: 0.6rem;
-  font-weight: 700;
+.searchInput::placeholder { color: var(--text3); }
+
+.searchClear {
+  background: none;
+  border: none;
   color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.statDivider {
-  width: 1px;
-  height: 32px;
-  background: var(--border);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
   flex-shrink: 0;
 }
+
+.filterBtn {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.filterBtn:active { background: var(--surface2); }
 
 /* ── TABS ── */
 .tabs {
@@ -248,7 +268,7 @@
 /* ── FAB ── */
 .fab {
   position: fixed;
-  bottom: calc(80px + var(--sb, 0px));
+  bottom: 20px;
   right: 20px;
   width: 56px;
   height: 56px;
