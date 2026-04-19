@@ -570,8 +570,10 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
               <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto' }}>open_in_new</span>
             </button>
           )}
-      </div>
-    </div>
+
+        </div> {/* closes detailBody */}
+      </div> {/* closes detailPanel */}
+    </div> {/* closes detailOverlay */}
   )
 }
 
