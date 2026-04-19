@@ -1,10 +1,8 @@
 /* src/pages/ReviewPage/ReviewPage.module.css */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Material+Icons&display=swap');
-
 .page {
   min-height: 100dvh;
-  background: linear-gradient(135deg, #f0f0ff 0%, #faf5ff 50%, #f0fdf4 100%);
+  background: var(--bg, #ffffff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,12 +26,9 @@
 .card {
   width: 100%;
   max-width: 480px;
-  background: #ffffff;
+  background: var(--surface, #f9f9f9);
   border-radius: 24px;
-  box-shadow:
-    0 4px 6px rgba(0,0,0,0.04),
-    0 12px 32px rgba(0,0,0,0.08),
-    0 0 0 1px rgba(0,0,0,0.04);
+  border: 1px solid var(--border, #e0e0e0);
   padding: 32px 28px 28px;
   display: flex;
   flex-direction: column;
@@ -55,8 +50,8 @@
 .brandBadge {
   width: 56px;
   height: 56px;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: var(--surface2, #f0f0f0);
+  border: 1px solid var(--border2, #d0d0d0);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -67,21 +62,21 @@
 .title {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text, #000000);
   margin: 0;
   line-height: 1.25;
 }
 
 .subtitle {
   font-size: 0.88rem;
-  color: #6b7280;
+  color: var(--text3, #888888);
   line-height: 1.6;
   margin: 0;
   max-width: 340px;
 }
 
 .subtitle strong {
-  color: #111827;
+  color: var(--text, #000000);
   font-weight: 700;
 }
 
@@ -122,42 +117,41 @@
 .fieldLabel {
   font-size: 0.72rem;
   font-weight: 800;
-  color: #374151;
+  color: var(--text2, #555555);
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
 
 .input {
   width: 100%;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--bg, #ffffff);
+  border: 1px solid var(--border2, #d0d0d0);
   border-radius: 12px;
   padding: 13px 14px;
-  color: #111827;
+  color: var(--text, #000000);
   font-family: 'DM Sans', sans-serif;
   font-size: 0.95rem;
   font-weight: 500;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s;
   -webkit-appearance: none;
 }
 
 .input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: var(--accent, #000000);
 }
 
-.input::placeholder { color: #9ca3af; }
-.input:disabled { opacity: 0.6; cursor: not-allowed; }
+.input::placeholder { color: var(--text3, #888888); }
+.input:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .textarea {
   width: 100%;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--bg, #ffffff);
+  border: 1px solid var(--border2, #d0d0d0);
   border-radius: 12px;
   padding: 13px 14px;
-  color: #111827;
+  color: var(--text, #000000);
   font-family: 'DM Sans', sans-serif;
   font-size: 0.9rem;
   font-weight: 400;
@@ -165,26 +159,24 @@
   resize: none;
   box-sizing: border-box;
   line-height: 1.6;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s;
   -webkit-appearance: none;
 }
 
 .textarea:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: var(--accent, #000000);
 }
 
-.textarea::placeholder { color: #9ca3af; }
-.textarea:disabled { opacity: 0.6; cursor: not-allowed; }
+.textarea::placeholder { color: var(--text3, #888888); }
+.textarea:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .inputError {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+  border-color: var(--danger, #ff4d4d) !important;
 }
 
 .errorMsg {
   font-size: 0.72rem;
-  color: #ef4444;
+  color: var(--danger, #ff4d4d);
   font-weight: 600;
 }
 
@@ -230,8 +222,8 @@
   padding: 15px;
   border-radius: 14px;
   border: none;
-  background: #6366f1;
-  color: #fff;
+  background: var(--accent, #000000);
+  color: var(--bg, #ffffff);
   font-family: 'DM Sans', sans-serif;
   font-size: 0.92rem;
   font-weight: 800;
@@ -247,7 +239,7 @@
 }
 
 .submitBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -256,19 +248,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(255, 77, 77, 0.08);
+  border: 1px solid rgba(255, 77, 77, 0.2);
   border-radius: 10px;
   padding: 10px 14px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #ef4444;
+  color: var(--danger, #ff4d4d);
 }
 
 /* ── DISCLAIMER ── */
 .disclaimer {
   font-size: 0.68rem;
-  color: #9ca3af;
+  color: var(--text3, #888888);
   text-align: center;
   line-height: 1.6;
   margin: 16px 0 0;
