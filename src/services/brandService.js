@@ -16,6 +16,7 @@ function brandDocRef(uid) {
 export async function saveBrandToFirestore(uid, settings) {
   if (!uid) return
   await setDoc(brandDocRef(uid), {
+    // ── Core brand ──
     brandName:    settings.brandName    || '',
     brandTagline: settings.brandTagline || '',
     brandColour:  settings.brandColour  || '#D4AF37',
@@ -24,6 +25,18 @@ export async function saveBrandToFirestore(uid, settings) {
     brandEmail:   settings.brandEmail   || '',
     brandAddress: settings.brandAddress || '',
     brandWebsite: settings.brandWebsite || '',
+
+    // ── Business info ──
+    brandFoundedYear:       settings.brandFoundedYear       || '',
+    brandTurnaround:        settings.brandTurnaround        || '',
+    brandServiceArea:       settings.brandServiceArea       || '',
+    brandAvailability:      settings.brandAvailability      || 'open',
+    brandAvailableUntil:    settings.brandAvailableUntil    || '',
+    brandStyleStatement:    settings.brandStyleStatement    || '',
+    brandFeaturedTechnique: settings.brandFeaturedTechnique || '',
+    brandMilestone:         settings.brandMilestone         || '',
+    brandSocials:           settings.brandSocials           || [],
+
     updatedAt: serverTimestamp(),
   })
 }
