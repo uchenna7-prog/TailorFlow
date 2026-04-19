@@ -309,57 +309,19 @@ function ReviewCard({ review, onTap, isLast }) {
   )
 }
 
-// ── Summary Stats ─────────────────────────────────────────────
-
-function StatsSummary({ reviews }) {
-  const approved = reviews.filter(r => r.status === 'approved')
-  const avg = approved.length
-    ? (approved.reduce((s, r) => s + (r.rating || 0), 0) / approved.length).toFixed(1)
-    : '—'
-
-  return (
-    <div className={styles.statsRow}>
-      <div className={styles.statCell}>
-        <div className={styles.statValue}>{reviews.length}</div>
-        <div className={styles.statLabel}>Total</div>
-      </div>
-      <div className={styles.statDivider} />
-      <div className={styles.statCell}>
-        <div className={styles.statValue} style={{ color: '#f59e0b' }}>{avg}</div>
-        <div className={styles.statLabel}>Avg Rating</div>
-      </div>
-      <div className={styles.statDivider} />
-      <div className={styles.statCell}>
-        <div className={styles.statValue} style={{ color: '#22c55e' }}>
-          {approved.length}
-        </div>
-        <div className={styles.statLabel}>Approved</div>
-      </div>
-      <div className={styles.statDivider} />
-      <div className={styles.statCell}>
-        <div
-          className={styles.statValue}
-          style={{ color: reviews.filter(r => r.status === 'pending').length > 0 ? '#f59e0b' : 'var(--text3)' }}
-        >
-          {reviews.filter(r => r.status === 'pending').length}
-        </div>
-        <div className={styles.statLabel}>Pending</div>
-      </div>
-    </div>
-  )
-}
-
 // ── Main Page ─────────────────────────────────────────────────
 
 export default function Reviews({ onMenuClick }) {
   const { reviews, loading, addReview, approveReview, rejectReview, deleteReview } = useReviews()
 
   const [activeTab,     setActiveTab]     = useState('all')
+  const [searchQuery,   setSearchQuery]   = useState('')
   const [addSheetOpen,  setAddSheetOpen]  = useState(false)
   const [detailReview,  setDetailReview]  = useState(null)
   const [confirmDel,    setConfirmDel]    = useState(null)
   const [toastMsg,      setToastMsg]      = useState('')
   const toastTimer = useRef(null)
+  const tabRefs    = useRef({})
 
   const showToast = useCallback((msg) => {
     setToastMsg(msg)
@@ -369,9 +331,16 @@ export default function Reviews({ onMenuClick }) {
 
   // ── Filtering ──────────────────────────────────────────────
 
-  const filtered = activeTab === 'all'
+  const tabFiltered = activeTab === 'all'
     ? reviews
     : reviews.filter(r => r.status === activeTab)
+
+  const filtered = searchQuery.trim()
+    ? tabFiltered.filter(r =>
+        r.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.review?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : tabFiltered
 
   const counts = {
     all:      reviews.length,
@@ -427,16 +396,38 @@ export default function Reviews({ onMenuClick }) {
     <div className={styles.page}>
       <Header title="Reviews" onMenuClick={onMenuClick} />
 
-      {/* Stats */}
-      {reviews.length > 0 && <StatsSummary reviews={reviews} />}
+      {/* Search + Filter bar */}
+      <div className={styles.searchRow}>
+        <div className={styles.searchWrap}>
+          <span className="material-icons" style={{ fontSize: '1.1rem', color: 'var(--text3)' }}>search</span>
+          <input
+            className={styles.searchInput}
+            placeholder="Search reviews or clients…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
+          {searchQuery.length > 0 && (
+            <button className={styles.searchClear} onClick={() => setSearchQuery('')}>
+              <span className="material-icons" style={{ fontSize: '1rem' }}>close</span>
+            </button>
+          )}
+        </div>
+        <button className={styles.filterBtn}>
+          <span className="material-icons" style={{ fontSize: '1.2rem' }}>tune</span>
+        </button>
+      </div>
 
       {/* Tabs */}
       <div className={styles.tabs}>
         {TABS.map(tab => (
           <div
             key={tab.id}
+            ref={el => { tabRefs.current[tab.id] = el }}
             className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              setActiveTab(tab.id)
+              tabRefs.current[tab.id]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+            }}
           >
             {tab.label}
             {counts[tab.id] > 0 && (
@@ -459,11 +450,13 @@ export default function Reviews({ onMenuClick }) {
           <div className={styles.emptyState}>
             <span className="material-icons" style={{ fontSize: '3rem', opacity: 0.15 }}>rate_review</span>
             <p>
-              {activeTab === 'all'
-                ? 'No reviews yet.'
-                : `No ${activeTab} reviews.`}
+              {searchQuery.trim()
+                ? 'No results found.'
+                : activeTab === 'all'
+                  ? 'No reviews yet.'
+                  : `No ${activeTab} reviews.`}
             </p>
-            {activeTab === 'all' && (
+            {activeTab === 'all' && !searchQuery.trim() && (
               <span className={styles.emptyHint}>
                 Send review links to customers from their order detail,{'\n'}or add one manually below.
               </span>
