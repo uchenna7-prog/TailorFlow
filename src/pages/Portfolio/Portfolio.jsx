@@ -130,10 +130,13 @@ function Lightbox({ photo, photos, onClose }) {
             )}
           </>
         )}
-        {current.caption && (
+        {(current.caption || current.price) && (
           <div className={styles.lbMeta}>
-            <p className={styles.lbCaption}>{current.caption}</p>
-            {current.clothingTypeLabel && <span className={styles.lbType}>{current.clothingTypeLabel}</span>}
+            {current.caption && <p className={styles.lbCaption}>{current.caption}</p>}
+            <div className={styles.lbTags}>
+              {current.clothingTypeLabel && <span className={styles.lbType}>{current.clothingTypeLabel}</span>}
+              {current.price && <span className={styles.lbPrice}>From ₦{current.price}</span>}
+            </div>
           </div>
         )}
       </div>
@@ -464,6 +467,9 @@ export default function Portfolio() {
                 <img src={photo.src || photo.storageUrl} alt={photo.caption || 'Completed work'} className={styles.photoImg} loading="lazy" />
                 <div className={styles.photoOverlay}>
                   <span className={`mi ${styles.photoZoom}`}>open_in_full</span>
+                  {photo.price && (
+                    <span className={styles.photoPrice}>From ₦{photo.price}</span>
+                  )}
                   {photo.caption && <p className={styles.photoCaption}>{photo.caption}</p>}
                   {photo.clothingTypeLabel && <span className={styles.photoType}>{photo.clothingTypeLabel}</span>}
                 </div>
