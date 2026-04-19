@@ -200,7 +200,6 @@
 }
 .navLink:hover { color: var(--text-primary); }
 
-/* Theme toggle — inside mobile dropdown */
 .themeToggle {
   display: flex;
   align-items: center;
@@ -222,7 +221,6 @@
 .themeToggle:hover { color: var(--text-primary); }
 .themeToggle .mi { font-size: 1rem; line-height: 1; }
 
-/* Home row — full width, icon sits immediately left of HOME text */
 .navHomeRow {
   display: flex;
   align-items: center;
@@ -250,7 +248,6 @@
   flex-shrink: 0;
 }
 
-/* navLinkActive — brand colour applied inline */
 .navLinkActive {
   border-bottom: 1.5px solid currentColor;
   padding-bottom: 8px;
@@ -285,7 +282,6 @@
 }
 .themeToggleDesktop .mi { font-size: 1.1rem; line-height: 1; }
 
-/* navCta — brand colour applied inline */
 .navCta {
   background: var(--accent);
   color: var(--accent-inv);
@@ -396,7 +392,6 @@
   width: 100%;
 }
 
-/* heroEyebrow — brand colour applied inline */
 .heroEyebrow {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 0.72rem;
@@ -404,6 +399,7 @@
   font-style: italic;
   letter-spacing: 4px;
   margin-bottom: 16px;
+  /* brand colour applied inline */
 }
 
 .heroName {
@@ -426,16 +422,19 @@
   line-height: 1.6;
 }
 
-/* Style statement — one step below tagline, more personal */
+/*
+ * heroStyleStatement — NOW brand-coloured italic serif quote
+ * Matches screenshot: "We don't make clothes — we make heirlooms." in accentColour
+ */
 .heroStyleStatement {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 0.5px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 300;
   line-height: 1.6;
   margin-bottom: 28px;
-  max-width: 400px;
+  max-width: 420px;
+  /* brand colour applied inline */
 }
 
 .heroCtas {
@@ -450,13 +449,12 @@
   background: #fff;
   color: #1a1814;
   border: none;
-  border-radius: 8px;
+  border-radius: 30px;
   padding: 14px 28px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.2s;
   box-shadow: 0 4px 20px rgba(0,0,0,0.25);
@@ -467,13 +465,12 @@
   background: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.85);
   border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 8px;
+  border-radius: 30px;
   padding: 14px 28px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, background 0.2s;
   display: flex;
@@ -487,6 +484,11 @@
   align-items: center;
   gap: 8px;
   margin-top: 4px;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 30px;
+  padding: 6px 14px;
 }
 
 .availDot {
@@ -516,10 +518,13 @@
   font-size: 0.65rem;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.6);
 }
 
-/* ── SCROLL INDICATOR — brand colour applied inline ── */
+/*
+ * SCROLL INDICATOR — pure UI chrome, always white on hero dark bg
+ * REMOVED brand colour — was distracting and arbitrary
+ */
 .heroScroll {
   position: absolute;
   bottom: 32px;
@@ -536,7 +541,7 @@
   display: block;
   width: 1px;
   height: 36px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.5));
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.45));
   animation: scrollPulse 2s ease infinite;
 }
 
@@ -573,12 +578,12 @@
   gap: 5px;
 }
 
-/* statNum — brand colour applied inline */
 .statNum {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.8rem;
   font-weight: 300;
   line-height: 1;
+  /* brand colour applied inline */
 }
 
 .statLabel {
@@ -672,7 +677,7 @@
   height: 72px;
   background: var(--bg-deep);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -700,18 +705,22 @@
   line-height: 1.5;
 }
 
-/* Style statement — brand colour left border applied inline */
+/*
+ * aboutStyleStatement — brand colour text + left border
+ * The personal brand quote — deserves brand colour, matches screenshots
+ */
 .aboutStyleStatement {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 400;
-  color: var(--text-body);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 1rem;
+  font-weight: 300;
   line-height: 1.7;
   margin: 0 0 18px;
-  padding: 14px 16px;
-  background: var(--bg-deep);
+  padding: 0 0 0 14px;
   border-left: 2px solid var(--border);
-  border-radius: 0 6px 6px 0;
+  border-radius: 0;
+  background: none;
+  /* brand colour text + border applied inline */
 }
 
 .aboutBio {
@@ -722,11 +731,11 @@
   font-family: 'DM Sans', sans-serif;
 }
 
-/* Business info grid — turnaround, service area, technique, founded year */
+/* Business info grid */
 .aboutInfoGrid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 20px;
   padding: 16px;
   background: var(--info-bg);
@@ -744,8 +753,11 @@
   line-height: 1.5;
 }
 
+/*
+ * aboutInfoItem icons — brand colour applied inline in JSX
+ * Was: var(--text-faint) — now picks up accentColour
+ */
 .aboutInfoItem .material-icons {
-  color: var(--text-faint);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -768,8 +780,13 @@
   gap: 6px;
 }
 
+/*
+ * aboutSpecialtyPill — transparent bg, brand colour text + border
+ * Matches screenshots: elegant outlined pills, not filled
+ * brand colour applied inline in JSX for text + border
+ */
 .aboutSpecialtyPill {
-  background: var(--bg-deep);
+  background: transparent;
   border: 1px solid var(--border);
   border-radius: 20px;
   color: var(--text-muted);
@@ -788,6 +805,11 @@
   margin-bottom: 24px;
 }
 
+/*
+ * aboutMetaRow — contact links
+ * Icons now get brand colour inline (location, phone, email, website)
+ * Text stays muted; icon is the brand accent — matches screenshots
+ */
 .aboutMetaRow {
   display: flex;
   align-items: center;
@@ -799,7 +821,7 @@
   line-height: 1.4;
 }
 .aboutMetaRow:hover { color: var(--text-primary); }
-.aboutMetaRow .mi { color: var(--text-faint); }
+/* Icons coloured inline in JSX — no override needed here */
 
 .whatsappBtn {
   display: inline-flex;
@@ -873,6 +895,11 @@
   to   { transform: translateX(-50%); }
 }
 
+/*
+ * marqueeItem — REMOVED brand colour from dot separator
+ * Dot now inherits currentColor (same muted tone as text) at 0.4 opacity
+ * Keeps the marquee calm and cohesive instead of dotted with brand flashes
+ */
 .marqueeItem {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 0.95rem;
@@ -927,14 +954,13 @@
 .filterPill {
   background: var(--pill-bg);
   border: 1px solid var(--pill-border);
-  border-radius: 10px;
+  border-radius: 20px;
   color: var(--pill-color);
   padding: 8px 20px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -998,7 +1024,7 @@
   transform: scale(1.04);
 }
 
-/* photoOverlay — brand colour gradient applied inline */
+/* photoOverlay — simplified, removed brand colour gradient (was heavy) */
 .photoOverlay {
   position: absolute;
   inset: 0;
@@ -1040,22 +1066,24 @@
   margin: 0 0 4px;
 }
 
+/*
+ * photoPrice — brand colour bg + contrasting text applied inline in JSX
+ * Was: dark translucent pill → now solid brand colour badge
+ * Matches screenshots: prominent "From ₦180,000" in brand colour
+ */
 .photoPrice {
   position: absolute;
   top: 10px;
   right: 10px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #fff;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   border-radius: 20px;
-  padding: 3px 9px;
+  padding: 4px 12px;
   z-index: 2;
   pointer-events: none;
+  /* background + color applied inline */
 }
 
 .photoType {
@@ -1074,7 +1102,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
-/* ── PROCESS — step numbers + icons coloured inline ── */
+/* ── PROCESS ── */
 .process {
   background: var(--process-bg);
   border-top: 1px solid var(--border-soft);
@@ -1103,10 +1131,10 @@
 }
 
 .processStep {
-  padding: 24px 0;
+  padding: 28px 0;
   border-bottom: 1px solid var(--border-soft);
   display: grid;
-  grid-template-columns: 36px 1px 1fr;
+  grid-template-columns: 48px 1px 1fr;
   gap: 0 16px;
   align-items: start;
 }
@@ -1114,28 +1142,38 @@
 .processNumWrap {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  align-items: center;
+  padding-top: 2px;
 }
 
-/* processNum — brand colour applied inline */
-.processNum {
+/*
+ * processNumBadge — circular badge, brand colour border + text
+ * Matches screenshots: "01" "02" in bordered circle, accentColour
+ * REPLACES old flat processNum + processIcon approach
+ */
+.processNumBadge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 0.75rem;
   font-weight: 300;
   letter-spacing: 1px;
+  background: transparent;
+  /* borderColor + color applied inline */
 }
 
-/* processIcon — brand colour applied inline */
-.processIcon {
-  font-size: 1rem;
-  color: var(--text-faint);
-}
-
-/* processLine — brand colour gradient applied inline */
+/*
+ * processLine — REMOVED brand colour gradient
+ * Structural grid divider — stays neutral, not a brand moment
+ */
 .processLine {
   width: 1px;
-  background: var(--border);
+  background: var(--border-soft);
   align-self: stretch;
   margin: 2px 0;
 }
@@ -1147,6 +1185,7 @@
   color: var(--text-primary);
   margin: 0 0 6px;
   letter-spacing: 0.5px;
+  padding-top: 8px;
 }
 
 .processStepDesc {
@@ -1197,6 +1236,10 @@
   width: 100%;
 }
 
+/*
+ * bookTitle — last word "extraordinary?" in brand colour (inline span)
+ * Matches screenshots: editorial colour highlight on key word
+ */
 .bookTitle {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: clamp(2.4rem, 10vw, 4.5rem);
@@ -1210,7 +1253,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
   font-size: 1rem;
-  color: #888;
+  color: rgba(255,255,255,0.7);
   line-height: 1.7;
   margin-bottom: 20px;
 }
@@ -1229,23 +1272,46 @@
 
 /* bookCta — brand colour applied inline */
 .bookCta {
-  background: #fff;
-  color: #1a1814;
   border: none;
-  border-radius: 8px;
+  border-radius: 30px;
   padding: 16px 36px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  display: block;
-  margin-bottom: 28px;
+  display: inline-block;
+  margin-bottom: 14px;
   transition: opacity 0.2s, transform 0.2s;
   box-shadow: 0 4px 20px rgba(255,255,255,0.12);
 }
 .bookCta:active { opacity: 0.85; transform: scale(0.98); }
+
+/*
+ * bookWhatsapp — secondary ghost CTA matching screenshot
+ * Dark ghost button on the dark book section
+ */
+.bookWhatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 30px;
+  color: rgba(255,255,255,0.8);
+  padding: 14px 28px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  margin-bottom: 28px;
+}
+.bookWhatsapp:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.35);
+  color: #fff;
+}
 
 .bookContacts {
   display: flex;
@@ -1272,7 +1338,6 @@
   padding: 52px 24px 0;
 }
 
-/* Top row: brand block left, socials right */
 .footerTop {
   display: flex;
   align-items: flex-start;
@@ -1315,7 +1380,10 @@
   margin: 0;
 }
 
-/* Social icons in footer — hover to brand colour via CSS custom property */
+/*
+ * footerSocialIcon — hover resolves to --accent-brand which is now
+ * set inline per-icon in JSX, fixing the undefined variable bug
+ */
 .footerSocials {
   display: flex;
   gap: 10px;
@@ -1340,7 +1408,6 @@
   border-color: var(--accent-brand, rgba(255,255,255,0.3));
 }
 
-/* Two-column contact + links section */
 .footerCols {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1398,7 +1465,6 @@
   margin-bottom: 24px;
 }
 
-/* Bottom row */
 .footerBottom {
   display: flex;
   align-items: center;
@@ -1426,6 +1492,10 @@
   align-items: center;
 }
 
+/*
+ * footerPowered — "TailorFlow" word highlighted in brand colour inline
+ * Matches screenshots: branded attribution, not invisible
+ */
 .footerPowered {
   font-size: 0.58rem;
   letter-spacing: 1.5px;
@@ -1466,7 +1536,10 @@
   transform: translateY(0);
 }
 
-/* drawerHandle — brand colour + opacity applied inline */
+/*
+ * drawerHandle — REMOVED brand colour
+ * Bottom sheet handle is navigation chrome like iOS — stays neutral grey
+ */
 .drawerHandle {
   width: 36px;
   height: 3px;
@@ -1543,7 +1616,6 @@
   margin-top: 2px;
 }
 
-/* fieldInput — focus uses --field-focus-border CSS var set inline */
 .fieldInput {
   background: var(--field-bg);
   border: 1px solid var(--field-border);
@@ -1561,12 +1633,10 @@
 .fieldInput::placeholder { color: var(--field-placeholder); }
 .fieldInput:focus { border-color: var(--field-focus-border, var(--text-muted)); }
 
-/* Date input styling */
 .fieldInput[type="date"] {
   cursor: pointer;
 }
 
-/* fieldTextarea — focus uses --field-focus-border CSS var set inline */
 .fieldTextarea {
   background: var(--field-bg);
   border: 1px solid var(--field-border);
@@ -1823,6 +1893,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
 }
 
 /* testimonialAvatar — brand colour border + text applied inline */
@@ -1894,6 +1966,15 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+  }
+  .bookCta {
+    display: inline-block;
+    width: auto;
+  }
+  .bookWhatsapp {
+    display: inline-flex;
+    margin-left: 12px;
+    margin-bottom: 28px;
   }
 }
 
