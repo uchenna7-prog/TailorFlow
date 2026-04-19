@@ -165,9 +165,12 @@ export default function Portfolio() {
   const [footerImageId, setFooterImageId] = useState(null)
   const [reviews,       setReviews]       = useState([])
 
+  const [activeNav,     setActiveNav]     = useState('home')
+
   const worksRef        = useRef(null)
   const aboutRef        = useRef(null)
   const bookRef         = useRef(null)
+  const heroRef         = useRef(null)
   const filterScrollRef = useRef(null)
 
   // ── Step 1: resolve handle → uid ─────────────────────────────
@@ -245,6 +248,26 @@ export default function Portfolio() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  useEffect(() => {
+    const sections = [
+      { id: 'home',  ref: heroRef },
+      { id: 'about', ref: aboutRef },
+      { id: 'works', ref: worksRef },
+      { id: 'book',  ref: bookRef },
+    ]
+    const observers = sections.map(({ id, ref }) => {
+      const observer = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveNav(id) },
+        { rootMargin: '-50% 0px -50% 0px', threshold: 0 }
+      )
+      if (ref.current) observer.observe(ref.current)
+      return observer
+    })
+    return () => observers.forEach((obs, i) => {
+      if (sections[i].ref.current) obs.unobserve(sections[i].ref.current)
+    })
+  }, [brand])
+
   const handleTabChange = (tabId) => {
     setActiveTab(tabId)
     if (filterScrollRef.current) {
@@ -303,12 +326,12 @@ export default function Portfolio() {
                   <path d="M12 2 A10 10 0 0 1 12 22 Z" fill="currentColor"/>
                 </svg>
               </button>
-              <button onClick={() => { setNavOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={`${styles.navLink} ${styles.navLinkActive}`}>Home</button>
+              <button onClick={() => { setNavOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={`${styles.navLink} ${activeNav === 'home' ? styles.navLinkActive : ''}`}>Home</button>
               <span className={styles.navHomeRowSpacer} />
             </div>
-            <button onClick={() => scrollTo(aboutRef)} className={styles.navLink}>About</button>
-            <button onClick={() => scrollTo(worksRef)} className={styles.navLink}>Works</button>
-            <button onClick={() => scrollTo(bookRef)}  className={styles.navLink}>Book</button>
+            <button onClick={() => scrollTo(aboutRef)} className={`${styles.navLink} ${activeNav === 'about' ? styles.navLinkActive : ''}`}>About</button>
+            <button onClick={() => scrollTo(worksRef)} className={`${styles.navLink} ${activeNav === 'works' ? styles.navLinkActive : ''}`}>Works</button>
+            <button onClick={() => scrollTo(bookRef)}  className={`${styles.navLink} ${activeNav === 'book'  ? styles.navLinkActive : ''}`}>Book</button>
             <button onClick={() => { setNavOpen(false); setBookingOpen(true) }} className={styles.navCta}>Order Now</button>
           </div>
           <div className={styles.navRight}>
@@ -324,7 +347,7 @@ export default function Portfolio() {
       </nav>
 
       {/* ── HERO ── */}
-      <section className={styles.hero}>
+      <section className={styles.hero} ref={heroRef}>
         {heroPhoto ? (
           <div className={styles.heroBgWrap}>
             <img src={heroPhoto.src || heroPhoto.storageUrl} alt="" className={styles.heroBgImg} />
