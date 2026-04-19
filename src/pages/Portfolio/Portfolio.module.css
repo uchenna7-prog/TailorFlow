@@ -493,6 +493,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
+  background: #22c55e;
   flex-shrink: 0;
   animation: pulse 2s ease infinite;
 }
@@ -819,6 +820,34 @@
   color: var(--text-primary);
   border-color: var(--text-muted);
   background: var(--bg-deep);
+}
+
+/* Social icons — About card */
+.aboutSocials {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.socialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  background: var(--bg-deep);
+}
+.socialIcon:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+  background: var(--bg-alt);
 }
 
 /* ── MARQUEE ── */
@@ -1238,8 +1267,20 @@
   padding: 52px 24px 0;
 }
 
+/* Top row: brand block left, socials right */
 .footerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
   margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.footerBrandBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .footerBrand {
@@ -1249,7 +1290,7 @@
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--footer-brand);
-  margin-bottom: 6px;
+  margin: 0;
 }
 
 .footerTagline {
@@ -1257,7 +1298,7 @@
   font-style: italic;
   font-size: 0.85rem;
   color: var(--footer-tag);
-  margin-bottom: 4px;
+  margin: 0;
 }
 
 .footerFounded {
@@ -1269,25 +1310,96 @@
   margin: 0;
 }
 
+/* Social icons in footer */
+.footerSocials {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footerSocialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #555;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+.footerSocialIcon:hover {
+  color: #ccc;
+  border-color: rgba(255,255,255,0.3);
+}
+
+/* Two-column contact + links section */
+.footerCols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.footerCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footerColLabel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #3a3a3a;
+  margin: 0 0 4px;
+}
+
+.footerColRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  color: var(--footer-link);
+  text-decoration: none;
+  line-height: 1.5;
+  transition: color 0.2s;
+}
+.footerColRow:hover { color: var(--footer-link-hover); }
+.footerColRow .material-icons { color: #3a3a3a; margin-top: 1px; }
+
+.footerColLink {
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  color: var(--footer-link);
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  transition: color 0.2s;
+  letter-spacing: 0.3px;
+}
+.footerColLink:hover { color: var(--footer-link-hover); }
+
 .footerDivider {
   height: 1px;
   background: var(--footer-div);
   margin-bottom: 24px;
 }
 
+/* Bottom row */
 .footerBottom {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 16px;
+  justify-content: space-between;
   flex-wrap: wrap;
-  padding-bottom: 24px;
-}
-
-.footerLinks {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
 }
 
 .footerLink {
@@ -1302,19 +1414,15 @@
   gap: 6px;
 }
 .footerLink:hover { color: var(--footer-link-hover); }
-.footerLink .mi {
-  font-size: 0.9rem;
-  line-height: 1;
-}
 
 .footerPoweredRow {
-  border-top: 1px solid var(--footer-div);
-  padding: 16px 0 calc(20px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
 }
 
 .footerPowered {
   font-size: 0.58rem;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--footer-powered);
   margin: 0;
