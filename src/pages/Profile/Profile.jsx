@@ -1,922 +1,901 @@
-// src/pages/Portfolio/Portfolio.jsx
-// Public-facing tailor landing page — no auth required
-// Route: /portfolio/:handle   (handle = slug OR legacy uid)
+import { useState, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useSettings } from '../../contexts/SettingsContext'
+import { useAuth } from '../../contexts/AuthContext'
+import { updateProfile } from 'firebase/auth'
+import Header from '../../components/Header/Header'
+import Toast from '../../components/Toast/Toast'
+import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
+import styles from './Profile.module.css'
 
-import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'react-router-dom'
-import { collection, query, orderBy, onSnapshot, doc, where } from 'firebase/firestore'
-import { db } from '../../firebase'
-import { getBrandFromFirestore } from '../../services/brandService'
-import { getPortfolioSettings } from '../../services/portfolioSettingsService'
-import { resolveSlug } from '../../services/slugService'
-import styles from './Portfolio.module.css'
+// ─────────────────────────────────────────────────────────────
+// Shared primitives
+// ─────────────────────────────────────────────────────────────
 
-function initials(name = '') {
-  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
-}
-
-// ── Brand colour helpers ──────────────────────────────────────
-function hexLuminance(hex = '#000000') {
-  const clean = hex.replace('#', '')
-  const r = parseInt(clean.slice(0, 2), 16)
-  const g = parseInt(clean.slice(2, 4), 16)
-  const b = parseInt(clean.slice(4, 6), 16)
-  return (r * 299 + g * 587 + b * 114) / 1000
-}
-
-function accentTextColour(hex) {
-  return hexLuminance(hex) > 128 ? '#1a1814' : '#ffffff'
-}
-
-// ── Social helpers ────────────────────────────────────────────
-// Builds a full URL from platform id + handle (matching Profile.jsx SOCIAL_PLATFORMS)
-function buildSocialUrl(platform, handle) {
-  const h = handle.replace(/^@/, '')
-  switch (platform) {
-    case 'instagram': return `https://instagram.com/${h}`
-    case 'tiktok':    return `https://tiktok.com/@${h}`
-    case 'facebook':  return `https://facebook.com/${h}`
-    case 'twitter':   return `https://x.com/${h}`
-    case 'youtube':   return `https://youtube.com/@${h}`
-    case 'pinterest': return `https://pinterest.com/${h}`
-    case 'threads':   return `https://threads.net/@${h}`
-    default:          return `https://${h}`
-  }
-}
-
-const SOCIAL_ICONS = {
-  instagram: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-    </svg>
-  ),
-  facebook: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-    </svg>
-  ),
-  tiktok: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
-    </svg>
-  ),
-  twitter: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.736-8.849L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
-    </svg>
-  ),
-  youtube: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
-    </svg>
-  ),
-  pinterest: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
-    </svg>
-  ),
-  threads: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.068c0-3.51.85-6.37 2.495-8.424C5.845 1.341 8.598.16 12.18.136h.014c2.744.018 5.143.854 6.928 2.417 1.688 1.476 2.697 3.54 2.997 6.135l-2.172.255c-.527-4.499-3.224-6.64-7.769-6.64h-.01c-2.898.018-5.119.929-6.601 2.706C4.085 6.713 3.342 9.13 3.342 12.07c0 2.936.743 5.351 2.212 7.195 1.482 1.777 3.703 2.688 6.601 2.706h.01c2.558-.016 4.242-.684 5.467-2.165.853-1.02 1.428-2.479 1.703-4.337-.937.22-1.952.331-3.023.317-2.667-.035-4.879-.917-6.157-2.473-1.126-1.37-1.584-3.168-1.29-5.063.559-3.584 3.297-5.896 7.045-5.896h.047c2.075.014 3.87.654 5.19 1.851 1.435 1.3 2.219 3.166 2.269 5.408.033 1.462-.22 2.786-.752 3.936l-1.953-.84c.41-.953.6-2.03.572-3.165-.037-1.704-.584-3.071-1.581-3.965-.869-.787-2.106-1.196-3.731-1.206h-.034c-2.798 0-4.677 1.598-5.076 4.153-.235 1.503.089 2.856.909 3.83.889 1.052 2.302 1.654 4.16 1.68 1.43.019 2.701-.26 3.715-.697-.054-.53-.155-1.025-.3-1.474-.45-1.388-1.402-2.17-2.705-2.17-.876 0-1.611.34-2.139.982-.5.605-.74 1.434-.68 2.33l-2.16-.15c-.089-1.346.334-2.636 1.175-3.638.886-1.055 2.173-1.637 3.804-1.637 2.248 0 3.845 1.28 4.565 3.542.247.762.377 1.604.387 2.498z"/>
-    </svg>
-  ),
-}
-
-function SocialIcon({ platform }) {
-  return SOCIAL_ICONS[platform] || (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-    </svg>
+function SectionHeader({ icon, label }) {
+  return (
+    <div className={styles.sectionHeader}>
+      <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>{icon}</span>
+      <span className={styles.sectionLabel}>{label}</span>
+    </div>
   )
 }
 
-// WhatsApp SVG reused in social rows
-const WA_SVG = (
-  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-  </svg>
-)
-function BookingSheet({ isOpen, onClose, brandName, brandEmail, brandPhone, accentColour, accentText }) {
-  const [name,     setName]     = useState('')
-  const [phone,    setPhone]    = useState('')
-  const [garment,  setGarment]  = useState('')
-  const [deadline, setDeadline] = useState('')
-  const [message,  setMessage]  = useState('')
-  const [sent,     setSent]     = useState(false)
-  const [visible,  setVisible]  = useState(false)
+function InfoRow({ icon, label, value, placeholder, divider = true }) {
+  return (
+    <div className={`${styles.row} ${!divider ? styles.noDivider : ''}`}>
+      <div className={styles.rowIcon}>
+        <span className="mi" style={{ fontSize: '1.15rem' }}>{icon}</span>
+      </div>
+      <div className={styles.rowText}>
+        <div className={styles.rowLabel}>{label}</div>
+        <div className={value ? styles.rowValue : styles.rowPlaceholder}>
+          {value || placeholder}
+        </div>
+      </div>
+    </div>
+  )
+}
 
-  useEffect(() => {
-    if (isOpen) requestAnimationFrame(() => setVisible(true))
-    else setVisible(false)
-  }, [isOpen])
-
-  if (!isOpen) return null
-
-  const handleSubmit = () => {
-    if (!name.trim() || !phone.trim()) return
-    const deadlineLine = deadline ? `%0ADeadline / Occasion Date: ${deadline}` : ''
-    const msg = `Hello ${brandName},%0A%0AI'd like to place an order.%0A%0AName: ${name}%0APhone: ${phone}%0AGarment: ${garment}${deadlineLine}%0ADetails: ${message}`
-    if (brandPhone) {
-      const clean = brandPhone.replace(/\D/g, '')
-      window.open(`https://wa.me/${clean}?text=${msg}`, '_blank', 'noopener,noreferrer')
-    } else if (brandEmail) {
-      window.open(`mailto:${brandEmail}?subject=Order Enquiry&body=${decodeURIComponent(msg.replace(/%0A/g, '\n').replace(/%0A%0A/g, '\n\n'))}`)
-    }
-    setSent(true)
-    setTimeout(() => {
-      setSent(false); onClose()
-      setName(''); setPhone(''); setGarment(''); setDeadline(''); setMessage('')
-    }, 2500)
-  }
-
+function TappableRow({ icon, label, sub, value, onClick, chevron = true, divider = true, danger = false }) {
   return (
     <div
-      className={`${styles.bookingOverlay} ${visible ? styles.bookingOverlayVisible : ''}`}
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+      className={`${styles.row} ${styles.rowTappable} ${!divider ? styles.noDivider : ''}`}
+      onClick={onClick}
     >
-      <div className={`${styles.bookingDrawer} ${visible ? styles.bookingDrawerVisible : ''}`}>
-        <div className={styles.drawerHandle} />
-        {sent ? (
-          <div className={styles.sentState}>
-            <div className={styles.sentCheck} style={{ borderColor: accentColour }}>
-              <span className="mi" style={{ color: accentColour }}>check</span>
-            </div>
-            <p className={styles.sentTitle}>Request Received</p>
-            <p className={styles.sentSub}>{brandName} will be in touch shortly.</p>
-          </div>
-        ) : (
-          <>
-            <div className={styles.drawerHead}>
-              <div>
-                <p className={styles.drawerLabel}>PLACE AN ORDER</p>
-                <p className={styles.drawerTitle}>Book {brandName}</p>
-              </div>
-              <button className={styles.drawerClose} onClick={onClose}>
-                <span className="mi">close</span>
-              </button>
-            </div>
-            <div className={styles.drawerBody}>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Full Name *</label>
-                <input className={styles.fieldInput} placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Phone Number *</label>
-                <input className={styles.fieldInput} placeholder="e.g. 0812 345 6789" value={phone} onChange={e => setPhone(e.target.value)} type="tel" />
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Garment Type</label>
-                <input className={styles.fieldInput} placeholder="e.g. Suit, Dress, Agbada, Co-ord…" value={garment} onChange={e => setGarment(e.target.value)} />
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Occasion / Deadline Date</label>
-                <input
-                  className={styles.fieldInput}
-                  type="date"
-                  value={deadline}
-                  onChange={e => setDeadline(e.target.value)}
-                  style={{ colorScheme: 'light dark' }}
-                />
-                <span className={styles.fieldHint}>When do you need this ready?</span>
-              </div>
-              <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Additional Details</label>
-                <textarea className={styles.fieldTextarea} placeholder="Fabric preferences, measurements, colour, event type…" value={message} onChange={e => setMessage(e.target.value)} rows={4} />
-              </div>
-            </div>
-            <div className={styles.drawerFooter}>
-              <button
-                className={styles.sendBtn}
-                onClick={handleSubmit}
-                disabled={!name.trim() || !phone.trim()}
-                style={{ background: accentColour, color: accentText }}
-              >
-                Send Booking Request
-              </button>
-            </div>
-          </>
-        )}
+      <div className={styles.rowIcon}>
+        <span className="mi" style={{ fontSize: '1.15rem', color: danger ? '#ef4444' : undefined }}>{icon}</span>
+      </div>
+      <div className={styles.rowText}>
+        <div className={`${styles.rowLabel} ${danger ? styles.rowLabelDanger : ''}`}>{label}</div>
+        {sub && <div className={styles.rowSub}>{sub}</div>}
+      </div>
+      <div className={styles.rowRight}>
+        {value && <span className={styles.rowBadge}>{value}</span>}
+        {chevron && <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>chevron_right</span>}
       </div>
     </div>
   )
 }
 
-// ── Lightbox ──────────────────────────────────────────────────
-function Lightbox({ photo, photos, onClose }) {
-  const [idx, setIdx] = useState(() => photos.findIndex(p => p.id === photo.id))
-  const current = photos[idx] || photo
+// ─────────────────────────────────────────────────────────────
+// Full-screen slide-in modal shell
+// ─────────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    const handler = e => {
-      if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowRight') setIdx(i => Math.min(i + 1, photos.length - 1))
-      if (e.key === 'ArrowLeft')  setIdx(i => Math.max(i - 1, 0))
+function FullModal({ title, onBack, onSave, children }) {
+  return (
+    <div className={styles.fullOverlay}>
+      <Header 
+        type="back" 
+        title={title} 
+        onBackClick={onBack} 
+        customActions={onSave ? [{ label: 'Save', onClick: onSave }] : []} 
+      />
+      <div className={styles.fullContent}>
+        <div className={styles.fullContentInner}>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// Field helpers
+// ─────────────────────────────────────────────────────────────
+
+function FieldGroup({ children }) {
+  return <div className={styles.fieldGroup}>{children}</div>
+}
+
+function Field({ label, hint, children }) {
+  return (
+    <div className={styles.field}>
+      <label className={styles.fieldLabel}>{label}</label>
+      {hint && <p className={styles.fieldHint}>{hint}</p>}
+      <div className={styles.fieldControl}>{children}</div>
+    </div>
+  )
+}
+
+function TextInput({ value, onChange, placeholder, type = 'text' }) {
+  return (
+    <input
+      className={styles.textInput}
+      type={type}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+    />
+  )
+}
+
+function Textarea({ value, onChange, placeholder, rows = 3 }) {
+  return (
+    <textarea
+      className={styles.textarea}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      rows={rows}
+    />
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// MODAL: Edit Personal Info
+// ─────────────────────────────────────────────────────────────
+
+const PERSONAL_KEY = 'tailorflow_personal'
+
+function loadPersonal(authUser) {
+  try {
+    const raw = localStorage.getItem(PERSONAL_KEY)
+    const stored = raw ? JSON.parse(raw) : {}
+    return {
+      fullName: stored.fullName || authUser?.displayName || '',
+      email:    stored.email    || authUser?.email       || '',
+      phone:    stored.phone    || '',
+      city:     stored.city     || '',
+      country:  stored.country  || '',
     }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [photos, onClose])
+  } catch {
+    return {
+      fullName: authUser?.displayName || '',
+      email:    authUser?.email       || '',
+      phone:    '',
+      city:     '',
+      country:  '',
+    }
+  }
+}
+
+function savePersonal(data) {
+  try { localStorage.setItem(PERSONAL_KEY, JSON.stringify(data)) } catch { /* ignore */ }
+}
+
+function PersonalModal({ personal, onBack, onSave, authUser }) {
+  const [local, setLocal] = useState({
+    fullName:  personal.fullName  || '',
+    email:     personal.email     || '',
+    phone:     personal.phone     || '',
+    city:      personal.city      || '',
+    country:   personal.country   || '',
+  })
+  const set = key => val => setLocal(p => ({ ...p, [key]: val }))
+
+  const handleSave = async () => {
+    const updated = { ...personal, ...local }
+    savePersonal(updated)
+    if (authUser && local.fullName && local.fullName !== authUser.displayName) {
+      try { await updateProfile(authUser, { displayName: local.fullName.trim() }) } catch { /* ignore */ }
+    }
+    onSave(updated)
+    onBack()
+  }
 
   return (
-    <div className={styles.lbOverlay} onClick={onClose}>
-      <div className={styles.lbInner} onClick={e => e.stopPropagation()}>
-        <button className={styles.lbClose} onClick={onClose}><span className="mi">close</span></button>
-        <img src={current.src || current.storageUrl} alt={current.caption} className={styles.lbImg} />
-        {photos.length > 1 && (
-          <>
-            {idx > 0 && (
-              <button className={`${styles.lbNav} ${styles.lbLeft}`} onClick={e => { e.stopPropagation(); setIdx(i => i - 1) }}>
-                <span className="mi">chevron_left</span>
-              </button>
-            )}
-            {idx < photos.length - 1 && (
-              <button className={`${styles.lbNav} ${styles.lbRight}`} onClick={e => { e.stopPropagation(); setIdx(i => i + 1) }}>
-                <span className="mi">chevron_right</span>
-              </button>
-            )}
-          </>
-        )}
-        {(current.caption || current.price) && (
-          <div className={styles.lbMeta}>
-            {current.caption && <p className={styles.lbCaption}>{current.caption}</p>}
-            <div className={styles.lbTags}>
-              {current.clothingTypeLabel && <span className={styles.lbType}>{current.clothingTypeLabel}</span>}
-              {current.price && <span className={styles.lbPrice}>From ₦{current.price}</span>}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    <FullModal title="Personal Info" onBack={onBack} onSave={handleSave}>
+      <FieldGroup>
+        <Field label="Full Name">
+          <TextInput value={local.fullName} onChange={set('fullName')} placeholder="e.g. Amara Okonkwo" />
+        </Field>
+        <Field label="Email Address">
+          <TextInput value={local.email} onChange={set('email')} placeholder="you@email.com" type="email" />
+        </Field>
+        <Field label="Phone Number">
+          <TextInput value={local.phone} onChange={set('phone')} placeholder="+234 800 000 0000" type="tel" />
+        </Field>
+      </FieldGroup>
+      <FieldGroup>
+        <Field label="City">
+          <TextInput value={local.city} onChange={set('city')} placeholder="e.g. Lagos" />
+        </Field>
+        <Field label="Country">
+          <TextInput value={local.country} onChange={set('country')} placeholder="e.g. Nigeria" />
+        </Field>
+      </FieldGroup>
+    </FullModal>
   )
 }
 
-// ── Main Component ────────────────────────────────────────────
-export default function Portfolio() {
-  const { handle } = useParams()
+// ─────────────────────────────────────────────────────────────
+// MODAL: Brand Identity
+// ─────────────────────────────────────────────────────────────
 
-  const [resolvedUid,   setResolvedUid]   = useState(null)
-  const [brand,         setBrand]         = useState(null)
-  const [photos,        setPhotos]        = useState([])
-  const [dressTypes,    setDressTypes]    = useState([])
-  const [loading,       setLoading]       = useState(true)
-  const [notFound,      setNotFound]      = useState(false)
-  const [activeTab,     setActiveTab]     = useState(null)
-  const [lightbox,      setLightbox]      = useState(null)
-  const [bookingOpen,   setBookingOpen]   = useState(false)
-  const [navScrolled,   setNavScrolled]   = useState(false)
-  const [navOpen,       setNavOpen]       = useState(false)
-  const [lightMode,     setLightMode]     = useState(true)
-  const [heroImageId,   setHeroImageId]   = useState(null)
-  const [footerImageId, setFooterImageId] = useState(null)
-  const [reviews,       setReviews]       = useState([])
-  const [activeNav,     setActiveNav]     = useState('home')
+function BrandModal({ onBack, showToast }) {
+  const { settings, updateMany } = useSettings()
+  const logoInputRef = useRef()
 
-  const worksRef        = useRef(null)
-  const aboutRef        = useRef(null)
-  const bookRef         = useRef(null)
-  const heroRef         = useRef(null)
-  const filterScrollRef = useRef(null)
+  const [local, setLocal] = useState({
+    brandName:    settings.brandName,
+    brandTagline: settings.brandTagline,
+    brandColour:  settings.brandColour,
+    brandLogo:    settings.brandLogo,
+    brandPhone:   settings.brandPhone,
+    brandEmail:   settings.brandEmail,
+    brandAddress: settings.brandAddress,
+    brandWebsite: settings.brandWebsite,
+  })
 
-  // ── Step 1: resolve handle → uid ─────────────────────────────
-  useEffect(() => {
-    if (!handle) { setNotFound(true); setLoading(false); return }
-    const looksLikeUid = /[A-Z]/.test(handle)
-    if (looksLikeUid) {
-      setResolvedUid(handle)
-    } else {
-      resolveSlug(handle)
-        .then(uid => {
-          if (!uid) { setNotFound(true); setLoading(false) }
-          else setResolvedUid(uid)
-        })
-        .catch(() => { setNotFound(true); setLoading(false) })
-    }
-  }, [handle])
+  const set = key => val => setLocal(p => ({ ...p, [key]: val }))
 
-  // ── Step 2: load brand once uid is known ─────────────────────
-  useEffect(() => {
-    if (!resolvedUid) return
-    getBrandFromFirestore(resolvedUid)
-      .then(data => { if (!data) setNotFound(true); else setBrand(data) })
-      .catch(() => setNotFound(true))
-      .finally(() => setLoading(false))
-  }, [resolvedUid])
-
-  // ── Step 3: realtime photos ───────────────────────────────────
-  useEffect(() => {
-    if (!resolvedUid) return
-    const q = query(collection(db, 'users', resolvedUid, 'galleryPhotos'), orderBy('createdAt', 'desc'))
-    return onSnapshot(q, snap => setPhotos(snap.docs.map(d => ({ id: d.id, ...d.data() }))), () => {})
-  }, [resolvedUid])
-
-  // ── Step 4: realtime dress types ─────────────────────────────
-  useEffect(() => {
-    if (!resolvedUid) return
-    return onSnapshot(
-      doc(db, 'users', resolvedUid, 'galleryDressTypes', 'completed_works'),
-      snap => setDressTypes(snap.exists() ? (snap.data().types ?? []) : []),
-      () => {}
-    )
-  }, [resolvedUid])
-
-  // ── Step 5: portfolio image selections ───────────────────────
-  useEffect(() => {
-    if (!resolvedUid) return
-    getPortfolioSettings(resolvedUid)
-      .then(({ heroImageId: h, footerImageId: f }) => { setHeroImageId(h); setFooterImageId(f) })
-      .catch(() => {})
-  }, [resolvedUid])
-
-  // ── Step 6: approved reviews ──────────────────────────────────
-  useEffect(() => {
-    if (!resolvedUid) return
-    const q = query(
-      collection(db, 'users', resolvedUid, 'reviews'),
-      where('status', '==', 'approved'),
-      orderBy('approvedAt', 'desc')
-    )
-    return onSnapshot(q, snap => {
-      setReviews(snap.docs.map(d => ({ id: d.id, ...d.data() })))
-    }, () => {})
-  }, [resolvedUid])
-
-  useEffect(() => {
-    const handler = () => setNavScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', handler, { passive: true })
-    return () => window.removeEventListener('scroll', handler)
+  const handleLogoChange = useCallback(e => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => setLocal(p => ({ ...p, brandLogo: ev.target.result }))
+    reader.readAsDataURL(file)
   }, [])
 
-  useEffect(() => {
-    const sections = [
-      { id: 'home',  ref: heroRef },
-      { id: 'about', ref: aboutRef },
-      { id: 'works', ref: worksRef },
-      { id: 'book',  ref: bookRef },
-    ]
-    const observers = sections.map(({ id, ref }) => {
-      const observer = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActiveNav(id) },
-        { rootMargin: '-50% 0px -50% 0px', threshold: 0 }
-      )
-      if (ref.current) observer.observe(ref.current)
-      return observer
-    })
-    return () => observers.forEach((obs, i) => {
-      if (sections[i].ref.current) obs.unobserve(sections[i].ref.current)
-    })
-  }, [brand])
-
-  const handleTabChange = (tabId) => {
-    setActiveTab(tabId)
-    if (filterScrollRef.current) {
-      const el = filterScrollRef.current.querySelector(`[data-tab="${tabId ?? 'all'}"]`)
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-    }
+  const save = () => {
+    updateMany(local)
+    showToast('Brand info saved')
+    onBack()
   }
-
-  const scrollTo = (ref) => {
-    setNavOpen(false)
-    ref?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f6f1' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-          <div style={{ width: 1, height: 60, background: 'linear-gradient(to bottom, transparent, #999)', animation: 'grow 1.2s ease infinite' }} />
-          <style>{`@keyframes grow { 0%,100%{opacity:0.2;transform:scaleY(0.3)} 50%{opacity:1;transform:scaleY(1)} }`}</style>
-          <p style={{ color: '#888', fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', fontFamily: 'Georgia, serif' }}>Loading</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (notFound) {
-    return (
-      <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8f6f1', gap: '16px' }}>
-        <span className="mi" style={{ fontSize: '3rem', color: '#bbb' }}>content_cut</span>
-        <p style={{ color: '#222', fontFamily: 'Georgia, serif', fontSize: '1.2rem', letterSpacing: '1px' }}>Portfolio not found</p>
-        <p style={{ color: '#888', fontSize: '0.8rem', letterSpacing: '1px' }}>This tailor hasn't set up their portfolio yet.</p>
-      </div>
-    )
-  }
-
-  // ── Derived values ────────────────────────────────────────────
-  const brandName       = brand.brandName    || 'The Tailor'
-  const tagline         = brand.brandTagline || ''
-  const brandBio        = brand.brandBio     || ''
-  const completedPhotos = photos.filter(p => p.category === 'completed_works')
-  const filteredPhotos  = activeTab ? completedPhotos.filter(p => p.clothingType === activeTab) : completedPhotos
-  const heroPhoto       = (heroImageId   ? completedPhotos.find(p => p.id === heroImageId)   : null) ?? completedPhotos[0] ?? null
-  const footerPhoto     = (footerImageId ? completedPhotos.find(p => p.id === footerImageId) : null) ?? completedPhotos[1] ?? null
-
-  // ── Brand colour — applied surgically to CTAs only ────────────
-  const accentColour = brand.brandColour || '#D4AF37'
-  const accentText   = accentTextColour(accentColour)
-
-  // ── Personalization fields ────────────────────────────────────
-  const foundedYear       = brand.brandFoundedYear       || ''
-  const turnaround        = brand.brandTurnaround        || ''
-  const serviceArea       = brand.brandServiceArea       || ''
-  const styleStatement    = brand.brandStyleStatement    || ''
-  const featuredTechnique = brand.brandFeaturedTechnique || ''
-  const milestone         = brand.brandMilestone         || ''
-  const availability      = brand.brandAvailability      || 'open'
-  const availableUntil    = brand.brandAvailableUntil    || ''
-
-  // Stats strip: milestone overrides completed count if set
-  const statGarments = milestone || (completedPhotos.length ? `${completedPhotos.length}+` : '—')
 
   return (
-    <div className={`${styles.page} ${lightMode ? styles.lightMode : ''}`}>
-
-      {/* ── NAV ── */}
-      <nav className={`${styles.nav} ${navScrolled ? styles.navScrolled : ''}`}>
-        <div className={styles.navInner}>
-          <span className={styles.navBrand}>{brandName}</span>
-          <div className={`${styles.navLinks} ${navOpen ? styles.navLinksOpen : ''}`}>
-            <div className={styles.navHomeRow}>
-              <button className={styles.themeToggleMobileInline} onClick={() => setLightMode(m => !m)} aria-label="Toggle theme">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
-                  <path d="M12 2 A10 10 0 0 1 12 22 Z" fill="currentColor"/>
-                </svg>
+    <FullModal title="Brand Identity" onBack={onBack} onSave={save}>
+      <FieldGroup>
+        <Field label="Brand Logo" hint="PNG or JPG. Appears on invoice headers. Ideally square.">
+          {local.brandLogo ? (
+            <div className={styles.logoPreviewWrap}>
+              <img src={local.brandLogo} alt="Brand logo" className={styles.logoPreview} />
+              <button
+                className={styles.logoRemove}
+                onClick={() => setLocal(p => ({ ...p, brandLogo: null }))}
+              >
+                <span className="mi" style={{ fontSize: 15 }}>close</span> Remove
               </button>
-              <button onClick={() => { setNavOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={`${styles.navLink} ${activeNav === 'home' ? styles.navLinkActive : ''}`}>Home</button>
-              <span className={styles.navHomeRowSpacer} />
             </div>
-            <button onClick={() => scrollTo(aboutRef)} className={`${styles.navLink} ${activeNav === 'about' ? styles.navLinkActive : ''}`}>About</button>
-            <button onClick={() => scrollTo(worksRef)} className={`${styles.navLink} ${activeNav === 'works' ? styles.navLinkActive : ''}`}>Works</button>
-            <button onClick={() => scrollTo(bookRef)}  className={`${styles.navLink} ${activeNav === 'book'  ? styles.navLinkActive : ''}`}>Book</button>
-            <button
-              onClick={() => { setNavOpen(false); setBookingOpen(true) }}
-              className={styles.navCta}
-              style={{ background: accentColour, color: accentText }}
-            >
-              Order Now
+          ) : (
+            <button className={styles.logoUploadBtn} onClick={() => logoInputRef.current?.click()}>
+              <span className="mi">add_photo_alternate</span>
+              Upload Logo
             </button>
-          </div>
-          <div className={styles.navRight}>
-            <button className={styles.themeToggleDesktop} onClick={() => setLightMode(m => !m)} aria-label="Toggle theme">
-              <span className="material-icons">{lightMode ? 'dark_mode' : 'light_mode'}</span>
-            </button>
-            <button className={styles.navHamburger} onClick={() => setNavOpen(o => !o)} aria-label="Menu">
-              <span className={`${styles.hamLine} ${navOpen ? styles.hamLineToTop : ''}`} />
-              <span className={`${styles.hamLine} ${navOpen ? styles.hamLineToBottom : ''}`} />
-            </button>
-          </div>
-        </div>
-      </nav>
+          )}
+          <input
+            ref={logoInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleLogoChange}
+          />
+        </Field>
+      </FieldGroup>
 
-      {/* ── HERO ── */}
-      <section className={styles.hero} ref={heroRef}>
-        {heroPhoto ? (
-          <div className={styles.heroBgWrap}>
-            <img src={heroPhoto.src || heroPhoto.storageUrl} alt="" className={styles.heroBgImg} />
-            <div className={styles.heroBgOverlay} />
+      <FieldGroup>
+        <Field label="Shop / Brand Name">
+          <TextInput value={local.brandName} onChange={set('brandName')} placeholder="e.g. Stitched by Amara" />
+        </Field>
+        <Field label="Tagline" hint="Short line shown under your name on coloured invoice templates.">
+          <TextInput value={local.brandTagline} onChange={set('brandTagline')} placeholder="e.g. Crafted with love, fitted for you" />
+        </Field>
+        <Field label="Brand Colour">
+          <div className={styles.colourRow}>
+            <input
+              type="color"
+              className={styles.colourPicker}
+              value={local.brandColour}
+              onChange={e => set('brandColour')(e.target.value)}
+            />
+            <TextInput value={local.brandColour} onChange={set('brandColour')} placeholder="#D4AF37" />
           </div>
-        ) : <div className={styles.heroBgFallback} />}
-        <div className={styles.heroContent}>
-          <p className={styles.heroEyebrow}>— {brandName} —</p>
-          <h1 className={styles.heroName}>{brandName}</h1>
-          {tagline && <p className={styles.heroTagline}>{tagline}</p>}
-          {styleStatement && <p className={styles.heroStyleStatement}>{styleStatement}</p>}
-          <div className={styles.heroCtas}>
+        </Field>
+      </FieldGroup>
+
+      <FieldGroup>
+        <Field label="Business Phone">
+          <TextInput value={local.brandPhone} onChange={set('brandPhone')} placeholder="+234 800 000 0000" type="tel" />
+        </Field>
+        <Field label="Business Email">
+          <TextInput value={local.brandEmail} onChange={set('brandEmail')} placeholder="shop@email.com" type="email" />
+        </Field>
+        <Field label="Business Address">
+          <Textarea value={local.brandAddress} onChange={set('brandAddress')} placeholder="12 Tailor Street, Ikeja, Lagos" rows={2} />
+        </Field>
+        <Field label="Website / Social Handle">
+          <TextInput value={local.brandWebsite} onChange={set('brandWebsite')} placeholder="instagram.com/yourbrand" />
+        </Field>
+      </FieldGroup>
+    </FullModal>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// MODAL: Account / Payment Details
+// ─────────────────────────────────────────────────────────────
+
+function AccountDetailsModal({ onBack, showToast }) {
+  const { settings, updateMany } = useSettings()
+
+  const [local, setLocal] = useState({
+    accountBank:   settings.accountBank   || '',
+    accountNumber: settings.accountNumber || '',
+    accountName:   settings.accountName   || '',
+  })
+
+  const set = key => val => setLocal(p => ({ ...p, [key]: val }))
+
+  const save = () => {
+    updateMany(local)
+    showToast('Account details saved')
+    onBack()
+  }
+
+  return (
+    <FullModal title="Account Details" onBack={onBack} onSave={save}>
+      <FieldGroup>
+        <Field label="Bank Name" hint="e.g. GTBank, Access, OPay">
+          <TextInput
+            value={local.accountBank}
+            onChange={set('accountBank')}
+            placeholder="e.g. GTBank"
+          />
+        </Field>
+        <Field label="Account Number">
+          <TextInput
+            value={local.accountNumber}
+            onChange={set('accountNumber')}
+            placeholder="e.g. 0123456789"
+            type="tel"
+          />
+        </Field>
+        <Field label="Account Name" hint="Name registered on the bank account">
+          <TextInput
+            value={local.accountName}
+            onChange={set('accountName')}
+            placeholder="e.g. Amara Okonkwo"
+          />
+        </Field>
+      </FieldGroup>
+    </FullModal>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// MODAL: Business Info
+// ─────────────────────────────────────────────────────────────
+
+const TURNAROUND_OPTIONS = [
+  { value: '1 week',    label: '1 week' },
+  { value: '1-2 weeks', label: '1–2 weeks' },
+  { value: '2-3 weeks', label: '2–3 weeks' },
+  { value: '3-4 weeks', label: '3–4 weeks' },
+  { value: '4-6 weeks', label: '4–6 weeks' },
+  { value: '6+ weeks',  label: '6+ weeks' },
+]
+
+const SERVICE_AREA_OPTIONS = [
+  { value: 'Lagos only',    label: 'Lagos only' },
+  { value: 'Nationwide',    label: 'Nationwide' },
+  { value: 'International', label: 'International' },
+]
+
+function SelectChips({ options, value, onChange }) {
+  return (
+    <div className={styles.chipsRow}>
+      {options.map(opt => (
+        <button
+          key={opt.value}
+          className={`${styles.chip} ${value === opt.value ? styles.chipActive : ''}`}
+          onClick={() => onChange(opt.value)}
+          type="button"
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function BusinessInfoModal({ onBack, showToast }) {
+  const { settings, updateMany } = useSettings()
+
+  const [local, setLocal] = useState({
+    brandFoundedYear:       settings.brandFoundedYear       || '',
+    brandTurnaround:        settings.brandTurnaround        || '',
+    brandServiceArea:       settings.brandServiceArea       || '',
+    brandAvailability:      settings.brandAvailability      || 'open',
+    brandAvailableUntil:    settings.brandAvailableUntil    || '',
+    brandStyleStatement:    settings.brandStyleStatement    || '',
+    brandFeaturedTechnique: settings.brandFeaturedTechnique || '',
+    brandMilestone:         settings.brandMilestone         || '',
+  })
+
+  const set = key => val => setLocal(p => ({ ...p, [key]: val }))
+
+  const save = () => {
+    updateMany(local)
+    showToast('Business info saved')
+    onBack()
+  }
+
+  return (
+    <FullModal title="Business Info" onBack={onBack} onSave={save}>
+
+      {/* Availability */}
+      <FieldGroup>
+        <Field label="Availability" hint="Clients will see this on your portfolio.">
+          <div className={styles.availabilityRow}>
             <button
-              className={styles.heroPrimary}
-              onClick={() => setBookingOpen(true)}
-              style={{ background: accentColour, color: accentText }}
+              type="button"
+              className={`${styles.availBtn} ${local.brandAvailability === 'open' ? styles.availBtnOpen : ''}`}
+              onClick={() => set('brandAvailability')('open')}
             >
-              Place an Order
+              <span className="mi" style={{ fontSize: '1rem' }}>check_circle</span>
+              Accepting Orders
             </button>
-            <button className={styles.heroSecondary} onClick={() => scrollTo(worksRef)}>
-              View Works
-              <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 6 }}>arrow_downward</span>
+            <button
+              type="button"
+              className={`${styles.availBtn} ${local.brandAvailability === 'booked' ? styles.availBtnBooked : ''}`}
+              onClick={() => set('brandAvailability')('booked')}
+            >
+              <span className="mi" style={{ fontSize: '1rem' }}>block</span>
+              Fully Booked
             </button>
           </div>
-          {/* Availability badge — green is semantic "open", never brand colour */}
-          {availability === 'open' && (
-            <div className={styles.availBadge}>
-              <span className={styles.availDot} />
-              <span className={styles.availText}>
-                {availableUntil ? `Taking orders until ${availableUntil}` : 'Currently taking orders'}
+        </Field>
+        {local.brandAvailability === 'booked' && (
+          <Field label="Available again from" hint="Optional — lets clients know when to check back.">
+            <TextInput
+              type="date"
+              value={local.brandAvailableUntil}
+              onChange={set('brandAvailableUntil')}
+              placeholder=""
+            />
+          </Field>
+        )}
+      </FieldGroup>
+
+      {/* Business history */}
+      <FieldGroup>
+        <Field label="Year Founded" hint="e.g. 2018 — shown as 'Crafting since 2018'">
+          <TextInput
+            value={local.brandFoundedYear}
+            onChange={set('brandFoundedYear')}
+            placeholder="e.g. 2018"
+            type="tel"
+          />
+        </Field>
+        <Field label="Client Milestone" hint="e.g. 200+ garments delivered">
+          <TextInput
+            value={local.brandMilestone}
+            onChange={set('brandMilestone')}
+            placeholder="e.g. 200+ garments delivered"
+          />
+        </Field>
+      </FieldGroup>
+
+      {/* Style & operations */}
+      <FieldGroup>
+        <Field label="Signature Style Statement" hint="One sentence about what makes your work unique. Max 100 characters.">
+          <Textarea
+            value={local.brandStyleStatement}
+            onChange={v => set('brandStyleStatement')(v.slice(0, 100))}
+            placeholder="e.g. I specialise in Yoruba ceremonial wear for weddings and naming ceremonies."
+            rows={2}
+          />
+          <span className={styles.charCount}>{local.brandStyleStatement.length}/100</span>
+        </Field>
+        <Field label="Featured Technique" hint="e.g. Hand-embroidered agbada, French-seam finishing">
+          <TextInput
+            value={local.brandFeaturedTechnique}
+            onChange={set('brandFeaturedTechnique')}
+            placeholder="e.g. Hand-embroidered agbada"
+          />
+        </Field>
+      </FieldGroup>
+
+      {/* Turnaround & service area */}
+      <FieldGroup>
+        <Field label="Standard Turnaround Time">
+          <SelectChips
+            options={TURNAROUND_OPTIONS}
+            value={local.brandTurnaround}
+            onChange={set('brandTurnaround')}
+          />
+        </Field>
+        <Field label="Service Area">
+          <SelectChips
+            options={SERVICE_AREA_OPTIONS}
+            value={local.brandServiceArea}
+            onChange={set('brandServiceArea')}
+          />
+        </Field>
+      </FieldGroup>
+
+    </FullModal>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// MODAL: Social Media Links
+// ─────────────────────────────────────────────────────────────
+
+const SOCIAL_PLATFORMS = [
+  { id: 'instagram', label: 'Instagram',  placeholder: 'yourbrand',         icon: 'photo_camera' },
+  { id: 'tiktok',    label: 'TikTok',     placeholder: 'yourbrand',         icon: 'play_circle'  },
+  { id: 'facebook',  label: 'Facebook',   placeholder: 'yourbrand',         icon: 'groups'       },
+  { id: 'twitter',   label: 'Twitter / X', placeholder: 'yourbrand',        icon: 'tag'          },
+  { id: 'youtube',   label: 'YouTube',    placeholder: 'YourBrandChannel',  icon: 'smart_display'},
+  { id: 'pinterest', label: 'Pinterest',  placeholder: 'yourbrand',         icon: 'push_pin'     },
+  { id: 'threads',   label: 'Threads',    placeholder: 'yourbrand',         icon: 'forum'        },
+]
+
+function SocialsModal({ onBack, showToast }) {
+  const { settings, updateMany } = useSettings()
+
+  // Build a map of platform → handle from saved socials array
+  const toMap = arr => Object.fromEntries((arr || []).map(s => [s.platform, s.handle]))
+  const [handles, setHandles] = useState(() => toMap(settings.brandSocials || []))
+  const [expanded, setExpanded] = useState(() => {
+    const active = new Set((settings.brandSocials || []).map(s => s.platform))
+    // Pre-open any already-saved platforms
+    return Object.fromEntries(SOCIAL_PLATFORMS.map(p => [p.id, active.has(p.id)]))
+  })
+
+  const togglePlatform = (id) => {
+    setExpanded(prev => {
+      const next = { ...prev, [id]: !prev[id] }
+      // Clear handle if collapsing
+      if (prev[id]) setHandles(h => { const n = { ...h }; delete n[id]; return n })
+      return next
+    })
+  }
+
+  const save = () => {
+    const brandSocials = SOCIAL_PLATFORMS
+      .filter(p => expanded[p.id] && handles[p.id]?.trim())
+      .map(p => ({ platform: p.id, handle: handles[p.id].trim() }))
+    updateMany({ brandSocials })
+    showToast('Social links saved')
+    onBack()
+  }
+
+  return (
+    <FullModal title="Social Media" onBack={onBack} onSave={save}>
+      <FieldGroup>
+        {SOCIAL_PLATFORMS.map(platform => (
+          <div key={platform.id} className={styles.socialRow}>
+            <button
+              type="button"
+              className={`${styles.socialToggle} ${expanded[platform.id] ? styles.socialToggleActive : ''}`}
+              onClick={() => togglePlatform(platform.id)}
+            >
+              <div className={styles.socialToggleLeft}>
+                <div className={`${styles.socialIconWrap} ${expanded[platform.id] ? styles.socialIconActive : ''}`}>
+                  <span className="mi" style={{ fontSize: '1.1rem' }}>{platform.icon}</span>
+                </div>
+                <span className={styles.socialPlatformLabel}>{platform.label}</span>
+              </div>
+              <span className={`mi ${styles.socialChevron} ${expanded[platform.id] ? styles.socialChevronOpen : ''}`} style={{ fontSize: '1rem' }}>
+                expand_more
               </span>
-            </div>
-          )}
-          {availability === 'busy' && availableUntil && (
-            <div className={styles.availBadge}>
-              <span className={styles.availDotBusy} />
-              <span className={styles.availText}>Fully booked until {availableUntil}</span>
-            </div>
-          )}
-        </div>
-        <div className={styles.heroScroll}>
-          <span className={styles.heroScrollLine} />
-          <span className={styles.heroScrollText}>Scroll</span>
-        </div>
-      </section>
+            </button>
+            {expanded[platform.id] && (
+              <div className={styles.socialHandleWrap}>
+                <span className={styles.socialAt}>@</span>
+                <input
+                  className={styles.socialHandleInput}
+                  type="text"
+                  placeholder={platform.placeholder}
+                  value={handles[platform.id] || ''}
+                  onChange={e => setHandles(h => ({ ...h, [platform.id]: e.target.value }))}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                />
+              </div>
+            )}
+          </div>
+        ))}
+      </FieldGroup>
+    </FullModal>
+  )
+}
 
-      {/* ── STATS STRIP ── */}
-      <div className={styles.statsStrip}>
-        <div className={styles.statItem}>
-          <span className={styles.statNum}>{statGarments}</span>
-          <span className={styles.statLabel}>Garments Delivered</span>
+function PlanBadge({ isPremium }) {
+  return (
+    <span className={isPremium ? styles.badgePro : styles.badgeFree}>
+      {isPremium
+        ? <><span className="mi" style={{ fontSize: '0.75rem' }}>workspace_premium</span> PRO</>
+        : 'FREE'
+      }
+    </span>
+  )
+}
+
+function Avatar({ name, logo, size = 72 }) {
+  const initials = name
+    ? name.trim().split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+    : '?'
+
+  if (logo) {
+    return (
+      <img
+        src={logo}
+        alt="Avatar"
+        className={styles.avatarImg}
+        style={{ width: size, height: size }}
+      />
+    )
+  }
+
+  return (
+    <div className={styles.avatarInitials} style={{ width: size, height: size, fontSize: size * 0.35 }}>
+      {initials}
+    </div>
+  )
+}
+
+function getOrSetJoinDate() {
+  const key = 'tailorflow_joined'
+  const existing = localStorage.getItem(key)
+  if (existing) return existing
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  localStorage.setItem(key, today)
+  return today
+}
+
+// ─────────────────────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────────────────────
+
+export default function Profile({ onMenuClick, isPremium = false, onUpgrade = () => {} }) {
+  const { settings } = useSettings()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const [personal,       setPersonal]       = useState(() => loadPersonal(user))
+  const [activeModal,    setActiveModal]     = useState(null)
+  const [logoutConfirm,  setLogoutConfirm]   = useState(false)
+  const [toastMsg,       setToastMsg]        = useState('')
+  const toastTimer = useRef(null)
+
+  const joinDate = getOrSetJoinDate()
+
+  const showToast = useCallback(msg => {
+    setToastMsg(msg)
+    clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToastMsg(''), 2400)
+  }, [])
+
+  const handleLogout = async () => {
+    setLogoutConfirm(false)
+    await logout()
+    navigate('/login', { replace: true })
+  }
+
+  const hasBrand = !!(settings.brandName || settings.brandLogo)
+  const hasAccountDetails = !!(settings.accountBank || settings.accountNumber)
+
+  return (
+    <div className={styles.page}>
+      <Header title="Account" onMenuClick={onMenuClick} />
+
+      <div className={styles.scrollArea}>
+        <div className={styles.heroCard}>
+          <div className={styles.heroCardGlow} />
+          <div className={styles.heroTop}>
+            <Avatar
+              name={personal.fullName || settings.brandName}
+              logo={settings.brandLogo}
+              size={72}
+            />
+            <div className={styles.heroInfo}>
+              <div className={styles.heroName}>
+                {personal.fullName || 'Your Name'}
+              </div>
+              {(personal.city || personal.country) && (
+                <div className={styles.heroLocation}>
+                  <span className="mi" style={{ fontSize: '0.75rem' }}>location_on</span>
+                  {[personal.city, personal.country].filter(Boolean).join(', ')}
+                </div>
+              )}
+              <PlanBadge isPremium={isPremium} />
+            </div>
+          </div>
+          <div className={styles.heroMeta}>
+            <div className={styles.heroMetaItem}>
+              <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>calendar_today</span>
+              <span className={styles.heroMetaLabel}>Joined {joinDate}</span>
+            </div>
+            {(personal.email || user?.email) && (
+              <div className={styles.heroMetaItem}>
+                <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>mail</span>
+                <span className={styles.heroMetaLabel}>{personal.email || user?.email}</span>
+              </div>
+            )}
+          </div>
         </div>
-        <div className={styles.statDivider} />
-        <div className={styles.statItem}>
-          <span className={styles.statNum}>{dressTypes.length || '—'}</span>
-          <span className={styles.statLabel}>Specialties</span>
-        </div>
-        <div className={styles.statDivider} />
-        {foundedYear ? (
-          <div className={styles.statItem}>
-            <span className={styles.statNum}>{new Date().getFullYear() - parseInt(foundedYear)}+</span>
-            <span className={styles.statLabel}>Years Crafting</span>
+
+        {/* ── Personal Info ── */}
+        <SectionHeader icon="person" label="Personal Info" />
+        <InfoRow icon="badge"  label="Full Name" value={personal.fullName}  placeholder="Not set" />
+        <InfoRow icon="mail"   label="Email"     value={personal.email || user?.email} placeholder="Not set" />
+        <InfoRow icon="call"   label="Phone"     value={personal.phone}     placeholder="Not set" />
+        <InfoRow icon="public" label="Location"  value={[personal.city, personal.country].filter(Boolean).join(', ')} placeholder="Not set" />
+        <TappableRow
+          icon="edit"
+          label="Edit Personal Info"
+          onClick={() => setActiveModal('personal')}
+          divider={false}
+        />
+
+        {/* ── Brand Identity ── */}
+        <SectionHeader icon="storefront" label="Brand Identity" />
+        {hasBrand ? (
+          <div className={`${styles.row} ${styles.brandPreview}`}>
+            {settings.brandLogo && (
+              <img src={settings.brandLogo} alt="Brand logo" className={styles.brandPreviewLogo} />
+            )}
+            <div className={styles.brandPreviewInfo}>
+              <div className={styles.brandPreviewName}>{settings.brandName || '—'}</div>
+              {settings.brandTagline && (
+                <div className={styles.brandPreviewTagline}>{settings.brandTagline}</div>
+              )}
+            </div>
+            {settings.brandColour && (
+              <div className={styles.brandColourDot} style={{ background: settings.brandColour }} />
+            )}
           </div>
         ) : (
-          <div className={styles.statItem}>
-            <span className="mi" style={{ fontSize: '1.1rem' }}>verified</span>
-            <span className={styles.statLabel}>Bespoke Only</span>
+          <div className={`${styles.row} ${styles.brandEmpty}`}>
+            <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>storefront</span>
+            <span className={styles.brandEmptyText}>No brand set up yet</span>
           </div>
         )}
+        <InfoRow icon="store" label="Brand Name" value={settings.brandName} placeholder="Not set" />
+        <InfoRow icon="call"  label="Biz Phone"  value={settings.brandPhone} placeholder="Not set" />
+        <TappableRow
+          icon="edit"
+          label="Edit Brand Identity"
+          sub="Logo, colours, contact details used on invoices"
+          onClick={() => setActiveModal('brand')}
+          divider={false}
+        />
+
+        {/* ── Account / Payment Details ── */}
+        <SectionHeader icon="account_balance" label="Account Details" />
+        {hasAccountDetails ? (
+          <>
+            <InfoRow icon="account_balance" label="Bank"           value={settings.accountBank}   placeholder="Not set" />
+            <InfoRow icon="tag"             label="Account Number" value={settings.accountNumber} placeholder="Not set" />
+            <InfoRow icon="badge"           label="Account Name"   value={settings.accountName}   placeholder="Not set" />
+          </>
+        ) : (
+          <div className={`${styles.row} ${styles.brandEmpty}`}>
+            <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>account_balance</span>
+            <span className={styles.brandEmptyText}>No account details yet</span>
+          </div>
+        )}
+        <TappableRow
+          icon="edit"
+          label="Edit Account Details"
+          sub="Bank info printed on invoices for client payments"
+          onClick={() => setActiveModal('accountDetails')}
+          divider={false}
+        />
+
+        {/* ── Business Info ── */}
+        <SectionHeader icon="storefront" label="Business Info" />
+        <InfoRow icon="schedule"     label="Turnaround Time"    value={settings.brandTurnaround}        placeholder="Not set" />
+        <InfoRow icon="public"       label="Service Area"       value={settings.brandServiceArea}       placeholder="Not set" />
+        <InfoRow icon="history"      label="Founded"            value={settings.brandFoundedYear ? `Since ${settings.brandFoundedYear}` : ''} placeholder="Not set" />
+        <InfoRow icon="emoji_events" label="Milestone"          value={settings.brandMilestone}         placeholder="Not set" />
+        <InfoRow
+          icon={settings.brandAvailability === 'booked' ? 'block' : 'check_circle'}
+          label="Availability"
+          value={settings.brandAvailability === 'booked'
+            ? `Fully Booked${settings.brandAvailableUntil ? ` · Available from ${settings.brandAvailableUntil}` : ''}`
+            : 'Accepting Orders'}
+          placeholder="Not set"
+        />
+        <TappableRow
+          icon="edit"
+          label="Edit Business Info"
+          sub="Availability, turnaround, style statement, service area"
+          onClick={() => setActiveModal('businessInfo')}
+          divider={false}
+        />
+
+        {/* ── Social Media ── */}
+        <SectionHeader icon="share" label="Social Media" />
+        {settings.brandSocials?.length > 0 ? (
+          <div className={styles.socialsPreview}>
+            {settings.brandSocials.map(s => {
+              const p = SOCIAL_PLATFORMS.find(pl => pl.id === s.platform)
+              return p ? (
+                <div key={s.platform} className={styles.socialPreviewChip}>
+                  <span className="mi" style={{ fontSize: '0.9rem' }}>{p.icon}</span>
+                  <span className={styles.socialPreviewLabel}>@{s.handle}</span>
+                </div>
+              ) : null
+            })}
+          </div>
+        ) : (
+          <div className={`${styles.row} ${styles.brandEmpty}`}>
+            <span className="mi" style={{ fontSize: '1.5rem', color: 'var(--text3)' }}>share</span>
+            <span className={styles.brandEmptyText}>No social links yet</span>
+          </div>
+        )}
+        <TappableRow
+          icon="edit"
+          label="Edit Social Links"
+          sub="Instagram, TikTok, Facebook and more"
+          onClick={() => setActiveModal('socials')}
+          divider={false}
+        />
+
+        {/* ── Plan ── */}
+        <SectionHeader icon="workspace_premium" label="My Plan" />
+        <div className={styles.row}>
+          <div className={styles.planLeft}>
+            <div className={styles.planName}>{isPremium ? 'TailorFlow Pro' : 'Free Plan'}</div>
+            <div className={styles.planSub}>
+              {isPremium
+                ? 'All features unlocked — invoice customisation, branded PDFs & more'
+                : 'Basic features only. Upgrade to unlock brand customisation.'}
+            </div>
+          </div>
+          <PlanBadge isPremium={isPremium} />
+        </div>
+
+        {!isPremium && (
+          <div className={`${styles.row} ${styles.upgradeStrip}`} onClick={onUpgrade}>
+            <div className={styles.upgradeStripGlow} />
+            <span className="mi" style={{ fontSize: '1.3rem', color: 'var(--accent)' }}>workspace_premium</span>
+            <div className={styles.upgradeStripText}>
+              <div className={styles.upgradeStripTitle}>Upgrade to Pro</div>
+              <div className={styles.upgradeStripSub}>Unlock everything — invoices, brand colours, PDFs</div>
+            </div>
+            <span className="mi" style={{ fontSize: '1rem', color: 'var(--accent)' }}>chevron_right</span>
+          </div>
+        )}
+
+        {/* ── Account ── */}
+        <SectionHeader icon="manage_accounts" label="Account" />
+        <TappableRow
+          icon="logout"
+          label="Log Out"
+          sub="You can always log back in"
+          onClick={() => setLogoutConfirm(true)}
+          divider={false}
+          danger
+        />
+
+        <div style={{ height: 40 }} />
       </div>
 
-      {/* ── ABOUT ── */}
-      <section className={styles.about} ref={aboutRef}>
-        <div className={styles.aboutInner}>
-          <div className={styles.aboutLeft}>
-            <p className={styles.sectionEyebrow} style={{ color: accentColour }}>01 — About</p>
-            <h2 className={styles.aboutHeading}>{brandName}</h2>
-            {tagline && <p className={styles.aboutHeadingTagline}>"{tagline}"</p>}
-          </div>
-          <div className={styles.aboutRight}>
-            <div className={styles.aboutCard}>
-              <div className={styles.aboutLogo}>
-                {brand.brandLogo
-                  ? <img src={brand.brandLogo} alt={brandName} className={styles.aboutLogoImg} />
-                  : <div className={styles.aboutInitials}>{initials(brandName)}</div>}
-              </div>
-              <p className={styles.aboutName}>{brandName}</p>
-              {tagline && <p className={styles.aboutTagline}>"{tagline}"</p>}
-
-              {/* Style statement — the personal signature line */}
-              {styleStatement && (
-                <p className={styles.aboutStyleStatement}>{styleStatement}</p>
-              )}
-
-              {brandBio && <p className={styles.aboutBio}>{brandBio}</p>}
-
-              {/* Business info pills */}
-              {(turnaround || serviceArea || featuredTechnique || foundedYear) && (
-                <div className={styles.aboutInfoGrid}>
-                  {foundedYear && (
-                    <div className={styles.aboutInfoItem}>
-                      <span className="material-icons" style={{ fontSize: '0.9rem' }}>history</span>
-                      <span>Crafting since {foundedYear}</span>
-                    </div>
-                  )}
-                  {turnaround && (
-                    <div className={styles.aboutInfoItem}>
-                      <span className="material-icons" style={{ fontSize: '0.9rem' }}>schedule</span>
-                      <span>{turnaround}</span>
-                    </div>
-                  )}
-                  {serviceArea && (
-                    <div className={styles.aboutInfoItem}>
-                      <span className="material-icons" style={{ fontSize: '0.9rem' }}>place</span>
-                      <span>{serviceArea}</span>
-                    </div>
-                  )}
-                  {featuredTechnique && (
-                    <div className={styles.aboutInfoItem}>
-                      <span className="material-icons" style={{ fontSize: '0.9rem' }}>auto_fix_high</span>
-                      <span>{featuredTechnique}</span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {dressTypes.length > 0 && (
-                <div className={styles.aboutSpecialties}>
-                  <p className={styles.aboutSpecialtiesLabel}>Specialises in</p>
-                  <div className={styles.aboutSpecialtiesList}>
-                    {dressTypes.map(t => <span key={t.id} className={styles.aboutSpecialtyPill}>{t.label}</span>)}
-                  </div>
-                </div>
-              )}
-              <div className={styles.aboutMeta}>
-                {brand.brandAddress && (
-                  <div className={styles.aboutMetaRow}>
-                    <span className="material-icons" style={{ fontSize: '0.95rem', flexShrink: 0 }}>location_on</span>
-                    <span>{brand.brandAddress}</span>
-                  </div>
-                )}
-                {brand.brandPhone && (
-                  <a href={`tel:${brand.brandPhone}`} className={styles.aboutMetaRow}>
-                    <span className="material-icons" style={{ fontSize: '0.95rem', flexShrink: 0 }}>call</span>
-                    <span>{brand.brandPhone}</span>
-                  </a>
-                )}
-                {brand.brandEmail && (
-                  <a href={`mailto:${brand.brandEmail}`} className={styles.aboutMetaRow}>
-                    <span className="material-icons" style={{ fontSize: '0.95rem', flexShrink: 0 }}>mail</span>
-                    <span>{brand.brandEmail}</span>
-                  </a>
-                )}
-                {brand.brandWebsite && (
-                  <a href={brand.brandWebsite} target="_blank" rel="noopener noreferrer" className={styles.aboutMetaRow}>
-                    <span className="material-icons" style={{ fontSize: '0.95rem', flexShrink: 0 }}>language</span>
-                    <span>{brand.brandWebsite}</span>
-                  </a>
-                )}
-              </div>
-              {/* Social links — WhatsApp always first, then only filled platforms */}
-              {brand.brandPhone && (
-                <div className={styles.aboutSocials}>
-                  <a
-                    href={`https://wa.me/${brand.brandPhone.replace(/\D/g,'')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.socialIcon}
-                    aria-label="WhatsApp"
-                  >
-                    {WA_SVG}
-                  </a>
-                  {(brand.brandSocials || []).map((s, i) => (
-                    <a
-                      key={i}
-                      href={buildSocialUrl(s.platform, s.handle)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.socialIcon}
-                      aria-label={s.platform}
-                    >
-                      <SocialIcon platform={s.platform} />
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SPECIALTIES MARQUEE ── */}
-      {dressTypes.length > 0 && (
-        <div className={styles.marqueeWrap}>
-          <div className={styles.marqueeTrack}>
-            {[...dressTypes, ...dressTypes, ...dressTypes, ...dressTypes].map((t, i) => (
-              <span key={i} className={styles.marqueeItem}>
-                {t.label}
-                <span className="mi" style={{ fontSize: '0.5rem', margin: '0 16px', opacity: 0.3, verticalAlign: 'middle' }}>fiber_manual_record</span>
-              </span>
-            ))}
-          </div>
-        </div>
+      {/* ── Modals ── */}
+      {activeModal === 'personal' && (
+        <PersonalModal
+          personal={personal}
+          authUser={user}
+          onBack={() => setActiveModal(null)}
+          onSave={data => { setPersonal(data); showToast('Personal info saved') }}
+        />
+      )}
+      {activeModal === 'brand' && (
+        <BrandModal onBack={() => setActiveModal(null)} showToast={showToast} />
+      )}
+      {activeModal === 'accountDetails' && (
+        <AccountDetailsModal onBack={() => setActiveModal(null)} showToast={showToast} />
+      )}
+      {activeModal === 'businessInfo' && (
+        <BusinessInfoModal onBack={() => setActiveModal(null)} showToast={showToast} />
+      )}
+      {activeModal === 'socials' && (
+        <SocialsModal onBack={() => setActiveModal(null)} showToast={showToast} />
       )}
 
-      {/* ── COMPLETED WORKS ── */}
-      <section className={styles.works} ref={worksRef}>
-        <div className={styles.worksHead}>
-          <p className={styles.sectionEyebrow} style={{ color: accentColour }}>02 — Portfolio</p>
-          <h2 className={styles.worksTitle}>Completed Works</h2>
-          <p className={styles.worksSub}>Every piece is a testament to precision and craft.</p>
-        </div>
-        {dressTypes.length > 0 && (
-          <div className={styles.filterBar}>
-            <div className={styles.filterScroll} ref={filterScrollRef}>
-              <button
-                data-tab="all"
-                className={`${styles.filterPill} ${!activeTab ? styles.filterPillActive : ''}`}
-                onClick={() => handleTabChange(null)}
-                style={!activeTab ? { background: accentColour, color: accentText, borderColor: accentColour } : {}}
-              >
-                All
-              </button>
-              {dressTypes.map(t => (
-                <button
-                  key={t.id}
-                  data-tab={t.id}
-                  className={`${styles.filterPill} ${activeTab === t.id ? styles.filterPillActive : ''}`}
-                  onClick={() => handleTabChange(t.id)}
-                  style={activeTab === t.id ? { background: accentColour, color: accentText, borderColor: accentColour } : {}}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {filteredPhotos.length === 0 ? (
-          <div className={styles.emptyWorks}><p>No works in this category yet.</p></div>
-        ) : (
-          <div className={styles.photoGrid}>
-            {filteredPhotos.map((photo, i) => (
-              <div key={photo.id} className={`${styles.photoCard} ${i === 0 ? styles.photoCardFeatured : ''}`} style={{ animationDelay: `${i * 0.05}s` }} onClick={() => setLightbox(photo)}>
-                <img src={photo.src || photo.storageUrl} alt={photo.caption || 'Completed work'} className={styles.photoImg} loading="lazy" />
-                {photo.price && (
-                  <span className={styles.photoPrice}>₦{photo.price}</span>
-                )}
-                <div className={styles.photoOverlay}>
-                  <span className={`mi ${styles.photoZoom}`}>open_in_full</span>
-                  {photo.caption && <p className={styles.photoCaption}>{photo.caption}</p>}
-                  {photo.clothingTypeLabel && <span className={styles.photoType}>{photo.clothingTypeLabel}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* ── PROCESS ── */}
-      <section className={styles.process}>
-        <div className={styles.processInner}>
-          <p className={styles.sectionEyebrow} style={{ color: accentColour }}>03 — Process</p>
-          <h2 className={styles.processTitle}>From Idea<br />to Outfit</h2>
-          <div className={styles.processSteps}>
-            {[
-              { num: '01', icon: 'forum',          title: 'Consultation', desc: 'Share your vision, occasion, and deadline. We listen carefully.' },
-              { num: '02', icon: 'straighten',     title: 'Measurements', desc: 'Precise measurements taken for a flawless custom fit.' },
-              { num: '03', icon: 'content_cut',    title: 'Crafting',     desc: 'Every stitch placed with intention, skill, and care.' },
-              { num: '04', icon: 'local_shipping', title: 'Delivery',     desc: turnaround ? `${turnaround}. Your bespoke garment, delivered to perfection.` : 'Your bespoke garment, delivered to perfection.' },
-            ].map(step => (
-              <div key={step.num} className={styles.processStep}>
-                <div className={styles.processNumWrap}>
-                  <span className={styles.processNum}>{step.num}</span>
-                  <span className={`mi ${styles.processIcon}`}>{step.icon}</span>
-                </div>
-                <div className={styles.processLine} />
-                <div>
-                  <p className={styles.processStepTitle}>{step.title}</p>
-                  <p className={styles.processStepDesc}>{step.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      {reviews.length > 0 && (
-        <section className={styles.testimonials}>
-          <div className={styles.testimonialsInner}>
-            <p className={styles.sectionEyebrow} style={{ color: accentColour }}>04 — Testimonials</p>
-            <h2 className={styles.testimonialsTitle}>What Clients Say</h2>
-            <div className={styles.testimonialsGrid}>
-              {reviews.map(r => (
-                <div key={r.id} className={styles.testimonialCard}>
-                  <div className={styles.testimonialStars}>
-                    {[1,2,3,4,5].map(n => (
-                      <span
-                        key={n}
-                        className="material-icons"
-                        style={{ fontSize: '0.9rem', color: n <= r.rating ? '#f59e0b' : 'var(--border)' }}
-                      >star</span>
-                    ))}
-                  </div>
-                  <p className={styles.testimonialText}>"{r.review}"</p>
-                  <div className={styles.testimonialAuthor}>
-                    <div className={styles.testimonialAvatar}>
-                      {(r.customerName || '?').charAt(0).toUpperCase()}
-                    </div>
-                    <span className={styles.testimonialName}>{r.customerName}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── BOOK CTA ── */}
-      <section className={styles.bookSection} ref={bookRef}>
-        {footerPhoto ? (
-          <div className={styles.bookBgWrap}>
-            <img src={footerPhoto.src || footerPhoto.storageUrl} alt="" className={styles.bookBgImg} />
-            <div className={styles.bookBgOverlay} />
-          </div>
-        ) : <div className={styles.bookBgFallback} />}
-        <div className={styles.bookContent}>
-          <p className={styles.sectionEyebrow} style={{ color: '#888' }}>05 — Book</p>
-          <h2 className={styles.bookTitle}>Ready for<br />something<br />extraordinary?</h2>
-          <p className={styles.bookSub}>Every garment is made to order.<br />Let's create yours.</p>
-          {turnaround && (
-            <p className={styles.bookTurnaround}>
-              <span className="material-icons" style={{ fontSize: '0.85rem', verticalAlign: 'middle', marginRight: 6 }}>schedule</span>
-              {turnaround}
-            </p>
-          )}
-          <button
-            className={styles.bookCta}
-            onClick={() => setBookingOpen(true)}
-            style={{ background: accentColour, color: accentText }}
-          >
-            Place Your Order
-          </button>
-          <div className={styles.bookContacts}>
-            {brand.brandPhone && (
-              <a href={`tel:${brand.brandPhone}`} className={styles.bookContact}>
-                <span className="mi" style={{ fontSize: '0.9rem' }}>call</span>{brand.brandPhone}
-              </a>
-            )}
-            {brand.brandEmail && (
-              <a href={`mailto:${brand.brandEmail}`} className={styles.bookContact}>
-                <span className="mi" style={{ fontSize: '0.9rem' }}>mail</span>{brand.brandEmail}
-              </a>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FOOTER ── */}
-      <footer className={styles.footer}>
-        {/* Top: brand name + tagline + socials */}
-        <div className={styles.footerTop}>
-          <div className={styles.footerBrandBlock}>
-            <p className={styles.footerBrand}>{brandName}</p>
-            {tagline && <p className={styles.footerTagline}>{tagline}</p>}
-            {foundedYear && <p className={styles.footerFounded}>Crafting since {foundedYear}</p>}
-          </div>
-          {brand.brandPhone && (
-            <div className={styles.footerSocials}>
-              <a
-                href={`https://wa.me/${brand.brandPhone.replace(/\D/g,'')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.footerSocialIcon}
-                aria-label="WhatsApp"
-              >
-                {WA_SVG}
-              </a>
-              {(brand.brandSocials || []).map((s, i) => (
-                <a
-                  key={i}
-                  href={buildSocialUrl(s.platform, s.handle)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.footerSocialIcon}
-                  aria-label={s.platform}
-                >
-                  <SocialIcon platform={s.platform} />
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className={styles.footerDivider} />
-
-        {/* Mid: contact info + quick links in columns */}
-        <div className={styles.footerCols}>
-          <div className={styles.footerCol}>
-            <p className={styles.footerColLabel}>Contact</p>
-            {brand.brandAddress && (
-              <div className={styles.footerColRow}>
-                <span className="material-icons" style={{ fontSize: '0.85rem', flexShrink: 0 }}>location_on</span>
-                <span>{brand.brandAddress}</span>
-              </div>
-            )}
-            {brand.brandEmail && (
-              <a href={`mailto:${brand.brandEmail}`} className={styles.footerColRow}>
-                <span className="material-icons" style={{ fontSize: '0.85rem', flexShrink: 0 }}>mail</span>
-                <span>{brand.brandEmail}</span>
-              </a>
-            )}
-            {brand.brandPhone && (
-              <a href={`tel:${brand.brandPhone}`} className={styles.footerColRow}>
-                <span className="material-icons" style={{ fontSize: '0.85rem', flexShrink: 0 }}>call</span>
-                <span>{brand.brandPhone}</span>
-              </a>
-            )}
-          </div>
-          <div className={styles.footerCol}>
-            <p className={styles.footerColLabel}>Quick Links</p>
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={styles.footerColLink}>Home</button>
-            {aboutRef.current && <button onClick={() => scrollTo(aboutRef)} className={styles.footerColLink}>About</button>}
-            {worksRef.current && <button onClick={() => scrollTo(worksRef)} className={styles.footerColLink}>Portfolio</button>}
-            {bookRef.current  && <button onClick={() => scrollTo(bookRef)}  className={styles.footerColLink}>Book</button>}
-          </div>
-        </div>
-
-        <div className={styles.footerDivider} />
-
-        {/* Bottom: copyright + powered by */}
-        <div className={styles.footerBottom}>
-          <div className={styles.footerPoweredRow}>
-            <p className={styles.footerPowered}>{brandName} © {new Date().getFullYear()} · Powered by TailorFlow</p>
-          </div>
-        </div>
-      </footer>
-
-      {lightbox && <Lightbox photo={lightbox} photos={filteredPhotos} onClose={() => setLightbox(null)} />}
-      <BookingSheet
-        isOpen={bookingOpen}
-        onClose={() => setBookingOpen(false)}
-        brandName={brandName}
-        brandEmail={brand.brandEmail}
-        brandPhone={brand.brandPhone}
-        accentColour={accentColour}
-        accentText={accentText}
+      <ConfirmSheet
+        open={logoutConfirm}
+        title="Log Out?"
+        onConfirm={handleLogout}
+        onCancel={() => setLogoutConfirm(false)}
       />
+      <Toast message={toastMsg} />
     </div>
   )
 }
