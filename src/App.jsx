@@ -61,7 +61,7 @@ export default function App() {
       {/* ── Public routes (no auth) ── */}
       <Route path="/login"            element={<Login />} />
       <Route path="/signup"           element={<Signup />} />
-      <Route path="/portfolio/:uid"   element={<Portfolio />} />  {/* ← NEW */}
+      <Route path="/portfolio/:handle" element={<Portfolio />} />  {/* slug or legacy uid */}
 
       {/* ── Protected routes ── */}
       <Route
