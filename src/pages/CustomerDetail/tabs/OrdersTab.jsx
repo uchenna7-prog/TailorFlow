@@ -480,51 +480,6 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           </div>
         )}
 
-        {/* Change Status */}
-        <div className={styles.linkedSection}>
-          <div className={styles.linkLabel}>Change Status</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {STATUSES.map(s => (
-              <button
-                key={s.value}
-                className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`}
-                onClick={() => onStatusChange(order.id, s.value)}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Change Stage */}
-        <div className={styles.linkedSection}>
-          <div className={styles.linkLabel}>Change Stage</div>
-          <div className={styles.stageChipRow}>
-            {STAGES.map(s => (
-              <button
-                key={s.value}
-                className={`${styles.stageChip} ${order.stage === s.value ? styles.stageChipActive : ''}`}
-                onClick={() => onStageChange(order.id, order.stage === s.value ? null : s.value)}
-              >
-                <span className="mi" style={{ fontSize: '0.85rem' }}>{s.icon}</span>
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Share Review Link — only when completed or delivered */}
-        {(order.status === 'completed' || order.status === 'delivered') && (
-          <button
-            className={styles.shareReviewBtn}
-            onClick={() => onShareReviewLink(order)}
-          >
-            <span className="material-icons" style={{ fontSize: '1.15rem' }}>rate_review</span>
-            Share Review Link Via WhatsApp 
-            <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto', color: '#22c55e' }}>open_in_new</span>
-          </button>
-        )}
-
         {/* Notes */}
         {order.notes && (
           <div className={styles.notesSection}>
@@ -549,6 +504,51 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           <span className="material-icons" style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: 6 }}>receipt_long</span>
           Generate Invoice
         </button>
+
+        {/* Change Stage */}
+        <div className={styles.linkedSection} style={{ marginTop: 16 }}>
+          <div className={styles.linkLabel}>Change Stage</div>
+          <div className={styles.stageChipRow}>
+            {STAGES.map(s => (
+              <button
+                key={s.value}
+                className={`${styles.stageChip} ${order.stage === s.value ? styles.stageChipActive : ''}`}
+                onClick={() => onStageChange(order.id, order.stage === s.value ? null : s.value)}
+              >
+                <span className="mi" style={{ fontSize: '0.85rem' }}>{s.icon}</span>
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Change Status */}
+        <div className={styles.linkedSection}>
+          <div className={styles.linkLabel}>Change Status</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {STATUSES.map(s => (
+              <button
+                key={s.value}
+                className={`${styles.statusToggleBtn} ${order.status === s.value ? styles.statusActive : ''}`}
+                onClick={() => onStatusChange(order.id, s.value)}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Share Review Link — only when completed or delivered */}
+        {(order.status === 'completed' || order.status === 'delivered') && (
+          <button
+            className={styles.shareReviewBtn}
+            onClick={() => onShareReviewLink(order)}
+          >
+            <span className="material-icons" style={{ fontSize: '1.15rem' }}>rate_review</span>
+            Share Review Link via WhatsApp
+            <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 'auto', color: '#22c55e' }}>open_in_new</span>
+          </button>
+        )}
       </div>
     </div>
   )
