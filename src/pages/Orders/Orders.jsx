@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import Header from '../../components/Header/Header'
 import styles from './Orders.module.css'
 import { useOrders } from '../../contexts/OrdersContext'
+import { useAuth }   from '../../contexts/AuthContext'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -125,6 +126,7 @@ const STAGE_TO_STATUS = {
 
 function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
   const { updateOrderStatus, updateOrderStage, updateOrder, deleteOrder } = useOrders()
+  const { user } = useAuth()
 
   const [localOrder,    setLocalOrder]    = useState(order)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -183,7 +185,7 @@ function OrderDetailPanel({ order, onClose, onGoToCustomer }) {
 
   const handleShareReviewLink = () => {
     const token      = localOrder.reviewToken || crypto.randomUUID()
-    const reviewUrl  = `https://YOUR_DOMAIN/review/${token}`
+    const reviewUrl  = `https://YOUR_DOMAIN/review/${user?.uid}/${token}`
     const name       = localOrder.customerName || 'there'
     const message    = encodeURIComponent(
       `Hi ${name}! 🙏 Thank you for your order.\n\n` +
