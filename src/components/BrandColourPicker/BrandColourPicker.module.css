@@ -59,16 +59,20 @@
   transform: scaleX(1);
 }
 
-/* ── Swatches grid ── */
+/* ── Swatches horizontal scroll ── */
 .swatches {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  gap: 4px;
   padding: 16px 12px;
   background: var(--bg);
 }
+.swatches::-webkit-scrollbar { display: none; }
 
 .swatch {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -80,6 +84,7 @@
   border-radius: 12px;
   transition: background 0.15s;
   -webkit-tap-highlight-color: transparent;
+  min-width: 64px; /* Ensures consistent width for scroll items */
 }
 .swatch:active {
   background: var(--surface);
