@@ -243,9 +243,9 @@ export default function Portfolio() {
   }, [resolvedUid])
 
   // Inject all brand CSS variable tokens onto the page element.
-  // brand.brandColour is a colour ID like "classic-deep-gold".
+  // brand.brandColourId is a palette ID like "classic-deep-gold".
   // All colour references in the CSS use var(--brand-*) — nothing hardcoded.
-  useBrandTokens(brand?.brandColour, pageRef)
+  useBrandTokens(brand?.brandColourId, pageRef)
 
   useEffect(() => {
     if (!resolvedUid) return
@@ -390,41 +390,22 @@ export default function Portfolio() {
           {styleStatement && <p className={styles.heroStyleStatement}>"{styleStatement}"</p>}
           <div className={styles.heroCtas}>
             <button className={styles.heroPrimary} onClick={() => setBookingOpen(true)}>Place an Order</button>
-            <button className={styles.heroSecondary} onClick={() => scrollTo(worksRef)}>
-              View Works <span className="material-icons" style={{ fontSize: '1rem', marginLeft: 6 }}>arrow_downward</span>
-            </button>
+            <button className={styles.heroSecondary} onClick={() => scrollTo(worksRef)}>View Works</button>
           </div>
-          {availability === 'open' && (
-            <div className={styles.availBadge}>
-              <span className={styles.availDot} />
-              <span className={styles.availText}>{availableUntil ? `Taking orders until ${availableUntil}` : 'Currently taking orders'}</span>
-            </div>
-          )}
-          {availability === 'busy' && availableUntil && (
-            <div className={styles.availBadge}>
-              <span className={styles.availDotBusy} />
-              <span className={styles.availText}>Fully booked until {availableUntil}</span>
-            </div>
-          )}
-        </div>
-        <div className={styles.heroScroll}>
-          <span className={styles.heroScrollLine} />
-          <span className={styles.heroScrollText}>Scroll</span>
+          {availability === 'open'
+            ? <span className={styles.heroAvailBadge}><span className={styles.heroDot} />Available for orders</span>
+            : <span className={`${styles.heroAvailBadge} ${styles.heroAvailBadgeBooked}`}>
+                <span className={`${styles.heroDot} ${styles.heroDotBooked}`} />
+                {availableUntil ? `Booked until ${new Date(availableUntil).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}` : 'Currently booked'}
+              </span>
+          }
         </div>
       </section>
 
-      {/* ── STATS STRIP ── */}
-      <div className={styles.statsStrip}>
-        <div className={styles.statItem}>
-          <span className={styles.statNum}>{statGarments}</span>
-          <span className={styles.statLabel}>Garments Delivered</span>
-        </div>
-        <div className={styles.statDivider} />
-        <div className={styles.statItem}>
-          <span className={styles.statNum}>{dressTypes.length || '—'}</span>
-          <span className={styles.statLabel}>Specialties</span>
-        </div>
-        <div className={styles.statDivider} />
+      {/* ── STATS BAR ── */}
+      <div className={styles.statsBar}>
+        <div className={styles.statItem}><span className={styles.statNum}>{statGarments}</span><span className={styles.statLabel}>Garments Made</span></div>
+        {serviceArea && <div className={styles.statItem}><span className={styles.statNum}>{serviceArea}</span><span className={styles.statLabel}>Service Area</span></div>}
         {foundedYear
           ? <div className={styles.statItem}><span className={styles.statNum}>{new Date().getFullYear() - parseInt(foundedYear)}+</span><span className={styles.statLabel}>Years Crafting</span></div>
           : <div className={styles.statItem}><span className={styles.statIcon + ' mi'}>verified</span><span className={styles.statLabel}>Bespoke Only</span></div>
