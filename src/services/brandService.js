@@ -1,6 +1,13 @@
 // src/services/brandService.js
 // Syncs brand/settings data to Firestore so the public portfolio page can read it.
 // Data path: users/{uid}/publicProfile/brand
+//
+// NOTE: brandLogo is intentionally excluded from Firestore writes.
+// Base64 logos easily exceed Firestore's 1MB document limit and cause
+// the entire setDoc to fail silently. The logo is kept in localStorage
+// only (via SettingsContext) and is not needed by the public Portfolio page
+// since Portfolio reads it from the brand doc — if you want logo on portfolio,
+// upload it to Firebase Storage instead and store the download URL.
 
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase'
@@ -20,9 +27,11 @@ export async function saveBrandToFirestore(uid, settings) {
     // ── Core brand ──
     brandName:      settings.brandName      || '',
     brandTagline:   settings.brandTagline   || '',
-    brandColourId:  settings.brandColourId  || DEFAULT_COLOUR_ID,  // ← palette ID for Portfolio
-    brandColour:    settings.brandColour    || '#D4AF37',           // ← hex fallback for invoices
-    brandLogo:      settings.brandLogo      || null,
+    brandColourId:  settings.brandColourId  || DEFAULT_COLOUR_ID,
+    brandColour:    settings.brandColour    || '#D4AF37',
+    // brandLogo intentionally omitted — base64 strings exceed Firestore's
+    // 1MB document limit and cause the entire write to fail.
+    // Store logo via Firebase Storage and save the download URL instead.
     brandPhone:     settings.brandPhone     || '',
     brandEmail:     settings.brandEmail     || '',
     brandAddress:   settings.brandAddress   || '',
