@@ -1,11 +1,13 @@
 // src/pages/Profile/Profile.jsx
 // ─────────────────────────────────────────────────────────────
-// Changes from original:
-//  • BrandModal now uses <BrandColourPicker> instead of
-//    <input type="color"> + hex TextInput
-//  • brandColourId is now stored as a colour ID (e.g. "classic-deep-gold")
-//    instead of a raw hex string, under the key brandColourId
-//  • brandColourDot in the profile preview resolves the ID to a hex
+// Changes:
+//  • BrandModal logo upload now uses Firebase Storage.
+//    The file is uploaded to users/{uid}/brandLogo, and the
+//    download URL (a short https:// string) is stored in
+//    settings.brandLogo instead of a base64 string.
+//    This prevents the Firestore 1MB document limit error.
+//  • BrandColourPicker replaces raw <input type="color">
+//  • brandColourId stored as palette ID, brandColour as hex fallback
 // ─────────────────────────────────────────────────────────────
 
 import { useState, useRef, useCallback } from 'react'
@@ -13,6 +15,8 @@ import { useNavigate } from 'react-router-dom'
 import { useSettings } from '../../contexts/SettingsContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { updateProfile } from 'firebase/auth'
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
+import { storage } from '../../firebase'
 import Header from '../../components/Header/Header'
 import Toast from '../../components/Toast/Toast'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
@@ -217,17 +221,17 @@ function PersonalModal({ personal, onBack, onSave, authUser }) {
 
 function BrandModal({ onBack, showToast }) {
   const { settings, updateMany } = useSettings()
+  const { user } = useAuth()
   const logoInputRef = useRef()
+  const [logoUploading, setLogoUploading] = useState(false)
 
   const [local, setLocal] = useState({
     brandName:      settings.brandName      || '',
     brandTagline:   settings.brandTagline   || '',
-    // ── Read from brandColourId (the palette key). If not set yet,
-    //    fall back gracefully: if old brandColour looks like a hex ignore it,
-    //    otherwise treat it as a legacy ID. Final fallback: DEFAULT_COLOUR_ID.
-    brandColourId:  settings.brandColourId
-                      || (settings.brandColour && !settings.brandColour.startsWith('#') ? settings.brandColour : null)
-                      || DEFAULT_COLOUR_ID,
+    // brandColourId: use stored ID. If somehow a hex crept in, reset to default.
+    brandColourId:  (settings.brandColourId && !settings.brandColourId.startsWith('#'))
+                      ? settings.brandColourId
+                      : DEFAULT_COLOUR_ID,
     brandLogo:      settings.brandLogo      || null,
     brandPhone:     settings.brandPhone     || '',
     brandEmail:     settings.brandEmail     || '',
@@ -237,17 +241,35 @@ function BrandModal({ onBack, showToast }) {
 
   const set = key => val => setLocal(p => ({ ...p, [key]: val }))
 
-  const handleLogoChange = useCallback(e => {
+  // ── Upload logo to Firebase Storage, store download URL ──────
+  const handleLogoChange = useCallback(async e => {
     const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => setLocal(p => ({ ...p, brandLogo: ev.target.result }))
-    reader.readAsDataURL(file)
-  }, [])
+    if (!file || !user?.uid) return
+    setLogoUploading(true)
+    try {
+      const storageRef = ref(storage, `users/${user.uid}/brandLogo`)
+      await uploadBytes(storageRef, file)
+      const url = await getDownloadURL(storageRef)
+      setLocal(p => ({ ...p, brandLogo: url }))
+    } catch (err) {
+      console.error('[BrandModal] logo upload failed:', err)
+      showToast('Logo upload failed — try again')
+    } finally {
+      setLogoUploading(false)
+    }
+  }, [user?.uid, showToast])
+
+  // ── Delete logo from Firebase Storage and clear from settings ─
+  const handleLogoRemove = useCallback(async () => {
+    if (!user?.uid) return
+    setLocal(p => ({ ...p, brandLogo: null }))
+    try {
+      const storageRef = ref(storage, `users/${user.uid}/brandLogo`)
+      await deleteObject(storageRef)
+    } catch { /* file may not exist — ignore */ }
+  }, [user?.uid])
 
   const save = () => {
-    // Also derive and save brandColour hex so legacy invoice templates
-    // that still reference settings.brandColour continue to work
     const entry = getColourById(local.brandColourId)
     updateMany({
       ...local,
@@ -258,17 +280,22 @@ function BrandModal({ onBack, showToast }) {
   }
 
   return (
-    <FullModal title="Brand Identity" onBack={onBack} onSave={save}>
+    <FullModal title="Brand Identity" onBack={onBack} onSave={logoUploading ? undefined : save}>
 
       {/* Logo */}
       <FieldGroup>
-        <Field label="Brand Logo" hint="PNG or JPG. Appears on invoice headers. Ideally square.">
-          {local.brandLogo ? (
+        <Field label="Brand Logo" hint="PNG or JPG. Appears on invoice headers and portfolio. Ideally square.">
+          {logoUploading ? (
+            <div className={styles.logoUploadBtn} style={{ opacity: 0.6, pointerEvents: 'none' }}>
+              <span className="mi">hourglass_top</span>
+              Uploading…
+            </div>
+          ) : local.brandLogo ? (
             <div className={styles.logoPreviewWrap}>
               <img src={local.brandLogo} alt="Brand logo" className={styles.logoPreview} />
               <button
                 className={styles.logoRemove}
-                onClick={() => setLocal(p => ({ ...p, brandLogo: null }))}
+                onClick={handleLogoRemove}
               >
                 <span className="mi" style={{ fontSize: 15 }}>close</span> Remove
               </button>
@@ -728,7 +755,6 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
                 <div className={styles.brandPreviewTagline}>{settings.brandTagline}</div>
               )}
             </div>
-            {/* Resolved hex dot from brandColourId */}
             {brandColourHex && (
               <div className={styles.brandColourDot} style={{ background: brandColourHex }} />
             )}
