@@ -1,3 +1,13 @@
+// src/pages/Profile/Profile.jsx
+// ─────────────────────────────────────────────────────────────
+// Changes from original:
+//  • BrandModal now uses <BrandColourPicker> instead of
+//    <input type="color"> + hex TextInput
+//  • brandColour is now stored as a colour ID (e.g. "classic-deep-gold")
+//    instead of a raw hex string
+//  • brandColourDot in the profile preview resolves the ID to a hex
+// ─────────────────────────────────────────────────────────────
+
 import { useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSettings } from '../../contexts/SettingsContext'
@@ -6,6 +16,8 @@ import { updateProfile } from 'firebase/auth'
 import Header from '../../components/Header/Header'
 import Toast from '../../components/Toast/Toast'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
+import BrandColourPicker from '../../components/BrandColourPicker/BrandColourPicker'
+import { getColourById, DEFAULT_COLOUR_ID } from '../../config/brandPalette'
 import styles from './Profile.module.css'
 
 // ─────────────────────────────────────────────────────────────
@@ -65,11 +77,11 @@ function TappableRow({ icon, label, sub, value, onClick, chevron = true, divider
 function FullModal({ title, onBack, onSave, children }) {
   return (
     <div className={styles.fullOverlay}>
-      <Header 
-        type="back" 
-        title={title} 
-        onBackClick={onBack} 
-        customActions={onSave ? [{ label: 'Save', onClick: onSave }] : []} 
+      <Header
+        type="back"
+        title={title}
+        onBackClick={onBack}
+        customActions={onSave ? [{ label: 'Save', onClick: onSave }] : []}
       />
       <div className={styles.fullContent}>
         <div className={styles.fullContentInner}>
@@ -208,14 +220,18 @@ function BrandModal({ onBack, showToast }) {
   const logoInputRef = useRef()
 
   const [local, setLocal] = useState({
-    brandName:    settings.brandName,
-    brandTagline: settings.brandTagline,
-    brandColour:  settings.brandColour,
-    brandLogo:    settings.brandLogo,
-    brandPhone:   settings.brandPhone,
-    brandEmail:   settings.brandEmail,
-    brandAddress: settings.brandAddress,
-    brandWebsite: settings.brandWebsite,
+    brandName:    settings.brandName    || '',
+    brandTagline: settings.brandTagline || '',
+    // brandColour is now a colour ID, not a hex string
+    // Fall back to DEFAULT_COLOUR_ID if the stored value looks like an old hex
+    brandColour:  (settings.brandColour && !settings.brandColour.startsWith('#'))
+                    ? settings.brandColour
+                    : DEFAULT_COLOUR_ID,
+    brandLogo:    settings.brandLogo    || null,
+    brandPhone:   settings.brandPhone   || '',
+    brandEmail:   settings.brandEmail   || '',
+    brandAddress: settings.brandAddress || '',
+    brandWebsite: settings.brandWebsite || '',
   })
 
   const set = key => val => setLocal(p => ({ ...p, [key]: val }))
@@ -236,6 +252,8 @@ function BrandModal({ onBack, showToast }) {
 
   return (
     <FullModal title="Brand Identity" onBack={onBack} onSave={save}>
+
+      {/* Logo */}
       <FieldGroup>
         <Field label="Brand Logo" hint="PNG or JPG. Appears on invoice headers. Ideally square.">
           {local.brandLogo ? (
@@ -264,6 +282,7 @@ function BrandModal({ onBack, showToast }) {
         </Field>
       </FieldGroup>
 
+      {/* Name + tagline */}
       <FieldGroup>
         <Field label="Shop / Brand Name">
           <TextInput value={local.brandName} onChange={set('brandName')} placeholder="e.g. Stitched by Amara" />
@@ -271,19 +290,22 @@ function BrandModal({ onBack, showToast }) {
         <Field label="Tagline" hint="Short line shown under your name on coloured invoice templates.">
           <TextInput value={local.brandTagline} onChange={set('brandTagline')} placeholder="e.g. Crafted with love, fitted for you" />
         </Field>
-        <Field label="Brand Colour">
-          <div className={styles.colourRow}>
-            <input
-              type="color"
-              className={styles.colourPicker}
-              value={local.brandColour}
-              onChange={e => set('brandColour')(e.target.value)}
-            />
-            <TextInput value={local.brandColour} onChange={set('brandColour')} placeholder="#D4AF37" />
-          </div>
+      </FieldGroup>
+
+      {/* Brand Colour — replaced raw picker with curated picker */}
+      <FieldGroup>
+        <Field
+          label="Brand Colour"
+          hint="Choose your brand colour. We've curated shades that look great on your portfolio and invoices."
+        >
+          <BrandColourPicker
+            value={local.brandColour}
+            onChange={set('brandColour')}
+          />
         </Field>
       </FieldGroup>
 
+      {/* Contact */}
       <FieldGroup>
         <Field label="Business Phone">
           <TextInput value={local.brandPhone} onChange={set('brandPhone')} placeholder="+234 800 000 0000" type="tel" />
@@ -298,6 +320,7 @@ function BrandModal({ onBack, showToast }) {
           <TextInput value={local.brandWebsite} onChange={set('brandWebsite')} placeholder="instagram.com/yourbrand" />
         </Field>
       </FieldGroup>
+
     </FullModal>
   )
 }
@@ -327,26 +350,13 @@ function AccountDetailsModal({ onBack, showToast }) {
     <FullModal title="Account Details" onBack={onBack} onSave={save}>
       <FieldGroup>
         <Field label="Bank Name" hint="e.g. GTBank, Access, OPay">
-          <TextInput
-            value={local.accountBank}
-            onChange={set('accountBank')}
-            placeholder="e.g. GTBank"
-          />
+          <TextInput value={local.accountBank} onChange={set('accountBank')} placeholder="e.g. GTBank" />
         </Field>
         <Field label="Account Number">
-          <TextInput
-            value={local.accountNumber}
-            onChange={set('accountNumber')}
-            placeholder="e.g. 0123456789"
-            type="tel"
-          />
+          <TextInput value={local.accountNumber} onChange={set('accountNumber')} placeholder="e.g. 0123456789" type="tel" />
         </Field>
         <Field label="Account Name" hint="Name registered on the bank account">
-          <TextInput
-            value={local.accountName}
-            onChange={set('accountName')}
-            placeholder="e.g. Amara Okonkwo"
-          />
+          <TextInput value={local.accountName} onChange={set('accountName')} placeholder="e.g. Amara Okonkwo" />
         </Field>
       </FieldGroup>
     </FullModal>
@@ -414,7 +424,6 @@ function BusinessInfoModal({ onBack, showToast }) {
   return (
     <FullModal title="Business Info" onBack={onBack} onSave={save}>
 
-      {/* Availability */}
       <FieldGroup>
         <Field label="Availability" hint="Clients will see this on your portfolio.">
           <div className={styles.availabilityRow}>
@@ -438,36 +447,20 @@ function BusinessInfoModal({ onBack, showToast }) {
         </Field>
         {local.brandAvailability === 'booked' && (
           <Field label="Available again from" hint="Optional — lets clients know when to check back.">
-            <TextInput
-              type="date"
-              value={local.brandAvailableUntil}
-              onChange={set('brandAvailableUntil')}
-              placeholder=""
-            />
+            <TextInput type="date" value={local.brandAvailableUntil} onChange={set('brandAvailableUntil')} placeholder="" />
           </Field>
         )}
       </FieldGroup>
 
-      {/* Business history */}
       <FieldGroup>
         <Field label="Year Founded" hint="e.g. 2018 — shown as 'Crafting since 2018'">
-          <TextInput
-            value={local.brandFoundedYear}
-            onChange={set('brandFoundedYear')}
-            placeholder="e.g. 2018"
-            type="tel"
-          />
+          <TextInput value={local.brandFoundedYear} onChange={set('brandFoundedYear')} placeholder="e.g. 2018" type="tel" />
         </Field>
         <Field label="Client Milestone" hint="e.g. 200+ garments delivered">
-          <TextInput
-            value={local.brandMilestone}
-            onChange={set('brandMilestone')}
-            placeholder="e.g. 200+ garments delivered"
-          />
+          <TextInput value={local.brandMilestone} onChange={set('brandMilestone')} placeholder="e.g. 200+ garments delivered" />
         </Field>
       </FieldGroup>
 
-      {/* Style & operations */}
       <FieldGroup>
         <Field label="Signature Style Statement" hint="One sentence about what makes your work unique. Max 100 characters.">
           <Textarea
@@ -479,29 +472,16 @@ function BusinessInfoModal({ onBack, showToast }) {
           <span className={styles.charCount}>{local.brandStyleStatement.length}/100</span>
         </Field>
         <Field label="Featured Technique" hint="e.g. Hand-embroidered agbada, French-seam finishing">
-          <TextInput
-            value={local.brandFeaturedTechnique}
-            onChange={set('brandFeaturedTechnique')}
-            placeholder="e.g. Hand-embroidered agbada"
-          />
+          <TextInput value={local.brandFeaturedTechnique} onChange={set('brandFeaturedTechnique')} placeholder="e.g. Hand-embroidered agbada" />
         </Field>
       </FieldGroup>
 
-      {/* Turnaround & service area */}
       <FieldGroup>
         <Field label="Standard Turnaround Time">
-          <SelectChips
-            options={TURNAROUND_OPTIONS}
-            value={local.brandTurnaround}
-            onChange={set('brandTurnaround')}
-          />
+          <SelectChips options={TURNAROUND_OPTIONS} value={local.brandTurnaround} onChange={set('brandTurnaround')} />
         </Field>
         <Field label="Service Area">
-          <SelectChips
-            options={SERVICE_AREA_OPTIONS}
-            value={local.brandServiceArea}
-            onChange={set('brandServiceArea')}
-          />
+          <SelectChips options={SERVICE_AREA_OPTIONS} value={local.brandServiceArea} onChange={set('brandServiceArea')} />
         </Field>
       </FieldGroup>
 
@@ -514,31 +494,28 @@ function BusinessInfoModal({ onBack, showToast }) {
 // ─────────────────────────────────────────────────────────────
 
 const SOCIAL_PLATFORMS = [
-  { id: 'instagram', label: 'Instagram',  placeholder: 'yourbrand',         icon: 'photo_camera' },
-  { id: 'tiktok',    label: 'TikTok',     placeholder: 'yourbrand',         icon: 'play_circle'  },
-  { id: 'facebook',  label: 'Facebook',   placeholder: 'yourbrand',         icon: 'groups'       },
-  { id: 'twitter',   label: 'Twitter / X', placeholder: 'yourbrand',        icon: 'tag'          },
-  { id: 'youtube',   label: 'YouTube',    placeholder: 'YourBrandChannel',  icon: 'smart_display'},
-  { id: 'pinterest', label: 'Pinterest',  placeholder: 'yourbrand',         icon: 'push_pin'     },
-  { id: 'threads',   label: 'Threads',    placeholder: 'yourbrand',         icon: 'forum'        },
+  { id: 'instagram', label: 'Instagram',   placeholder: 'yourbrand',        icon: 'photo_camera'  },
+  { id: 'tiktok',    label: 'TikTok',      placeholder: 'yourbrand',        icon: 'play_circle'   },
+  { id: 'facebook',  label: 'Facebook',    placeholder: 'yourbrand',        icon: 'groups'        },
+  { id: 'twitter',   label: 'Twitter / X', placeholder: 'yourbrand',        icon: 'tag'           },
+  { id: 'youtube',   label: 'YouTube',     placeholder: 'YourBrandChannel', icon: 'smart_display' },
+  { id: 'pinterest', label: 'Pinterest',   placeholder: 'yourbrand',        icon: 'push_pin'      },
+  { id: 'threads',   label: 'Threads',     placeholder: 'yourbrand',        icon: 'forum'         },
 ]
 
 function SocialsModal({ onBack, showToast }) {
   const { settings, updateMany } = useSettings()
 
-  // Build a map of platform → handle from saved socials array
   const toMap = arr => Object.fromEntries((arr || []).map(s => [s.platform, s.handle]))
   const [handles, setHandles] = useState(() => toMap(settings.brandSocials || []))
   const [expanded, setExpanded] = useState(() => {
     const active = new Set((settings.brandSocials || []).map(s => s.platform))
-    // Pre-open any already-saved platforms
     return Object.fromEntries(SOCIAL_PLATFORMS.map(p => [p.id, active.has(p.id)]))
   })
 
   const togglePlatform = (id) => {
     setExpanded(prev => {
       const next = { ...prev, [id]: !prev[id] }
-      // Clear handle if collapsing
       if (prev[id]) setHandles(h => { const n = { ...h }; delete n[id]; return n })
       return next
     })
@@ -594,6 +571,10 @@ function SocialsModal({ onBack, showToast }) {
   )
 }
 
+// ─────────────────────────────────────────────────────────────
+// Shared sub-components
+// ─────────────────────────────────────────────────────────────
+
 function PlanBadge({ isPremium }) {
   return (
     <span className={isPremium ? styles.badgePro : styles.badgeFree}>
@@ -646,10 +627,10 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  const [personal,       setPersonal]       = useState(() => loadPersonal(user))
-  const [activeModal,    setActiveModal]     = useState(null)
-  const [logoutConfirm,  setLogoutConfirm]   = useState(false)
-  const [toastMsg,       setToastMsg]        = useState('')
+  const [personal,      setPersonal]      = useState(() => loadPersonal(user))
+  const [activeModal,   setActiveModal]   = useState(null)
+  const [logoutConfirm, setLogoutConfirm] = useState(false)
+  const [toastMsg,      setToastMsg]      = useState('')
   const toastTimer = useRef(null)
 
   const joinDate = getOrSetJoinDate()
@@ -668,6 +649,15 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
 
   const hasBrand = !!(settings.brandName || settings.brandLogo)
   const hasAccountDetails = !!(settings.accountBank || settings.accountNumber)
+
+  // Resolve colour ID → hex for the preview dot
+  const brandColourHex = (() => {
+    const id = settings.brandColour
+    if (!id) return null
+    // Legacy: was stored as raw hex — show it as-is
+    if (id.startsWith('#')) return id
+    return getColourById(id)?.tokens.primary || null
+  })()
 
   return (
     <div className={styles.page}>
@@ -735,8 +725,9 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
                 <div className={styles.brandPreviewTagline}>{settings.brandTagline}</div>
               )}
             </div>
-            {settings.brandColour && (
-              <div className={styles.brandColourDot} style={{ background: settings.brandColour }} />
+            {/* Resolved hex dot */}
+            {brandColourHex && (
+              <div className={styles.brandColourDot} style={{ background: brandColourHex }} />
             )}
           </div>
         ) : (
