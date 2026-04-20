@@ -164,12 +164,12 @@
   max-width: 1100px; margin: 0 auto; height: 60px;
   display: flex; align-items: center; justify-content: space-between;
 }
-/* Brand name uses --brand-primary */
+/* Brand name — same colour as hamburger/text so it reads cleanly in both modes */
 .navBrand {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.15rem; font-weight: 600;
   letter-spacing: 2px; text-transform: uppercase;
-  color: var(--brand-primary);
+  color: var(--text-primary);
 }
 .navLinks { display: none; align-items: center; gap: 6px; }
 .navLinksOpen {
@@ -260,13 +260,8 @@
   position: relative; z-index: 2;
   padding: 0 24px calc(80px + env(safe-area-inset-bottom)); width: 100%;
 }
-/* Eyebrow — brand primary */
-.heroEyebrow {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 0.72rem; font-weight: 400; font-style: italic;
-  letter-spacing: 4px; margin-bottom: 16px;
-  color: var(--brand-primary);
-}
+/* Eyebrow removed — replaced by availability badge inline with hero content */
+.heroEyebrow { display: none; }
 .heroName {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: clamp(2.8rem, 11vw, 5rem); font-weight: 300;
@@ -275,13 +270,13 @@
 }
 .heroTagline {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1rem; font-style: italic; font-weight: 300;
-  color: rgba(255,255,255,0.65); margin-bottom: 12px; line-height: 1.6;
+  font-size: 1.1rem; font-style: italic; font-weight: 400;
+  color: rgba(255,255,255,0.88); margin-bottom: 12px; line-height: 1.6;
 }
 /* Style statement — brand primary italic quote */
 .heroStyleStatement {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1rem; font-style: italic; font-weight: 300;
+  font-size: 1.05rem; font-style: italic; font-weight: 400;
   color: var(--brand-primary); line-height: 1.6;
   margin-bottom: 28px; max-width: 420px;
 }
@@ -307,7 +302,22 @@
 }
 .heroSecondary:active { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
 
-/* Availability badge — semantic green/grey, never brand colour */
+/* Availability badge — sits below CTAs, green dot + text, no background pill */
+.heroAvailBadge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.78rem;
+  font-weight: 500; letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.88);
+}
+.heroAvailBadgeBooked { color: rgba(255,255,255,0.55); }
+.heroDot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #22c55e; flex-shrink: 0;
+  animation: pulse 2s ease infinite;
+  box-shadow: 0 0 6px #22c55e;
+}
+.heroDotBooked { background: #888; box-shadow: none; animation: none; }
+/* Keep old availBadge for any other usage */
 .availBadge {
   display: inline-flex; align-items: center; gap: 8px; margin-top: 4px;
   background: rgba(0,0,0,0.35); backdrop-filter: blur(6px);
@@ -331,7 +341,19 @@
 @keyframes scrollPulse { 0%,100% { opacity: 0.3; transform: scaleY(0.6); } 50% { opacity: 1; transform: scaleY(1); } }
 .heroScrollText { font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.45); font-family: 'DM Sans', sans-serif; }
 
-/* ── STATS STRIP — brand surface background so it reads as a branded band ── */
+/* ── STATS BAR — horizontal strip with vertical bar dividers, big-app style ── */
+.statsBar {
+  background: var(--brand-surface);
+  border-top: 1px solid var(--brand-muted);
+  border-bottom: 1px solid var(--brand-muted);
+  display: flex; align-items: stretch; justify-content: center;
+  padding: 0;
+  overflow: hidden;
+}
+.page:not(.lightMode) .statsBar {
+  background: var(--brand-surface-dark);
+}
+/* Keep old statsStrip as alias in case used elsewhere */
 .statsStrip {
   background: var(--brand-surface);
   border-top: 1px solid var(--brand-muted);
@@ -342,11 +364,25 @@
 .page:not(.lightMode) .statsStrip {
   background: var(--brand-surface-dark);
 }
-.statItem  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.statNum   { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.8rem; font-weight: 300; line-height: 1; color: var(--brand-primary); }
+.statItem {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  padding: 22px 12px;
+  position: relative;
+}
+/* Vertical bar divider between stat items */
+.statItem + .statItem::before {
+  content: '';
+  position: absolute; left: 0; top: 20%; bottom: 20%;
+  width: 1px;
+  background: var(--brand-muted);
+}
+.statNum   { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.65rem; font-weight: 300; line-height: 1; color: var(--brand-primary); }
 .statIcon  { font-size: 1.1rem !important; color: var(--brand-primary); }
-.statLabel { font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); }
-.statDivider { width: 1px; height: 40px; background: var(--brand-muted); flex-shrink: 0; }
+.statLabel { font-size: 0.52rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); text-align: center; }
+/* Keep old statDivider for any explicit divider elements */
+.statDivider { width: 1px; height: 40px; background: var(--brand-muted); flex-shrink: 0; align-self: center; }
 
 /* ── SECTION EYEBROW — brand primary ── */
 .sectionEyebrow {
@@ -372,13 +408,13 @@
   font-style: italic; font-size: 1rem; font-weight: 300;
   color: var(--text-muted); line-height: 1.5; margin: 0;
 }
-/* About card — gradient card bg + glow shadow, top border brand primary */
+/* About card — gradient card bg + subtle glow, top border brand primary */
 .aboutCard {
   background: var(--brand-gradient-card);
   border: 1px solid var(--brand-muted);
   border-top: 2px solid var(--brand-primary);
   border-radius: 16px; padding: 32px 28px;
-  box-shadow: 0 4px 32px var(--brand-glow);
+  box-shadow: 0 2px 12px var(--brand-glow);
 }
 .lightMode .aboutCard {
   background: var(--bg-card);
@@ -436,14 +472,14 @@
   border-radius: 20px; color: var(--brand-primary);
   font-size: 0.62rem; font-weight: 500; letter-spacing: 1.5px;
   text-transform: uppercase; padding: 5px 14px; font-family: 'DM Sans', sans-serif;
-  box-shadow: 0 1px 8px var(--brand-glow);
+  box-shadow: 0 1px 5px var(--brand-glow);
 }
 .page:not(.lightMode) .aboutSpecialtyPill {
   background: var(--brand-surface-dark);
 }
 
 .aboutMeta { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-/* Meta row icons — brand primary */
+/* Meta row icons — brand primary colour */
 .aboutMetaRow {
   display: flex; align-items: center; gap: 10px;
   font-size: 0.8rem; color: var(--text-muted); text-decoration: none;
@@ -462,7 +498,7 @@
   text-decoration: none;
   background: var(--brand-surface);
   transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px var(--brand-glow);
+  box-shadow: 0 1px 6px var(--brand-glow);
 }
 .page:not(.lightMode) .socialIcon {
   background: var(--brand-surface-dark);
@@ -471,7 +507,7 @@
   background: var(--brand-gradient);
   color: var(--brand-on-primary);
   border-color: var(--brand-primary-dark);
-  box-shadow: 0 2px 16px var(--brand-glow);
+  box-shadow: 0 2px 10px var(--brand-glow);
 }
 
 /* ── MARQUEE ── */
@@ -585,7 +621,7 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 0.75rem; font-weight: 300; letter-spacing: 1px;
   color: var(--brand-primary);
-  box-shadow: 0 0 16px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow: 0 0 8px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 /* Dark mode: use the dark brand surface so the circle is visibly distinct from the dark page bg */
 .page:not(.lightMode) .processNumBadge {
@@ -607,22 +643,22 @@
 .testimonialsInner { padding: 0 24px; max-width: 600px; margin: 0 auto; }
 .testimonialsTitle { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2.2rem, 8vw, 3.5rem); font-weight: 300; color: var(--text-primary); margin: 0 0 40px; line-height: 1.1; }
 .testimonialsGrid { display: flex; flex-direction: column; gap: 16px; }
-/* Testimonial card — gradient card bg + glow shadow + top border */
+/* Testimonial card — gradient card bg + subtle glow + top border */
 .testimonialCard {
   background: var(--brand-gradient-card);
   border: 1px solid var(--brand-muted);
   border-top: 2px solid var(--brand-primary);
   border-radius: 16px; padding: 24px 22px;
-  box-shadow: 0 2px 16px var(--brand-glow);
+  box-shadow: 0 2px 10px var(--brand-glow);
 }
 .lightMode .testimonialCard {
   background: var(--bg-card);
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
 }
 .testimonialStars { display: flex; gap: 2px; margin-bottom: 14px; }
-/* Filled star uses brand primary, empty uses border colour */
+/* Stars are always amber/yellow — never brand colour */
 .star        { font-size: 0.9rem !important; color: var(--border); }
-.starFilled  { color: var(--brand-primary) !important; }
+.starFilled  { color: #f59e0b !important; }
 .testimonialText { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 1.05rem; color: var(--text-body); line-height: 1.75; margin: 0 0 18px; }
 .testimonialAuthor { display: flex; align-items: center; gap: 10px; padding-top: 16px; border-top: 1px solid var(--brand-muted); }
 /* Avatar — brand gradient background + on-primary text + glow */
@@ -635,7 +671,7 @@
   font-size: 1rem;
   color: var(--brand-on-primary);
   flex-shrink: 0;
-  box-shadow: 0 2px 10px var(--brand-glow);
+  box-shadow: 0 1px 6px var(--brand-glow);
 }
 .testimonialName { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; }
 
@@ -695,24 +731,25 @@
   color: var(--brand-primary);
   text-decoration: none;
   transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px var(--brand-glow);
+  box-shadow: 0 1px 6px var(--brand-glow);
 }
 .footerSocialIcon:hover {
   background: var(--brand-gradient);
   color: var(--brand-on-primary);
   border-color: var(--brand-primary-dark);
-  box-shadow: 0 2px 16px var(--brand-glow);
+  box-shadow: 0 2px 10px var(--brand-glow);
 }
 /* Footer divider — brand muted tint */
 .footerDivider      { height: 1px; background: var(--brand-muted); margin-bottom: 24px; }
 .footerDividerFaint { height: 1px; background: rgba(255,255,255,0.05); margin-bottom: 24px; }
 .footerCols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; }
 .footerCol  { display: flex; flex-direction: column; gap: 10px; }
-/* Footer column labels — brand primary */
-.footerColLabel { font-family: 'DM Sans', sans-serif; font-size: 0.58rem; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 4px; color: var(--brand-primary); }
+/* Footer column labels — brand primary, nowrap so they stay on one line */
+.footerColLabel { font-family: 'DM Sans', sans-serif; font-size: 0.58rem; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 4px; color: var(--brand-primary); white-space: nowrap; }
 .footerColRow { display: flex; align-items: flex-start; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; color: var(--footer-link); text-decoration: none; line-height: 1.5; transition: color 0.2s; }
 .footerColRow:hover { color: var(--footer-link-hover); }
-.footerColRow .material-icons { color: var(--brand-primary); opacity: 0.6; margin-top: 1px; }
+/* Footer contact icons — brand primary colour at full opacity */
+.footerColRow .material-icons { color: var(--brand-primary); margin-top: 1px; font-size: 0.95rem; }
 .footerColLink { background: none; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; color: var(--footer-link); cursor: pointer; padding: 0; text-align: left; transition: color 0.2s; }
 .footerColLink:hover { color: var(--footer-link-hover); }
 .footerBottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
@@ -730,7 +767,7 @@
   max-height: 92dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
   transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
   padding-bottom: env(safe-area-inset-bottom);
-  box-shadow: 0 -4px 40px var(--brand-glow);
+  box-shadow: 0 -2px 20px var(--brand-glow);
 }
 .bookingDrawerVisible { transform: translateY(0); }
 /* Handle — neutral, not brand coloured */
