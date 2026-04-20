@@ -219,7 +219,6 @@ export default function Portfolio() {
   const bookRef         = useRef(null)
   const heroRef         = useRef(null)
   const filterScrollRef = useRef(null)
-  // pageRef is the injection target for useBrandTokens
   const pageRef         = useRef(null)
 
   useEffect(() => {
@@ -242,10 +241,10 @@ export default function Portfolio() {
       .finally(() => setLoading(false))
   }, [resolvedUid])
 
-  // Inject all brand CSS variable tokens onto the page element.
-  // brand.brandColourId is a palette ID like "classic-deep-gold".
-  // All colour references in the CSS use var(--brand-*) — nothing hardcoded.
-  useBrandTokens(brand?.brandColourId, pageRef)
+  // Inject brand CSS variable tokens onto :root so all CSS var(--brand-*)
+  // references work regardless of where in the tree they appear.
+  // No ref passed — defaults to document.documentElement, no cleanup on unmount.
+  useBrandTokens(brand?.brandColourId)
 
   useEffect(() => {
     if (!resolvedUid) return
