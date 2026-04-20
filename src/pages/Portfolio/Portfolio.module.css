@@ -7,8 +7,8 @@
  *   --brand-primary-light  lighter tint
  *   --brand-primary-dark   darker shade
  *   --brand-on-primary     text on brand bg (auto black or white)
- *   --brand-gradient       diagonal gradient
- *   --brand-gradient-card  subtle card bg gradient
+ *   --brand-gradient       diagonal gradient (used on badges, CTAs, filled elements)
+ *   --brand-gradient-card  subtle card bg gradient (used on card backgrounds)
  *   --brand-surface        faint tint for light mode surfaces
  *   --brand-surface-dark   tinted dark bg for dark mode cards
  *   --brand-muted          low-opacity for borders / dividers
@@ -216,12 +216,13 @@
 .themeToggleDesktop:hover { background: var(--bg-deep); color: var(--text-primary); }
 /* Nav CTA — brand gradient background */
 .navCta {
-  background: var(--brand-primary);
+  background: var(--brand-gradient);
   color: var(--brand-on-primary);
   border: none; border-radius: 6px;
   font-family: 'DM Sans', sans-serif; font-size: 0.65rem;
   font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
   padding: 9px 18px; cursor: pointer; margin-top: 8px; transition: opacity 0.2s;
+  box-shadow: 0 2px 12px var(--brand-glow);
 }
 .navCta:active { opacity: 0.8; }
 .navHamburger {
@@ -287,7 +288,7 @@
 .heroCtas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
 /* Primary CTA — brand gradient */
 .heroPrimary {
-  background: var(--brand-primary);
+  background: var(--brand-gradient);
   color: var(--brand-on-primary);
   border: none; border-radius: 30px; padding: 14px 28px;
   font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
@@ -330,18 +331,22 @@
 @keyframes scrollPulse { 0%,100% { opacity: 0.3; transform: scaleY(0.6); } 50% { opacity: 1; transform: scaleY(1); } }
 .heroScrollText { font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.45); font-family: 'DM Sans', sans-serif; }
 
-/* ── STATS STRIP — numbers use brand primary ── */
+/* ── STATS STRIP — brand surface background so it reads as a branded band ── */
 .statsStrip {
-  background: var(--bg-alt);
-  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  background: var(--brand-surface);
+  border-top: 1px solid var(--brand-muted);
+  border-bottom: 1px solid var(--brand-muted);
   display: flex; align-items: center; justify-content: center;
   padding: 28px 20px;
+}
+.page:not(.lightMode) .statsStrip {
+  background: var(--brand-surface-dark);
 }
 .statItem  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .statNum   { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.8rem; font-weight: 300; line-height: 1; color: var(--brand-primary); }
 .statIcon  { font-size: 1.1rem !important; color: var(--brand-primary); }
 .statLabel { font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); }
-.statDivider { width: 1px; height: 40px; background: var(--border); flex-shrink: 0; }
+.statDivider { width: 1px; height: 40px; background: var(--brand-muted); flex-shrink: 0; }
 
 /* ── SECTION EYEBROW — brand primary ── */
 .sectionEyebrow {
@@ -367,9 +372,9 @@
   font-style: italic; font-size: 1rem; font-weight: 300;
   color: var(--text-muted); line-height: 1.5; margin: 0;
 }
-/* About card — top border brand primary, bg uses brand-surface in light / brand-surface-dark in dark */
+/* About card — gradient card bg + glow shadow, top border brand primary */
 .aboutCard {
-  background: var(--brand-surface);
+  background: var(--brand-gradient-card);
   border: 1px solid var(--brand-muted);
   border-top: 2px solid var(--brand-primary);
   border-radius: 16px; padding: 32px 28px;
@@ -381,15 +386,16 @@
 }
 .aboutLogo { margin-bottom: 20px; }
 .aboutLogoImg { width: 72px; height: 72px; object-fit: contain; border-radius: 10px; filter: grayscale(100%); }
-/* Initials — brand primary border + text, circular */
+/* Initials — brand gradient background, on-primary text */
 .aboutInitials {
   width: 72px; height: 72px; border-radius: 50%;
-  background: var(--bg-deep);
-  border: 1px solid var(--brand-primary);
+  background: var(--brand-gradient);
+  border: 1px solid var(--brand-primary-dark);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 1.5rem; font-weight: 300; letter-spacing: 2px;
-  color: var(--brand-primary);
+  color: var(--brand-on-primary);
+  box-shadow: 0 2px 16px var(--brand-glow);
 }
 .aboutName { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.4rem; font-weight: 400; color: var(--text-primary); margin-bottom: 4px; }
 .aboutTagline { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 0.95rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
@@ -403,10 +409,16 @@
 }
 .aboutBio { font-size: 0.85rem; color: var(--text-body); line-height: 1.75; margin: 0 0 20px; }
 
-/* Info grid — icons use brand primary */
+/* Info grid — solid brand surface so it's distinct from the card behind it */
 .aboutInfoGrid {
   display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
-  padding: 16px; background: var(--info-bg); border: 1px solid var(--info-border); border-radius: 10px;
+  padding: 16px;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-muted);
+  border-radius: 10px;
+}
+.page:not(.lightMode) .aboutInfoGrid {
+  background: var(--brand-surface-dark);
 }
 .aboutInfoItem {
   display: flex; align-items: flex-start; gap: 10px;
@@ -417,12 +429,17 @@
 .aboutSpecialties { margin-bottom: 20px; }
 .aboutSpecialtiesLabel { font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 10px; }
 .aboutSpecialtiesList { display: flex; flex-wrap: wrap; gap: 6px; }
-/* Specialty pills — brand primary text + border */
+/* Specialty pills — solid brand surface bg so they're always distinct from the page */
 .aboutSpecialtyPill {
-  background: transparent; border: 1px solid var(--brand-muted);
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-primary);
   border-radius: 20px; color: var(--brand-primary);
   font-size: 0.62rem; font-weight: 500; letter-spacing: 1.5px;
   text-transform: uppercase; padding: 5px 14px; font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 1px 8px var(--brand-glow);
+}
+.page:not(.lightMode) .aboutSpecialtyPill {
+  background: var(--brand-surface-dark);
 }
 
 .aboutMeta { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
@@ -435,22 +452,48 @@
 .aboutMetaRow:hover { color: var(--text-primary); }
 .aboutMetaRow .material-icons { font-size: 0.95rem; color: var(--brand-primary); flex-shrink: 0; }
 
-/* Social icons */
-.aboutSocials { display: flex; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+/* Social icons — solid brand surface bg (not transparent) so they're always visible */
+.aboutSocials { display: flex; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--brand-muted); }
 .socialIcon {
   display: flex; align-items: center; justify-content: center;
   width: 36px; height: 36px; border-radius: 50%;
-  border: 1px solid var(--border); color: var(--text-faint);
-  text-decoration: none; background: var(--bg-deep);
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  border: 1px solid var(--brand-primary);
+  color: var(--brand-primary);
+  text-decoration: none;
+  background: var(--brand-surface);
+  transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px var(--brand-glow);
 }
-.socialIcon:hover { color: var(--brand-primary); border-color: var(--brand-muted); background: var(--brand-surface); }
+.page:not(.lightMode) .socialIcon {
+  background: var(--brand-surface-dark);
+}
+.socialIcon:hover {
+  background: var(--brand-gradient);
+  color: var(--brand-on-primary);
+  border-color: var(--brand-primary-dark);
+  box-shadow: 0 2px 16px var(--brand-glow);
+}
 
 /* ── MARQUEE ── */
-.marqueeWrap { overflow: hidden; background: var(--marquee-bg); border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); padding: 18px 0; }
+.marqueeWrap {
+  overflow: hidden;
+  background: var(--brand-surface);
+  border-top: 1px solid var(--brand-muted);
+  border-bottom: 1px solid var(--brand-muted);
+  padding: 18px 0;
+}
+.page:not(.lightMode) .marqueeWrap {
+  background: var(--brand-surface-dark);
+}
 .marqueeTrack { display: flex; animation: marquee 24s linear infinite; white-space: nowrap; }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.marqueeItem { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.95rem; font-style: italic; color: var(--text-faint); padding: 0 20px; letter-spacing: 1px; }
+.marqueeItem {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.95rem; font-style: italic;
+  color: var(--brand-primary);
+  padding: 0 20px; letter-spacing: 1px;
+  opacity: 0.7;
+}
 
 /* ── WORKS ── */
 .works { padding: 90px 0 60px; }
@@ -458,7 +501,7 @@
 .worksTitle { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2.2rem, 8vw, 3.5rem); font-weight: 300; color: var(--text-primary); margin: 0 0 8px; line-height: 1.1; }
 .worksSub { font-size: 0.8rem; color: var(--text-faint); font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif; }
 
-/* Filter pills — active uses brand primary */
+/* Filter pills — active uses brand gradient */
 .filterBar { padding: 0 24px 28px; }
 .filterScroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
 .filterScroll::-webkit-scrollbar { display: none; }
@@ -470,12 +513,13 @@
   cursor: pointer; white-space: nowrap; flex-shrink: 0;
   transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
 }
-.filterPill:hover { color: var(--text-primary); border-color: var(--text-muted); }
-/* Active filter pill — brand primary bg */
+.filterPill:hover { color: var(--brand-primary); border-color: var(--brand-primary); }
+/* Active filter pill — brand gradient bg */
 .filterPillActive {
-  background: var(--brand-primary) !important;
+  background: var(--brand-gradient) !important;
   color: var(--brand-on-primary) !important;
-  border-color: var(--brand-primary) !important;
+  border-color: var(--brand-primary-dark) !important;
+  box-shadow: 0 2px 12px var(--brand-glow);
 }
 .filterPillActive:hover { opacity: 0.9; }
 
@@ -505,44 +549,65 @@
   font-size: 0.9rem; color: #fff; backdrop-filter: blur(4px);
 }
 .photoCaption { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.95rem; color: #fff; margin: 0 0 4px; }
-/* Price badge — brand primary bg */
+/* Price badge — brand gradient bg */
 .photoPrice {
   position: absolute; top: 10px; right: 10px;
   font-family: 'DM Sans', sans-serif; font-size: 0.68rem; font-weight: 600;
-  background: var(--brand-primary); color: var(--brand-on-primary);
+  background: var(--brand-gradient);
+  color: var(--brand-on-primary);
   border-radius: 20px; padding: 4px 12px; z-index: 2; pointer-events: none;
+  box-shadow: 0 2px 10px var(--brand-glow);
 }
 .photoType { font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: #ccc; }
 .emptyWorks { padding: 60px 24px; text-align: center; color: var(--text-faint); font-size: 0.85rem; font-style: italic; font-family: 'Cormorant Garamond', Georgia, serif; }
 
 /* ── PROCESS ── */
-.process { background: var(--process-bg); border-top: 1px solid var(--border-soft); padding: 90px 0; }
+.process {
+  background: var(--process-bg);
+  border-top: 1px solid var(--brand-muted);
+  padding: 90px 0;
+}
 .processInner { padding: 0 24px; max-width: 600px; margin: 0 auto; }
 .processTitle { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2.2rem, 8vw, 3.5rem); font-weight: 300; color: var(--text-primary); margin: 0 0 48px; line-height: 1.1; }
 .processSteps { display: flex; flex-direction: column; }
-.processStep { padding: 28px 0; border-bottom: 1px solid var(--border-soft); display: grid; grid-template-columns: 48px 1px 1fr; gap: 0 16px; align-items: start; }
+.processStep {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--brand-muted);
+  display: grid; grid-template-columns: 48px 1px 1fr; gap: 0 16px; align-items: start;
+}
 .processNumWrap { display: flex; flex-direction: column; align-items: center; padding-top: 2px; }
-/* Process number badge — brand primary border + text */
+/* Process number badge — solid brand surface bg so it never blends into the page */
 .processNumBadge {
   width: 40px; height: 40px; border-radius: 50%;
-  border: 1px solid var(--brand-primary);
+  background: var(--brand-surface);
+  border: 1.5px solid var(--brand-primary);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 0.75rem; font-weight: 300; letter-spacing: 1px;
-  color: var(--brand-primary); background: transparent;
+  color: var(--brand-primary);
+  box-shadow: 0 0 16px var(--brand-glow), inset 0 1px 0 rgba(255,255,255,0.08);
 }
-/* Process line — neutral structural divider */
-.processLine { width: 1px; background: var(--border-soft); align-self: stretch; margin: 2px 0; }
+/* Dark mode: use the dark brand surface so the circle is visibly distinct from the dark page bg */
+.page:not(.lightMode) .processNumBadge {
+  background: var(--brand-surface-dark);
+}
+/* Process line — brand muted tint */
+.processLine { width: 1px; background: var(--brand-muted); align-self: stretch; margin: 2px 0; }
 .processStepContent { padding-top: 8px; }
 .processStepTitle { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; font-weight: 400; color: var(--text-primary); margin: 0 0 6px; letter-spacing: 0.5px; }
 .processStepDesc  { font-size: 0.78rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
 
 /* ── TESTIMONIALS ── */
-.testimonials { padding: 90px 0; background: var(--bg-alt); border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+.testimonials {
+  padding: 90px 0;
+  background: var(--bg-alt);
+  border-top: 1px solid var(--brand-muted);
+  border-bottom: 1px solid var(--brand-muted);
+}
 .testimonialsInner { padding: 0 24px; max-width: 600px; margin: 0 auto; }
 .testimonialsTitle { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2.2rem, 8vw, 3.5rem); font-weight: 300; color: var(--text-primary); margin: 0 0 40px; line-height: 1.1; }
 .testimonialsGrid { display: flex; flex-direction: column; gap: 16px; }
-/* Testimonial card — top border + gradient card bg */
+/* Testimonial card — gradient card bg + glow shadow + top border */
 .testimonialCard {
   background: var(--brand-gradient-card);
   border: 1px solid var(--brand-muted);
@@ -559,15 +624,18 @@
 .star        { font-size: 0.9rem !important; color: var(--border); }
 .starFilled  { color: var(--brand-primary) !important; }
 .testimonialText { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 1.05rem; color: var(--text-body); line-height: 1.75; margin: 0 0 18px; }
-.testimonialAuthor { display: flex; align-items: center; gap: 10px; padding-top: 16px; border-top: 1px solid var(--border); }
-/* Avatar — brand primary border + text */
+.testimonialAuthor { display: flex; align-items: center; gap: 10px; padding-top: 16px; border-top: 1px solid var(--brand-muted); }
+/* Avatar — brand gradient background + on-primary text + glow */
 .testimonialAvatar {
   width: 36px; height: 36px; border-radius: 50%;
-  background: var(--brand-surface);
-  border: 1px solid var(--brand-primary);
+  background: var(--brand-gradient);
+  border: 1px solid var(--brand-primary-dark);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1rem; color: var(--brand-primary); flex-shrink: 0;
+  font-size: 1rem;
+  color: var(--brand-on-primary);
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px var(--brand-glow);
 }
 .testimonialName { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; }
 
@@ -586,7 +654,7 @@
 .bookTurnaround { display: flex; align-items: center; font-family: 'DM Sans', sans-serif; font-size: 0.68rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--brand-primary); margin-bottom: 28px; }
 /* Book CTA — brand gradient */
 .bookCta {
-  background: var(--brand-primary); color: var(--brand-on-primary);
+  background: var(--brand-gradient); color: var(--brand-on-primary);
   border: none; border-radius: 30px; padding: 16px 36px;
   font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
   font-weight: 500; letter-spacing: 0.5px; cursor: pointer;
@@ -607,25 +675,34 @@
 .bookWhatsapp:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.35); color: #fff; }
 .bookContacts { display: flex; flex-direction: column; gap: 8px; }
 .bookContact { color: #666; text-decoration: none; font-size: 0.78rem; transition: color 0.2s; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
-.bookContact:hover { color: #bbb; }
+.bookContact:hover { color: var(--brand-primary); }
 
 /* ── FOOTER — always dark ── */
-.footer { background: var(--footer-bg); border-top: 1px solid rgba(255,255,255,0.06); padding: 52px 24px 0; }
+.footer { background: var(--footer-bg); border-top: 1px solid var(--brand-muted); padding: 52px 24px 0; }
 .footerTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
 .footerBrandBlock { display: flex; flex-direction: column; gap: 6px; }
 /* Footer brand name — brand primary */
 .footerBrand { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.5rem; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; margin: 0; color: var(--brand-primary); }
 .footerTagline { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 0.85rem; color: var(--footer-tag); margin: 0; }
 .footerFounded { font-family: 'DM Sans', sans-serif; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--footer-powered-color); margin: 0; }
-/* Footer social icons — hover to brand primary */
+/* Footer social icons — solid brand surface bg + brand primary colour; gradient fill on hover */
 .footerSocials { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .footerSocialIcon {
   display: flex; align-items: center; justify-content: center;
   width: 36px; height: 36px; border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.1); color: #555; text-decoration: none;
-  transition: color 0.2s, border-color 0.2s;
+  border: 1px solid var(--brand-primary);
+  background: var(--brand-surface-dark);
+  color: var(--brand-primary);
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px var(--brand-glow);
 }
-.footerSocialIcon:hover { color: var(--brand-primary); border-color: var(--brand-muted); }
+.footerSocialIcon:hover {
+  background: var(--brand-gradient);
+  color: var(--brand-on-primary);
+  border-color: var(--brand-primary-dark);
+  box-shadow: 0 2px 16px var(--brand-glow);
+}
 /* Footer divider — brand muted tint */
 .footerDivider      { height: 1px; background: var(--brand-muted); margin-bottom: 24px; }
 .footerDividerFaint { height: 1px; background: rgba(255,255,255,0.05); margin-bottom: 24px; }
@@ -635,7 +712,7 @@
 .footerColLabel { font-family: 'DM Sans', sans-serif; font-size: 0.58rem; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 4px; color: var(--brand-primary); }
 .footerColRow { display: flex; align-items: flex-start; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; color: var(--footer-link); text-decoration: none; line-height: 1.5; transition: color 0.2s; }
 .footerColRow:hover { color: var(--footer-link-hover); }
-.footerColRow .material-icons { color: #3a3a3a; margin-top: 1px; }
+.footerColRow .material-icons { color: var(--brand-primary); opacity: 0.6; margin-top: 1px; }
 .footerColLink { background: none; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; color: var(--footer-link); cursor: pointer; padding: 0; text-align: left; transition: color 0.2s; }
 .footerColLink:hover { color: var(--footer-link-hover); }
 .footerBottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
@@ -646,11 +723,19 @@
 /* ── BOOKING DRAWER ── */
 .bookingOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 5000; display: flex; align-items: flex-end; transition: background 0.35s ease; }
 .bookingOverlayVisible { background: rgba(0,0,0,0.6); }
-.bookingDrawer { width: 100%; background: var(--drawer-bg); border-top: 1px solid var(--drawer-border); border-radius: 20px 20px 0 0; max-height: 92dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); padding-bottom: env(safe-area-inset-bottom); }
+.bookingDrawer {
+  width: 100%; background: var(--drawer-bg);
+  border-top: 2px solid var(--brand-primary);
+  border-radius: 20px 20px 0 0;
+  max-height: 92dvh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 40px var(--brand-glow);
+}
 .bookingDrawerVisible { transform: translateY(0); }
 /* Handle — neutral, not brand coloured */
 .drawerHandle { width: 36px; height: 3px; background: var(--handle-color); border-radius: 2px; margin: 14px auto 0; }
-.drawerHead { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1px solid var(--drawer-border); }
+.drawerHead { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1px solid var(--brand-muted); }
 /* Drawer label — brand primary */
 .drawerLabel { font-size: 0.58rem; letter-spacing: 3px; color: var(--brand-primary); margin-bottom: 4px; }
 .drawerTitle { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.3rem; font-weight: 400; color: var(--field-text); letter-spacing: 0.5px; }
@@ -660,31 +745,41 @@
 .fieldGroup { display: flex; flex-direction: column; gap: 6px; }
 .fieldLabel { font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-faint); }
 .fieldHint  { font-size: 0.68rem; color: var(--text-faint); font-style: italic; margin-top: 2px; }
-/* Fields — focus border uses brand primary */
+/* Fields — focus border uses brand primary + glow */
 .fieldInput, .fieldTextarea {
   background: var(--field-bg); border: 1px solid var(--field-border);
   border-radius: 8px; color: var(--field-text); padding: 13px 14px;
   font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
-  outline: none; transition: border-color 0.2s; width: 100%; box-sizing: border-box;
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; box-sizing: border-box;
   -webkit-appearance: none;
 }
 .fieldInput::placeholder, .fieldTextarea::placeholder { color: var(--field-ph); }
-.fieldInput:focus, .fieldTextarea:focus { border-color: var(--brand-primary); }
+.fieldInput:focus, .fieldTextarea:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-glow);
+}
 .fieldTextarea { resize: none; line-height: 1.5; }
 .drawerFooter { padding: 16px 24px 28px; }
-/* Send button — brand primary */
+/* Send button — brand gradient */
 .sendBtn {
-  width: 100%; background: var(--brand-primary); color: var(--brand-on-primary);
+  width: 100%; background: var(--brand-gradient); color: var(--brand-on-primary);
   border: none; border-radius: 8px; padding: 16px;
   font-family: 'DM Sans', sans-serif; font-size: 0.68rem;
   font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
   cursor: pointer; transition: opacity 0.2s;
+  box-shadow: 0 4px 16px var(--brand-glow);
 }
 .sendBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 .sendBtn:not(:disabled):active { opacity: 0.85; }
 .sentState { display: flex; flex-direction: column; align-items: center; padding: 48px 24px 60px; gap: 12px; }
-/* Sent check — brand primary border + icon */
-.sentCheck { width: 52px; height: 52px; border: 1px solid var(--brand-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--brand-primary); }
+/* Sent check — brand gradient bg + on-primary icon */
+.sentCheck {
+  width: 52px; height: 52px;
+  background: var(--brand-gradient);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: var(--brand-on-primary);
+  box-shadow: 0 4px 20px var(--brand-glow);
+}
 .sentCheck .mi { font-size: 1.4rem; }
 .sentTitle { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.3rem; color: var(--field-text); letter-spacing: 1px; }
 .sentSub   { font-size: 0.78rem; color: var(--text-muted); text-align: center; }
@@ -703,8 +798,15 @@
 .lbCaption { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1rem; color: #fff; margin: 0 0 8px; }
 .lbTags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .lbType  { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: #aaa; }
-/* Lightbox price — brand primary tint */
-.lbPrice { font-family: 'DM Sans', sans-serif; font-size: 0.62rem; font-weight: 700; color: #fff; background: var(--brand-muted); border: 1px solid var(--brand-primary); border-radius: 20px; padding: 3px 10px; }
+/* Lightbox price — brand gradient bg */
+.lbPrice {
+  font-family: 'DM Sans', sans-serif; font-size: 0.62rem; font-weight: 700;
+  color: var(--brand-on-primary);
+  background: var(--brand-gradient);
+  border: 1px solid var(--brand-primary-dark);
+  border-radius: 20px; padding: 3px 10px;
+  box-shadow: 0 2px 8px var(--brand-glow);
+}
 
 /* ── DESKTOP ── */
 @media (min-width: 640px) {
@@ -719,7 +821,7 @@
   .photoGrid { grid-template-columns: repeat(3, 1fr); }
   .photoCardFeatured { grid-column: span 2; aspect-ratio: 16/9; }
   .processSteps { display: grid; grid-template-columns: repeat(2, 1fr); }
-  .processStep:nth-child(odd)  { border-right: 1px solid var(--border-soft); padding-right: 32px; }
+  .processStep:nth-child(odd)  { border-right: 1px solid var(--brand-muted); padding-right: 32px; }
   .processStep:nth-child(even) { padding-left: 32px; }
   .testimonialsInner { max-width: 1100px; }
   .testimonialsGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
