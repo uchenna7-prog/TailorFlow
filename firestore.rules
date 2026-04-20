@@ -53,6 +53,10 @@ service cloud.firestore {
         match /payments/{paymentId} {
           allow read, write: if request.auth != null && request.auth.uid == uid;
         }
+
+        match /receipts/{receiptId} {
+          allow read, write: if request.auth != null && request.auth.uid == uid;
+        }
       }
 
       match /tasks/{taskId} {
