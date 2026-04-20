@@ -686,8 +686,17 @@
 .bookTitle { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2.4rem, 10vw, 4.5rem); font-weight: 300; line-height: 1.05; color: #fff; margin: 0 0 20px; }
 .bookTitleAccent { color: var(--brand-primary); }
 .bookSub { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 1rem; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 20px; }
-/* Turnaround — brand primary */
-.bookTurnaround { display: flex; align-items: center; font-family: 'DM Sans', sans-serif; font-size: 0.68rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--brand-primary); margin-bottom: 28px; }
+/* Turnaround — brand primary, icon inherits colour */
+.bookTurnaround {
+  display: flex; align-items: center;
+  font-family: 'DM Sans', sans-serif; font-size: 0.68rem;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--brand-primary); margin-bottom: 28px;
+}
+/* The schedule icon inside bookTurnaround inherits brand primary from parent */
+.bookTurnaround .material-icons,
+.bookTurnaround .mi { color: inherit; }
+
 /* Book CTA — brand gradient */
 .bookCta {
   background: var(--brand-gradient); color: var(--brand-on-primary);
@@ -710,8 +719,15 @@
 }
 .bookWhatsapp:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.35); color: #fff; }
 .bookContacts { display: flex; flex-direction: column; gap: 8px; }
-.bookContact { color: #666; text-decoration: none; font-size: 0.78rem; transition: color 0.2s; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
-.bookContact:hover { color: var(--brand-primary); }
+.bookContact {
+  color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.78rem;
+  transition: color 0.2s; letter-spacing: 0.5px;
+  display: flex; align-items: center; gap: 8px;
+}
+.bookContact:hover { color: rgba(255,255,255,0.85); }
+/* Call/mail icons inside book contacts use brand primary so they pop against the dark bg */
+.bookContact .mi,
+.bookContact .material-icons { color: var(--brand-primary); font-size: 1rem; }
 
 /* ── FOOTER — always dark ── */
 .footer { background: var(--footer-bg); border-top: 1px solid var(--brand-muted); padding: 52px 24px 0; }
@@ -844,6 +860,34 @@
   border-radius: 20px; padding: 3px 10px;
   box-shadow: 0 2px 8px var(--brand-glow);
 }
+
+/* ── GLOBAL BRAND ICON COLOUR RULES ──────────────────────────
+ * Any .material-icons or .mi span that sits inside a brand-
+ * coloured parent container picks up the brand primary colour
+ * unless a more specific rule overrides it.
+ * This catches leftover icons not explicitly targeted above.
+ * ─────────────────────────────────────────────────────────── */
+
+/* About card info items — history, schedule, place, auto_fix_high */
+.aboutInfoItem .mi,
+.aboutInfoItem .material-icons { color: var(--brand-primary); }
+
+/* About meta rows — location_on, call, mail, language */
+.aboutMetaRow .mi { color: var(--brand-primary); }
+
+/* Stats bar verified icon */
+.statItem .mi { color: var(--brand-primary); }
+
+/* Drawer sent-state check icon — uses on-primary since it's on a gradient bg */
+.sentCheck .mi,
+.sentCheck .material-icons { color: var(--brand-on-primary); }
+
+/* Nav active link icon if any */
+.navLinkActive .mi,
+.navLinkActive .material-icons { color: var(--brand-primary); }
+
+/* Footer contact col icons — location_on, mail, call */
+.footerColRow .mi { color: var(--brand-primary); font-size: 0.95rem; margin-top: 1px; }
 
 /* ── DESKTOP ── */
 @media (min-width: 640px) {
