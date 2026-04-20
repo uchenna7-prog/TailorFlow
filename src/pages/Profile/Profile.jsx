@@ -3,8 +3,8 @@
 // Changes from original:
 //  • BrandModal now uses <BrandColourPicker> instead of
 //    <input type="color"> + hex TextInput
-//  • brandColour is now stored as a colour ID (e.g. "classic-deep-gold")
-//    instead of a raw hex string
+//  • brandColourId is now stored as a colour ID (e.g. "classic-deep-gold")
+//    instead of a raw hex string, under the key brandColourId
 //  • brandColourDot in the profile preview resolves the ID to a hex
 // ─────────────────────────────────────────────────────────────
 
@@ -220,18 +220,19 @@ function BrandModal({ onBack, showToast }) {
   const logoInputRef = useRef()
 
   const [local, setLocal] = useState({
-    brandName:    settings.brandName    || '',
-    brandTagline: settings.brandTagline || '',
-    // brandColour is now a colour ID, not a hex string
-    // Fall back to DEFAULT_COLOUR_ID if the stored value looks like an old hex
-    brandColour:  (settings.brandColour && !settings.brandColour.startsWith('#'))
-                    ? settings.brandColour
-                    : DEFAULT_COLOUR_ID,
-    brandLogo:    settings.brandLogo    || null,
-    brandPhone:   settings.brandPhone   || '',
-    brandEmail:   settings.brandEmail   || '',
-    brandAddress: settings.brandAddress || '',
-    brandWebsite: settings.brandWebsite || '',
+    brandName:      settings.brandName      || '',
+    brandTagline:   settings.brandTagline   || '',
+    // ── Read from brandColourId (the palette key). If not set yet,
+    //    fall back gracefully: if old brandColour looks like a hex ignore it,
+    //    otherwise treat it as a legacy ID. Final fallback: DEFAULT_COLOUR_ID.
+    brandColourId:  settings.brandColourId
+                      || (settings.brandColour && !settings.brandColour.startsWith('#') ? settings.brandColour : null)
+                      || DEFAULT_COLOUR_ID,
+    brandLogo:      settings.brandLogo      || null,
+    brandPhone:     settings.brandPhone     || '',
+    brandEmail:     settings.brandEmail     || '',
+    brandAddress:   settings.brandAddress   || '',
+    brandWebsite:   settings.brandWebsite   || '',
   })
 
   const set = key => val => setLocal(p => ({ ...p, [key]: val }))
@@ -245,7 +246,13 @@ function BrandModal({ onBack, showToast }) {
   }, [])
 
   const save = () => {
-    updateMany(local)
+    // Also derive and save brandColour hex so legacy invoice templates
+    // that still reference settings.brandColour continue to work
+    const entry = getColourById(local.brandColourId)
+    updateMany({
+      ...local,
+      brandColour: entry?.tokens.primary || '#D4AF37',
+    })
     showToast('Brand info saved')
     onBack()
   }
@@ -292,15 +299,15 @@ function BrandModal({ onBack, showToast }) {
         </Field>
       </FieldGroup>
 
-      {/* Brand Colour — replaced raw picker with curated picker */}
+      {/* Brand Colour — curated palette picker, saves as brandColourId */}
       <FieldGroup>
         <Field
           label="Brand Colour"
           hint="Choose your brand colour. We've curated shades that look great on your portfolio and invoices."
         >
           <BrandColourPicker
-            value={local.brandColour}
-            onChange={set('brandColour')}
+            value={local.brandColourId}
+            onChange={set('brandColourId')}
           />
         </Field>
       </FieldGroup>
@@ -650,14 +657,10 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
   const hasBrand = !!(settings.brandName || settings.brandLogo)
   const hasAccountDetails = !!(settings.accountBank || settings.accountNumber)
 
-  // Resolve colour ID → hex for the preview dot
-  const brandColourHex = (() => {
-    const id = settings.brandColour
-    if (!id) return null
-    // Legacy: was stored as raw hex — show it as-is
-    if (id.startsWith('#')) return id
-    return getColourById(id)?.tokens.primary || null
-  })()
+  // Resolve brandColourId → hex for the preview dot
+  const brandColourHex = getColourById(settings.brandColourId)?.tokens.primary
+    || getColourById(DEFAULT_COLOUR_ID)?.tokens.primary
+    || null
 
   return (
     <div className={styles.page}>
@@ -725,7 +728,7 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
                 <div className={styles.brandPreviewTagline}>{settings.brandTagline}</div>
               )}
             </div>
-            {/* Resolved hex dot */}
+            {/* Resolved hex dot from brandColourId */}
             {brandColourHex && (
               <div className={styles.brandColourDot} style={{ background: brandColourHex }} />
             )}
