@@ -8,7 +8,7 @@ import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import styles from './Settings.module.css'
 
 // ─────────────────────────────────────────────────────────────
-// Shared tailoring data (Naira, real names)
+// Shared invoice sample data
 // ─────────────────────────────────────────────────────────────
 const TAILOR_ROWS = [
   ['Custom Agbada Sewing',     '₦8,500',  '1', '₦8,500'],
@@ -19,8 +19,16 @@ const TAILOR_ROWS = [
   ['Kaftan Embroidery',        '₦4,000',  '2', '₦8,000'],
 ]
 
+const NUMBERED_ROWS = [
+  ['1', 'Custom Agbada Sewing',    '1', '₦8,500',  '₦8,500'],
+  ['2', 'Senator Suit Stitching',  '2', '₦6,200',  '₦12,400'],
+  ['3', 'Ankara Dress Alteration', '3', '₦2,500',  '₦7,500'],
+  ['4', 'Bridal Gown Fitting',     '1', '₦15,000', '₦15,000'],
+  ['5', 'Trouser Hemming',         '4', '₦1,200',  '₦4,800'],
+]
+
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 1 — Centred Line Invoice
+// TEMPLATE 1 — Centered Balance
 // ══════════════════════════════════════════════════════════════
 
 function EditableTemplate() {
@@ -78,7 +86,7 @@ function EditableTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 2 — Three-Column Info Bar
+// TEMPLATE 2 — Triple-Box Info Bar
 // ══════════════════════════════════════════════════════════════
 
 function FreeTemplate() {
@@ -131,7 +139,7 @@ function FreeTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 3 — Banner Header
+// TEMPLATE 3 — Full-Bleed Banner
 // ══════════════════════════════════════════════════════════════
 
 function CustomTemplate() {
@@ -162,7 +170,7 @@ function CustomTemplate() {
           <strong>15 Apr 2025</strong>
         </div>
       </div>
-      <div style={{ padding: '0 14px' }}>
+      <div style={{ padding: '0 14px', flex: 1 }}>
         <div className={styles.pTHead2}>
           <span style={{ flex: 3 }}>Description</span><span>Price</span><span>Qty</span><span>Total</span>
         </div>
@@ -192,7 +200,7 @@ function CustomTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 4 — Printable Classic
+// TEMPLATE 4 — Dual-Column Compact
 // ══════════════════════════════════════════════════════════════
 
 function PrintableTemplate() {
@@ -242,16 +250,12 @@ function PrintableTemplate() {
       <div className={styles.p4Divider} />
       <div className={styles.p4TableHead}>
         <span style={{ flex: 3 }}>Description</span>
-        <span>Price</span>
-        <span>QTY</span>
-        <span>Total</span>
+        <span>Price</span><span>QTY</span><span>Total</span>
       </div>
       {items.map((it, i) => (
         <div key={i} className={styles.p4TableRow}>
           <span style={{ flex: 3 }}>{it.desc}</span>
-          <span>{it.price}</span>
-          <span>{it.qty}</span>
-          <span>{it.total}</span>
+          <span>{it.price}</span><span>{it.qty}</span><span>{it.total}</span>
         </div>
       ))}
       <div className={styles.p4TotalsArea}>
@@ -277,7 +281,7 @@ function PrintableTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 5 — Warm Beige Classic
+// TEMPLATE 5 — Solid Header and Base
 // ══════════════════════════════════════════════════════════════
 
 function CanvaTemplate() {
@@ -332,7 +336,7 @@ function CanvaTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 6 — Dark Header Corporate
+// TEMPLATE 6 — Three-Column Grid
 // ══════════════════════════════════════════════════════════════
 
 function DarkHeaderTemplate() {
@@ -390,7 +394,7 @@ function DarkHeaderTemplate() {
         <span style={{ flex: 3 }}>DESCRIPTION</span><span>PRICE</span><span>QTY</span><span>TOTAL</span>
       </div>
       {TAILOR_ROWS.map(([d, p, q, t]) => (
-        <div key={d} className={styles.t6TableRow}>
+        <div key={d} className={styles.t6TableRowSolid}>
           <span style={{ flex: 3 }}>{d}</span><span>{p}</span><span>{q}</span><span>{t}</span>
         </div>
       ))}
@@ -405,17 +409,10 @@ function DarkHeaderTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 7 — Bold From/To
+// TEMPLATE 7 — Formal Field-Labelled
 // ══════════════════════════════════════════════════════════════
 
 function RedBoldTemplate() {
-  const items = [
-    ['1','Custom Agbada Sewing','1','₦8,500','₦8,500'],
-    ['2','Senator Suit Stitching','2','₦6,200','₦12,400'],
-    ['3','Ankara Dress Alteration','3','₦2,500','₦7,500'],
-    ['4','Bridal Gown Fitting','1','₦15,000','₦15,000'],
-    ['5','Trouser Hemming','4','₦1,200','₦4,800'],
-  ]
   return (
     <div className={styles.t7Base}>
       <div className={styles.t7Header}>
@@ -457,7 +454,7 @@ function RedBoldTemplate() {
         <span style={{ flex:1,textAlign:'right' }}>Price</span>
         <span style={{ flex:1,textAlign:'right' }}>Total</span>
       </div>
-      {items.map(([n,d,q,p,t])=>(
+      {NUMBERED_ROWS.map(([n,d,q,p,t])=>(
         <div key={n} className={styles.t7TableRow}>
           <span className={styles.t7NumCol}>{n}</span>
           <span style={{ flex:3 }}>{d}</span>
@@ -475,7 +472,7 @@ function RedBoldTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 8 — Green Accent
+// TEMPLATE 8 — Integrated Summary Box
 // ══════════════════════════════════════════════════════════════
 
 function GreenAccentTemplate() {
@@ -539,7 +536,7 @@ function GreenAccentTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 9 — Teal Geometric
+// TEMPLATE 9 — Accent Strip and Signature
 // ══════════════════════════════════════════════════════════════
 
 function TealGeometricTemplate() {
@@ -602,7 +599,7 @@ function TealGeometricTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 10 — Full-Width Diagonal
+// TEMPLATE 10 — Slanted Geometric
 // ══════════════════════════════════════════════════════════════
 
 function PinkDiagonalTemplate() {
@@ -675,7 +672,7 @@ function PinkDiagonalTemplate() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TEMPLATE 11 — Blue Clean Corporate
+// TEMPLATE 11 — Multi-Tile Payment Grid
 // ══════════════════════════════════════════════════════════════
 
 function BlueCleanTemplate() {
@@ -841,53 +838,60 @@ function FullModal({ title, onBack, onSave, children }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Template Picker (Grouped)
+// Invoice Template Groups
 // ─────────────────────────────────────────────────────────────
 
 const TEMPLATE_GROUPS = [
   {
-    groupLabel: 'Essential',
-    groupDesc: 'Straightforward and clean — nothing in the way',
+    groupLabel: 'Simple and Clean',
+    groupDesc: 'Light, open layouts that are easy to read',
     groupIcon: 'article',
     templates: [
-      { id:'editable',  label:'1. Centred Line Invoice',      desc:'Centred header with flanking lines',                  Component:EditableTemplate },
-      { id:'free',      label:'2. Three-Column Info Bar',     desc:'Big invoice number with three-column info grid',      Component:FreeTemplate },
-      { id:'printable', label:'4. Side-by-Side Classic',      desc:'Side-by-side billing blocks with accent top bar',     Component:PrintableTemplate },
-      { id:'canva',     label:'5. Soft Divider Layout',       desc:'Soft header, dividers, sender details at base',       Component:CanvaTemplate },
+      { id:'editable',  label:'1. Centered Balance',    desc:'Business name in the middle with a line on each side',  Component:EditableTemplate },
+      { id:'free',      label:'2. Triple-Box Info Bar', desc:'Three side-by-side boxes showing contact details',       Component:FreeTemplate },
+      { id:'printable', label:'4. Dual-Column Compact', desc:'From and To details placed side by side',                Component:PrintableTemplate },
     ],
   },
   {
-    groupLabel: 'Structured',
-    groupDesc: 'Every detail in its place — easy to scan',
-    groupIcon: 'format_list_numbered',
+    groupLabel: 'Bold Blocks',
+    groupDesc: 'Strong designs that use solid colour sections',
+    groupIcon: 'widgets',
     templates: [
-      { id:'redbold',   label:'7. Field-Labelled From / To',  desc:'Field-labelled From/To with numbered line items',     Component:RedBoldTemplate },
-      { id:'blueclean', label:'11. Info Bar with Payment Tiles', desc:'Three-column header, info bar and payment option tiles', Component:BlueCleanTemplate },
+      { id:'custom',       label:'3. Full-Bleed Banner',    desc:'Big colour header at the top with a logo space',     Component:CustomTemplate },
+      { id:'canva',        label:'5. Solid Top and Bottom', desc:'Colour fills both the top header and the base',      Component:CanvaTemplate },
+      { id:'pinkdiagonal', label:'10. Slanted Header',      desc:'Header cuts diagonally with a matching corner fill', Component:PinkDiagonalTemplate },
     ],
   },
   {
-    groupLabel: 'Branded',
-    groupDesc: 'Built around your logo and colours',
-    groupIcon: 'palette',
+    groupLabel: 'Clear Labels',
+    groupDesc: 'Every section has a bold label so nothing is confusing',
+    groupIcon: 'format_list_bulleted',
     templates: [
-      { id:'custom',        label:'3. Full-Bleed Banner',         desc:'Full-bleed banner header with matching footer',        Component:CustomTemplate },
-      { id:'darkheader',    label:'6. Heavy Header Bar',          desc:'Heavy header bar with three-column info strip',        Component:DarkHeaderTemplate },
-      { id:'greenaccent',   label:'8. Side Panel with Invoice Box', desc:'Inline invoice box, side-by-side totals and client panel', Component:GreenAccentTemplate },
-      { id:'tealgeometric', label:'9. Accent Table Header',       desc:'Accent table header with corner signature block',      Component:TealGeometricTemplate },
+      { id:'redbold',     label:'7. Full Field Labels',     desc:'Sender and receiver details listed with bold labels',  Component:RedBoldTemplate },
+      { id:'greenaccent', label:'8. Side Summary Box',      desc:'A dedicated box on the side holds totals and client details', Component:GreenAccentTemplate },
     ],
   },
   {
-    groupLabel: 'Statement',
-    groupDesc: 'Bold layouts that leave an impression',
-    groupIcon: 'style',
+    groupLabel: 'Info Strip',
+    groupDesc: 'Packs in your business details without clutter',
+    groupIcon: 'table_rows',
     templates: [
-      { id:'pinkdiagonal', label:'10. Diagonal Header',           desc:'Diagonal full-bleed header with corner signature',     Component:PinkDiagonalTemplate },
+      { id:'darkheader',    label:'6. Three-Column Details', desc:'Payment, delivery, and billing info in one row',      Component:DarkHeaderTemplate },
+      { id:'tealgeometric', label:'9. Strip and Signature',  desc:'Slim info bar at the top with a sign line at the base', Component:TealGeometricTemplate },
+    ],
+  },
+  {
+    groupLabel: 'Payment Options',
+    groupDesc: 'Shows all the ways your customer can pay you',
+    groupIcon: 'payments',
+    templates: [
+      { id:'blueclean', label:'11. Payment Tiles', desc:'Separate boxes for bank transfer, mobile money, and cash', Component:BlueCleanTemplate },
     ],
   },
 ]
 
 // ─────────────────────────────────────────────────────────────
-// Receipt preview sample data
+// Receipt sample data
 // ─────────────────────────────────────────────────────────────
 
 const RECEIPT_SAMPLE = {
@@ -924,14 +928,12 @@ const RECEIPT_BRAND_SAMPLE = {
   email: 'info@adeolacouture.ng',
   website: 'adeolacouture.ng',
   currency: '₦',
-  // No colour hex — all templates now use CSS variables via useBrandTokens
   footer: 'Thank you for your payment!',
   showTax: false,
   taxRate: 0,
 }
 
-// ── Receipt preview helpers ────────────────────────────────────
-
+// Receipt helpers
 function rFmt(amount) {
   const n = parseFloat(amount) || 0
   return `₦${n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -942,7 +944,7 @@ function rResolvePaid(receipt) {
   return (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
 }
 
-// Shared receipt payment summary for preview templates
+// Shared receipt item + payment summary block
 function RPreviewSummary({ receipt }) {
   const orderTotal     = receipt.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? (parseFloat(receipt.orderPrice) || 0)
   const cumulativePaid = rResolvePaid(receipt)
@@ -973,14 +975,16 @@ function RPreviewSummary({ receipt }) {
   )
 }
 
-// ── Receipt Preview Templates (static, for picker only) ────────
-// All colour is driven by CSS variables set via useBrandTokens on the
-// TemplateModal wrapper — no hardcoded hex fallbacks needed here.
+// ══════════════════════════════════════════════════════════════
+// RECEIPT PREVIEWS — exact same structure as invoice counterparts,
+// only document type (RECEIPT), labels, and content differ.
+// ══════════════════════════════════════════════════════════════
 
+// Receipt 1 — Centered Balance
 function REditablePreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
-    <div className={styles.pBase} style={{ padding: '22px 20px' }}>
+    <div className={styles.pBase}>
       <div className={styles.pBrandCenter}>
         <div className={styles.pBrandName}>{b.name}</div>
         <div className={styles.pBrandSub}>{b.address}</div>
@@ -990,22 +994,39 @@ function REditablePreview() {
         <div className={styles.pInvoiceWordCentre}>RECEIPT</div>
         <div className={styles.pInvoiceLine} />
       </div>
-      <div className={styles.pBody} style={{ margin: '16px 0' }}>
-        <div className={styles.pMetaRow} style={{ marginBottom: 18 }}>
-          <div><div className={styles.pSmallCap}>RECEIVED FROM:</div><strong>{c.name}</strong><br />{c.phone}</div>
-          <div style={{ textAlign: 'right', fontSize: '7px' }}>Receipt #: <strong>{r.number}</strong><br />Date: <strong>{r.date}</strong></div>
+      <div className={styles.pBody}>
+        <div className={styles.pMetaRow}>
+          <div>
+            <div className={styles.pSmallCap}>RECEIVED FROM:</div>
+            <strong>{c.name}</strong><br />{c.phone}
+          </div>
+          <div style={{ textAlign: 'right', fontSize: '7px' }}>
+            Receipt #: <strong>{r.number}</strong><br />
+            Date: <strong>{r.date}</strong>
+          </div>
         </div>
         <RPreviewSummary receipt={r} />
       </div>
-      <div className={styles.pFooter} style={{ paddingTop: 14 }}><div className={styles.pFootSection}><strong>Notes:</strong><br />{b.footer}</div></div>
+      <div className={styles.pFooter}>
+        <div className={styles.pFootSection}>
+          <strong>Payment Received via:</strong><br />
+          GT Bank — {b.name}<br />
+          Account: 0123456789
+        </div>
+        <div className={styles.pFootSection}>
+          <strong>Notes:</strong><br />
+          {b.footer}
+        </div>
+      </div>
     </div>
   )
 }
 
+// Receipt 2 — Triple-Box Info Bar
 function RFreePreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
-    <div className={styles.pBase} style={{ padding: '22px 20px' }}>
+    <div className={styles.pBase}>
       <div className={styles.pHeaderFree}>
         <div className={styles.pTitleBlock}>
           <div className={styles.pLargeTitle}>RECEIPT</div>
@@ -1013,17 +1034,34 @@ function RFreePreview() {
         </div>
         <div className={styles.pLogoPlaceholderBig}>{b.name}</div>
       </div>
-      <div className={styles.pFreeGrid} style={{ marginBottom: 16 }}>
-        <div className={styles.pFreeBox}><div className={styles.pSmallCap}>FROM:</div><strong>{b.name}</strong><br />{b.address}</div>
-        <div className={styles.pFreeBox}><div className={styles.pSmallCap}>RECEIVED FROM:</div><strong>{c.name}</strong><br />{c.phone}</div>
-        <div className={styles.pFreeBox}><div className={styles.pSmallCap}>DATE:</div><strong>{r.date}</strong></div>
+      <div className={styles.pFreeGrid}>
+        <div className={styles.pFreeBox}>
+          <div className={styles.pSmallCap}>FROM:</div>
+          <strong>{b.name}</strong><br />{b.address}<br />{b.phone}
+        </div>
+        <div className={styles.pFreeBox}>
+          <div className={styles.pSmallCap}>RECEIVED FROM:</div>
+          <strong>{c.name}</strong><br />{c.phone}
+        </div>
+        <div className={styles.pFreeBox}>
+          <div className={styles.pSmallCap}>DATE:</div><strong>{r.date}</strong>
+        </div>
       </div>
-      <div className={styles.pBody} style={{ margin: '0 0 8px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.pBody}>
+        <RPreviewSummary receipt={r} />
+      </div>
+      <div className={styles.pFooter}>
+        <div className={styles.pFootSection}>
+          <strong>Payment Received via:</strong><br />
+          GT Bank — {b.name}, Account: 0123456789
+        </div>
+      </div>
       <div className={styles.pFooterGray}>{b.footer}</div>
     </div>
   )
 }
 
+// Receipt 3 — Full-Bleed Banner
 function RCustomPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
@@ -1035,19 +1073,44 @@ function RCustomPreview() {
           <div className={styles.pWhiteNo}>{r.number}</div>
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 8, padding: '14px 18px 8px', fontSize: '7px' }}>
-        <div style={{ flex: 1 }}><div className={styles.pSmallCap}>FROM:</div><strong>{b.name}</strong><br />{b.address}</div>
-        <div style={{ flex: 1 }}><div className={styles.pSmallCap}>RECEIVED FROM:</div><strong>{c.name}</strong><br />{c.phone}</div>
-        <div style={{ flex: 1 }}><div className={styles.pSmallCap}>DATE:</div><strong>{r.date}</strong></div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', gap: 8, padding: '10px 14px 6px', fontSize: '7px' }}>
+          <div style={{ flex: 1 }}>
+            <div className={styles.pSmallCap}>FROM:</div>
+            <strong>{b.name}</strong><br />{b.address}<br />{b.phone}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div className={styles.pSmallCap}>RECEIVED FROM:</div>
+            <strong>{c.name}</strong><br />{c.phone}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div className={styles.pSmallCap}>DATE:</div>
+            <strong>{r.date}</strong>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div className={styles.pSmallCap}>RECEIPT #:</div>
+            <strong>{r.number}</strong>
+          </div>
+        </div>
+        <div style={{ padding: '0 14px', flex: 1 }}>
+          <RPreviewSummary receipt={r} />
+        </div>
       </div>
-      <div style={{ padding: '0 18px' }}><RPreviewSummary receipt={r} /></div>
-      <div className={styles.pPurpleBottom} style={{ marginTop: 12 }}>
-        <div className={styles.pPurpleFootRow}><div className={styles.pFootSectionWhite}>{b.footer}</div></div>
+      <div className={styles.pPurpleBottom}>
+        <div className={styles.pPurpleFootRow}>
+          <div className={styles.pFootSectionWhite}>
+            <strong>Payment Received via:</strong><br />GT Bank — Account: 0123456789
+          </div>
+          <div className={styles.pFootSectionWhite}>
+            <strong>Notes:</strong><br />{b.footer}
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
+// Receipt 4 — Dual-Column Compact
 function RPrintablePreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
@@ -1056,187 +1119,539 @@ function RPrintablePreview() {
       <div className={styles.p4Header}>
         <div className={styles.p4InvoiceWord}>RECEIPT</div>
         <div className={styles.p4HeaderRight}>
-          <div className={styles.p4MetaRow}><span className={styles.p4MetaKey}>DATE</span><span className={styles.p4MetaVal}>{r.date}</span></div>
-          <div className={styles.p4MetaRow}><span className={styles.p4MetaKey}>RECEIPT #</span><span className={styles.p4MetaVal}>{r.number}</span></div>
+          <div className={styles.p4MetaRow}>
+            <span className={styles.p4MetaKey}>DATE</span>
+            <span className={styles.p4MetaVal}>{r.date}</span>
+          </div>
+          <div className={styles.p4MetaRow}>
+            <span className={styles.p4MetaKey}>RECEIPT #</span>
+            <span className={styles.p4MetaVal}>{r.number}</span>
+          </div>
         </div>
       </div>
       <div className={styles.p4BillRow}>
-        <div className={styles.p4BillBlock}><div className={styles.p4BillLabel}>FROM</div><div className={styles.p4BillName}>{b.name}</div><div className={styles.p4BillInfo}>{b.address}</div></div>
-        <div className={styles.p4BillBlock} style={{ textAlign: 'right' }}><div className={styles.p4BillLabel}>RECEIVED FROM</div><div className={styles.p4BillName}>{c.name}</div><div className={styles.p4BillInfo}>{c.phone}</div></div>
+        <div className={styles.p4BillBlock}>
+          <div className={styles.p4BillLabel}>FROM</div>
+          <div className={styles.p4BillName}>{b.name}</div>
+          <div className={styles.p4BillInfo}>{b.address}</div>
+          <div className={styles.p4BillInfo}>{b.phone}</div>
+        </div>
+        <div className={styles.p4BillBlock} style={{ textAlign: 'right' }}>
+          <div className={styles.p4BillLabel}>RECEIVED FROM</div>
+          <div className={styles.p4BillName}>{c.name}</div>
+          <div className={styles.p4BillInfo}>{c.phone}</div>
+        </div>
       </div>
       <div className={styles.p4Divider} />
-      <div style={{ padding: '0 16px' }}><RPreviewSummary receipt={r} /></div>
+      <div style={{ padding: '0 16px' }}>
+        <RPreviewSummary receipt={r} />
+      </div>
+      <div className={styles.p4Footer}>
+        <div className={styles.p4FootBlock}>
+          <div className={styles.p4FootLabel}>Payment Received via:</div>
+          <div className={styles.p4FootInfo}>GT Bank — {b.name}</div>
+          <div className={styles.p4FootInfo}>Account No: 0123456789</div>
+        </div>
+        <div className={styles.p4FootBlock}>
+          <div className={styles.p4FootLabel}>Notes:</div>
+          <div className={styles.p4FootInfo}>{b.footer}</div>
+        </div>
+      </div>
     </div>
   )
 }
 
+// Receipt 5 — Solid Header and Base
 function RCanvaPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
     <div className={styles.t5Base}>
-      <div className={styles.t5Top}><div className={styles.t5Title}>Receipt</div><div className={styles.t5TopRight}><div>{r.date}</div><div><strong>Receipt No. {r.number}</strong></div></div></div>
+      <div className={styles.t5Top}>
+        <div className={styles.t5Title}>Receipt</div>
+        <div className={styles.t5TopRight}>
+          <div>{r.date}</div>
+          <div><strong>Receipt No. {r.number}</strong></div>
+        </div>
+      </div>
       <div className={styles.t5Divider} />
-      <div className={styles.t5BilledTo}><div className={styles.t5BilledLabel}>Received from:</div><div><strong>{c.name}</strong></div><div>{c.phone}</div></div>
+      <div className={styles.t5BilledTo}>
+        <div className={styles.t5BilledLabel}>Received from:</div>
+        <div><strong>{c.name}</strong></div>
+        <div>{c.phone}</div>
+      </div>
       <div className={styles.t5Divider} />
       <RPreviewSummary receipt={r} />
       <div className={styles.t5Divider} />
-      <div className={styles.t5Footer}><div /><div style={{ textAlign: 'right' }}><div><strong>{b.name}</strong></div><div>{b.phone}</div></div></div>
+      <div className={styles.t5Footer}>
+        <div>
+          <div className={styles.t5FootLabel}>Payment Received via</div>
+          <div>{b.name}</div>
+          <div>Bank: GT Bank Nigeria</div>
+          <div>Account No: 0123 4567 89</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div><strong>{b.ownerName}</strong></div>
+          <div>{b.address}</div>
+          <div>{b.phone}</div>
+          <div>{b.email}</div>
+        </div>
+      </div>
     </div>
   )
 }
 
+// Receipt 6 — Three-Column Grid
+// Uses solid border-bottom on table rows (matching invoice design)
 function RDarkHeaderPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
     <div className={styles.t6Base}>
       <div className={styles.t6Header}>
-        <div className={styles.t6LogoArea}><div className={styles.t6LogoCircle}><span className="mi" style={{ fontSize: 13, color: '#1a1a1a' }}>checkroom</span></div><div><div className={styles.t6CompanyName}>{b.name.toUpperCase()}</div></div></div>
+        <div className={styles.t6LogoArea}>
+          <div className={styles.t6LogoCircle}>
+            <span className="mi" style={{ fontSize: 13, color: '#1a1a1a' }}>checkroom</span>
+          </div>
+          <div>
+            <div className={styles.t6CompanyName}>{b.name.toUpperCase()}</div>
+            <div className={styles.t6CompanySub}>TAILORING STUDIO</div>
+          </div>
+        </div>
         <div className={styles.t6HeaderRight}><div>{b.address}</div></div>
-        <div className={styles.t6HeaderRight}><div>{b.phone}</div></div>
+        <div className={styles.t6HeaderRight}><div>{b.phone}</div><div>{b.email}</div></div>
       </div>
-      <div className={styles.t6InvoiceRow}><div className={styles.t6InvoiceLeft}><span className={styles.t6InvoiceWord}>RECEIPT </span><span className={styles.t6InvoiceNum}>#{r.number}</span></div><div className={styles.t6InvoiceRight}><div><span className={styles.t6Label}>DATE:</span> {r.date}</div></div></div>
-      <div className={styles.t6InfoRow}><div><div className={styles.t6InfoLabel}>FROM:</div>{b.name}<br />{b.address}</div><div><div className={styles.t6InfoLabel}>RECEIVED FROM:</div>{c.name}<br />{c.phone}</div></div>
-      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.t6InvoiceRow}>
+        <div className={styles.t6InvoiceLeft}>
+          <span className={styles.t6InvoiceWord}>RECEIPT </span>
+          <span className={styles.t6InvoiceNum}>#{r.number}</span>
+        </div>
+        <div className={styles.t6InvoiceRight}>
+          <div><span className={styles.t6Label}>DATE:</span> {r.date}</div>
+          <div><span className={styles.t6Label}>TOTAL:</span> {rFmt('56200')}</div>
+        </div>
+      </div>
+      <div className={styles.t6InfoRow}>
+        <div>
+          <div className={styles.t6InfoLabel}>PAYMENT:</div>
+          <strong>GT BANK</strong><br />
+          {b.name}<br />Acct: 0123456789<br />
+          <strong style={{ display: 'block', marginTop: 3 }}>TRANSFER</strong>
+          {b.email}
+        </div>
+        <div>
+          <div className={styles.t6InfoLabel}>RECEIVED BY:</div>
+          {b.name}<br />{b.address}
+        </div>
+        <div>
+          <div className={styles.t6InfoLabel}>RECEIVED FROM:</div>
+          {c.name}<br />{c.phone}
+        </div>
+      </div>
+      <div className={styles.t6TableHead}>
+        <span style={{ flex: 3 }}>DESCRIPTION</span><span>PRICE</span><span>QTY</span><span>TOTAL</span>
+      </div>
+      {TAILOR_ROWS.map(([d, p, q, t]) => (
+        // solid border matches invoice design — t6TableRowSolid defined in CSS
+        <div key={d} className={styles.t6TableRowSolid}>
+          <span style={{ flex: 3 }}>{d}</span><span>{p}</span><span>{q}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t6TotalsArea}>
+        <div className={styles.t6TotRow}><span>SUBTOTAL</span><span>₦56,200</span></div>
+        <div className={styles.t6TotRow}><span>TAX</span><span>₦0</span></div>
+        <div className={styles.t6TotTotal}><span>TOTAL RECEIVED</span><span>{rFmt('56200')}</span></div>
+      </div>
       <div className={styles.t6ThankYou}>{b.footer}</div>
     </div>
   )
 }
 
+// Receipt 7 — Formal Field-Labelled (numbered rows, same as invoice)
 function RRedBoldPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
     <div className={styles.t7Base}>
       <div className={styles.t7Header}>
-        <div className={styles.t7LogoCircle}><span className="mi" style={{ fontSize: 13, color: 'var(--brand-primary)' }}>checkroom</span></div>
-        <div className={styles.t7TitleGroup}><span className={styles.t7InvoiceWord}>RECEIPT</span><span className={styles.t7InvoiceNum}>#{r.number}</span></div>
-        <div className={styles.t7DateBlock}><div className={styles.t7DateLabel}>DATE:</div><div className={styles.t7DateVal}>{r.date}</div></div>
+        <div className={styles.t7LogoCircle}>
+          <span className="mi" style={{ fontSize: 13, color: 'var(--brand-primary)' }}>checkroom</span>
+        </div>
+        <div className={styles.t7TitleGroup}>
+          <span className={styles.t7InvoiceWord}>RECEIPT</span>
+          <span className={styles.t7InvoiceNum}>#{r.number}</span>
+        </div>
+        <div className={styles.t7DateBlock}>
+          <div className={styles.t7DateLabel}>DATE:</div>
+          <div className={styles.t7DateVal}>{r.date.toUpperCase()}</div>
+        </div>
       </div>
       <div className={styles.t7Divider} />
       <div className={styles.t7FromTo}>
-        <div className={styles.t7FromToBlock}><div className={styles.t7FromLabel}>FROM:</div><div className={styles.t7FromDivider} />{[['NAME:',b.name],['PHONE:',b.phone]].map(([l,v])=>(<div key={l} className={styles.t7InfoRow}><span className={styles.t7InfoKey}>{l}</span><span className={styles.t7InfoVal}>{v}</span></div>))}</div>
-        <div className={styles.t7FromToBlock}><div className={styles.t7ToLabel}>TO:</div><div className={styles.t7FromDivider} />{[['NAME:',c.name],['PHONE:',c.phone]].map(([l,v])=>(<div key={l} className={styles.t7InfoRow}><span className={styles.t7InfoKey}>{l}</span><span className={styles.t7InfoVal}>{v}</span></div>))}</div>
+        <div className={styles.t7FromToBlock}>
+          <div className={styles.t7FromLabel}>FROM:</div>
+          <div className={styles.t7FromDivider} />
+          {[['NAME:',b.ownerName],['COMPANY:',b.name.toUpperCase()],['ADDRESS:',b.address.split(',')[0]],['CITY:','SURULERE, LAGOS'],['PHONE:',b.phone]].map(([l,v])=>(
+            <div key={l} className={styles.t7InfoRow}><span className={styles.t7InfoKey}>{l}</span><span className={styles.t7InfoVal}>{v}</span></div>
+          ))}
+        </div>
+        <div className={styles.t7FromToBlock}>
+          <div className={styles.t7ToLabel}>TO:</div>
+          <div className={styles.t7FromDivider} />
+          {[['NAME:',c.name.toUpperCase()],['PHONE:',c.phone],['ADDRESS:',c.address?.split(',')[0] || '22 AKIN ADESOLA ST'],['CITY:','VICTORIA ISLAND']].map(([l,v])=>(
+            <div key={l} className={styles.t7InfoRow}><span className={styles.t7InfoKey}>{l}</span><span className={styles.t7InfoVal}>{v}</span></div>
+          ))}
+        </div>
       </div>
       <div className={styles.t7Divider} />
-      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
-      <div className={styles.t7TotalBar}><span>RECEIVED:</span><span className={styles.t7TotalAmt}>{rFmt('56200')}</span></div>
+      <div className={styles.t7ForLabel}>FOR:</div>
+      <div className={styles.t7TableHead}>
+        <span className={styles.t7NumCol}>No.</span>
+        <span style={{ flex: 3 }}>Description</span>
+        <span style={{ flex:1,textAlign:'right' }}>Qty</span>
+        <span style={{ flex:1,textAlign:'right' }}>Price</span>
+        <span style={{ flex:1,textAlign:'right' }}>Total</span>
+      </div>
+      {NUMBERED_ROWS.map(([n,d,q,p,t])=>(
+        <div key={n} className={styles.t7TableRow}>
+          <span className={styles.t7NumCol}>{n}</span>
+          <span style={{ flex:3 }}>{d}</span>
+          <span style={{ flex:1,textAlign:'right' }}>{q}</span>
+          <span style={{ flex:1,textAlign:'right' }}>{p}</span>
+          <span className={styles.t7RedPrice}>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t7TotalBar}>
+        <span>RECEIVED:</span>
+        <span className={styles.t7TotalAmt}>{rFmt('56200')}</span>
+      </div>
     </div>
   )
 }
 
+// Receipt 8 — Integrated Summary Box (full bottom: client box + payment + totals + sign)
 function RGreenAccentPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
     <div className={styles.t8Base}>
       <div className={styles.t8Header}>
-        <div className={styles.t8LogoArea}><span className="mi" style={{ fontSize: 20, color: '#333' }}>checkroom</span><div><div className={styles.t8BrandName}>{b.name}</div></div></div>
-        {/* t8InvoiceBox uses var(--brand-gradient) via CSS — no inline style needed */}
-        <div className={styles.t8InvoiceBox}><div className={styles.t8InvoiceTitle}>RECEIPT</div><div className={styles.t8InvoiceMeta}><span>Receipt#</span><span>{r.number}</span><span>Date</span><span>{r.date}</span></div></div>
+        <div className={styles.t8LogoArea}>
+          <span className="mi" style={{ fontSize: 20, color: '#333' }}>checkroom</span>
+          <div>
+            <div className={styles.t8BrandName}>{b.name}</div>
+            <div className={styles.t8BrandSub}>TAILORING STUDIO</div>
+          </div>
+        </div>
+        <div className={styles.t8InvoiceBox}>
+          <div className={styles.t8InvoiceTitle}>RECEIPT</div>
+          <div className={styles.t8InvoiceMeta}>
+            <span>Receipt#</span><span>{r.number}</span>
+            <span>Date</span><span>{r.date}</span>
+          </div>
+        </div>
       </div>
-      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.t8TableHead}>
+        <span>SL.</span>
+        <span style={{ flex:3 }}>Description</span>
+        <span>Price</span><span>Qty</span><span>Total</span>
+      </div>
+      {TAILOR_ROWS.map(([d,p,q,t],i)=>(
+        <div key={d} className={styles.t8TableRow}>
+          <span>{i+1}</span>
+          <span style={{ flex:3 }}>{d}</span>
+          <span>{p}</span><span>{q}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t8Divider} />
       <div className={styles.t8Bottom}>
-        {/* t8GreenBox uses var(--brand-gradient) via CSS — no inline style needed */}
-        <div className={styles.t8GreenBox}><div className={styles.t8GreenBoxTitle}>Received from:</div><div className={styles.t8GreenBoxName}>{c.name}</div><div className={styles.t8GreenBoxAddr}>{c.phone}</div></div>
-        <div style={{ flex: 1 }} />
-        <div className={styles.t8Totals}><div className={styles.t8TotRow}><span>Received:</span><span style={{ color: '#16a34a', fontWeight: 700 }}>{rFmt('56200')}</span></div><div className={styles.t8SignLine}>Authorised Sign</div></div>
+        <div className={styles.t8GreenBox}>
+          <div className={styles.t8GreenBoxTitle}>Received from:</div>
+          <div className={styles.t8GreenBoxName}>{c.name}</div>
+          <div className={styles.t8GreenBoxAddr}>{c.phone}<br />{c.address}</div>
+          <div className={styles.t8GreenDivider} />
+          <div className={styles.t8GreenBoxTitle}>Terms &amp; Conditions</div>
+          <div className={styles.t8GreenBoxAddr}>All garments collected within 30 days of completion.</div>
+        </div>
+        <div className={styles.t8PaymentInfo}>
+          <div className={styles.t8PayLabel}>Payment Received via:</div>
+          <div>Account #: 0123 4567 89</div>
+          <div>A/C Name: {b.name}</div>
+          <div>Bank: GT Bank Nigeria</div>
+          <div className={styles.t8ThankYou}>{b.footer}</div>
+        </div>
+        <div className={styles.t8Totals}>
+          <div className={styles.t8TotRow}><span>Sub Total:</span><span>₦56,200</span></div>
+          <div className={styles.t8TotRow}><span>Tax:</span><span>0.00%</span></div>
+          <div className={styles.t8TotDivider} />
+          <div className={styles.t8TotTotal}><span>Received:</span><span>{rFmt('56200')}</span></div>
+          <div className={styles.t8SignLine}>Authorised Sign</div>
+        </div>
       </div>
     </div>
   )
 }
 
+// Receipt 9 — Accent Strip and Signature (footer with thank you + signature, same as invoice)
 function RTealGeometricPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
     <div className={styles.t9Base}>
-      {/* t9InvoiceTitle colour is driven by var(--brand-primary) in CSS */}
-      <div className={styles.t9Header}><div><div className={styles.t9LogoRow}><span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span><span className={styles.t9CompanyName}>{b.name.toUpperCase()}</span></div></div><div className={styles.t9InvoiceTitle}>RECEIPT</div></div>
-      <div className={styles.t9NumBar}><span>RECEIPT # {r.number}</span><span>|</span><span>DATE: {r.date}</span></div>
-      <div className={styles.t9BillShip}><div><span className={styles.t9BillLabel}>Received from:</span><div><strong>{c.name}</strong></div><div>{c.phone}</div></div><div><span className={styles.t9BillLabel}>From:</span><div><strong>{b.name}</strong></div><div>{b.phone}</div></div></div>
-      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.t9Header}>
+        <div>
+          <div className={styles.t9LogoRow}>
+            <span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span>
+            <span className={styles.t9CompanyName}>{b.name.toUpperCase()}</span>
+          </div>
+          <div className={styles.t9CompanySub}>TAILORING STUDIO</div>
+          <div className={styles.t9CompanyAddr}>{b.address}</div>
+        </div>
+        <div className={styles.t9InvoiceTitle}>RECEIPT</div>
+      </div>
+      <div className={styles.t9NumBar}>
+        <span>RECEIPT # {r.number}</span><span>|</span><span>DATE: {r.date}</span>
+      </div>
+      <div className={styles.t9BillShip}>
+        <div>
+          <span className={styles.t9BillLabel}>Received from:</span>
+          <div><strong>{c.name}</strong></div>
+          <div>{c.phone}</div>
+        </div>
+        <div>
+          <span className={styles.t9BillLabel}>Received by:</span>
+          <div><strong>{b.name}</strong></div>
+          <div>{b.phone}</div>
+        </div>
+      </div>
+      <div className={styles.t9TableHead}>
+        <span>QTY</span>
+        <span style={{ flex:3 }}>DESCRIPTION</span>
+        <span>PRICE</span><span>TOTAL</span>
+      </div>
+      {[['1','Custom Agbada Sewing','₦8,500','₦8,500'],['2','Senator Suit Stitching','₦6,200','₦12,400'],['3','Ankara Dress Alteration','₦2,500','₦7,500'],['1','Bridal Gown Fitting','₦15,000','₦15,000']].map(([q,d,p,t])=>(
+        <div key={d} className={styles.t9TableRow}>
+          <span>{q}</span><span style={{ flex:3 }}>{d}</span><span>{p}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t9SubArea}>
+        <div className={styles.t9SubRow}><span>Subtotal</span><span>₦43,400</span></div>
+        <div className={styles.t9SubRow}><span>Tax</span><span>0.00%</span></div>
+      </div>
       <div className={styles.t9TotalBar}><span>AMOUNT RECEIVED</span><span>{rFmt('56200')}</span></div>
+      <div className={styles.t9Footer}>
+        <div>
+          <div className={styles.t9ThankYou}>{b.footer.toUpperCase()}</div>
+          <div className={styles.t9PayNote}>Payment received on {r.date}.</div>
+        </div>
+        <div className={styles.t9SignArea}>
+          <div className={styles.t9SignLine} />
+          <div className={styles.t9SignLabel}>Signature</div>
+        </div>
+      </div>
+      <div className={styles.t9CornerDeco} />
     </div>
   )
 }
 
+// Receipt 10 — Slanted Geometric (full bottom: payment info + totals + sign block + corner)
 function RPinkDiagonalPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
     <div className={styles.t10Base}>
       <div className={styles.t10HeaderZone}>
-        {/* t10FullBanner and t10CornerPink use var(--brand-gradient) in CSS */}
-        <div className={styles.t10FullBanner}><span className={styles.t10BannerTitle}>RECEIPT</span></div>
-        <div className={styles.t10BrandInBanner}><span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span><div><div className={styles.t10BrandName}>{b.name}</div><div className={styles.t10BrandSub}>TAILOR SHOP</div></div></div>
+        <div className={styles.t10FullBanner}>
+          <span className={styles.t10BannerTitle}>RECEIPT</span>
+        </div>
+        <div className={styles.t10BrandInBanner}>
+          <span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span>
+          <div>
+            <div className={styles.t10BrandName}>{b.name}</div>
+            <div className={styles.t10BrandSub}>TAILORING STUDIO</div>
+          </div>
+        </div>
       </div>
-      <div className={styles.t10MetaRow}><div><div className={styles.t10MetaLabel}>Received from:</div><div className={styles.t10MetaName}>{c.name}</div><div className={styles.t10MetaAddr}>{c.phone}</div></div><div style={{ textAlign:'right' }}><div><span className={styles.t10MetaKey}>Receipt#</span> <strong>{r.number}</strong></div><div><span className={styles.t10MetaKey}>Date</span> <strong>{r.date}</strong></div></div></div>
-      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.t10MetaRow}>
+        <div>
+          <div className={styles.t10MetaLabel}>Received from:</div>
+          <div className={styles.t10MetaName}>{c.name}</div>
+          <div className={styles.t10MetaAddr}>{c.phone}<br />{c.address}</div>
+        </div>
+        <div style={{ textAlign:'right' }}>
+          <div><span className={styles.t10MetaKey}>Receipt#</span> <strong>{r.number}</strong></div>
+          <div><span className={styles.t10MetaKey}>Date</span> <strong>{r.date}</strong></div>
+        </div>
+      </div>
+      <div className={styles.t10TableHead}>
+        <span>SL.</span>
+        <span style={{ flex:3 }}>Description</span>
+        <span>Price</span><span>Qty</span><span>Total</span>
+      </div>
+      {TAILOR_ROWS.map(([d,p,q,t],i)=>(
+        <div key={d} className={styles.t10TableRow}>
+          <span>{i+1}</span>
+          <span style={{ flex:3 }}>{d}</span>
+          <span>{p}</span><span>{q}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t10Divider} />
+      <div className={styles.t10Bottom}>
+        <div style={{ flex:1 }}>
+          <div className={styles.t10ThankYou}>{b.footer}</div>
+          <div className={styles.t10PayLabel}>Payment Received via:</div>
+          <div className={styles.t10PayInfo}>
+            Account #: 0123 4567 89<br />
+            A/C Name: {b.name}<br />
+            Bank: GT Bank Nigeria
+          </div>
+          <div className={styles.t10TCLabel}>Terms &amp; Conditions</div>
+          <div className={styles.t10TCText}>Garments not collected within 30 days become property of the studio.</div>
+        </div>
+        <div className={styles.t10RightCol}>
+          <div className={styles.t10TotalsWrap}>
+            <div className={styles.t10TotRow}><span>Sub Total:</span><span>₦56,200</span></div>
+            <div className={styles.t10TotRow}><span>Tax:</span><span>0.00%</span></div>
+            <div className={styles.t10TotDivider} />
+            <div className={styles.t10TotTotal}><span>Received:</span><span>{rFmt('56200')}</span></div>
+          </div>
+          <div className={styles.t10SignBlock}>
+            <div className={styles.t10SignLine} />
+            <div className={styles.t10SignLabel}>Authorised Sign</div>
+          </div>
+        </div>
+      </div>
       <div className={styles.t10CornerPink} />
     </div>
   )
 }
 
+// Receipt 11 — Multi-Tile Payment Grid (full payment tiles + thank you, same as invoice)
 function RBlueCleanPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
     <div className={styles.t11Base}>
-      <div className={styles.t11TopBar}><div className={styles.t11LogoArea}><div className={styles.t11LogoHex}><span className="mi" style={{ fontSize:11,color:'#fff' }}>checkroom</span></div><div><div className={styles.t11CompanyName}>{b.name.toUpperCase()}</div></div></div><div className={styles.t11CompanyInfo} style={{ textAlign:'right' }}><div>{b.phone}</div></div></div>
+      <div className={styles.t11TopBar}>
+        <div className={styles.t11LogoArea}>
+          <div className={styles.t11LogoHex}>
+            <span className="mi" style={{ fontSize:11,color:'#fff' }}>checkroom</span>
+          </div>
+          <div>
+            <div className={styles.t11CompanyName}>{b.name.toUpperCase()}</div>
+            <div className={styles.t11CompanySub}>Tailoring Studio</div>
+          </div>
+        </div>
+        <div className={styles.t11CompanyInfo}>
+          <div>{b.address}</div>
+        </div>
+        <div className={styles.t11CompanyInfo} style={{ textAlign:'right' }}>
+          <div>{b.website}</div>
+          <div>{b.email}</div>
+          <div>{b.phone}</div>
+        </div>
+      </div>
       <div className={styles.t11InvoiceTitle}>Receipt</div>
-      {/* t11BlueBar colour is driven by var(--brand-primary) / var(--brand-surface) in CSS */}
-      <div className={styles.t11BlueBar}><span>RECEIPT: #{r.number}</span><span>DATE: {r.date}</span><span>AMOUNT: {rFmt('56200')}</span></div>
-      <div className={styles.t11IssuedRow}><div><div className={styles.t11IssuedLabel}>RECEIVED FROM</div><div>{c.name}</div><div>{c.phone}</div></div><div style={{ textAlign:'right' }}><div className={styles.t11AmountLabel}>AMOUNT PAID</div><div className={styles.t11AmountVal}>{rFmt('56200')}</div></div></div>
-      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
-      <div className={styles.t11ThankYou}>{b.footer}</div>
+      <div className={styles.t11BlueBar}>
+        <span>RECEIPT: #{r.number}</span>
+        <span>DATE: {r.date}</span>
+        <span>AMOUNT: {rFmt('56200')}</span>
+      </div>
+      <div className={styles.t11IssuedRow}>
+        <div>
+          <div className={styles.t11IssuedLabel}>RECEIVED FROM</div>
+          <div>{c.name}</div>
+          <div>{c.phone}</div>
+        </div>
+        <div style={{ textAlign:'right' }}>
+          <div className={styles.t11AmountLabel}>AMOUNT PAID</div>
+          <div className={styles.t11AmountVal}>{rFmt('56200')}</div>
+        </div>
+      </div>
+      <div className={styles.t11ProjectName}>Payment for Tailoring Services</div>
+      <div className={styles.t11TableHead}>
+        <span style={{ flex:3 }}>Description</span>
+        <span>Qty</span><span>Price</span><span>Subtotal</span>
+      </div>
+      {TAILOR_ROWS.map(([d,p,q,t])=>(
+        <div key={d} className={styles.t11TableRow}>
+          <span style={{ flex:3 }}>• {d}</span>
+          <span>{q}</span><span>{p}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t11TotArea}>
+        <div className={styles.t11TotRow}><span>Subtotal</span><span>₦56,200</span></div>
+        <div className={styles.t11TotRow}><span>Tax 0.00%</span><span>₦0</span></div>
+        <div className={styles.t11TotBold}><span>TOTAL RECEIVED</span><span>{rFmt('56200')}</span></div>
+      </div>
+      <div className={styles.t11PayTitle}>Payment Received via</div>
+      <div className={styles.t11PayBoxRow}>
+        <div className={styles.t11PayBox}>
+          <div className={styles.t11PayBoxTitle}>Bank Transfer</div>
+          <div>GT Bank Nigeria<br />{b.name}<br />Acct: 0123456789</div>
+        </div>
+        <div className={styles.t11PayBox}>
+          <div className={styles.t11PayBoxTitle}>Mobile Money</div>
+          <div>OPay: 0801 234 5678<br />Palmpay: 0803 987 6543<br />{b.ownerName}</div>
+        </div>
+        <div className={styles.t11PayBox}>
+          <div className={styles.t11PayBoxTitle}>Cash / Other</div>
+          <div>Collected at studio<br />14 Bode Thomas St<br />Surulere, Lagos</div>
+        </div>
+      </div>
+      <div className={styles.t11ThankYou}>THANK YOU!</div>
     </div>
   )
 }
 
+// ─────────────────────────────────────────────────────────────
+// Receipt Template Groups (same order and grouping as invoice)
+// ─────────────────────────────────────────────────────────────
+
 const RECEIPT_TEMPLATE_GROUPS = [
   {
-    groupLabel: 'Essential',
-    groupDesc: 'Straightforward and clean — nothing in the way',
+    groupLabel: 'Simple and Clean',
+    groupDesc: 'Light, open layouts that are easy to read',
     templates: [
-      { id:'editable',  label:'1. Centred Line Receipt',     desc:'Centred header with flanking lines',              Component: REditablePreview },
-      { id:'free',      label:'2. Three-Column Info Bar',    desc:'Big receipt number with three-column info grid',  Component: RFreePreview },
-      { id:'printable', label:'4. Side-by-Side Classic',     desc:'Side-by-side billing blocks with accent top bar', Component: RPrintablePreview },
-      { id:'canva',     label:'5. Soft Divider Layout',      desc:'Soft header, dividers, sender details at base',   Component: RCanvaPreview },
+      { id:'editable',  label:'1. Centered Balance',    desc:'Business name in the middle with a line on each side',  Component: REditablePreview },
+      { id:'free',      label:'2. Triple-Box Info Bar', desc:'Three side-by-side boxes showing contact details',       Component: RFreePreview },
+      { id:'printable', label:'4. Dual-Column Compact', desc:'From and To details placed side by side',                Component: RPrintablePreview },
     ],
   },
   {
-    groupLabel: 'Structured',
-    groupDesc: 'Every detail in its place — easy to scan',
+    groupLabel: 'Bold Blocks',
+    groupDesc: 'Strong designs that use solid colour sections',
     templates: [
-      { id:'redbold',   label:'7. Field-Labelled From / To', desc:'Field-labelled From/To with numbered line items',     Component: RRedBoldPreview },
-      { id:'blueclean', label:'11. Info Bar with Amount',    desc:'Three-column header, info bar and amount display',    Component: RBlueCleanPreview },
+      { id:'custom',       label:'3. Full-Bleed Banner',    desc:'Big colour header at the top with a logo space',     Component: RCustomPreview },
+      { id:'canva',        label:'5. Solid Top and Bottom', desc:'Colour fills both the top header and the base',      Component: RCanvaPreview },
+      { id:'pinkdiagonal', label:'10. Slanted Header',      desc:'Header cuts diagonally with a matching corner fill', Component: RPinkDiagonalPreview },
     ],
   },
   {
-    groupLabel: 'Branded',
-    groupDesc: 'Built around your logo and colours',
+    groupLabel: 'Clear Labels',
+    groupDesc: 'Every section has a bold label so nothing is confusing',
     templates: [
-      { id:'custom',        label:'3. Full-Bleed Banner',           desc:'Full-bleed banner header with matching footer',        Component: RCustomPreview },
-      { id:'darkheader',    label:'6. Heavy Header Bar',            desc:'Heavy header bar with three-column info strip',        Component: RDarkHeaderPreview },
-      { id:'greenaccent',   label:'8. Side Panel with Receipt Box', desc:'Inline receipt box, side-by-side totals and client panel', Component: RGreenAccentPreview },
-      { id:'tealgeometric', label:'9. Accent Table Header',         desc:'Accent table header with corner signature block',      Component: RTealGeometricPreview },
+      { id:'redbold',     label:'7. Full Field Labels',    desc:'Sender and receiver details listed with bold labels',       Component: RRedBoldPreview },
+      { id:'greenaccent', label:'8. Side Summary Box',     desc:'A dedicated box on the side holds totals and client details', Component: RGreenAccentPreview },
     ],
   },
   {
-    groupLabel: 'Statement',
-    groupDesc: 'Bold layouts that leave an impression',
+    groupLabel: 'Info Strip',
+    groupDesc: 'Packs in your business details without clutter',
     templates: [
-      { id:'pinkdiagonal', label:'10. Diagonal Header', desc:'Diagonal full-bleed header with corner signature', Component: RPinkDiagonalPreview },
+      { id:'darkheader',    label:'6. Three-Column Details', desc:'Payment, delivery, and billing info in one row',       Component: RDarkHeaderPreview },
+      { id:'tealgeometric', label:'9. Strip and Signature',  desc:'Slim info bar at the top with a sign line at the base', Component: RTealGeometricPreview },
+    ],
+  },
+  {
+    groupLabel: 'Payment Options',
+    groupDesc: 'Shows all the ways your customer can pay you',
+    templates: [
+      { id:'blueclean', label:'11. Payment Tiles', desc:'Separate boxes for bank transfer, mobile money, and cash', Component: RBlueCleanPreview },
     ],
   },
 ]
 
 // ─────────────────────────────────────────────────────────────
 // Template Modal
-// Injects the user's saved brand colour tokens onto a ref so that
-// every template preview inside uses var(--brand-*) correctly.
 // ─────────────────────────────────────────────────────────────
 
 function TemplateModal({ isOpen, currentTemplate, colourId, onClose, onSelect }) {
   const [selected, setSelected] = useState(currentTemplate || 'editable')
   const [activeTab, setActiveTab] = useState('invoice')
-  // Inject brand tokens scoped to this modal overlay so previews pick
-  // up the user's actual saved colour without polluting :root.
   const modalRef = useRef(null)
   useBrandTokens(colourId, modalRef)
 
@@ -1247,7 +1662,6 @@ function TemplateModal({ isOpen, currentTemplate, colourId, onClose, onSelect })
   return (
     <div className={styles.fullOverlay} ref={modalRef}>
       <Header type="back" title="Templates" onBackClick={onClose} customActions={[{label:'Select',onClick:()=>{onSelect(selected);onClose()}}]} />
-      {/* Tab bar */}
       <div className={styles.tabBar}>
         <button className={`${styles.tabBtn} ${activeTab==='invoice'?styles.tabBtnActive:''}`} onClick={()=>setActiveTab('invoice')}>
           <span className="mi" style={{ fontSize:'1rem' }}>receipt_long</span>
@@ -1420,10 +1834,10 @@ export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{
           <Toggle value={isDark} onChange={v=>updateSetting('theme',v?'dark':'light')} />
         </SettingRow>
 
-        <SectionHeader icon="receipt_long" label="Invoice & Receipt" />
+        <SectionHeader icon="receipt_long" label="Invoice / Receipt" />
         <SettingRow icon="tune" label="Invoice Settings" sub={`${settings.invoiceCurrency} · ${settings.invoicePrefix} · Due ${settings.invoiceDueDays}d`} onClick={()=>setInvoiceModal(true)} chevron />
         <SettingRow icon="request_quote" label="Receipt Settings" sub="Prefix, footer text and receipt defaults" onClick={()=>setReceiptModal(true)} chevron />
-        <SettingRow icon="description" label="Templates" sub="Choose your preferred invoice & receipt designs" value={settings.invoiceTemplate} onClick={()=>setTemplateModal(true)} chevron />
+        <SettingRow icon="description" label="Templates" sub="Choose your preferred invoice and receipt designs" value={settings.invoiceTemplate} onClick={()=>setTemplateModal(true)} chevron />
 
         <SectionHeader icon="notifications" label="Notifications" />
         <SettingRow icon="alarm" label="Overdue Tasks" sub="Alert when tasks pass their due date">
