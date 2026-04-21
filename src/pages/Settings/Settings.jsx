@@ -1,391 +1,1032 @@
-.page { background: var(--bg); min-height: 100dvh; display: flex; flex-direction: column; }
-.scrollArea { flex: 1; overflow-y: auto; padding: 8px 0 40px; }
+import { useState, useRef, useCallback } from 'react'
+import { useSettings } from '../../contexts/SettingsContext'
+import Header from '../../components/Header/Header'
+import Toast from '../../components/Toast/Toast'
+import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
+import styles from './Settings.module.css'
 
-/* ── SECTION HEADER ── */
-.sectionHeader { display: flex; align-items: center; gap: 10px; padding: 32px 16px 10px; }
-.sectionLabel { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); }
+// ─────────────────────────────────────────────────────────────
+// Shared tailoring data (Naira, real names)
+// ─────────────────────────────────────────────────────────────
+const TAILOR_ROWS = [
+  ['Custom Agbada Sewing',     '₦8,500',  '1', '₦8,500'],
+  ['Senator Suit Stitching',   '₦6,200',  '2', '₦12,400'],
+  ['Ankara Dress Alteration',  '₦2,500',  '3', '₦7,500'],
+  ['Bridal Gown Fitting',      '₦15,000', '1', '₦15,000'],
+  ['Trouser Hemming',          '₦1,200',  '4', '₦4,800'],
+  ['Kaftan Embroidery',        '₦4,000',  '2', '₦8,000'],
+]
 
-/* ── GROUP HEADER (template picker) ── */
-.groupHeader {
-  padding: 56px 0 20px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 1 — Centred Line Invoice
+// ══════════════════════════════════════════════════════════════
+
+function EditableTemplate() {
+  return (
+    <div className={styles.pBase}>
+      <div className={styles.pBrandCenter}>
+        <div className={styles.pBrandName}>Adeola Couture House</div>
+        <div className={styles.pBrandSub}>14 Bode Thomas St, Surulere, Lagos</div>
+      </div>
+      <div className={styles.pInvoiceCentred}>
+        <div className={styles.pInvoiceLine} />
+        <div className={styles.pInvoiceWordCentre}>INVOICE</div>
+        <div className={styles.pInvoiceLine} />
+      </div>
+      <div className={styles.pBody}>
+        <div className={styles.pMetaRow}>
+          <div>
+            <div className={styles.pSmallCap}>BILL TO:</div>
+            <strong>Mrs. Chidinma Okafor</strong><br />
+            22 Akin Adesola Street<br />Victoria Island, Lagos
+          </div>
+          <div style={{ textAlign: 'right', fontSize: '7px' }}>
+            Invoice #: <strong>0000001</strong><br />
+            Issue Date: <strong>12 Apr 2025</strong><br />
+            Due Date: <strong>19 Apr 2025</strong>
+          </div>
+        </div>
+        <div className={styles.pTHead2}>
+          <span style={{ flex: 3 }}>Description</span><span>Price</span><span>Qty</span><span>Total</span>
+        </div>
+        {TAILOR_ROWS.map(([d, p, q, t]) => (
+          <div key={d} className={styles.pTRow2}>
+            <span style={{ flex: 3 }}>{d}</span><span>{p}</span><span>{q}</span><span>{t}</span>
+          </div>
+        ))}
+        <div className={styles.pSummary}>
+          <div className={styles.pSumRow}><span>Subtotal</span><span>₦56,200</span></div>
+          <div className={styles.pSumRow}><span>Tax</span><span>₦0</span></div>
+          <div className={`${styles.pSumRow} ${styles.pBold}`}><span>Total Due</span><span>₦56,200</span></div>
+        </div>
+      </div>
+      <div className={styles.pFooter}>
+        <div className={styles.pFootSection}>
+          <strong>Payment Terms:</strong><br />
+          GT Bank — Adeola Couture House<br />
+          Account: 0123456789
+        </div>
+        <div className={styles.pFootSection}>
+          <strong>Notes:</strong><br />
+          Kindly make payment within 7 days.
+        </div>
+      </div>
+    </div>
+  )
 }
 
-/* First group doesn't need the giant top gap — nothing is above it */
-.groupHeaderFirst {
-  padding-top: 8px;
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 2 — Three-Column Info Bar
+// ══════════════════════════════════════════════════════════════
+
+function FreeTemplate() {
+  return (
+    <div className={styles.pBase}>
+      <div className={styles.pHeaderFree}>
+        <div className={styles.pTitleBlock}>
+          <div className={styles.pLargeTitle}>INVOICE</div>
+          <div className={styles.pSubNo}>0000002</div>
+        </div>
+        <div className={styles.pLogoPlaceholderBig}>ADD YOUR LOGO</div>
+      </div>
+      <div className={styles.pFreeGrid}>
+        <div className={styles.pFreeBox}>
+          <div className={styles.pSmallCap}>BILL FROM:</div>
+          <strong>Adeola Couture House</strong><br />14 Bode Thomas St, Lagos<br />+234 801 234 5678
+        </div>
+        <div className={styles.pFreeBox}>
+          <div className={styles.pSmallCap}>BILL TO:</div>
+          <strong>Mr. Emeka Nwosu</strong><br />5 Ogui Road, Enugu
+        </div>
+        <div className={styles.pFreeBox}>
+          <div className={styles.pSmallCap}>ISSUE DATE:</div><strong>10 Apr 2025</strong><br />
+          <div className={styles.pSmallCap} style={{ marginTop: 3 }}>DUE DATE:</div><strong>17 Apr 2025</strong>
+        </div>
+      </div>
+      <div className={styles.pBody}>
+        <div className={styles.pTHead2}>
+          <span style={{ flex: 3 }}>Description</span><span>Price</span><span>Qty</span><span>Total</span>
+        </div>
+        {TAILOR_ROWS.map(([d, p, q, t]) => (
+          <div key={d} className={styles.pTRow2}>
+            <span style={{ flex: 3 }}>{d}</span><span>{p}</span><span>{q}</span><span>{t}</span>
+          </div>
+        ))}
+        <div className={styles.pSummary}>
+          <div className={styles.pSumRow}><span>Subtotal</span><span>₦56,200</span></div>
+          <div className={`${styles.pSumRow} ${styles.pBold}`}><span>Total Due</span><span>₦56,200</span></div>
+        </div>
+      </div>
+      <div className={styles.pFooter}>
+        <div className={styles.pFootSection}>
+          <strong>Payment Information:</strong><br />
+          GT Bank — Adeola Couture House, Account: 0123456789
+        </div>
+      </div>
+      <div className={styles.pFooterGray}>Thank you for your business!</div>
+    </div>
+  )
 }
 
-.groupHeaderInner {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: none;
-  border-radius: 0;
-  padding: 0 0 12px;
-  margin: 0;
-  width: 98%;
-  border-bottom: 6px solid var(--accent);
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 3 — Banner Header
+// ══════════════════════════════════════════════════════════════
+
+function CustomTemplate() {
+  return (
+    <div className={styles.pBase} style={{ padding: 0 }}>
+      <div className={styles.pPurpleBanner}>
+        <div className={styles.pLogoBoxWhite}>Place logo here</div>
+        <div style={{ textAlign: 'right' }}>
+          <div className={styles.pLargeTitleWhite}>INVOICE</div>
+          <div className={styles.pWhiteNo}>0000003</div>
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 8, padding: '10px 14px 6px', fontSize: '7px' }}>
+        <div style={{ flex: 1 }}>
+          <div className={styles.pSmallCap}>BILL FROM:</div>
+          <strong>Adeola Couture House</strong><br />14 Bode Thomas St<br />Surulere, Lagos<br />+234 801 234 5678
+        </div>
+        <div style={{ flex: 1 }}>
+          <div className={styles.pSmallCap}>BILL TO:</div>
+          <strong>Miss Fatima Bello</strong><br />9 Marina Road<br />Lagos Island, Lagos
+        </div>
+        <div style={{ flex: 1 }}>
+          <div className={styles.pSmallCap}>ISSUE DATE:</div>
+          <strong>08 Apr 2025</strong>
+        </div>
+        <div style={{ flex: 1 }}>
+          <div className={styles.pSmallCap}>DUE DATE:</div>
+          <strong>15 Apr 2025</strong>
+        </div>
+      </div>
+      <div style={{ padding: '0 14px' }}>
+        <div className={styles.pTHead2}>
+          <span style={{ flex: 3 }}>Description</span><span>Price</span><span>Qty</span><span>Total</span>
+        </div>
+        {TAILOR_ROWS.map(([d, p, q, t]) => (
+          <div key={d} className={styles.pTRow2}>
+            <span style={{ flex: 3 }}>{d}</span><span>{p}</span><span>{q}</span><span>{t}</span>
+          </div>
+        ))}
+        <div className={styles.pSummary}>
+          <div className={styles.pSumRow}><span>Subtotal</span><span>₦56,200</span></div>
+          <div className={styles.pSumRow}><span>Tax</span><span>₦0</span></div>
+          <div className={`${styles.pSumRow} ${styles.pBold}`}><span>Total Due</span><span>₦56,200</span></div>
+        </div>
+      </div>
+      <div className={styles.pPurpleBottom}>
+        <div className={styles.pPurpleFootRow}>
+          <div className={styles.pFootSectionWhite}>
+            <strong>Payment Terms:</strong><br />GT Bank — Account: 0123456789
+          </div>
+          <div className={styles.pFootSectionWhite}>
+            <strong>Notes:</strong><br />Payment due within 7 days
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-.groupLabel {
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: var(--text);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 4 — Printable Classic
+// ══════════════════════════════════════════════════════════════
+
+function PrintableTemplate() {
+  const items = [
+    { desc: 'Custom Agbada Sewing',    price: '₦8,500',  qty: 1, total: '₦8,500'  },
+    { desc: 'Senator Suit Stitching',  price: '₦6,200',  qty: 2, total: '₦12,400' },
+    { desc: 'Ankara Dress Alteration', price: '₦2,500',  qty: 3, total: '₦7,500'  },
+    { desc: 'Bridal Gown Fitting',     price: '₦15,000', qty: 1, total: '₦15,000' },
+    { desc: 'Trouser Hemming',         price: '₦1,200',  qty: 4, total: '₦4,800'  },
+    { desc: 'Kaftan Embroidery',       price: '₦4,000',  qty: 2, total: '₦8,000'  },
+  ]
+  return (
+    <div className={styles.p4Base}>
+      <div className={styles.p4GoldBar} />
+      <div className={styles.p4Header}>
+        <div className={styles.p4InvoiceWord}>INVOICE</div>
+        <div className={styles.p4HeaderRight}>
+          <div className={styles.p4MetaRow}>
+            <span className={styles.p4MetaKey}>ISSUE DATE</span>
+            <span className={styles.p4MetaVal}>Date Field</span>
+          </div>
+          <div className={styles.p4MetaRow}>
+            <span className={styles.p4MetaKey}>DUE DATE</span>
+            <span className={styles.p4MetaVal}>Date Field</span>
+          </div>
+          <div className={styles.p4MetaRow}>
+            <span className={styles.p4MetaKey}>INVOICE #</span>
+            <span className={styles.p4MetaVal}>0000004</span>
+          </div>
+        </div>
+      </div>
+      <div className={styles.p4BillRow}>
+        <div className={styles.p4BillBlock}>
+          <div className={styles.p4BillLabel}>BILL FROM</div>
+          <div className={styles.p4BillName}>Adeola Couture House</div>
+          <div className={styles.p4BillInfo}>14 Bode Thomas Street</div>
+          <div className={styles.p4BillInfo}>Surulere, Lagos</div>
+          <div className={styles.p4BillInfo}>+234 801 234 5678</div>
+        </div>
+        <div className={styles.p4BillBlock} style={{ textAlign: 'right' }}>
+          <div className={styles.p4BillLabel}>BILL TO</div>
+          <div className={styles.p4BillName}>Dr. Tunde Adeleke</div>
+          <div className={styles.p4BillInfo}>Block 7, GRA Phase 2</div>
+          <div className={styles.p4BillInfo}>Port Harcourt, Rivers</div>
+        </div>
+      </div>
+      <div className={styles.p4Divider} />
+      <div className={styles.p4TableHead}>
+        <span style={{ flex: 3 }}>Description</span>
+        <span>Price</span>
+        <span>QTY</span>
+        <span>Total</span>
+      </div>
+      {items.map((it, i) => (
+        <div key={i} className={styles.p4TableRow}>
+          <span style={{ flex: 3 }}>{it.desc}</span>
+          <span>{it.price}</span>
+          <span>{it.qty}</span>
+          <span>{it.total}</span>
+        </div>
+      ))}
+      <div className={styles.p4TotalsArea}>
+        <div className={styles.p4TotRow}><span>Subtotal</span><span>₦56,200</span></div>
+        <div className={styles.p4TotRow}><span>Tax</span><span>₦0.00</span></div>
+        <div className={styles.p4TotDivider} />
+        <div className={styles.p4TotBold}><span>Total Due</span><span>₦56,200</span></div>
+      </div>
+      <div className={styles.p4Footer}>
+        <div className={styles.p4FootBlock}>
+          <div className={styles.p4FootLabel}>Payment Terms:</div>
+          <div className={styles.p4FootInfo}>GT Bank — Adeola Couture House</div>
+          <div className={styles.p4FootInfo}>Account No: 0123456789</div>
+          <div className={styles.p4FootInfo}>Routing #: 058152522</div>
+        </div>
+        <div className={styles.p4FootBlock}>
+          <div className={styles.p4FootLabel}>Notes:</div>
+          <div className={styles.p4FootInfo}>Add any additional notes here.</div>
+        </div>
+      </div>
+    </div>
+  )
 }
-.groupDesc {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text3);
-  opacity: 0.8;
-  letter-spacing: 0.02em;
+
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 5 — Warm Beige Classic
+// ══════════════════════════════════════════════════════════════
+
+function CanvaTemplate() {
+  return (
+    <div className={styles.t5Base}>
+      <div className={styles.t5Top}>
+        <div className={styles.t5Title}>Invoice</div>
+        <div className={styles.t5TopRight}>
+          <div>08 April 2025</div>
+          <div><strong>Invoice No. 0000005</strong></div>
+        </div>
+      </div>
+      <div className={styles.t5Divider} />
+      <div className={styles.t5BilledTo}>
+        <div className={styles.t5BilledLabel}>Billed to:</div>
+        <div><strong>Mrs. Ngozi Eze</strong></div>
+        <div>+234 807 654 3210</div>
+        <div>12 Awolowo Road, Ikoyi, Lagos</div>
+      </div>
+      <div className={styles.t5Divider} />
+      <div className={styles.t5TableHead}>
+        <span style={{ flex: 3 }}>Description</span><span>Price</span><span>Qty</span><span>Total</span>
+      </div>
+      {TAILOR_ROWS.map(([d, p, q, t]) => (
+        <div key={d} className={styles.t5TableRow}>
+          <span style={{ flex: 3 }}>{d}</span><span>{p}</span><span>{q}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t5Divider} />
+      <div className={styles.t5Totals}>
+        <div className={styles.t5TotRow}><span>Subtotal</span><span>₦56,200</span></div>
+        <div className={styles.t5TotRow}><span>Tax (0%)</span><span>₦0</span></div>
+        <div className={`${styles.t5TotRow} ${styles.t5TotBold}`}><span>Total</span><span>₦56,200</span></div>
+      </div>
+      <div className={styles.t5Divider} />
+      <div className={styles.t5Footer}>
+        <div>
+          <div className={styles.t5FootLabel}>Payment Information</div>
+          <div>Adeola Couture House</div>
+          <div>Bank: GT Bank Nigeria</div>
+          <div>Account No: 0123 4567 89</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div><strong>Adeola Fashola</strong></div>
+          <div>14 Bode Thomas St, Surulere, Lagos</div>
+          <div>+234 801 234 5678</div>
+          <div>info@adeolacouture.ng</div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-/* ── PREMIUM BADGE ── */
-.premiumBadge { display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--accent),#b8942a);color:var(--bg);font-size:0.55rem;font-weight:900;letter-spacing:0.06em;padding:2px 7px 2px 5px;border-radius:20px;margin-left:2px; }
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 6 — Dark Header Corporate
+// ══════════════════════════════════════════════════════════════
 
-/* ── ROW ── */
-.row { display:flex;align-items:center;gap:16px;padding:16px;border-bottom:1px solid var(--border);background:var(--bg); }
-.noDivider { border-bottom:none; }
-.rowTappable { cursor:pointer; }
-.rowTappable:active { background:var(--surface); }
-.rowLocked { opacity:0.55;cursor:default; }
-.rowIcon { width:36px;height:36px;border-radius:10px;background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0; }
-.rowText { flex:1;min-width:0; }
-.rowLabel { font-size:0.95rem;font-weight:700;color:var(--text); }
-.rowSub { font-size:0.75rem;color:var(--text3);margin-top:2px; }
-.rowRight { display:flex;align-items:center;gap:6px;flex-shrink:0; }
-.rowValue { font-size:0.8rem;font-weight:700;color:var(--accent); }
-
-/* ── TOGGLE ── */
-.toggle { width:44px;height:26px;border-radius:13px;background:var(--surface2);border:1px solid var(--border);position:relative;cursor:pointer;flex-shrink:0;transition:all 0.2s ease; }
-.toggleOn { background:var(--accent);border-color:var(--accent); }
-.toggleThumb { position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--accent);transition:transform 0.2s,background 0.2s; }
-.toggleOn .toggleThumb { transform:translateX(18px);background:var(--bg); }
-
-/* ── FULL SCREEN MODAL ── */
-.fullOverlay { position:fixed;inset:0;background:var(--bg);z-index:5000;display:flex;flex-direction:column;animation:slideIn 0.25s ease; }
-@keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
-.fullContent { flex:1;overflow-y:auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:12px; }
-
-/* ── TEMPLATE PICKER ── */
-.templateWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 40px;
-  margin-bottom: 24px;
+function DarkHeaderTemplate() {
+  return (
+    <div className={styles.t6Base}>
+      <div className={styles.t6Header}>
+        <div className={styles.t6LogoArea}>
+          <div className={styles.t6LogoCircle}>
+            <span className="mi" style={{ fontSize: 13, color: '#1a1a1a' }}>checkroom</span>
+          </div>
+          <div>
+            <div className={styles.t6CompanyName}>ADEOLA COUTURE</div>
+            <div className={styles.t6CompanySub}>PREMIUM TAILORING STUDIO</div>
+          </div>
+        </div>
+        <div className={styles.t6HeaderRight}>
+          <div>Adeola Couture House</div>
+          <div>14 Bode Thomas Street</div>
+          <div>Surulere, Lagos</div>
+        </div>
+        <div className={styles.t6HeaderRight}>
+          <div>+234 801 234 5678</div>
+          <div>+234 803 987 6543</div>
+          <div>info@adeolacouture.ng</div>
+        </div>
+      </div>
+      <div className={styles.t6InvoiceRow}>
+        <div className={styles.t6InvoiceLeft}>
+          <span className={styles.t6InvoiceWord}>INVOICE </span>
+          <span className={styles.t6InvoiceNum}>#0000006</span>
+        </div>
+        <div className={styles.t6InvoiceRight}>
+          <div><span className={styles.t6Label}>DATE:</span> 08/04/2025</div>
+          <div><span className={styles.t6Label}>TOTAL:</span> ₦56,200</div>
+        </div>
+      </div>
+      <div className={styles.t6InfoRow}>
+        <div>
+          <div className={styles.t6InfoLabel}>PAYMENT:</div>
+          <strong>GT BANK</strong><br />
+          Adeola Couture House<br />Acct: 0123456789<br />
+          <strong style={{ display: 'block', marginTop: 3 }}>TRANSFER</strong>
+          adeola@couture.ng
+        </div>
+        <div>
+          <div className={styles.t6InfoLabel}>SHIP TO:</div>
+          Mr. Babatunde Salami<br />Plot 3, Allen Avenue<br />Ikeja, Lagos
+        </div>
+        <div>
+          <div className={styles.t6InfoLabel}>BILL TO:</div>
+          Mr. Babatunde Salami<br />Plot 3, Allen Avenue<br />Ikeja, Lagos
+        </div>
+      </div>
+      <div className={styles.t6TableHead}>
+        <span style={{ flex: 3 }}>DESCRIPTION</span><span>PRICE</span><span>QTY</span><span>TOTAL</span>
+      </div>
+      {TAILOR_ROWS.map(([d, p, q, t]) => (
+        <div key={d} className={styles.t6TableRow}>
+          <span style={{ flex: 3 }}>{d}</span><span>{p}</span><span>{q}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t6TotalsArea}>
+        <div className={styles.t6TotRow}><span>SUBTOTAL</span><span>₦56,200</span></div>
+        <div className={styles.t6TotRow}><span>TAX</span><span>₦0</span></div>
+        <div className={styles.t6TotTotal}><span>TOTAL</span><span>₦56,200</span></div>
+      </div>
+      <div className={styles.t6ThankYou}>THANK YOU FOR YOUR BUSINESS</div>
+    </div>
+  )
 }
 
-.fullPreviewContainer { width:100%;background:#fff;border-radius:8px;border:2px solid transparent;box-shadow:0 4px 12px rgba(0,0,0,0.1);overflow:hidden;transition:0.2s; }
-.fullPreviewActive { border-color:var(--accent);transform:scale(1.02); }
-.templateInfo { display:flex;align-items:flex-start;gap:10px;padding:0 4px; }
-.radio { width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:2px; }
-.radioActive { background:var(--accent);border-color:var(--accent);position:relative; }
-.radioActive::after { content:'';position:absolute;inset:5px;background:var(--bg);border-radius:50%; }
-.templateLabelGroup { display:flex;flex-direction:column;gap:2px; }
-.templateLabel { font-weight: 700; color: var(--text); font-size: 0.82rem; }
-.templateDesc { font-weight: 400; color: var(--text3); font-size: 0.72rem; }
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 7 — Bold From/To
+// ══════════════════════════════════════════════════════════════
 
-/* ── FORMS ── */
-.fieldGroup { background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden; }
-.field { padding:14px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px; }
-.field:last-child { border-bottom:none; }
-.fieldLabel { font-size:0.68rem;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em; }
-.fieldHint { font-size:0.72rem;color:var(--text3);margin:0;line-height:1.4; }
-.textInput, .textarea { width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.9rem;color:var(--text);font-family:inherit;box-sizing:border-box;outline:none;transition:border-color 0.15s; }
-.textInput:focus, .textarea:focus { border-color:var(--accent); }
+function RedBoldTemplate() {
+  const items = [
+    ['1','Custom Agbada Sewing','1','₦8,500','₦8,500'],
+    ['2','Senator Suit Stitching','2','₦6,200','₦12,400'],
+    ['3','Ankara Dress Alteration','3','₦2,500','₦7,500'],
+    ['4','Bridal Gown Fitting','1','₦15,000','₦15,000'],
+    ['5','Trouser Hemming','4','₦1,200','₦4,800'],
+  ]
+  return (
+    <div className={styles.t7Base}>
+      <div className={styles.t7Header}>
+        <div className={styles.t7LogoCircle}>
+          <span className="mi" style={{ fontSize: 13, color: '#cc0000' }}>checkroom</span>
+        </div>
+        <div className={styles.t7TitleGroup}>
+          <span className={styles.t7InvoiceWord}>INVOICE</span>
+          <span className={styles.t7InvoiceNum}>#0000007</span>
+        </div>
+        <div className={styles.t7DateBlock}>
+          <div className={styles.t7DateLabel}>DATE:</div>
+          <div className={styles.t7DateVal}>APRIL 08, 2025</div>
+        </div>
+      </div>
+      <div className={styles.t7Divider} />
+      <div className={styles.t7FromTo}>
+        <div className={styles.t7FromToBlock}>
+          <div className={styles.t7FromLabel}>FROM:</div>
+          <div className={styles.t7FromDivider} />
+          {[['NAME:','ADEOLA FASHOLA'],['COMPANY:','ADEOLA COUTURE HOUSE'],['ADDRESS:','14 BODE THOMAS ST'],['CITY:','SURULERE, LAGOS'],['PHONE:','+234 801 234 5678']].map(([l,v])=>(
+            <div key={l} className={styles.t7InfoRow}><span className={styles.t7InfoKey}>{l}</span><span className={styles.t7InfoVal}>{v}</span></div>
+          ))}
+        </div>
+        <div className={styles.t7FromToBlock}>
+          <div className={styles.t7ToLabel}>TO:</div>
+          <div className={styles.t7FromDivider} />
+          {[['NAME:','CHUKWUEMEKA OBI'],['COMPANY:','OKONKWO HOLDINGS'],['ADDRESS:','7 INDEPENDENCE LAYOUT'],['CITY:','ENUGU STATE'],['PHONE:','+234 905 678 1234']].map(([l,v])=>(
+            <div key={l} className={styles.t7InfoRow}><span className={styles.t7InfoKey}>{l}</span><span className={styles.t7InfoVal}>{v}</span></div>
+          ))}
+        </div>
+      </div>
+      <div className={styles.t7Divider} />
+      <div className={styles.t7ForLabel}>FOR:</div>
+      <div className={styles.t7TableHead}>
+        <span className={styles.t7NumCol}>No.</span>
+        <span style={{ flex: 3 }}>Description</span>
+        <span style={{ flex:1,textAlign:'right' }}>Qty</span>
+        <span style={{ flex:1,textAlign:'right' }}>Price</span>
+        <span style={{ flex:1,textAlign:'right' }}>Total</span>
+      </div>
+      {items.map(([n,d,q,p,t])=>(
+        <div key={n} className={styles.t7TableRow}>
+          <span className={styles.t7NumCol}>{n}</span>
+          <span style={{ flex:3 }}>{d}</span>
+          <span style={{ flex:1,textAlign:'right' }}>{q}</span>
+          <span style={{ flex:1,textAlign:'right' }}>{p}</span>
+          <span className={styles.t7RedPrice}>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t7TotalBar}>
+        <span>TOTAL:</span>
+        <span className={styles.t7TotalAmt}>₦48,200</span>
+      </div>
+    </div>
+  )
+}
 
-/* ── SEGMENT CONTROL ── */
-.segment { display:flex;background:var(--surface2);border-radius:10px;padding:3px;gap:2px; }
-.segBtn { flex:1;border:none;background:none;border-radius:8px;padding:8px 4px;font-size:0.73rem;font-weight:700;color:var(--text3);cursor:pointer;transition:all 0.15s;font-family:inherit; }
-.segActive { background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.12); }
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 8 — Green Accent
+// ══════════════════════════════════════════════════════════════
 
-/* ══════════════════════════════════════════════════════════
-   SHARED TEMPLATE BASE STYLES (Templates 1–3)
-══════════════════════════════════════════════════════════ */
-.pBase { padding:16px;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:8px;min-height:400px;display:flex;flex-direction:column; }
-.pSmallCap { font-size:6.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;margin-bottom:1px; }
+function GreenAccentTemplate() {
+  return (
+    <div className={styles.t8Base}>
+      <div className={styles.t8Header}>
+        <div className={styles.t8LogoArea}>
+          <span className="mi" style={{ fontSize: 20, color: '#333' }}>checkroom</span>
+          <div>
+            <div className={styles.t8BrandName}>Adeola Couture</div>
+            <div className={styles.t8BrandSub}>PREMIUM TAILORING STUDIO</div>
+          </div>
+        </div>
+        <div className={styles.t8InvoiceBox}>
+          <div className={styles.t8InvoiceTitle}>INVOICE</div>
+          <div className={styles.t8InvoiceMeta}>
+            <span>Invoice#</span><span>0000008</span>
+            <span>Date</span><span>08/04/2025</span>
+          </div>
+        </div>
+      </div>
+      <div className={styles.t8TableHead}>
+        <span>SL.</span>
+        <span style={{ flex:3 }}>Description</span>
+        <span>Price</span><span>Qty</span><span>Total</span>
+      </div>
+      {TAILOR_ROWS.map(([d,p,q,t],i)=>(
+        <div key={d} className={styles.t8TableRow}>
+          <span>{i+1}</span>
+          <span style={{ flex:3 }}>{d}</span>
+          <span>{p}</span><span>{q}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t8Divider} />
+      <div className={styles.t8Bottom}>
+        <div className={styles.t8GreenBox}>
+          <div className={styles.t8GreenBoxTitle}>Invoice to:</div>
+          <div className={styles.t8GreenBoxName}>Mrs. Ngozi Eze</div>
+          <div className={styles.t8GreenBoxAddr}>12 Awolowo Rd,<br />Ikoyi, Lagos.</div>
+          <div className={styles.t8GreenDivider} />
+          <div className={styles.t8GreenBoxTitle}>Terms &amp; Conditions</div>
+          <div className={styles.t8GreenBoxAddr}>All garments collected within 30 days of completion.</div>
+        </div>
+        <div className={styles.t8PaymentInfo}>
+          <div className={styles.t8PayLabel}>Payment Info:</div>
+          <div>Account #: 0123 4567 89</div>
+          <div>A/C Name: Adeola Couture</div>
+          <div>Bank: GT Bank Nigeria</div>
+          <div className={styles.t8ThankYou}>Thank you for your business</div>
+        </div>
+        <div className={styles.t8Totals}>
+          <div className={styles.t8TotRow}><span>Sub Total:</span><span>₦56,200</span></div>
+          <div className={styles.t8TotRow}><span>Tax:</span><span>0.00%</span></div>
+          <div className={styles.t8TotDivider} />
+          <div className={styles.t8TotTotal}><span>Total:</span><span>₦56,200</span></div>
+          <div className={styles.t8SignLine}>Authorised Sign</div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
-.pTHead2 { display:flex;align-items:center;font-weight:800;border-bottom:1.5px solid #1a1a1a;padding-bottom:4px;margin-bottom:6px;font-size:7px; }
-.pTHead2 span { flex:1;text-align:right; }
-.pTHead2 span:first-child { flex:3;text-align:left; }
-.pTRow2 { display:flex;align-items:center;border-bottom:1px solid #eee;padding:5px 0;font-size:7.5px; }
-.pTRow2 span { flex:1;text-align:right; }
-.pTRow2 span:first-child { flex:3;text-align:left; }
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 9 — Teal Geometric
+// ══════════════════════════════════════════════════════════════
 
-.pBody { flex:1;margin:12px 0; }
-.pMetaRow { display:flex;justify-content:space-between;margin-bottom:14px; }
-.pSummary { margin-left:auto;width:40%;margin-top:12px; }
-.pSummarySide { margin-left:auto;width:40%;margin-top:12px; }
-.pSumRow { display:flex;justify-content:space-between;padding:2px 0;font-size:7.5px; }
-.pBold { font-weight:900;font-size:9px;border-top:1px solid #1a1a1a;margin-top:4px;padding-top:3px; }
-.pTotalBox { background:#f8fafc;padding:5px 8px;font-weight:900;font-size:9px;border-left:3px solid #1a1a1a; }
+function TealGeometricTemplate() {
+  return (
+    <div className={styles.t9Base}>
+      <div className={styles.t9Header}>
+        <div>
+          <div className={styles.t9LogoRow}>
+            <span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span>
+            <span className={styles.t9CompanyName}>ADEOLA COUTURE</span>
+          </div>
+          <div className={styles.t9CompanySub}>PREMIUM TAILORING STUDIO</div>
+          <div className={styles.t9CompanyAddr}>14 Bode Thomas St,<br />Surulere, Lagos</div>
+        </div>
+        <div className={styles.t9InvoiceTitle}>INVOICE</div>
+      </div>
+      <div className={styles.t9NumBar}>
+        <span>INVOICE # 0000009</span><span>|</span><span>DATE: 08 / 04 / 2025</span>
+      </div>
+      <div className={styles.t9BillShip}>
+        <div>
+          <span className={styles.t9BillLabel}>Bill to:</span>
+          <div><strong>Mr. Yusuf Abubakar</strong></div>
+          <div>15 Kaduna Road, GRA</div><div>Kaduna State</div>
+        </div>
+        <div>
+          <span className={styles.t9BillLabel}>Ship to:</span>
+          <div><strong>Mr. Yusuf Abubakar</strong></div>
+          <div>15 Kaduna Road, GRA</div><div>Kaduna State</div>
+        </div>
+      </div>
+      <div className={styles.t9TableHead}>
+        <span>QTY</span>
+        <span style={{ flex:3 }}>DESCRIPTION</span>
+        <span>PRICE</span><span>TOTAL</span>
+      </div>
+      {[['1','Custom Agbada Sewing','₦8,500','₦8,500'],['2','Senator Suit Stitching','₦6,200','₦12,400'],['3','Ankara Dress Alteration','₦2,500','₦7,500'],['1','Bridal Gown Fitting','₦15,000','₦15,000']].map(([q,d,p,t])=>(
+        <div key={d} className={styles.t9TableRow}>
+          <span>{q}</span><span style={{ flex:3 }}>{d}</span><span>{p}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t9SubArea}>
+        <div className={styles.t9SubRow}><span>Subtotal</span><span>₦43,400</span></div>
+        <div className={styles.t9SubRow}><span>Tax</span><span>0.00%</span></div>
+      </div>
+      <div className={styles.t9TotalBar}><span>TOTAL</span><span>₦43,400</span></div>
+      <div className={styles.t9Footer}>
+        <div>
+          <div className={styles.t9ThankYou}>THANK YOU FOR YOUR BUSINESS</div>
+          <div className={styles.t9PayNote}>Payment due max 7 days after invoice.</div>
+        </div>
+        <div className={styles.t9SignArea}>
+          <div className={styles.t9SignLine} />
+          <div className={styles.t9SignLabel}>Signature</div>
+        </div>
+      </div>
+      <div className={styles.t9CornerDeco} />
+    </div>
+  )
+}
 
-.pBrandCenter { text-align:center; }
-.pBrandName { font-size:13px;font-weight:800; }
-.pBrandSub { color:#666;font-size:7px;margin-top:1px; }
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 10 — Full-Width Diagonal
+// ══════════════════════════════════════════════════════════════
 
-.pInvoiceCentred { display:flex;align-items:center;gap:8px;margin:10px 0 8px; }
-.pInvoiceLine { flex:1;height:1.5px;background:#c8a96e; }
-.pInvoiceLineTan { flex:1;height:1.5px;background:#c8a96e; }
-.pInvoiceWordCentre { font-size:16px;font-weight:900;letter-spacing:0.12em;white-space:nowrap;padding:0 6px; }
+function PinkDiagonalTemplate() {
+  return (
+    <div className={styles.t10Base}>
+      <div className={styles.t10HeaderZone}>
+        <div className={styles.t10FullBanner}>
+          <span className={styles.t10BannerTitle}>INVOICE</span>
+        </div>
+        <div className={styles.t10BrandInBanner}>
+          <span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span>
+          <div>
+            <div className={styles.t10BrandName}>Adeola Couture</div>
+            <div className={styles.t10BrandSub}>TAILORING STUDIO</div>
+          </div>
+        </div>
+      </div>
+      <div className={styles.t10MetaRow}>
+        <div>
+          <div className={styles.t10MetaLabel}>Invoice to:</div>
+          <div className={styles.t10MetaName}>Mrs. Amina Garba</div>
+          <div className={styles.t10MetaAddr}>Plot 22, Maitama District,<br />Abuja, FCT, 900211</div>
+        </div>
+        <div style={{ textAlign:'right' }}>
+          <div><span className={styles.t10MetaKey}>Invoice#</span> <strong>0000010</strong></div>
+          <div><span className={styles.t10MetaKey}>Date</span> <strong>08 / 04 / 2025</strong></div>
+        </div>
+      </div>
+      <div className={styles.t10TableHead}>
+        <span>SL.</span>
+        <span style={{ flex:3 }}>Description</span>
+        <span>Price</span><span>Qty</span><span>Total</span>
+      </div>
+      {TAILOR_ROWS.map(([d,p,q,t],i)=>(
+        <div key={d} className={styles.t10TableRow}>
+          <span>{i+1}</span>
+          <span style={{ flex:3 }}>{d}</span>
+          <span>{p}</span><span>{q}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t10Divider} />
+      <div className={styles.t10Bottom}>
+        <div style={{ flex:1 }}>
+          <div className={styles.t10ThankYou}>Thank you for your business</div>
+          <div className={styles.t10PayLabel}>Payment Info:</div>
+          <div className={styles.t10PayInfo}>
+            Account #: 0123 4567 89<br />
+            A/C Name: Adeola Couture House<br />
+            Bank: GT Bank Nigeria
+          </div>
+          <div className={styles.t10TCLabel}>Terms &amp; Conditions</div>
+          <div className={styles.t10TCText}>Garments not collected within 30 days become property of the studio.</div>
+        </div>
+        <div className={styles.t10RightCol}>
+          <div className={styles.t10TotalsWrap}>
+            <div className={styles.t10TotRow}><span>Sub Total:</span><span>₦56,200</span></div>
+            <div className={styles.t10TotRow}><span>Tax:</span><span>0.00%</span></div>
+            <div className={styles.t10TotDivider} />
+            <div className={styles.t10TotTotal}><span>Total:</span><span>₦56,200</span></div>
+          </div>
+          <div className={styles.t10SignBlock}>
+            <div className={styles.t10SignLine} />
+            <div className={styles.t10SignLabel}>Authorised Sign</div>
+          </div>
+        </div>
+      </div>
+      <div className={styles.t10CornerPink} />
+    </div>
+  )
+}
 
-.pLargeTitle { font-size:20px;font-weight:900; }
-.pSubNo { font-size:8px;color:#666; }
-.pLogoPlaceholderBig { background:#f3f4f6;border:1px solid #e5e7eb;padding:12px 16px;font-weight:800;color:#9ca3af;font-size:7px; }
-.pHeaderFree { display:flex;justify-content:space-between;align-items:center;margin-bottom:8px; }
-.pTitleBlock { display:flex;flex-direction:column; }
-.pFreeGrid { display:flex;gap:6px;margin-bottom:10px; }
-.pFreeBox { flex:1;border:1px solid #eee;padding:6px;font-size:6.5px;line-height:1.5; }
-.pFooter { display:flex;gap:10px;margin-top:auto;padding-top:8px;border-top:1px solid #eee; }
-.pFootSection { flex:1;font-size:6.5px;line-height:1.5; }
-.pFooterGray { background:#f2f2f2;padding:8px;text-align:center;font-weight:700;font-size:7.5px;margin-top:auto; }
+// ══════════════════════════════════════════════════════════════
+// TEMPLATE 11 — Blue Clean Corporate
+// ══════════════════════════════════════════════════════════════
 
-.pPurpleBanner { background:#b39ddb;color:#fff;padding:18px 16px;display:flex;justify-content:space-between;align-items:center; }
-.pLogoBoxWhite { border:1.5px dashed rgba(255,255,255,0.5);padding:8px 12px;font-size:6.5px;color:rgba(255,255,255,0.9); }
-.pLargeTitleWhite { font-size:18px;font-weight:900; }
-.pWhiteNo { font-size:9px;font-weight:700;opacity:0.85; }
-.pPurpleBottom { background:#b39ddb;padding:12px 16px;margin-top:auto;color:#fff; }
-.pPurpleFootRow { display:flex;gap:12px; }
-.pFootSectionWhite { flex:1;font-size:6.5px;line-height:1.5; }
+function BlueCleanTemplate() {
+  return (
+    <div className={styles.t11Base}>
+      <div className={styles.t11TopBar}>
+        <div className={styles.t11LogoArea}>
+          <div className={styles.t11LogoHex}>
+            <span className="mi" style={{ fontSize:11,color:'#fff' }}>checkroom</span>
+          </div>
+          <div>
+            <div className={styles.t11CompanyName}>ADEOLA COUTURE</div>
+            <div className={styles.t11CompanySub}>Premium Tailoring Studio</div>
+          </div>
+        </div>
+        <div className={styles.t11CompanyInfo}>
+          <div>Adeola Couture House</div>
+          <div>14 Bode Thomas Street</div>
+          <div>Surulere, Lagos</div>
+        </div>
+        <div className={styles.t11CompanyInfo} style={{ textAlign:'right' }}>
+          <div>www.adeolacouture.ng</div>
+          <div>info@adeolacouture.ng</div>
+          <div>+234 801 234 5678</div>
+        </div>
+      </div>
+      <div className={styles.t11InvoiceTitle}>Invoice</div>
+      <div className={styles.t11BlueBar}>
+        <span>INVOICE: #0000011</span>
+        <span>DATE ISSUED: 08.04.2025</span>
+        <span>DUE DATE: 15.04.2025</span>
+      </div>
+      <div className={styles.t11IssuedRow}>
+        <div>
+          <div className={styles.t11IssuedLabel}>ISSUED TO</div>
+          <div>Mrs. Adaeze Obi</div>
+          <div>27 Trans-Ekulu Avenue</div>
+          <div>Enugu, Enugu State</div>
+          <div>+234 812 345 6789</div>
+        </div>
+        <div style={{ textAlign:'right' }}>
+          <div className={styles.t11AmountLabel}>AMOUNT</div>
+          <div className={styles.t11AmountVal}>₦56,200</div>
+        </div>
+      </div>
+      <div className={styles.t11ProjectName}>Tailoring Order — Spring Collection 2025</div>
+      <div className={styles.t11TableHead}>
+        <span style={{ flex:3 }}>Description</span>
+        <span>Qty</span><span>Price</span><span>Subtotal</span>
+      </div>
+      {TAILOR_ROWS.map(([d,p,q,t])=>(
+        <div key={d} className={styles.t11TableRow}>
+          <span style={{ flex:3 }}>• {d}</span>
+          <span>{q}</span><span>{p}</span><span>{t}</span>
+        </div>
+      ))}
+      <div className={styles.t11TotArea}>
+        <div className={styles.t11TotRow}><span>Subtotal</span><span>₦56,200</span></div>
+        <div className={styles.t11TotRow}><span>Tax 0.00%</span><span>₦0</span></div>
+        <div className={styles.t11TotBold}><span>TOTAL</span><span>₦56,200</span></div>
+      </div>
+      <div className={styles.t11PayTitle}>Payment Information</div>
+      <div className={styles.t11PayBoxRow}>
+        <div className={styles.t11PayBox}>
+          <div className={styles.t11PayBoxTitle}>Bank Transfer</div>
+          <div>GT Bank Nigeria<br />Adeola Couture House<br />Acct: 0123456789</div>
+        </div>
+        <div className={styles.t11PayBox}>
+          <div className={styles.t11PayBoxTitle}>Mobile Money</div>
+          <div>OPay: 0801 234 5678<br />Palmpay: 0803 987 6543<br />Adeola Fashola</div>
+        </div>
+        <div className={styles.t11PayBox}>
+          <div className={styles.t11PayBoxTitle}>Cash / Other</div>
+          <div>Visit our studio at<br />14 Bode Thomas St<br />Surulere, Lagos</div>
+        </div>
+      </div>
+      <div className={styles.t11ThankYou}>THANK YOU!</div>
+    </div>
+  )
+}
 
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 4 — Printable Clothing Store Classic
-══════════════════════════════════════════════════════════ */
-.p4Base { background: #fff; color: #1a1a1a; font-family: 'Inter', sans-serif; font-size: 7.5px; min-height: 440px; display: flex; flex-direction: column; padding: 0; }
-.p4GoldBar { height: 6px; background: #c8a96e; width: 100%; flex-shrink: 0; }
-.p4Header { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 16px 8px; border-bottom: 1.5px solid #1a1a1a; }
-.p4InvoiceWord { font-size: 22px; font-weight: 900; letter-spacing: 0.04em; line-height: 1; }
-.p4HeaderRight { display: flex; flex-direction: column; gap: 3px; text-align: right; }
-.p4MetaRow { display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
-.p4MetaKey { font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #888; }
-.p4MetaVal { font-size: 7px; font-weight: 600; color: #1a1a1a; }
-.p4BillRow { display: flex; justify-content: space-between; padding: 10px 16px 8px; }
-.p4BillBlock { font-size: 7px; line-height: 1.6; }
-.p4BillLabel { font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 2px; }
-.p4BillName { font-size: 8.5px; font-weight: 700; margin-bottom: 1px; }
-.p4BillInfo { color: #555; font-size: 6.5px; }
-.p4Divider { height: 1px; background: #ddd; margin: 0 16px 4px; }
-.p4TableHead { display: flex; align-items: center; padding: 5px 16px; font-size: 6.5px; font-weight: 700; border-bottom: 1px solid #1a1a1a; border-top: 1px solid #1a1a1a; gap: 4px; }
-.p4TableHead span, .p4TableRow span { flex: 1; text-align: right; }
-.p4TableHead span:first-child, .p4TableRow span:first-child { flex: 3; text-align: left; }
-.p4TableRow { display: flex; align-items: center; padding: 5px 16px; font-size: 7px; border-bottom: 1px solid #f0f0f0; gap: 4px; }
-.p4TotalsArea { margin-left: auto; width: 42%; padding: 6px 16px 4px 0; margin-top: 4px; }
-.p4TotRow { display: flex; justify-content: space-between; padding: 2px 0; font-size: 7px; color: #555; }
-.p4TotDivider { height: 1px; background: #ccc; margin: 3px 0; }
-.p4TotBold { display: flex; justify-content: space-between; font-weight: 900; font-size: 8.5px; padding-top: 1px; }
-.p4Footer { display: flex; gap: 12px; padding: 10px 16px 14px; margin-top: auto; border-top: 1px solid #eee; }
-.p4FootBlock { flex: 1; font-size: 6.5px; line-height: 1.6; }
-.p4FootLabel { font-weight: 700; font-size: 7px; margin-bottom: 2px; }
-.p4FootInfo { color: #555; }
+// ─────────────────────────────────────────────────────────────
+// Shared UI Primitives
+// ─────────────────────────────────────────────────────────────
 
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 5 — Canva Warm Beige
-══════════════════════════════════════════════════════════ */
-.t5Base { padding:18px;background:#f5f0e8;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:7.5px;min-height:420px;display:flex;flex-direction:column;gap:7px; }
-.t5Top { display:flex;justify-content:space-between;align-items:flex-start; }
-.t5Title { font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1; }
-.t5TopRight { text-align:right;font-size:7px;line-height:1.6; }
-.t5Divider { height:1px;background:#c8bfa8;margin:2px 0; }
-.t5BilledTo { font-size:7px;line-height:1.5; }
-.t5BilledLabel { font-weight:700;font-size:6.5px;margin-bottom:2px; }
-.t5TableHead { display:flex;font-weight:700;font-size:6.5px;padding:3px 0;border-bottom:1px solid #c8bfa8; }
-.t5TableHead span,.t5TableRow span { flex:1;text-align:right; }
-.t5TableHead span:first-child,.t5TableRow span:first-child { text-align:left; }
-.t5TableRow { display:flex;font-size:7px;padding:4px 0;border-bottom:1px solid #e8e0d0; }
-.t5Totals { margin-left:auto;width:38%; }
-.t5TotRow { display:flex;justify-content:space-between;padding:2px 0;font-size:7px; }
-.t5TotBold { font-weight:900;font-size:8.5px;border-top:1px solid #c8bfa8;padding-top:3px;margin-top:2px; }
-.t5Footer { display:flex;justify-content:space-between;font-size:6.5px;line-height:1.5;margin-top:auto;padding-top:4px; }
-.t5FootLabel { font-weight:700;margin-bottom:2px; }
+function SectionHeader({ icon, label, premium = false }) {
+  return (
+    <div className={styles.sectionHeader}>
+      <span className="mi" style={{ fontSize:'1.1rem',color:'var(--accent)' }}>{icon}</span>
+      <span className={styles.sectionLabel}>{label}</span>
+      {premium && (
+        <span className={styles.premiumBadge}>
+          <span className="mi" style={{ fontSize:'0.7rem' }}>workspace_premium</span>PRO
+        </span>
+      )}
+    </div>
+  )
+}
 
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 6 — Dark Corporate Header
-══════════════════════════════════════════════════════════ */
-.t6Base { background:#fff;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:7px;min-height:480px;display:flex;flex-direction:column; }
-.t6Header { background:#1a1a1a;color:#fff;padding:10px 14px;display:flex;align-items:center;gap:14px; }
-.t6LogoArea { display:flex;align-items:center;gap:7px;flex:1; }
-.t6LogoCircle { width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-.t6CompanyName { font-size:8.5px;font-weight:900;letter-spacing:0.05em; }
-.t6CompanySub { font-size:6px;opacity:0.6;letter-spacing:0.07em; }
-.t6HeaderRight { font-size:6px;line-height:1.6;opacity:0.85; }
-.t6InvoiceRow { display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #eee; }
-.t6InvoiceLeft { display:flex;align-items:baseline;gap:4px; }
-.t6InvoiceWord { font-size:10px;font-weight:400;color:#555; }
-.t6InvoiceNum { font-size:17px;font-weight:900; }
-.t6InvoiceRight { text-align:right;font-size:7px;line-height:1.7; }
-.t6Label { font-weight:700; }
-.t6InfoRow { display:flex;gap:14px;padding:7px 14px 8px;border-bottom:1px solid #eee; }
-.t6InfoRow>div { flex:1;font-size:6.5px;line-height:1.6; }
-.t6InfoLabel { font-weight:700;font-size:7px;margin-bottom:2px; }
-.t6TableHead { display:flex;background:#1a1a1a;color:#fff;padding:5px 14px;font-weight:700;font-size:6.5px;gap:4px; }
-.t6TableHead span,.t6TableRow span { flex:1;text-align:right; }
-.t6TableHead span:first-child,.t6TableRow span:first-child { text-align:left; }
-.t6TableRow { display:flex;padding:4px 14px;font-size:6.5px;border-bottom:1px dashed #eee;gap:4px; }
-.t6TotalsArea { margin-left:auto;width:42%;padding:5px 14px 0 0; }
-.t6TotRow { display:flex;justify-content:space-between;padding:2px 0;font-size:7px; }
-.t6TotTotal { display:flex;justify-content:space-between;background:#1a1a1a;color:#fff;padding:5px 8px;font-weight:900;font-size:8.5px;margin-top:3px; }
-.t6ThankYou { text-align:right;font-style:italic;font-size:7.5px;padding:7px 14px;color:#555;margin-top:auto; }
+function SettingRow({ icon, label, sub, value, children, onClick, chevron, divider=true, locked=false, danger=false }) {
+  return (
+    <div
+      className={`${styles.row} ${onClick&&!locked?styles.rowTappable:''} ${locked?styles.rowLocked:''} ${!divider?styles.noDivider:''}`}
+      onClick={locked?undefined:onClick}
+    >
+      <div className={styles.rowIcon}><span className="mi" style={{ fontSize:'1.15rem', color: danger ? '#ef4444' : undefined }}>{icon}</span></div>
+      <div className={styles.rowText}>
+        <div className={styles.rowLabel} style={{ color: danger ? '#ef4444' : undefined }}>{label}</div>
+        {sub&&<div className={styles.rowSub} style={{ color: danger ? '#ef4444' : undefined }}>{sub}</div>}
+      </div>
+      <div className={styles.rowRight}>
+        {locked
+          ?<span className="mi" style={{ fontSize:'1.1rem',color:'var(--accent)',opacity:0.7 }}>lock</span>
+          :<>{value&&<span className={styles.rowValue}>{value}</span>}{children}{chevron&&<span className="mi" style={{ fontSize:'1rem',color:'var(--text3)',marginLeft:6 }}>chevron_right</span>}</>
+        }
+      </div>
+    </div>
+  )
+}
 
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 7 — Red Bold From/To
-══════════════════════════════════════════════════════════ */
-.t7Base { background:#fff;color:#1a1a1a;font-family:'Arial',sans-serif;font-size:7px;min-height:480px;display:flex;flex-direction:column;padding:0; }
-.t7Header { display:flex;align-items:center;gap:9px;padding:10px 14px 7px; }
-.t7LogoCircle { width:24px;height:24px;border-radius:50%;border:2px solid #cc0000;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-.t7TitleGroup { display:flex;align-items:baseline;gap:5px;flex:1; }
-.t7InvoiceWord { font-size:16px;font-weight:900;letter-spacing:0.05em; }
-.t7InvoiceNum { font-size:12px;font-weight:900;color:#888; }
-.t7DateBlock { text-align:right;font-size:6.5px; }
-.t7DateLabel { font-size:6px;color:#888;text-transform:uppercase; }
-.t7DateVal { font-weight:700;color:#cc0000;font-size:7px; }
-.t7Divider { height:2px;background:#1a1a1a;margin:0 14px; }
-.t7FromTo { display:flex;padding:7px 14px; }
-.t7FromToBlock { flex:1;font-size:6.5px;line-height:1.5; }
-.t7FromLabel,.t7ToLabel { font-size:12px;font-weight:900;margin-bottom:3px; }
-.t7FromDivider { height:1px;background:#1a1a1a;margin-bottom:3px; }
-.t7InfoRow { display:flex;gap:3px;margin-bottom:1px; }
-.t7InfoKey { color:#aaa;font-size:5.5px;text-transform:uppercase;width:50px;flex-shrink:0; }
-.t7InfoVal { font-weight:700;font-size:6.5px; }
-.t7ForLabel { font-size:12px;font-weight:900;padding:3px 14px; }
-.t7TableHead { display:flex;align-items:center;background:#1a1a1a;color:#fff;padding:4px 14px;font-size:6.5px;font-weight:700;gap:4px; }
-.t7TableRow { display:flex;align-items:center;padding:4px 14px;border-bottom:1px solid #eee;font-size:6.5px;gap:4px; }
-.t7NumCol { width:16px;flex-shrink:0;color:#aaa; }
-.t7RedPrice { flex:1;text-align:right;font-weight:900;color:#cc0000; }
-.t7TotalBar { display:flex;justify-content:space-between;align-items:baseline;background:#f0f0f0;padding:6px 14px;margin-top:auto;font-weight:900;font-size:10px;border-top:2px solid #1a1a1a; }
-.t7TotalAmt { font-size:16px;font-weight:900;color:#cc0000; }
+function Toggle({ value, onChange }) {
+  return (
+    <button className={`${styles.toggle} ${value?styles.toggleOn:''}`} onClick={e=>{e.stopPropagation();onChange(!value);}} role="switch" aria-checked={value}>
+      <span className={styles.toggleThumb} />
+    </button>
+  )
+}
 
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 8 — Green Accent Brand
-══════════════════════════════════════════════════════════ */
-.t8Base { background:#fff;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:7px;min-height:480px;display:flex;flex-direction:column;padding:0; }
-.t8Header { display:flex;justify-content:space-between;align-items:center;padding:12px 14px 8px; }
-.t8LogoArea { display:flex;align-items:center;gap:6px; }
-.t8BrandName { font-size:9.5px;font-weight:700; }
-.t8BrandSub { font-size:5.5px;color:#999;letter-spacing:0.06em; }
-.t8InvoiceBox { background:#00c896;color:#fff;padding:7px 12px;border-radius:2px;text-align:right;min-width:75px; }
-.t8InvoiceTitle { font-size:15px;font-weight:900;letter-spacing:0.05em; }
-.t8InvoiceMeta { display:grid;grid-template-columns:1fr 1fr;gap:0 5px;font-size:6px;margin-top:3px; }
-.t8TableHead { display:flex;background:#f5f5f5;padding:5px 14px;font-size:6.5px;font-weight:700;gap:4px;color:#444; }
-.t8TableHead span,.t8TableRow span { flex:1;text-align:right; }
-.t8TableHead span:nth-child(2),.t8TableRow span:nth-child(2) { flex:3;text-align:left; }
-.t8TableHead span:first-child,.t8TableRow span:first-child { text-align:left;flex:0.5; }
-.t8TableRow { display:flex;padding:4px 14px;border-bottom:1px solid #f0f0f0;font-size:7px;gap:4px; }
-.t8Divider { height:1px;background:#eee;margin:4px 14px; }
-.t8Bottom { display:flex;gap:7px;padding:7px 14px 12px;margin-top:auto; }
-.t8GreenBox { background:#00c896;color:#fff;padding:7px 9px;border-radius:2px;width:100px;flex-shrink:0;font-size:6px;line-height:1.5; }
-.t8GreenBoxTitle { font-weight:700;font-size:7px;margin-bottom:2px; }
-.t8GreenBoxName { font-weight:700;font-size:7.5px; }
-.t8GreenBoxAddr { opacity:0.85;font-size:5.5px;margin-top:1px; }
-.t8GreenDivider { height:1px;background:rgba(255,255,255,0.4);margin:4px 0; }
-.t8PaymentInfo { flex:1;font-size:6.5px;line-height:1.6; }
-.t8PayLabel { font-weight:700;font-size:7px;margin-bottom:2px; }
-.t8ThankYou { margin-top:7px;font-weight:700;font-size:6.5px; }
-.t8Totals { min-width:75px;font-size:7px; }
-.t8TotRow { display:flex;justify-content:space-between;gap:7px;padding:2px 0; }
-.t8TotDivider { height:1px;background:#1a1a1a;margin:2px 0; }
-.t8TotTotal { display:flex;justify-content:space-between;font-weight:900;font-size:8.5px;gap:7px; }
-.t8SignLine { font-size:5.5px;color:#999;border-top:1px solid #aaa;padding-top:2px;margin-top:9px;text-align:center; }
+function SegmentControl({ options, value, onChange }) {
+  return (
+    <div className={styles.segment}>
+      {options.map(opt=>(
+        <button key={opt.value} className={`${styles.segBtn} ${value===opt.value?styles.segActive:''}`} onClick={()=>onChange(opt.value)}>{opt.label}</button>
+      ))}
+    </div>
+  )
+}
 
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 9 — Teal Geometric
-══════════════════════════════════════════════════════════ */
-.t9Base { background:#fff;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:7px;min-height:480px;display:flex;flex-direction:column;padding:0;position:relative;overflow:hidden; }
-.t9Header { display:flex;justify-content:space-between;align-items:flex-start;padding:12px 14px 5px; }
-.t9LogoRow { display:flex;align-items:center;gap:4px; }
-.t9CompanyName { font-size:8.5px;font-weight:900;letter-spacing:0.04em; }
-.t9CompanySub { font-size:5.5px;color:#888;letter-spacing:0.06em;margin-top:1px; }
-.t9CompanyAddr { font-size:6px;color:#555;line-height:1.5;margin-top:2px; }
-.t9InvoiceTitle { font-size:26px;font-weight:300;color:#00b4c8;letter-spacing:0.1em;align-self:center; }
-.t9NumBar { background:#1a1a2e;color:#fff;display:flex;gap:10px;padding:4px 14px;font-size:6.5px;font-weight:600; }
-.t9BillShip { display:flex;gap:16px;padding:7px 14px;font-size:6.5px;line-height:1.5; }
-.t9BillShip>div { flex:1; }
-.t9BillLabel { font-weight:700;font-size:7px; }
-.t9TableHead { display:flex;background:#00b4c8;color:#fff;padding:4px 14px;font-size:6.5px;font-weight:700;gap:4px; }
-.t9TableHead span,.t9TableRow span { flex:1;text-align:right; }
-.t9TableHead span:nth-child(2),.t9TableRow span:nth-child(2) { flex:3;text-align:left; }
-.t9TableHead span:first-child,.t9TableRow span:first-child { flex:0.5;text-align:left; }
-.t9TableRow { display:flex;padding:4px 14px;border-bottom:1px solid #f0f0f0;font-size:7px;gap:4px; }
-.t9SubArea { display:flex;flex-direction:column;align-items:flex-end;padding:4px 14px 0;font-size:7px; }
-.t9SubRow { display:flex;gap:18px;justify-content:flex-end;padding:2px 0; }
-.t9TotalBar { display:flex;justify-content:space-between;background:#1a1a2e;color:#fff;padding:5px 14px;font-weight:900;font-size:8.5px;margin-top:3px; }
-.t9Footer { display:flex;justify-content:space-between;align-items:flex-end;padding:7px 14px;font-size:6.5px;margin-top:auto; }
-.t9ThankYou { font-weight:700;font-size:7px;text-transform:uppercase;margin-bottom:2px; }
-.t9PayNote { color:#666;font-size:6px; }
-.t9SignArea { text-align:center; }
-.t9SignLine { width:55px;height:1px;background:#aaa;margin:0 auto 2px; }
-.t9SignLabel { font-size:6px;color:#666; }
-.t9CornerDeco { position:absolute;bottom:0;right:0;width:48px;height:48px;background:linear-gradient(135deg,transparent 50%,#00b4c8 50%);opacity:0.35; }
+function FieldGroup({ children }) { return <div className={styles.fieldGroup}>{children}</div> }
+function Field({ label, hint, children }) {
+  return (
+    <div className={styles.field}>
+      <label className={styles.fieldLabel}>{label}</label>
+      {hint&&<p className={styles.fieldHint}>{hint}</p>}
+      {children}
+    </div>
+  )
+}
+function TextInput({ value, onChange, placeholder, type='text' }) {
+  return <input className={styles.textInput} type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} />
+}
+function Textarea({ value, onChange, placeholder, rows=3 }) {
+  return <textarea className={styles.textarea} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows} />
+}
 
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 10 — Full-Width Diagonal
-══════════════════════════════════════════════════════════ */
-.t10Base { background: #fff; color: #1a1a1a; font-family: 'Inter', sans-serif; font-size: 7px; min-height: 500px; display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
-.t10HeaderZone { position: relative; width: 100%; height: 70px; flex-shrink: 0; overflow: hidden; }
-.t10FullBanner { position: absolute; inset: 0; background: #ff5c8a; clip-path: polygon(0 0, 100% 0, 100% 28px, 0 100%); display: flex; align-items: flex-start; padding: 10px 16px 0; }
-.t10BannerTitle { color: #fff; font-size: 20px; font-weight: 900; letter-spacing: 0.05em; padding-top: 2px; }
-.t10BrandInBanner { position: absolute; top: 6px; right: 12px; display: flex; align-items: center; gap: 6px; }
-.t10BrandName { font-size: 9.5px; font-weight: 700; color: #1a1a1a; }
-.t10BrandSub { font-size: 5.5px; color: #888; letter-spacing: 0.06em; }
-.t10MetaRow { display:flex;justify-content:space-between;padding:8px 14px 5px;font-size:6.5px;line-height:1.5; }
-.t10MetaLabel { font-weight:700;font-size:7.5px;margin-bottom:1px; }
-.t10MetaName { font-weight:700;font-size:8px; }
-.t10MetaAddr { color:#555; }
-.t10MetaKey { color:#888; }
-.t10TableHead { display:flex;border:1.5px solid #1a1a1a;padding:4px 14px;font-size:6.5px;font-weight:700;gap:4px;margin:0 14px; }
-.t10TableHead span,.t10TableRow span { flex:1;text-align:right; }
-.t10TableHead span:nth-child(2),.t10TableRow span:nth-child(2) { flex:3;text-align:left; }
-.t10TableHead span:first-child,.t10TableRow span:first-child { flex:0.5;text-align:left; }
-.t10TableRow { display:flex;padding:4px 14px;border-bottom:1px solid #f0f0f0;margin:0 14px;font-size:7px;gap:4px; }
-.t10Divider { height:1px;background:#eee;margin:5px 14px; }
-.t10Bottom { display: flex; gap: 10px; padding: 4px 14px 52px; font-size: 6.5px; line-height: 1.6; flex: 1; }
-.t10ThankYou { font-weight:700;font-size:7px;margin-bottom:3px; }
-.t10PayLabel { font-weight:700;margin-top:4px;margin-bottom:1px; }
-.t10PayInfo { color:#444;line-height:1.6; }
-.t10TCLabel { font-weight:700;margin-top:5px;margin-bottom:1px; }
-.t10TCText { color:#666; }
-.t10RightCol { display: flex; flex-direction: column; justify-content: space-between; min-width: 85px; flex-shrink: 0; }
-.t10TotalsWrap { font-size:7px; }
-.t10TotRow { display:flex;justify-content:space-between;gap:8px;padding:2px 0; }
-.t10TotDivider { height:1px;background:#1a1a1a;margin:3px 0; }
-.t10TotTotal { display:flex;justify-content:space-between;font-weight:900;font-size:8.5px;gap:8px; }
-.t10SignBlock { text-align:center; }
-.t10SignLine { height:1px;background:#aaa;margin-bottom:2px; }
-.t10SignLabel { font-size:6px;color:#666; }
-.t10CornerPink { position: absolute; bottom: 0; right: 0; width: 65px; height: 55px; background: #ff5c8a; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+function FullModal({ title, onBack, onSave, children }) {
+  return (
+    <div className={styles.fullOverlay}>
+      <Header type="back" title={title} onBackClick={onBack} customActions={onSave?[{label:'Save',onClick:onSave}]:[]} />
+      <div className={styles.fullContent}>{children}</div>
+    </div>
+  )
+}
 
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 11 — Blue Clean Corporate
-══════════════════════════════════════════════════════════ */
-.t11Base { background:#fff;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:7px;min-height:500px;display:flex;flex-direction:column;padding:0; }
-.t11TopBar { display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #f0f0f0; }
-.t11LogoArea { display:flex;align-items:center;gap:5px; }
-.t11LogoHex { width:26px;height:26px;background:#1a1a1a;clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-.t11CompanyName { font-size:8.5px;font-weight:900;letter-spacing:0.05em; }
-.t11CompanySub { font-size:5.5px;color:#888; }
-.t11CompanyInfo { font-size:6px;line-height:1.6;color:#444; }
-.t11InvoiceTitle { font-size:20px;font-weight:400;padding:7px 14px 3px;color:#1a1a1a; }
-.t11BlueBar { background:#dbeeff;display:flex;justify-content:space-between;padding:4px 14px;font-size:6.5px;font-weight:600;color:#1a5a9a; }
-.t11IssuedRow { display:flex;justify-content:space-between;padding:7px 14px 3px;font-size:6.5px;line-height:1.6; }
-.t11IssuedLabel { font-size:7px;font-weight:700;margin-bottom:2px; }
-.t11AmountLabel { font-size:6.5px;color:#5da0d0;font-weight:700;text-align:right; }
-.t11AmountVal { font-size:18px;font-weight:300;color:#5da0d0;text-align:right; }
-.t11ProjectName { font-size:9.5px;font-weight:600;padding:3px 14px 2px; }
-.t11TableHead { display:flex;background:#1a1a1a;color:#fff;padding:4px 14px;font-size:6.5px;font-weight:700;gap:4px; }
-.t11TableHead span,.t11TableRow span { flex:1;text-align:right; }
-.t11TableHead span:first-child,.t11TableRow span:first-child { flex:3;text-align:left; }
-.t11TableRow { display:flex;padding:4px 14px;border-bottom:1px solid #f0f0f0;font-size:6.5px;gap:4px;color:#555; }
-.t11TotArea { margin-left:auto;width:43%;padding:3px 14px 0 0;border-top:1px solid #eee;margin-top:2px; }
-.t11TotRow { display:flex;justify-content:space-between;padding:2px 0;font-size:7px;color:#555; }
-.t11TotBold { display:flex;justify-content:space-between;font-weight:900;font-size:7.5px;border-top:1px solid #aaa;padding-top:2px;margin-top:2px; }
-.t11PayTitle { font-size:9.5px;font-weight:600;padding:7px 14px 3px; }
-.t11PayBoxRow { display:flex;gap:5px;padding:0 14px 7px; }
-.t11PayBox { flex:1;background:#dbeeff;padding:5px 7px;font-size:6px;line-height:1.5; }
-.t11PayBoxTitle { font-weight:700;font-size:7px;margin-bottom:2px; }
-.t11ThankYou { text-align:right;font-size:9.5px;font-weight:700;color:#5da0d0;padding:3px 14px 9px;margin-top:auto;letter-spacing:0.05em; }
+// ─────────────────────────────────────────────────────────────
+// Template Picker (Grouped)
+// ─────────────────────────────────────────────────────────────
+
+const TEMPLATE_GROUPS = [
+  {
+    groupLabel: 'Essential',
+    groupDesc: 'Straightforward and clean — nothing in the way',
+    groupIcon: 'article',
+    templates: [
+      { id:'editable',  label:'1. Centred Line Invoice',      desc:'Centred header with flanking lines',                  Component:EditableTemplate },
+      { id:'free',      label:'2. Three-Column Info Bar',     desc:'Big invoice number with three-column info grid',      Component:FreeTemplate },
+      { id:'printable', label:'4. Side-by-Side Classic',      desc:'Side-by-side billing blocks with accent top bar',     Component:PrintableTemplate },
+      { id:'canva',     label:'5. Soft Divider Layout',       desc:'Soft header, dividers, sender details at base',       Component:CanvaTemplate },
+    ],
+  },
+  {
+    groupLabel: 'Structured',
+    groupDesc: 'Every detail in its place — easy to scan',
+    groupIcon: 'format_list_numbered',
+    templates: [
+      { id:'redbold',   label:'7. Field-Labelled From / To',  desc:'Field-labelled From/To with numbered line items',     Component:RedBoldTemplate },
+      { id:'blueclean', label:'11. Info Bar with Payment Tiles', desc:'Three-column header, info bar and payment option tiles', Component:BlueCleanTemplate },
+    ],
+  },
+  {
+    groupLabel: 'Branded',
+    groupDesc: 'Built around your logo and colours',
+    groupIcon: 'palette',
+    templates: [
+      { id:'custom',        label:'3. Full-Bleed Banner',         desc:'Full-bleed banner header with matching footer',        Component:CustomTemplate },
+      { id:'darkheader',    label:'6. Heavy Header Bar',          desc:'Heavy header bar with three-column info strip',        Component:DarkHeaderTemplate },
+      { id:'greenaccent',   label:'8. Side Panel with Invoice Box', desc:'Inline invoice box, side-by-side totals and client panel', Component:GreenAccentTemplate },
+      { id:'tealgeometric', label:'9. Accent Table Header',       desc:'Accent table header with corner signature block',      Component:TealGeometricTemplate },
+    ],
+  },
+  {
+    groupLabel: 'Statement',
+    groupDesc: 'Bold layouts that leave an impression',
+    groupIcon: 'style',
+    templates: [
+      { id:'pinkdiagonal', label:'10. Diagonal Header',           desc:'Diagonal full-bleed header with corner signature',     Component:PinkDiagonalTemplate },
+    ],
+  },
+]
+
+function TemplateModal({ isOpen, currentTemplate, onClose, onSelect }) {
+  const [selected, setSelected] = useState(currentTemplate || 'editable')
+  if (!isOpen) return null
+  return (
+    <div className={styles.fullOverlay}>
+      <Header type="back" title="Invoice Templates" onBackClick={onClose} customActions={[{label:'Select',onClick:()=>{onSelect(selected);onClose()}}]} />
+      <div className={styles.fullContent}>
+        {TEMPLATE_GROUPS.map((group, groupIndex) => (
+          <div key={group.groupLabel}>
+            <div className={`${styles.groupHeader} ${groupIndex === 0 ? styles.groupHeaderFirst : ''}`}>
+              <div className={styles.groupHeaderInner}>
+                <span className={styles.groupLabel}>{group.groupLabel}</span>
+                {group.groupDesc && <span className={styles.groupDesc}>{group.groupDesc}</span>}
+              </div>
+            </div>
+            {group.templates.map(t=>(
+              <div key={t.id} className={styles.templateWrapper} onClick={()=>setSelected(t.id)}>
+                <div className={`${styles.fullPreviewContainer} ${selected===t.id?styles.fullPreviewActive:''}`}>
+                  <t.Component />
+                </div>
+                <div className={styles.templateInfo}>
+                  <div className={`${styles.radio} ${selected===t.id?styles.radioActive:''}`} />
+                  <div className={styles.templateLabelGroup}>
+                    <span className={styles.templateLabel}>{t.label}</span>
+                    {t.desc && <span className={styles.templateDesc}>{t.desc}</span>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// Invoice Settings Modal
+// ─────────────────────────────────────────────────────────────
+
+function InvoiceSettingsModal({ onBack, showToast }) {
+  const { settings, updateMany } = useSettings()
+  const [local, setLocal] = useState({
+    invoicePrefix:   settings.invoicePrefix,
+    invoiceCurrency: settings.invoiceCurrency,
+    invoiceDueDays:  settings.invoiceDueDays,
+    invoiceShowTax:  settings.invoiceShowTax,
+    invoiceTaxRate:  settings.invoiceTaxRate,
+    invoiceFooter:   settings.invoiceFooter,
+  })
+  const set = key => val => setLocal(p=>({...p,[key]:val}))
+  const save = () => { updateMany(local); showToast('Invoice settings saved'); onBack() }
+  return (
+    <FullModal title="Invoice Settings" onBack={onBack} onSave={save}>
+      <div>
+        <FieldGroup>
+          <Field label="Invoice Number Prefix" hint="Shown before the number, e.g. INV-0042.">
+            <TextInput value={local.invoicePrefix} onChange={set('invoicePrefix')} placeholder="INV" />
+          </Field>
+          <Field label="Currency">
+            <SegmentControl options={[{label:'₦ Naira',value:'₦'},{label:'$ Dollar',value:'$'},{label:'£ Pound',value:'£'},{label:'€ Euro',value:'€'}]} value={local.invoiceCurrency} onChange={set('invoiceCurrency')} />
+          </Field>
+          <Field label="Default Due Period" hint="Days after issue date the invoice is due.">
+            <SegmentControl options={[{label:'3 days',value:3},{label:'7 days',value:7},{label:'14 days',value:14},{label:'30 days',value:30}]} value={local.invoiceDueDays} onChange={set('invoiceDueDays')} />
+          </Field>
+        </FieldGroup>
+        <div style={{ height:12 }} />
+        <FieldGroup>
+          <div className={styles.row} style={{ borderBottom: local.invoiceShowTax?'1px solid var(--border)':'none' }}>
+            <div className={styles.rowIcon}><span className="mi" style={{ fontSize:'1.15rem' }}>percent</span></div>
+            <div className={styles.rowText}>
+              <div className={styles.rowLabel}>Show Tax Line</div>
+              <div className={styles.rowSub}>Add a VAT / tax row to invoice totals</div>
+            </div>
+            <div className={styles.rowRight}><Toggle value={local.invoiceShowTax} onChange={v=>set('invoiceShowTax')(v)} /></div>
+          </div>
+          {local.invoiceShowTax && (
+            <Field label="Tax Rate (%)" hint="e.g. 7.5 for 7.5% VAT">
+              <TextInput type="number" value={String(local.invoiceTaxRate)} onChange={v=>set('invoiceTaxRate')(parseFloat(v)||0)} placeholder="7.5" />
+            </Field>
+          )}
+        </FieldGroup>
+        <div style={{ height:12 }} />
+        <FieldGroup>
+          <Field label="Invoice Footer Text" hint="Printed at the bottom of every invoice.">
+            <Textarea value={local.invoiceFooter} onChange={set('invoiceFooter')} placeholder="Thank you for your patronage 🙏" rows={3} />
+          </Field>
+        </FieldGroup>
+      </div>
+    </FullModal>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// Main Settings Page
+// ─────────────────────────────────────────────────────────────
+
+export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{} }) {
+  const { settings, updateSetting, resetSettings } = useSettings()
+  const [toastMsg,setToastMsg]=useState('')
+  const [templateModal,setTemplateModal]=useState(false)
+  const [invoiceModal,setInvoiceModal]=useState(false)
+  const [clearConfirm,setClearConfirm]=useState(false)
+  const [resetConfirm,setResetConfirm]=useState(false)
+  const toastTimer=useRef(null)
+  const showToast=useCallback(msg=>{setToastMsg(msg);clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToastMsg(''),2400)},[])
+  const isDark=settings.theme==='dark'
+
+  return (
+    <div className={styles.page}>
+      <Header onMenuClick={onMenuClick} />
+      <div className={styles.scrollArea}>
+        <SectionHeader icon="palette" label="Appearance" />
+        <SettingRow icon="dark_mode" label="Dark Mode" sub={isDark?'Dark theme active':'Light theme active'}>
+          <Toggle value={isDark} onChange={v=>updateSetting('theme',v?'dark':'light')} />
+        </SettingRow>
+
+        <SectionHeader icon="receipt_long" label="Invoice" />
+        <SettingRow icon="tune" label="Invoice Settings" sub={`${settings.invoiceCurrency} · ${settings.invoicePrefix} · Due ${settings.invoiceDueDays}d`} onClick={()=>setInvoiceModal(true)} chevron />
+        <SettingRow icon="description" label="Invoice Template" sub="Choose your preferred invoice design" value={settings.invoiceTemplate} onClick={()=>setTemplateModal(true)} chevron />
+
+        <SectionHeader icon="notifications" label="Notifications" />
+        <SettingRow icon="alarm" label="Overdue Tasks" sub="Alert when tasks pass their due date">
+          <Toggle value={settings.notifyOverdueTasks} onChange={v=>updateSetting('notifyOverdueTasks',v)} />
+        </SettingRow>
+        <SettingRow icon="cake" label="Customer Birthdays" sub="Remind you a day before">
+          <Toggle value={settings.notifyUpcomingBirthdays} onChange={v=>updateSetting('notifyUpcomingBirthdays',v)} />
+        </SettingRow>
+        <SettingRow icon="money_off" label="Unpaid Invoices" sub="Alert for invoices past due date">
+          <Toggle value={settings.notifyUnpaidInvoices} onChange={v=>updateSetting('notifyUnpaidInvoices',v)} />
+        </SettingRow>
+
+        <SectionHeader icon="storage" label="Data" />
+        <SettingRow icon="restart_alt" label="Reset All Settings" sub="Restore defaults. Your customers and orders are safe." onClick={()=>setResetConfirm(true)} chevron danger />
+        <SettingRow icon="delete_forever" label="Clear All Data" sub="Permanently delete everything" onClick={()=>setClearConfirm(true)} chevron divider={false} danger />
+        <div style={{ height:32 }} />
+      </div>
+
+      <TemplateModal isOpen={templateModal} currentTemplate={settings.invoiceTemplate} onClose={()=>setTemplateModal(false)} onSelect={v=>{updateSetting('invoiceTemplate',v);showToast('Template selected')}} />
+      {invoiceModal&&<InvoiceSettingsModal onBack={()=>setInvoiceModal(false)} showToast={showToast} />}
+      <ConfirmSheet open={clearConfirm} title="Delete All Data?" onConfirm={()=>{localStorage.clear();setClearConfirm(false);showToast('Cleared')}} onCancel={()=>setClearConfirm(false)} />
+      <ConfirmSheet open={resetConfirm} title="Reset All Settings?" onConfirm={()=>{resetSettings();setResetConfirm(false);showToast('Settings reset')}} onCancel={()=>setResetConfirm(false)} />
+      <Toast message={toastMsg} />
+    </div>
+  )
+}
