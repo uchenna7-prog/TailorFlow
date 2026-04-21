@@ -73,6 +73,36 @@
 @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
 .fullContent { flex:1;overflow-y:auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:12px; }
 
+/* ── TEMPLATE TAB BAR ── */
+.tabBar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+.tabBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 0;
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  margin-bottom: -1px;
+}
+.tabBtnActive {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
 /* ── TEMPLATE PICKER ── */
 .templateWrapper {
   display: flex;
