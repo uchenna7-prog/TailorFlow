@@ -722,11 +722,40 @@ function ServiceAreaPicker({ value, onChange }) {
   const selected = value ? value.split(',').map(s => s.trim()).filter(Boolean) : []
   const [search, setSearch] = useState('')
 
-  const toggle = area => {
-    const next = selected.includes(area)
-      ? selected.filter(s => s !== area)
-      : [...selected, area]
+  const hasNationwide    = selected.includes('Nationwide')
+  const hasInternational = selected.includes('International')
+  const hasStates        = selected.some(s => NIGERIAN_STATES.includes(s))
+
+  // Nationwide and individual states are mutually exclusive.
+  // International is always independent — can pair with anything.
+  const isNationwideDisabled = hasStates
+  const isStatesDisabled     = hasNationwide
+
+  const toggleSpecial = opt => {
+    if (opt === 'Nationwide') {
+      if (isNationwideDisabled) return
+      const next = hasNationwide
+        ? selected.filter(s => s !== 'Nationwide')
+        : [...selected, 'Nationwide']
+      onChange(next.join(', '))
+    } else {
+      const next = hasInternational
+        ? selected.filter(s => s !== 'International')
+        : [...selected, 'International']
+      onChange(next.join(', '))
+    }
+  }
+
+  const toggleState = state => {
+    if (isStatesDisabled) return
+    const next = selected.includes(state)
+      ? selected.filter(s => s !== state)
+      : [...selected, state]
     onChange(next.join(', '))
+  }
+
+  const removeChip = item => {
+    onChange(selected.filter(s => s !== item).join(', '))
   }
 
   const filteredStates = search.trim()
@@ -735,11 +764,22 @@ function ServiceAreaPicker({ value, onChange }) {
 
   return (
     <div className={styles.serviceAreaWrap}>
+
+      {/* Conflict hint */}
+      {(isNationwideDisabled || isStatesDisabled) && (
+        <div className={styles.serviceAreaHint}>
+          <span className="mi" style={{ fontSize: '0.85rem' }}>info</span>
+          {isStatesDisabled
+            ? 'Remove Nationwide to select specific states'
+            : 'Remove your selected states to choose Nationwide'}
+        </div>
+      )}
+
       {/* Selected chips */}
       {selected.length > 0 && (
         <div className={styles.serviceAreaSelected}>
           {selected.map(s => (
-            <button key={s} type="button" className={styles.serviceAreaChip} onClick={() => toggle(s)}>
+            <button key={s} type="button" className={styles.serviceAreaChip} onClick={() => removeChip(s)}>
               {s}
               <span className="mi" style={{ fontSize: '0.75rem' }}>close</span>
             </button>
@@ -749,42 +789,47 @@ function ServiceAreaPicker({ value, onChange }) {
 
       {/* Special options */}
       <div className={styles.serviceAreaSpecial}>
-        {SERVICE_AREA_SPECIAL.map(opt => (
-          <button
-            key={opt}
-            type="button"
-            className={`${styles.serviceAreaSpecialBtn} ${selected.includes(opt) ? styles.serviceAreaOptionActive : ''}`}
-            onClick={() => toggle(opt)}
-          >
-            <span className="mi" style={{ fontSize: '0.9rem' }}>
-              {opt === 'Nationwide' ? 'flag' : 'public'}
-            </span>
-            {opt}
-            {selected.includes(opt) && (
-              <span className="mi" style={{ fontSize: '0.85rem', marginLeft: 2 }}>check</span>
-            )}
-          </button>
-        ))}
+        <button
+          type="button"
+          disabled={isNationwideDisabled}
+          className={`${styles.serviceAreaSpecialBtn} ${hasNationwide ? styles.serviceAreaOptionActive : ''} ${isNationwideDisabled ? styles.serviceAreaSpecialDisabled : ''}`}
+          onClick={() => toggleSpecial('Nationwide')}
+        >
+          <span className="mi" style={{ fontSize: '0.9rem' }}>flag</span>
+          Nationwide
+          {hasNationwide && <span className="mi" style={{ fontSize: '0.85rem', marginLeft: 2 }}>check</span>}
+        </button>
+        <button
+          type="button"
+          className={`${styles.serviceAreaSpecialBtn} ${hasInternational ? styles.serviceAreaOptionActive : ''}`}
+          onClick={() => toggleSpecial('International')}
+        >
+          <span className="mi" style={{ fontSize: '0.9rem' }}>public</span>
+          International
+          {hasInternational && <span className="mi" style={{ fontSize: '0.85rem', marginLeft: 2 }}>check</span>}
+        </button>
       </div>
 
       {/* Search + state list */}
-      <div className={styles.serviceAreaSearch}>
+      <div className={`${styles.serviceAreaSearch} ${isStatesDisabled ? styles.serviceAreaSearchDisabled : ''}`}>
         <span className="mi" style={{ fontSize: '1rem', color: 'var(--text3)' }}>search</span>
         <input
           type="text"
           className={styles.serviceAreaSearchInput}
-          placeholder="Search states…"
+          placeholder={isStatesDisabled ? 'Nationwide selected — states unavailable' : 'Search states…'}
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => { if (!isStatesDisabled) setSearch(e.target.value) }}
+          readOnly={isStatesDisabled}
         />
       </div>
-      <div className={styles.serviceAreaList}>
+      <div className={`${styles.serviceAreaList} ${isStatesDisabled ? styles.serviceAreaListDisabled : ''}`}>
         {filteredStates.map(state => (
           <button
             key={state}
             type="button"
-            className={`${styles.serviceAreaOption} ${selected.includes(state) ? styles.serviceAreaOptionActive : ''}`}
-            onClick={() => toggle(state)}
+            disabled={isStatesDisabled}
+            className={`${styles.serviceAreaOption} ${selected.includes(state) ? styles.serviceAreaOptionActive : ''} ${isStatesDisabled ? styles.serviceAreaOptionDisabled : ''}`}
+            onClick={() => toggleState(state)}
           >
             {selected.includes(state) && (
               <span className="mi" style={{ fontSize: '0.9rem' }}>check</span>
@@ -1517,12 +1562,13 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
         )}
 
         {/* ── Account ── */}
-        <SectionHeader icon="settings_account_box" label="Danger Zone" />
+        <SectionHeader icon="warning" label="Danger Zone" />
         <TappableRow
           icon="logout"
           label="Log Out"
           sub="You can always log back in"
           onClick={() => setLogoutConfirm(true)}
+          danger
         />
         <TappableRow
           icon="delete_forever"
