@@ -2,8 +2,14 @@
 .scrollArea { flex: 1; overflow-y: auto; padding: 8px 0 40px; }
 
 /* ── SECTION HEADER ── */
-.sectionHeader { display: flex; align-items: center; gap: 7px; padding: 28px 16px 12px; }
-.sectionLabel { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); }
+.sectionHeader { display: flex; align-items: center; gap: 8px; padding: 32px 16px 12px; }
+.sectionLabel {
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
 
 /* ── HERO CARD ── */
 .heroCard {
@@ -80,11 +86,9 @@
   font-weight: 900;
   padding: 3px 8px; 
   border-radius: 20px;
-  /* Add these two lines */
   width: fit-content;
   display: inline-flex;
 }
-
 .badgeFree {
   background: var(--surface); 
   border: 1px solid var(--border);
@@ -93,11 +97,9 @@
   font-weight: 800;
   padding: 3px 8px; 
   border-radius: 20px;
-  /* Add these two lines */
   width: fit-content;
   display: inline-flex;
 }
-
 
 /* ── BRAND PREVIEW ── */
 .brandPreviewLogo { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: #fff; }
@@ -106,6 +108,18 @@
 .brandPreviewTagline { font-size: 0.75rem; color: var(--text3); }
 .brandColourDot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); }
 .brandEmpty { color: var(--text3); font-style: italic; gap: 12px; }
+.brandEmptyText { font-size: 0.85rem; }
+
+/* ── SIGNATURE PREVIEW (on profile page) ── */
+.sigPreview {
+  max-width: 160px;
+  max-height: 50px;
+  object-fit: contain;
+  margin-top: 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
 
 /* ── FULL SCREEN MODAL ── */
 .fullOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; flex-direction: column; animation: slideIn 0.25s ease-out; }
@@ -128,6 +142,7 @@
   display: block;
 }
 .textInput:focus, .textarea:focus { border-color: var(--accent); background: var(--bg); }
+.textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 
 /* ── BRAND EXTRAS ── */
 .colourRow { display: flex; align-items: center; gap: 10px; }
@@ -139,36 +154,12 @@
 .logoPreviewWrap { display: flex; align-items: center; gap: 16px; }
 .logoPreview { width: 80px; height: 80px; object-fit: contain; border-radius: 12px; border: 1px solid var(--border); background: #fff; }
 .logoRemove { padding: 8px 12px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); cursor: pointer; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px; }
+
 /* ── BUSINESS INFO ── */
-.chipsRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chip {
-  padding: 7px 14px;
-  border-radius: 20px;
-  border: 1.5px solid var(--border);
-  background: var(--surface2);
-  color: var(--text3);
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.chipActive {
-  border-color: var(--accent);
-  background: var(--surface);
-  color: var(--accent);
-}
-
 .availabilityRow {
   display: flex;
   gap: 10px;
 }
-
 .availBtn {
   flex: 1;
   display: flex;
@@ -197,13 +188,232 @@
   background: rgba(239, 68, 68, 0.08);
 }
 
-.charCount {
-  font-size: 0.65rem;
-  color: var(--text3);
-  display: block;
-  text-align: right;
-  margin-top: 4px;
+/* ── TURNAROUND PICKER ── */
+.turnaroundRow {
+  display: flex;
+  gap: 10px;
 }
+.turnaroundSelect {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+  transition: border-color 0.15s;
+}
+.turnaroundSelect:focus { border-color: var(--accent); }
+
+/* ── SERVICE AREA PICKER ── */
+.serviceAreaWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.serviceAreaSelected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.serviceAreaChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.serviceAreaSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.serviceAreaSearchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: var(--text);
+  font-family: inherit;
+}
+.serviceAreaSearchInput::placeholder { color: var(--text3); }
+.serviceAreaList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+.serviceAreaOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text3);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.serviceAreaOptionActive {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+}
+
+/* ── SIGNATURE PAD ── */
+.sigWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sigCanvas {
+  width: 100%;
+  height: 160px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--border);
+  background: var(--surface2);
+  touch-action: none;
+  cursor: crosshair;
+  display: block;
+}
+.sigFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sigHint {
+  font-size: 0.72rem;
+  color: var(--text3);
+}
+.sigClearBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sigClearBtn:active { background: var(--surface); }
+
+/* ── PHONE FIELD ── */
+.phoneRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.phoneHint {
+  font-size: 0.72rem;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* ── COUNTRY CODE PICKER ── */
+.ccPickerWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.ccBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  height: 100%;
+  min-height: 44px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.ccFlag { font-size: 1.1rem; line-height: 1; }
+.ccCode { font-size: 0.85rem; font-weight: 700; color: var(--text); }
+.ccDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 9999;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 280px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+.ccSearchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.ccSearchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: var(--text);
+  font-family: inherit;
+}
+.ccSearchInput::placeholder { color: var(--text3); }
+.ccList {
+  max-height: 220px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.ccListEmpty {
+  padding: 16px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text3);
+}
+.ccOption {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+.ccOption:active { background: var(--surface2); }
+.ccOptionActive { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.ccOptionName { flex: 1; font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.ccOptionCode { font-size: 0.8rem; color: var(--text3); font-weight: 700; }
 
 /* ── SOCIAL MEDIA ── */
 .socialRow {
@@ -211,7 +421,6 @@
   overflow: hidden;
 }
 .socialRow:last-child { border-bottom: none; }
-
 .socialToggle {
   width: 100%;
   display: flex;
@@ -225,13 +434,11 @@
 }
 .socialToggle:active { background: var(--surface2); }
 .socialToggleActive { background: var(--surface2); }
-
 .socialToggleLeft {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 .socialIconWrap {
   width: 36px;
   height: 36px;
@@ -250,13 +457,11 @@
   border-color: var(--accent);
   color: var(--accent);
 }
-
 .socialPlatformLabel {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
 }
-
 .socialChevron {
   color: var(--text3);
   transition: transform 0.2s ease;
@@ -264,7 +469,6 @@
 .socialChevronOpen {
   transform: rotate(180deg);
 }
-
 .socialHandleWrap {
   display: flex;
   align-items: center;
@@ -322,3 +526,12 @@
   font-weight: 700;
 }
 .socialPreviewLabel { color: var(--text); }
+
+/* ── CHAR COUNT ── */
+.charCount {
+  font-size: 0.65rem;
+  color: var(--text3);
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+}
