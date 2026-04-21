@@ -164,10 +164,8 @@ function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, br
   // ── WhatsApp: share PDF file directly via Web Share API ─────
   const handleWhatsApp = () => withBlob(async (blob, file) => {
     if (canShareFiles) {
-      // Native share sheet opens → user picks WhatsApp → picks contact
       await navigator.share({ files: [file], text: message })
     } else {
-      // Fallback: download PDF + open wa.me link
       const url = URL.createObjectURL(blob)
       const a   = document.createElement('a')
       a.href = url; a.download = filename; a.click()
@@ -369,7 +367,7 @@ function LogoOrName({ brand, darkBg = false }) {
   )
 }
 
-// Generic shared items table — used by templates 1, 2, 3, 4, 5, 6
+// Generic shared items table — used by templates 1, 2, 3
 function ItemsTable({ invoice, brand }) {
   const { currency, showTax, taxRate } = brand
   const subtotal = invoice.items?.length > 0
@@ -417,13 +415,15 @@ function ItemsTable({ invoice, brand }) {
 // ─────────────────────────────────────────────────────────────
 
 // ── 1. Centred Line Invoice (editable) ────────────────────────
+// Settings preview: brand name as text only, NO logo element
 function EditableTemplate({ invoice, customer, brand }) {
   const dueDate   = getDueDate(invoice, brand.dueDays)
   const lineColor = brand.colour || '#c8a96e'
   return (
     <div className={styles.tplBase}>
       <div className={styles.editHeader}>
-        <LogoOrName brand={brand} />
+        {/* No logo — settings preview shows brand name text only */}
+        <div className={styles.pBrandName}>{brand.name || 'Your Brand'}</div>
         {brand.tagline && <div className={styles.editTagline}>{brand.tagline}</div>}
         {brand.address && <div className={styles.editAddr}>{brand.address}</div>}
         <div className={styles.editTitleRow}>
@@ -585,7 +585,6 @@ function PrintableTemplate({ invoice, customer, brand }) {
           {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
         </div>
       </div>
-      {/* Template 4 unique table: divider-separated rows with gold divider bar */}
       <div className={styles.p4TableArea}>
         <div className={styles.p4TableHead} style={{ borderColor: barColor }}>
           <span style={{ flex: 3 }}>Description</span>
@@ -657,7 +656,6 @@ function CanvaTemplate({ invoice, customer, brand }) {
         {customer.address && <div>{customer.address}</div>}
       </div>
       <div className={styles.t5Divider} />
-      {/* Template 5 unique table: divider-separated rows on beige bg */}
       <div className={styles.t5TableHead}>
         <span style={{ flex: 3 }}>Description</span><span>Price</span><span>Qty</span><span>Total</span>
       </div>
@@ -761,7 +759,6 @@ function DarkHeaderTemplate({ invoice, customer, brand }) {
           {customer.address}
         </div>
       </div>
-      {/* Template 6 unique table: dark header row, plain rows */}
       <div className={styles.t6TableHead}>
         <span style={{ flex: 3 }}>DESCRIPTION</span><span>PRICE</span><span>QTY</span><span>TOTAL</span>
       </div>
@@ -784,7 +781,6 @@ function DarkHeaderTemplate({ invoice, customer, brand }) {
 }
 
 // ── 7. Field-Labelled From / To (redbold) ─────────────────────
-// Unique table: numbered rows with red total price
 function RedBoldTemplate({ invoice, customer, brand }) {
   const dueDate = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#cc0000'
@@ -848,7 +844,6 @@ function RedBoldTemplate({ invoice, customer, brand }) {
       </div>
       <div className={styles.t7Divider} />
       <div className={styles.t7ForLabel}>FOR:</div>
-      {/* Template 7 unique: numbered rows, red price column */}
       <div className={styles.t7TableHead}>
         <span className={styles.t7NumCol}>No.</span>
         <span style={{ flex: 3 }}>Description</span>
@@ -882,7 +877,6 @@ function RedBoldTemplate({ invoice, customer, brand }) {
 }
 
 // ── 8. Side Panel with Invoice Box (greenaccent) ──────────────
-// Unique table: SL. numbered rows, grey header, green bottom panel
 function GreenAccentTemplate({ invoice, customer, brand }) {
   const dueDate    = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#00c896'
@@ -913,7 +907,6 @@ function GreenAccentTemplate({ invoice, customer, brand }) {
           </div>
         </div>
       </div>
-      {/* Template 8 unique: SL. numbered, grey bg header */}
       <div className={styles.t8TableHead}>
         <span>SL.</span>
         <span style={{ flex: 3 }}>Description</span>
@@ -961,7 +954,6 @@ function GreenAccentTemplate({ invoice, customer, brand }) {
 }
 
 // ── 9. Accent Table Header (tealgeometric) ────────────────────
-// Unique table: teal header bar, dark number bar, QTY first col, signature footer
 function TealGeometricTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#00b4c8'
@@ -1006,7 +998,6 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
           {brand.email && <div>{brand.email}</div>}
         </div>
       </div>
-      {/* Template 9 unique: teal-bg header, QTY first col */}
       <div className={styles.t9TableHead} style={{ background: accentColor }}>
         <span>QTY</span>
         <span style={{ flex: 3 }}>DESCRIPTION</span>
@@ -1052,8 +1043,6 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
 }
 
 // ── 10. Diagonal Header (pinkdiagonal) ────────────────────────
-// Unique table: bordered header, SL. numbered, right side totals + sign
-// Note: no tagline in brand area (would make it look awkward)
 function PinkDiagonalTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#ff5c8a'
@@ -1065,7 +1054,6 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
   return (
     <div className={styles.t10Wrap}>
       <div className={styles.t10HeaderZone}>
-        {/* SVG diagonal banner — replaces clip-path which html2canvas cannot render */}
         <svg
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
           viewBox="0 0 400 72"
@@ -1076,7 +1064,6 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
         <div style={{ position: 'absolute', top: 10, left: 18, zIndex: 1 }}>
           <span className={styles.t10BannerTitle}>INVOICE</span>
         </div>
-        {/* No tagline here — only brand name + "Tailor Shop" label */}
         <div className={styles.t10BrandInBanner}>
           {brand.logo
             ? <img src={brand.logo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
@@ -1101,7 +1088,6 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
           <div><span className={styles.t10MetaKey}>Due</span> <strong>{dueDate}</strong></div>
         </div>
       </div>
-      {/* Template 10 unique: bordered header, SL. numbered */}
       <div className={styles.t10TableHead}>
         <span>SL.</span>
         <span style={{ flex: 3 }}>Description</span>
@@ -1153,7 +1139,6 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
           </div>
         </div>
       </div>
-      {/* SVG corner accent — replaces clip-path which html2canvas cannot render */}
       <svg
         style={{ position: 'absolute', bottom: 0, right: 0, width: 68, height: 58 }}
         viewBox="0 0 68 58"
@@ -1165,7 +1150,6 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
 }
 
 // ── 11. Info Bar with Payment Tiles (blueclean) ───────────────
-// Unique table: black header bar, bullet items, blue amount display
 function BlueCleanTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#5da0d0'
@@ -1216,7 +1200,6 @@ function BlueCleanTemplate({ invoice, customer, brand }) {
         </div>
       </div>
       {invoice.orderDesc && <div className={styles.t11ProjectName}>{invoice.orderDesc}</div>}
-      {/* Template 11 unique: black header, bullet items, right-aligned totals */}
       <div className={styles.t11TableHead}>
         <span style={{ flex: 3 }}>Description</span>
         <span>Qty</span><span>Price</span><span>Subtotal</span>
