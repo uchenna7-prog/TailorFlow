@@ -418,7 +418,7 @@ function RedBoldTemplate() {
     <div className={styles.t7Base}>
       <div className={styles.t7Header}>
         <div className={styles.t7LogoCircle}>
-          <span className="mi" style={{ fontSize: 13, color: '#cc0000' }}>checkroom</span>
+          <span className="mi" style={{ fontSize: 13, color: '#c8a96e' }}>checkroom</span>
         </div>
         <div className={styles.t7TitleGroup}>
           <span className={styles.t7InvoiceWord}>INVOICE</span>
@@ -1175,7 +1175,7 @@ function RPinkDiagonalPreview() {
 function RBlueCleanPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   const accentColor = b.colour || '#5da0d0'
-  const barBg = '#dbeeff'
+  const barBg = '#f5eed9'
   return (
     <div className={styles.t11Base}>
       <div className={styles.t11TopBar}><div className={styles.t11LogoArea}><div className={styles.t11LogoHex}><span className="mi" style={{ fontSize:11,color:'#fff' }}>checkroom</span></div><div><div className={styles.t11CompanyName}>{b.name.toUpperCase()}</div></div></div><div className={styles.t11CompanyInfo} style={{ textAlign:'right' }}><div>{b.phone}</div></div></div>
