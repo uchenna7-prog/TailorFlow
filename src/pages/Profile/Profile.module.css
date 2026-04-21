@@ -236,6 +236,21 @@
   cursor: pointer;
   transition: all 0.15s;
 }
+/* Hint bar */
+.serviceAreaHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--text3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 /* Nationwide / International special buttons */
 .serviceAreaSpecial {
   display: flex;
@@ -259,6 +274,23 @@
   transition: all 0.15s;
 }
 .serviceAreaSpecialBtn:active { opacity: 0.8; }
+.serviceAreaSpecialDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.serviceAreaSearchDisabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.serviceAreaListDisabled {
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+}
+.serviceAreaOptionDisabled {
+  cursor: not-allowed;
+}
 .serviceAreaSearch {
   display: flex;
   align-items: center;
