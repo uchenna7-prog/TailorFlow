@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { useSettings } from '../../contexts/SettingsContext'
+import { useBrand } from '../../contexts/BrandContext'
+import { useBrandTokens } from '../../hooks/useBrandTokens'
 import Header from '../../components/Header/Header'
 import Toast from '../../components/Toast/Toast'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
@@ -418,7 +420,7 @@ function RedBoldTemplate() {
     <div className={styles.t7Base}>
       <div className={styles.t7Header}>
         <div className={styles.t7LogoCircle}>
-          <span className="mi" style={{ fontSize: 13, color: '#c8a96e' }}>checkroom</span>
+          <span className="mi" style={{ fontSize: 13, color: 'var(--brand-primary)' }}>checkroom</span>
         </div>
         <div className={styles.t7TitleGroup}>
           <span className={styles.t7InvoiceWord}>INVOICE</span>
@@ -922,7 +924,7 @@ const RECEIPT_BRAND_SAMPLE = {
   email: 'info@adeolacouture.ng',
   website: 'adeolacouture.ng',
   currency: '₦',
-  colour: '#c8a96e',
+  // No colour hex — all templates now use CSS variables via useBrandTokens
   footer: 'Thank you for your payment!',
   showTax: false,
   taxRate: 0,
@@ -972,29 +974,30 @@ function RPreviewSummary({ receipt }) {
 }
 
 // ── Receipt Preview Templates (static, for picker only) ────────
+// All colour is driven by CSS variables set via useBrandTokens on the
+// TemplateModal wrapper — no hardcoded hex fallbacks needed here.
 
 function REditablePreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
-  const lineColor = b.colour || '#c8a96e'
   return (
-    <div className={styles.pBase}>
+    <div className={styles.pBase} style={{ padding: '22px 20px' }}>
       <div className={styles.pBrandCenter}>
         <div className={styles.pBrandName}>{b.name}</div>
         <div className={styles.pBrandSub}>{b.address}</div>
       </div>
       <div className={styles.pInvoiceCentred}>
-        <div className={styles.pInvoiceLine} style={{ background: lineColor }} />
+        <div className={styles.pInvoiceLine} />
         <div className={styles.pInvoiceWordCentre}>RECEIPT</div>
-        <div className={styles.pInvoiceLine} style={{ background: lineColor }} />
+        <div className={styles.pInvoiceLine} />
       </div>
-      <div className={styles.pBody}>
-        <div className={styles.pMetaRow}>
+      <div className={styles.pBody} style={{ margin: '16px 0' }}>
+        <div className={styles.pMetaRow} style={{ marginBottom: 18 }}>
           <div><div className={styles.pSmallCap}>RECEIVED FROM:</div><strong>{c.name}</strong><br />{c.phone}</div>
           <div style={{ textAlign: 'right', fontSize: '7px' }}>Receipt #: <strong>{r.number}</strong><br />Date: <strong>{r.date}</strong></div>
         </div>
         <RPreviewSummary receipt={r} />
       </div>
-      <div className={styles.pFooter}><div className={styles.pFootSection}><strong>Notes:</strong><br />{b.footer}</div></div>
+      <div className={styles.pFooter} style={{ paddingTop: 14 }}><div className={styles.pFootSection}><strong>Notes:</strong><br />{b.footer}</div></div>
     </div>
   )
 }
@@ -1002,7 +1005,7 @@ function REditablePreview() {
 function RFreePreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
   return (
-    <div className={styles.pBase}>
+    <div className={styles.pBase} style={{ padding: '22px 20px' }}>
       <div className={styles.pHeaderFree}>
         <div className={styles.pTitleBlock}>
           <div className={styles.pLargeTitle}>RECEIPT</div>
@@ -1010,12 +1013,12 @@ function RFreePreview() {
         </div>
         <div className={styles.pLogoPlaceholderBig}>{b.name}</div>
       </div>
-      <div className={styles.pFreeGrid}>
+      <div className={styles.pFreeGrid} style={{ marginBottom: 16 }}>
         <div className={styles.pFreeBox}><div className={styles.pSmallCap}>FROM:</div><strong>{b.name}</strong><br />{b.address}</div>
         <div className={styles.pFreeBox}><div className={styles.pSmallCap}>RECEIVED FROM:</div><strong>{c.name}</strong><br />{c.phone}</div>
         <div className={styles.pFreeBox}><div className={styles.pSmallCap}>DATE:</div><strong>{r.date}</strong></div>
       </div>
-      <div className={styles.pBody}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.pBody} style={{ margin: '0 0 8px' }}><RPreviewSummary receipt={r} /></div>
       <div className={styles.pFooterGray}>{b.footer}</div>
     </div>
   )
@@ -1023,23 +1026,22 @@ function RFreePreview() {
 
 function RCustomPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
-  const bannerBg = b.colour || '#7c3aed'
   return (
     <div className={styles.pBase} style={{ padding: 0 }}>
-      <div className={styles.pPurpleBanner} style={{ background: bannerBg }}>
+      <div className={styles.pPurpleBanner}>
         <div className={styles.pLogoBoxWhite}>{b.name}</div>
         <div style={{ textAlign: 'right' }}>
           <div className={styles.pLargeTitleWhite}>RECEIPT</div>
           <div className={styles.pWhiteNo}>{r.number}</div>
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 8, padding: '10px 14px 6px', fontSize: '7px' }}>
+      <div style={{ display: 'flex', gap: 8, padding: '14px 18px 8px', fontSize: '7px' }}>
         <div style={{ flex: 1 }}><div className={styles.pSmallCap}>FROM:</div><strong>{b.name}</strong><br />{b.address}</div>
         <div style={{ flex: 1 }}><div className={styles.pSmallCap}>RECEIVED FROM:</div><strong>{c.name}</strong><br />{c.phone}</div>
         <div style={{ flex: 1 }}><div className={styles.pSmallCap}>DATE:</div><strong>{r.date}</strong></div>
       </div>
-      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
-      <div className={styles.pPurpleBottom} style={{ background: bannerBg }}>
+      <div style={{ padding: '0 18px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.pPurpleBottom} style={{ marginTop: 12 }}>
         <div className={styles.pPurpleFootRow}><div className={styles.pFootSectionWhite}>{b.footer}</div></div>
       </div>
     </div>
@@ -1048,10 +1050,9 @@ function RCustomPreview() {
 
 function RPrintablePreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
-  const barColor = b.colour || '#c8a96e'
   return (
     <div className={styles.p4Base}>
-      <div className={styles.p4GoldBar} style={{ background: barColor }} />
+      <div className={styles.p4GoldBar} />
       <div className={styles.p4Header}>
         <div className={styles.p4InvoiceWord}>RECEIPT</div>
         <div className={styles.p4HeaderRight}>
@@ -1064,7 +1065,7 @@ function RPrintablePreview() {
         <div className={styles.p4BillBlock} style={{ textAlign: 'right' }}><div className={styles.p4BillLabel}>RECEIVED FROM</div><div className={styles.p4BillName}>{c.name}</div><div className={styles.p4BillInfo}>{c.phone}</div></div>
       </div>
       <div className={styles.p4Divider} />
-      <RPreviewSummary receipt={r} />
+      <div style={{ padding: '0 16px' }}><RPreviewSummary receipt={r} /></div>
     </div>
   )
 }
@@ -1095,7 +1096,7 @@ function RDarkHeaderPreview() {
       </div>
       <div className={styles.t6InvoiceRow}><div className={styles.t6InvoiceLeft}><span className={styles.t6InvoiceWord}>RECEIPT </span><span className={styles.t6InvoiceNum}>#{r.number}</span></div><div className={styles.t6InvoiceRight}><div><span className={styles.t6Label}>DATE:</span> {r.date}</div></div></div>
       <div className={styles.t6InfoRow}><div><div className={styles.t6InfoLabel}>FROM:</div>{b.name}<br />{b.address}</div><div><div className={styles.t6InfoLabel}>RECEIVED FROM:</div>{c.name}<br />{c.phone}</div></div>
-      <RPreviewSummary receipt={r} />
+      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
       <div className={styles.t6ThankYou}>{b.footer}</div>
     </div>
   )
@@ -1103,11 +1104,10 @@ function RDarkHeaderPreview() {
 
 function RRedBoldPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
-  const accentColor = b.colour || '#cc0000'
   return (
     <div className={styles.t7Base}>
       <div className={styles.t7Header}>
-        <div className={styles.t7LogoCircle}><span className="mi" style={{ fontSize: 13, color: accentColor }}>checkroom</span></div>
+        <div className={styles.t7LogoCircle}><span className="mi" style={{ fontSize: 13, color: 'var(--brand-primary)' }}>checkroom</span></div>
         <div className={styles.t7TitleGroup}><span className={styles.t7InvoiceWord}>RECEIPT</span><span className={styles.t7InvoiceNum}>#{r.number}</span></div>
         <div className={styles.t7DateBlock}><div className={styles.t7DateLabel}>DATE:</div><div className={styles.t7DateVal}>{r.date}</div></div>
       </div>
@@ -1117,24 +1117,25 @@ function RRedBoldPreview() {
         <div className={styles.t7FromToBlock}><div className={styles.t7ToLabel}>TO:</div><div className={styles.t7FromDivider} />{[['NAME:',c.name],['PHONE:',c.phone]].map(([l,v])=>(<div key={l} className={styles.t7InfoRow}><span className={styles.t7InfoKey}>{l}</span><span className={styles.t7InfoVal}>{v}</span></div>))}</div>
       </div>
       <div className={styles.t7Divider} />
-      <RPreviewSummary receipt={r} />
-      <div className={styles.t7TotalBar} style={{ background: accentColor }}><span>RECEIVED:</span><span className={styles.t7TotalAmt}>{rFmt('56200')}</span></div>
+      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.t7TotalBar}><span>RECEIVED:</span><span className={styles.t7TotalAmt}>{rFmt('56200')}</span></div>
     </div>
   )
 }
 
 function RGreenAccentPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
-  const accentColor = b.colour || '#00c896'
   return (
     <div className={styles.t8Base}>
       <div className={styles.t8Header}>
         <div className={styles.t8LogoArea}><span className="mi" style={{ fontSize: 20, color: '#333' }}>checkroom</span><div><div className={styles.t8BrandName}>{b.name}</div></div></div>
-        <div className={styles.t8InvoiceBox} style={{ background: accentColor }}><div className={styles.t8InvoiceTitle}>RECEIPT</div><div className={styles.t8InvoiceMeta}><span>Receipt#</span><span>{r.number}</span><span>Date</span><span>{r.date}</span></div></div>
+        {/* t8InvoiceBox uses var(--brand-gradient) via CSS — no inline style needed */}
+        <div className={styles.t8InvoiceBox}><div className={styles.t8InvoiceTitle}>RECEIPT</div><div className={styles.t8InvoiceMeta}><span>Receipt#</span><span>{r.number}</span><span>Date</span><span>{r.date}</span></div></div>
       </div>
-      <RPreviewSummary receipt={r} />
+      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
       <div className={styles.t8Bottom}>
-        <div className={styles.t8GreenBox} style={{ background: accentColor }}><div className={styles.t8GreenBoxTitle}>Received from:</div><div className={styles.t8GreenBoxName}>{c.name}</div><div className={styles.t8GreenBoxAddr}>{c.phone}</div></div>
+        {/* t8GreenBox uses var(--brand-gradient) via CSS — no inline style needed */}
+        <div className={styles.t8GreenBox}><div className={styles.t8GreenBoxTitle}>Received from:</div><div className={styles.t8GreenBoxName}>{c.name}</div><div className={styles.t8GreenBoxAddr}>{c.phone}</div></div>
         <div style={{ flex: 1 }} />
         <div className={styles.t8Totals}><div className={styles.t8TotRow}><span>Received:</span><span style={{ color: '#16a34a', fontWeight: 700 }}>{rFmt('56200')}</span></div><div className={styles.t8SignLine}>Authorised Sign</div></div>
       </div>
@@ -1144,13 +1145,13 @@ function RGreenAccentPreview() {
 
 function RTealGeometricPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
-  const accentColor = b.colour || '#00b4c8'
   return (
     <div className={styles.t9Base}>
-      <div className={styles.t9Header}><div><div className={styles.t9LogoRow}><span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span><span className={styles.t9CompanyName}>{b.name.toUpperCase()}</span></div></div><div className={styles.t9InvoiceTitle} style={{ color: accentColor }}>RECEIPT</div></div>
+      {/* t9InvoiceTitle colour is driven by var(--brand-primary) in CSS */}
+      <div className={styles.t9Header}><div><div className={styles.t9LogoRow}><span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span><span className={styles.t9CompanyName}>{b.name.toUpperCase()}</span></div></div><div className={styles.t9InvoiceTitle}>RECEIPT</div></div>
       <div className={styles.t9NumBar}><span>RECEIPT # {r.number}</span><span>|</span><span>DATE: {r.date}</span></div>
       <div className={styles.t9BillShip}><div><span className={styles.t9BillLabel}>Received from:</span><div><strong>{c.name}</strong></div><div>{c.phone}</div></div><div><span className={styles.t9BillLabel}>From:</span><div><strong>{b.name}</strong></div><div>{b.phone}</div></div></div>
-      <RPreviewSummary receipt={r} />
+      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
       <div className={styles.t9TotalBar}><span>AMOUNT RECEIVED</span><span>{rFmt('56200')}</span></div>
     </div>
   )
@@ -1158,32 +1159,31 @@ function RTealGeometricPreview() {
 
 function RPinkDiagonalPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
-  const accentColor = b.colour || '#ff5c8a'
   return (
     <div className={styles.t10Base}>
       <div className={styles.t10HeaderZone}>
-        <div className={styles.t10FullBanner} style={{ background: accentColor }}><span className={styles.t10BannerTitle}>RECEIPT</span></div>
+        {/* t10FullBanner and t10CornerPink use var(--brand-gradient) in CSS */}
+        <div className={styles.t10FullBanner}><span className={styles.t10BannerTitle}>RECEIPT</span></div>
         <div className={styles.t10BrandInBanner}><span className="mi" style={{ fontSize:14,color:'#333' }}>checkroom</span><div><div className={styles.t10BrandName}>{b.name}</div><div className={styles.t10BrandSub}>TAILOR SHOP</div></div></div>
       </div>
       <div className={styles.t10MetaRow}><div><div className={styles.t10MetaLabel}>Received from:</div><div className={styles.t10MetaName}>{c.name}</div><div className={styles.t10MetaAddr}>{c.phone}</div></div><div style={{ textAlign:'right' }}><div><span className={styles.t10MetaKey}>Receipt#</span> <strong>{r.number}</strong></div><div><span className={styles.t10MetaKey}>Date</span> <strong>{r.date}</strong></div></div></div>
-      <RPreviewSummary receipt={r} />
-      <div className={styles.t10CornerPink} style={{ background: accentColor }} />
+      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.t10CornerPink} />
     </div>
   )
 }
 
 function RBlueCleanPreview() {
   const r = RECEIPT_SAMPLE; const c = RECEIPT_SAMPLE_CUSTOMER; const b = RECEIPT_BRAND_SAMPLE
-  const accentColor = b.colour || '#5da0d0'
-  const barBg = '#f5eed9'
   return (
     <div className={styles.t11Base}>
       <div className={styles.t11TopBar}><div className={styles.t11LogoArea}><div className={styles.t11LogoHex}><span className="mi" style={{ fontSize:11,color:'#fff' }}>checkroom</span></div><div><div className={styles.t11CompanyName}>{b.name.toUpperCase()}</div></div></div><div className={styles.t11CompanyInfo} style={{ textAlign:'right' }}><div>{b.phone}</div></div></div>
       <div className={styles.t11InvoiceTitle}>Receipt</div>
-      <div className={styles.t11BlueBar} style={{ background: barBg, color: accentColor }}><span>RECEIPT: #{r.number}</span><span>DATE: {r.date}</span><span>AMOUNT: {rFmt('56200')}</span></div>
-      <div className={styles.t11IssuedRow}><div><div className={styles.t11IssuedLabel}>RECEIVED FROM</div><div>{c.name}</div><div>{c.phone}</div></div><div style={{ textAlign:'right' }}><div className={styles.t11AmountLabel} style={{ color: accentColor }}>AMOUNT PAID</div><div className={styles.t11AmountVal} style={{ color: accentColor }}>{rFmt('56200')}</div></div></div>
-      <RPreviewSummary receipt={r} />
-      <div className={styles.t11ThankYou} style={{ color: accentColor }}>{b.footer}</div>
+      {/* t11BlueBar colour is driven by var(--brand-primary) / var(--brand-surface) in CSS */}
+      <div className={styles.t11BlueBar}><span>RECEIPT: #{r.number}</span><span>DATE: {r.date}</span><span>AMOUNT: {rFmt('56200')}</span></div>
+      <div className={styles.t11IssuedRow}><div><div className={styles.t11IssuedLabel}>RECEIVED FROM</div><div>{c.name}</div><div>{c.phone}</div></div><div style={{ textAlign:'right' }}><div className={styles.t11AmountLabel}>AMOUNT PAID</div><div className={styles.t11AmountVal}>{rFmt('56200')}</div></div></div>
+      <div style={{ padding: '0 14px' }}><RPreviewSummary receipt={r} /></div>
+      <div className={styles.t11ThankYou}>{b.footer}</div>
     </div>
   )
 }
@@ -1226,15 +1226,26 @@ const RECEIPT_TEMPLATE_GROUPS = [
   },
 ]
 
-function TemplateModal({ isOpen, currentTemplate, onClose, onSelect }) {
+// ─────────────────────────────────────────────────────────────
+// Template Modal
+// Injects the user's saved brand colour tokens onto a ref so that
+// every template preview inside uses var(--brand-*) correctly.
+// ─────────────────────────────────────────────────────────────
+
+function TemplateModal({ isOpen, currentTemplate, colourId, onClose, onSelect }) {
   const [selected, setSelected] = useState(currentTemplate || 'editable')
   const [activeTab, setActiveTab] = useState('invoice')
+  // Inject brand tokens scoped to this modal overlay so previews pick
+  // up the user's actual saved colour without polluting :root.
+  const modalRef = useRef(null)
+  useBrandTokens(colourId, modalRef)
+
   if (!isOpen) return null
 
   const groups = activeTab === 'invoice' ? TEMPLATE_GROUPS : RECEIPT_TEMPLATE_GROUPS
 
   return (
-    <div className={styles.fullOverlay}>
+    <div className={styles.fullOverlay} ref={modalRef}>
       <Header type="back" title="Templates" onBackClick={onClose} customActions={[{label:'Select',onClick:()=>{onSelect(selected);onClose()}}]} />
       {/* Tab bar */}
       <div className={styles.tabBar}>
@@ -1389,6 +1400,7 @@ function InvoiceSettingsModal({ onBack, showToast }) {
 
 export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{} }) {
   const { settings, updateSetting, resetSettings } = useSettings()
+  const { brand } = useBrand()
   const [toastMsg,setToastMsg]=useState('')
   const [templateModal,setTemplateModal]=useState(false)
   const [invoiceModal,setInvoiceModal]=useState(false)
@@ -1430,9 +1442,15 @@ export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{
         <div style={{ height:32 }} />
       </div>
 
-      <TemplateModal isOpen={templateModal} currentTemplate={settings.invoiceTemplate} onClose={()=>setTemplateModal(false)} onSelect={v=>{updateSetting('invoiceTemplate',v);showToast('Template selected')}} />
+      <TemplateModal
+        isOpen={templateModal}
+        currentTemplate={settings.invoiceTemplate}
+        colourId={brand.colourId}
+        onClose={()=>setTemplateModal(false)}
+        onSelect={v=>{updateSetting('invoiceTemplate',v);showToast('Template selected')}}
+      />
       {invoiceModal&&<InvoiceSettingsModal onBack={()=>setInvoiceModal(false)} showToast={showToast} />}
-      {receiptModal&&<ReceiptSettingsModal onBack={()=>setReceiptModal(false)} showToast={showToast} />}}
+      {receiptModal&&<ReceiptSettingsModal onBack={()=>setReceiptModal(false)} showToast={showToast} />}
       <ConfirmSheet open={clearConfirm} title="Delete All Data?" onConfirm={()=>{localStorage.clear();setClearConfirm(false);showToast('Cleared')}} onCancel={()=>setClearConfirm(false)} />
       <ConfirmSheet open={resetConfirm} title="Reset All Settings?" onConfirm={()=>{resetSettings();setResetConfirm(false);showToast('Settings reset')}} onCancel={()=>setResetConfirm(false)} />
       <Toast message={toastMsg} />
