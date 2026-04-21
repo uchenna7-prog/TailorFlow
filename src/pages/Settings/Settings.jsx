@@ -762,7 +762,7 @@ function BlueCleanTemplate() {
 function SectionHeader({ icon, label, premium = false }) {
   return (
     <div className={styles.sectionHeader}>
-      <span className="mi" style={{ fontSize:'1rem',color:'var(--text3)' }}>{icon}</span>
+      <span className="mi" style={{ fontSize:'1.1rem',color:'var(--accent)' }}>{icon}</span>
       <span className={styles.sectionLabel}>{label}</span>
       {premium && (
         <span className={styles.premiumBadge}>
@@ -773,16 +773,16 @@ function SectionHeader({ icon, label, premium = false }) {
   )
 }
 
-function SettingRow({ icon, label, sub, value, children, onClick, chevron, divider=true, locked=false }) {
+function SettingRow({ icon, label, sub, value, children, onClick, chevron, divider=true, locked=false, danger=false }) {
   return (
     <div
       className={`${styles.row} ${onClick&&!locked?styles.rowTappable:''} ${locked?styles.rowLocked:''} ${!divider?styles.noDivider:''}`}
       onClick={locked?undefined:onClick}
     >
-      <div className={styles.rowIcon}><span className="mi" style={{ fontSize:'1.15rem' }}>{icon}</span></div>
+      <div className={styles.rowIcon}><span className="mi" style={{ fontSize:'1.15rem', color: danger ? '#ef4444' : undefined }}>{icon}</span></div>
       <div className={styles.rowText}>
-        <div className={styles.rowLabel}>{label}</div>
-        {sub&&<div className={styles.rowSub}>{sub}</div>}
+        <div className={styles.rowLabel} style={{ color: danger ? '#ef4444' : undefined }}>{label}</div>
+        {sub&&<div className={styles.rowSub} style={{ color: danger ? '#ef4444' : undefined }}>{sub}</div>}
       </div>
       <div className={styles.rowRight}>
         {locked
@@ -1017,8 +1017,8 @@ export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{
         </SettingRow>
 
         <SectionHeader icon="storage" label="Data" />
-        <SettingRow icon="restart_alt" label="Reset All Settings" sub="Restore defaults. Your customers and orders are safe." onClick={()=>setResetConfirm(true)} chevron />
-        <SettingRow icon="delete_forever" label="Clear All Data" sub="Permanently delete everything" onClick={()=>setClearConfirm(true)} chevron divider={false} />
+        <SettingRow icon="restart_alt" label="Reset All Settings" sub="Restore defaults. Your customers and orders are safe." onClick={()=>setResetConfirm(true)} chevron danger />
+        <SettingRow icon="delete_forever" label="Clear All Data" sub="Permanently delete everything" onClick={()=>setClearConfirm(true)} chevron divider={false} danger />
         <div style={{ height:32 }} />
       </div>
 
