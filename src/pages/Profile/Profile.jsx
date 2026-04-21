@@ -207,12 +207,16 @@ function InfoRow({ icon, label, value, placeholder, divider = true }) {
 }
 
 function TappableRow({ icon, label, sub, value, onClick, chevron = true, divider = true, danger = false }) {
+  const isEdit = icon === 'edit'
   return (
     <div
       className={`${styles.row} ${styles.rowTappable} ${!divider ? styles.noDivider : ''}`}
       onClick={onClick}
     >
-      <div className={styles.rowIcon}>
+      <div
+        className={styles.rowIcon}
+        style={isEdit ? { background: 'var(--text)', color: 'var(--bg)' } : undefined}
+      >
         <span className="mi" style={{ fontSize: '1.15rem', color: danger ? '#ef4444' : undefined }}>{icon}</span>
       </div>
       <div className={styles.rowText}>
@@ -1562,7 +1566,7 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
         )}
 
         <TappableRow
-          icon="receipt_long"
+          icon="payments"
           label="Billing History"
           sub="See past payments, plan renewals & expiry dates"
           onClick={() => {}}
