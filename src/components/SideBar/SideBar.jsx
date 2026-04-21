@@ -16,7 +16,7 @@ const NAV_ITEMS = [
   { path: '/reviews',      label: 'Reviews',      icon: 'rate_review'   },
   { path: '/gallery',      label: 'Gallery',      icon: 'photo_library' },
   { path: '/settings',     label: 'Settings',     icon: 'settings'      },
-  { path: '/profile',      label: 'My Account',   icon: 'person'        },
+  { path: '/profile',      label: 'Account',   icon: 'person'        },
   { path: '/contact',      label: 'Contact Us',   icon: 'call'          },
   { path: '/faq',          label: 'FAQs',         icon: 'help_outline'  },
   { path: '/login',        label: 'Log out',      icon: 'logout'        },
