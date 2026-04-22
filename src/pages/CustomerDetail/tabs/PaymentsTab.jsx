@@ -34,14 +34,7 @@ function statusMeta(value) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ORDER MOSAIC THUMBNAIL  (same pattern as OrdersTab)
-// orderItems = order.items[] — each has imgSrc
-// Layout:
-//   0 imgs  → icon placeholder
-//   1 img   → single full thumb
-//   2 imgs  → left half | right half
-//   3+ imgs → large left | right column (top + bottom stacked)
-//             4+ shows "+N" overlay on bottom-right
+// ORDER MOSAIC THUMBNAIL
 // ─────────────────────────────────────────────────────────────
 function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
   const covers = (orderItems || [])
@@ -93,7 +86,6 @@ function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
     )
   }
 
-  // 3+ items → large left + two stacked right
   const extra = total > 3 ? total - 3 : 0
 
   return (
@@ -130,17 +122,10 @@ function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
 }
 
 // ── ADD PAYMENT MODAL ─────────────────────────────────────────
-// Shows "Payment Type" (Full / Part) — NOT the status chips.
-// Status chips (Not Paid / Part / Paid) belong in PaymentDetail only.
-//
-// If the selected order already has a payment card, the form fields
-// are replaced with a contextual message guiding the user to the
-// existing card instead of allowing a duplicate.
 
 function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [orderDropOpen, setOrderDropOpen] = useState(false)
-  // paymentType: 'full' | 'part'
   const [paymentType,   setPaymentType]   = useState('full')
   const [amount,        setAmount]        = useState('')
   const [method,        setMethod]        = useState('cash')
@@ -153,13 +138,10 @@ function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
 
   const handleClose = () => { reset(); onClose() }
 
-  // Check if the selected order already has a payment card
   const existingPayment = selectedOrder
     ? payments.find(p => String(p.orderId) === String(selectedOrder.id))
     : null
 
-  // Was the existing payment originally a full payment or part payment?
-  // A single-installment 'paid' doc = full payment. Anything else = part.
   const existingIsFullPayment = existingPayment
     ? (existingPayment.installments || []).length === 1 && existingPayment.status === 'paid'
     : false
@@ -213,7 +195,6 @@ function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
 
       <div className={styles.modalBody}>
 
-        {/* Related Order */}
         <div className={styles.fieldGroup}>
           <label className={styles.fieldLabel}>Related Order *</label>
           {selectedOrder ? (
@@ -251,7 +232,6 @@ function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
           )}
         </div>
 
-        {/* ── Duplicate payment block ── */}
         {existingPayment ? (
           <div className={styles.duplicateNotice}>
             <div className={styles.duplicateIconWrap}>
@@ -275,7 +255,6 @@ function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
           </div>
         ) : (
           <>
-            {/* Payment Type — 2 chips: Full Payment | Part Payment */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>Payment Type</label>
               <div className={styles.statusRow}>
@@ -300,7 +279,6 @@ function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
               </div>
             </div>
 
-            {/* Amount */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
                 {paymentType === 'part' ? 'Initial Amount Paid (₦)' : 'Amount (₦)'}
@@ -325,7 +303,6 @@ function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
               />
             </div>
 
-            {/* Payment Method */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>Payment Method</label>
               <div className={styles.methodRow}>
@@ -341,7 +318,6 @@ function AddPaymentModal({ isOpen, onClose, orders, payments, onSave }) {
               </div>
             </div>
 
-            {/* Notes */}
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>Notes <span className={styles.optional}>(optional)</span></label>
               <textarea
@@ -457,7 +433,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
 
       <div className={styles.modalBody}>
 
-        {/* ── Order info card ── */}
         <div className={styles.detailCard}>
           <div className={styles.detailRow}>
             <span className={styles.detailLabel}>Order</span>
@@ -481,7 +456,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           )}
         </div>
 
-        {/* ── Smart payment breakdown ── */}
         {fullPrice > 0 && hasInstallments && (
           <div className={styles.summaryCard} style={{ marginTop: 16 }}>
             <label className={styles.fieldLabel} style={{ marginBottom: 12, display: 'block' }}>Payment Breakdown</label>
@@ -547,7 +521,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           </div>
         )}
 
-        {/* Fallback summary for no-price payments */}
         {(!fullPrice || !hasInstallments) && hasInstallments && (
           <div className={styles.summaryCard} style={{ marginTop: 16 }}>
             <div className={styles.installmentList}>
@@ -576,7 +549,6 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
           </div>
         )}
 
-        {/* ── Status chips ── */}
         <div className={styles.fieldGroup} style={{ marginTop: 18 }}>
           <label className={styles.fieldLabel}>Payment Status</label>
           {hasPartPayments && (
@@ -665,8 +637,6 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
     return unsub
   }, [user, customerId])
 
-  // Build order items lookup: orderId → items[]
-  // We pass the full items array so the mosaic can use all cover images
   const orderItemsMap = {}
   for (const order of (orders || [])) {
     if (order.id && order.items?.length > 0) {
@@ -726,23 +696,18 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
     }
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // FIX: pass the FULL payment object straight to CustomerDetail.
+  // CustomerDetail.handleGenerateReceipt already handles which
+  // installments are new vs previously receipted — we must NOT
+  // strip previous installments here or that logic is bypassed.
+  // ─────────────────────────────────────────────────────────────
   const handleGenerateReceipt = (payment) => {
-    const allInstallments = payment.installments || []
-    const cumulativePaid  = allInstallments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
-    const latestInstallment    = allInstallments[allInstallments.length - 1] ?? null
-    const previousInstallments = allInstallments.slice(0, -1)
-    const previousPaid         = previousInstallments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
-
-    const receiptPayload = {
-      ...payment,
-      payments:             latestInstallment ? [latestInstallment] : allInstallments,
-      cumulativePaid,
-      previousInstallments,
-      previousPaid,
-    }
-
     setDetailPay(null)
-    onGenerateReceipt(receiptPayload)
+    // Pass payment as-is; CustomerDetail.handleGenerateReceipt
+    // uses installmentIds stored on existing receipts to work out
+    // which installments are new and which are previous history.
+    onGenerateReceipt(payment)
   }
 
   const handleDeleteConfirm = async () => {
@@ -779,16 +744,16 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
           <div className={styles.payGroupDate}>{date}</div>
           <div className={styles.payGroupDivider} />
           {datePayments.map((p, idx) => {
-            const sm             = statusMeta(p.status)
-            const isLast         = idx === datePayments.length - 1
-            const installments   = p.installments || []
-            const totalPaid      = installments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
-            const fullPrice      = parseFloat(p.orderPrice) || 0
-            const installCount   = installments.length
-            const pct            = fullPrice > 0
+            const sm           = statusMeta(p.status)
+            const isLast       = idx === datePayments.length - 1
+            const installments = p.installments || []
+            const totalPaid    = installments.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
+            const fullPrice    = parseFloat(p.orderPrice) || 0
+            const installCount = installments.length
+            const pct          = fullPrice > 0
               ? (p.status === 'part' ? Math.min(99, (totalPaid / fullPrice) * 100) : Math.min(100, (totalPaid / fullPrice) * 100))
               : 0
-            const orderItems     = orderItemsMap[p.orderId] ?? []
+            const orderItems   = orderItemsMap[p.orderId] ?? []
 
             return (
               <div
@@ -888,3 +853,4 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
 PaymentsTab.openModal = () => {
   document.getElementById('__payment_modal_trigger__')?.dispatchEvent(new Event('open'))
 }
+
