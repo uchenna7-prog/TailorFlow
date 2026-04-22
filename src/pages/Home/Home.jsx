@@ -56,7 +56,6 @@ function isDateInLastMonth(dateStr) {
   return d >= lastMonth && d <= lastMonthEnd
 }
 
-// ── Compact naira formatter: ₦30k, ₦1.2m, ₦500 ───────────────
 function formatNairaCompact(amount) {
   if (!amount || amount <= 0) return null
   if (amount >= 1_000_000) return `₦${(amount / 1_000_000).toFixed(1).replace(/\.0$/, '')}m`
@@ -64,7 +63,6 @@ function formatNairaCompact(amount) {
   return `₦${amount.toLocaleString()}`
 }
 
-// ── Timely greeting with emoji ────────────────────────────────
 function getGreeting() {
   const h = new Date().getHours()
   if (h >= 5  && h < 12) return 'Good morning'
@@ -83,7 +81,6 @@ function formatUpdatedTime(date) {
   return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
 }
 
-// ── Random subtexts ───────────────────────────────────────────
 const SUBTEXTS = [
   "Here's what's happening in your shop today.",
   "Let's see how your shop is doing right now.",
@@ -100,7 +97,6 @@ function getRandomSubtext() {
   return SUBTEXTS[Math.floor(Math.random() * SUBTEXTS.length)]
 }
 
-// ── Delta helper ──────────────────────────────────────────────
 function makeDelta(current, previous) {
   const diff = current - previous
   if (diff > 0) return { value: diff, direction: 'up'   }
@@ -139,7 +135,6 @@ const TASK_STATUS_STYLES = {
   pending:   { bg: 'rgba(234,179,8,0.12)',   color: '#a16207', border: 'rgba(234,179,8,0.3)'   },
 }
 
-// Production stages — must match OrdersTab
 const STAGES = [
   { value: 'measurement_taken', label: 'Measurement Taken', icon: 'straighten'    },
   { value: 'fabric_ready',      label: 'Fabric Ready',      icon: 'roll_content'  },
@@ -296,14 +291,20 @@ function NotifBanner({ onEnable, onDismiss }) {
   )
 }
 
+/**
+ * MobileQuickActions — rendered in the DOM always, but the CSS class
+ * `.mobileQuickNav` is `display:none` on desktop (≥ 769px) and
+ * `display:flex` on mobile (≤ 768px).  This keeps it out of the
+ * visual flow on large screens without any JS media-query logic.
+ */
 function MobileQuickActions({ navigate }) {
   const path = window.location.pathname
   const navItems = [
     { icon: 'dashboard',         label: 'Dashboard',         route: '/'             },
-    { icon: 'groups',       label: 'Customers',    route: '/customers'    },
-    { icon: 'event',        label: 'Appointments', route: '/appointments' },
-    { icon: 'shopping_cart',label: 'Orders',       route: '/orders'       },
-    { icon: 'assignment',   label: 'Tasks',        route: '/tasks'        },
+    { icon: 'groups',            label: 'Customers',         route: '/customers'    },
+    { icon: 'event',             label: 'Appointments',      route: '/appointments' },
+    { icon: 'shopping_cart',     label: 'Orders',            route: '/orders'       },
+    { icon: 'assignment',        label: 'Tasks',             route: '/tasks'        },
   ]
   return (
     <nav className={styles.mobileQuickNav}>
@@ -420,14 +421,6 @@ function periodLabel(period) {
 
 // ─────────────────────────────────────────────────────────────
 // HOME ORDER MOSAIC THUMBNAIL
-// Same layout logic as OrdersTab's OrderMosaic, using the same
-// card size as the Orders page (listOuter 80px / listInner 58px).
-//   0 images  → scissors icon
-//   1 image   → single full image
-//   2 images  → left half | right half
-//   3+ images → large left (full height) | right column
-//               (top + bottom stacked); bottom-right shows "+N"
-//               overlay when total > 3
 // ─────────────────────────────────────────────────────────────
 function HomeMosaic({ items }) {
   const covers = (items || [])
@@ -584,7 +577,7 @@ function Home({ onMenuClick }) {
   }).length
   const newCustLastMonth = customers.filter(c => c.date && isDateInLastMonth(c.date)).length
 
-  // ── Top customer (most orders + total spend) ──────────────
+  // ── Top customer ──────────────────────────────────────────
   const topCustomer = (() => {
     if (!customers.length) return { name: '—', orderCount: 0, totalSpend: 0 }
     const counts = {}
@@ -650,12 +643,6 @@ function Home({ onMenuClick }) {
   }).length
   const invoicesDueThisWeek = unpaidInvoices.filter(i => dueThisWeek(getInvDueDate(i))).length
 
-  // ── Unpaid invoices — status field is the source of truth ─────
-  // 'unpaid'    = no payment made at all   → count it
-  // 'part_paid' = partial payment made     → don't count
-  // 'paid'      = fully paid               → don't count
-  // The CustomerDetail heal effect keeps invoice status in sync with
-  // actual payments, so we just trust the status field directly.
   const zeroPaidInvoices    = allInvoices.filter(i => i.status === 'unpaid')
   const zeroPaidDueThisWeek = zeroPaidInvoices.filter(i => dueThisWeek(getInvDueDate(i))).length
 
@@ -803,7 +790,6 @@ function Home({ onMenuClick }) {
     },
   ]
 
-  // ── Top customer sub-line: "₦30k • 5 orders" ─────────────
   const topCustomerMeta = (() => {
     const { orderCount, totalSpend } = topCustomer
     if (!orderCount) return null
@@ -1023,7 +1009,7 @@ function Home({ onMenuClick }) {
           </section>
         )}
 
-        {/* ── QUICK ACTIONS — desktop only ── */}
+        {/* ── QUICK ACTIONS — desktop only (CSS hides on mobile) ── */}
         <section className={styles.quickActionsDesktop}>
           <h3 className={styles.sectionTitle}>Quick Actions</h3>
           <div className={styles.statsGrid}>
@@ -1144,6 +1130,7 @@ function Home({ onMenuClick }) {
 
       </main>
 
+      {/* Bottom nav — CSS shows on mobile only, hidden on desktop */}
       <MobileQuickActions navigate={navigate} />
     </div>
   )
