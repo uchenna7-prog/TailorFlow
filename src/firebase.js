@@ -14,6 +14,7 @@ const firebaseConfig = {
   measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
@@ -21,8 +22,6 @@ export const db      = getFirestore(app);
 export const auth    = getAuth(app);
 export const storage = getStorage(app);
 
-// Analytics is not supported in all environments (e.g. some mobile browsers,
-// Firefox with tracking protection). isSupported() prevents a runtime crash.
 export const analytics = isSupported().then(yes => yes ? getAnalytics(app) : null);
 
 export default app;
