@@ -34,6 +34,74 @@ function sanitizePhone(raw) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Derive CSS brand variables from a hex colour so the paper
+// element is fully isolated from the global --brand-* tokens
+// set by useBrandTokens. Without this, changing your brand
+// colour in Profile would bleed into already-generated docs
+// because the CSS module's var(--brand-*) always reads the
+// live global values, even when effectiveBrand.colour is
+// correctly set from the snapshot.
+//
+// We inject these as inline CSS variables on the paperInner
+// wrapper — they cascade into every template child element
+// that uses var(--brand-primary) etc., overriding the globals.
+// ─────────────────────────────────────────────────────────────
+function hexToRgb(hex) {
+  const h = hex.replace('#', '')
+  const full = h.length === 3
+    ? h.split('').map(c => c + c).join('')
+    : h
+  const n = parseInt(full, 16)
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 }
+}
+
+function luminance({ r, g, b }) {
+  const ch = [r, g, b].map(v => {
+    const s = v / 255
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)
+  })
+  return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+}
+
+function mixHex(hex, white, ratio) {
+  const { r, g, b } = hexToRgb(hex)
+  const wr = parseInt(white.slice(1, 3), 16)
+  const wg = parseInt(white.slice(3, 5), 16)
+  const wb = parseInt(white.slice(5, 7), 16)
+  const mix = (a, wv) => Math.round(a + (wv - a) * ratio)
+  const toHex = v => v.toString(16).padStart(2, '0')
+  return `#${toHex(mix(r, wr))}${toHex(mix(g, wg))}${toHex(mix(b, wb))}`
+}
+
+function darkenHex(hex, ratio) {
+  const { r, g, b } = hexToRgb(hex)
+  const d = v => Math.round(v * (1 - ratio))
+  const toHex = v => v.toString(16).padStart(2, '0')
+  return `#${toHex(d(r))}${toHex(d(g))}${toHex(d(b))}`
+}
+
+function getBrandCSSVars(colour) {
+  const hex = colour || '#D4AF37'
+  const rgb = hexToRgb(hex)
+  const lum = luminance(rgb)
+  const onPrimary   = lum > 0.35 ? '#1a1a1a' : '#ffffff'
+  const primary     = hex
+  const primaryDark = darkenHex(hex, 0.25)
+  const muted       = mixHex(hex, '#ffffff', 0.75)
+  const surface     = mixHex(hex, '#ffffff', 0.92)
+  const gradient    = hex
+
+  return {
+    '--brand-primary':      primary,
+    '--brand-primary-dark': primaryDark,
+    '--brand-gradient':     gradient,
+    '--brand-on-primary':   onPrimary,
+    '--brand-muted':        muted,
+    '--brand-surface':      surface,
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
 // Build WhatsApp message for an invoice
 // ─────────────────────────────────────────────────────────────
 
@@ -946,7 +1014,6 @@ function GreenAccentTemplate({ invoice, customer, brand }) {
 }
 
 // ── 9. Accent Table Header (tealgeometric) ────────────────────
-// FIX: replaced all hardcoded #1a1a2e with brand gradient tokens
 function TealGeometricTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#00b4c8'
@@ -971,7 +1038,6 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
         </div>
         <div className={styles.t9InvoiceTitle} style={{ color: accentColor }}>INVOICE</div>
       </div>
-      {/* FIX: was background: darkBar (#1a1a2e) — now brand gradient via CSS class */}
       <div className={styles.t9NumBar}>
         <span>INVOICE # {invoice.number}</span><span>|</span>
         <span>DATE: {invoice.date}</span><span>|</span>
@@ -991,7 +1057,6 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
           {brand.email && <div>{brand.email}</div>}
         </div>
       </div>
-      {/* FIX: was background: accentColor inline — now brand gradient via CSS class */}
       <div className={styles.t9TableHead}>
         <span>QTY</span>
         <span style={{ flex: 3 }}>DESCRIPTION</span>
@@ -1009,7 +1074,6 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
         <div className={styles.t9SubRow}><span>Subtotal</span><span>{fmt(currency, subtotal)}</span></div>
         {showTax && taxRate > 0 && <div className={styles.t9SubRow}><span>Tax ({taxRate}%)</span><span>{fmt(currency, tax)}</span></div>}
       </div>
-      {/* FIX: was background: darkBar — now brand gradient via CSS class */}
       <div className={styles.t9TotalBar}>
         <span>TOTAL</span><span>{fmt(currency, total)}</span>
       </div>
@@ -1032,7 +1096,6 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
           <div className={styles.t9SignLabel}>Signature</div>
         </div>
       </div>
-      {/* FIX: was inline style with accentColor — corner deco now purely brand via CSS */}
       <div className={styles.t9CornerDeco} />
     </div>
   )
@@ -1146,7 +1209,6 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
 }
 
 // ── 11. Info Bar with Payment Tiles (blueclean) ───────────────
-// FIX: .t11LogoHex in CSS is now border-radius:50% (circle)
 function BlueCleanTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#5da0d0'
@@ -1160,7 +1222,6 @@ function BlueCleanTemplate({ invoice, customer, brand }) {
     <div className={styles.t11Wrap}>
       <div className={styles.t11TopBar}>
         <div className={styles.t11LogoArea}>
-          {/* FIX: circle container — CSS now uses border-radius:50% */}
           <div className={styles.t11LogoHex}>
             {brand.logo
               ? <img src={brand.logo} alt="" style={{ width: 14, height: 14, objectFit: 'contain', borderRadius: 2 }} />
@@ -1284,16 +1345,27 @@ const STATUS_LABELS = {
 // ─────────────────────────────────────────────────────────────
 
 export default function InvoiceView({ invoice: initialInvoice, customer, onClose, onStatusChange, onDelete, showToast }) {
-  const { brand } = useBrand()
+  const { brand: liveBrand } = useBrand()
   const paperRef  = useRef(null)
   const [invoice,    setInvoice]    = useState(initialInvoice)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [showShare,  setShowShare]  = useState(false)
 
-  const templateKey    = invoice.template || brand.template || 'editable'
+  const templateKey    = invoice.template || liveBrand.template || 'editable'
   const Template       = TEMPLATE_MAP[templateKey] || EditableTemplate
-  const effectiveBrand = { ...brand, ...(invoice.brandSnapshot || {}) }
-  const filename       = `Invoice-${invoice.number}-${customer.name.replace(/\s+/g, '_')}.pdf`
+
+  // FIX: if the invoice has a brandSnapshot, use it exclusively for all brand
+  // fields so the frozen-at-generation colours/details are always shown.
+  const effectiveBrand = invoice.brandSnapshot
+    ? { ...liveBrand, ...invoice.brandSnapshot }
+    : liveBrand
+
+  // Derive isolated CSS variables from the frozen snapshot colour.
+  // This overrides the global --brand-* tokens (set by useBrandTokens)
+  // so templates always render with the colour active at generation time.
+  const brandCSSVars = getBrandCSSVars(effectiveBrand.colour)
+
+  const filename = `Invoice-${invoice.number}-${customer.name.replace(/\s+/g, '_')}.pdf`
 
   const handleDownload = async () => {
     if (!paperRef.current) return
@@ -1340,7 +1412,7 @@ export default function InvoiceView({ invoice: initialInvoice, customer, onClose
           </div>
         </div>
         <div className={styles.paperWrap}>
-          <div className={styles.paperInner} ref={paperRef}>
+          <div className={styles.paperInner} ref={paperRef} style={brandCSSVars}>
             <Template invoice={invoice} customer={customer} brand={effectiveBrand} />
           </div>
         </div>
