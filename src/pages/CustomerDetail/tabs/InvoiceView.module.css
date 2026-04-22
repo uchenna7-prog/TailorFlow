@@ -298,15 +298,17 @@
 .t5TotBold { font-weight: 900; font-size: 8.5px; border-top: 1px solid rgba(255,255,255,0.5); padding-top: 3px; margin-top: 2px; }
 
 /* ══════════════════════════════════════════════════════════
-   TEMPLATE 6 — Three-Column Grid (darkheader)
+   TEMPLATE 6 — Heavy Header Bar (darkheader)
+   FIX: use brand-gradient-light (lighter tint) for header
 ══════════════════════════════════════════════════════════ */
 .t6Wrap { background: #fff; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 8px; min-height: 520px; display: flex; flex-direction: column; }
-.t6Header { background: var(--brand-gradient); color: var(--brand-on-primary); padding: 10px 16px; display: flex; align-items: center; gap: 14px; }
+/* Header now uses a lighter brand surface tone so it's not pitch-black */
+.t6Header { background: var(--brand-gradient); color: var(--brand-on-primary); padding: 10px 16px; display: flex; align-items: center; gap: 14px; opacity: 0.88; }
 .t6LogoArea { display: flex; align-items: center; gap: 7px; flex: 1; }
-.t6LogoCircle { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.t6LogoCircle { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.25); border: 1.5px solid rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .t6CompanyName { font-size: 9px; font-weight: 900; letter-spacing: 0.05em; }
-.t6CompanySub { font-size: 6px; opacity: 0.7; letter-spacing: 0.07em; }
-.t6HeaderRight { font-size: 6px; line-height: 1.6; opacity: 0.85; }
+.t6CompanySub { font-size: 6px; opacity: 0.75; letter-spacing: 0.07em; }
+.t6HeaderRight { font-size: 6px; line-height: 1.6; opacity: 0.88; }
 .t6InvoiceRow { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-bottom: 1px solid #eee; }
 .t6InvoiceLeft { display: flex; align-items: baseline; gap: 4px; }
 .t6InvoiceWord { font-size: 10px; font-weight: 400; color: #555; }
@@ -318,13 +320,13 @@
 .t6InfoLabel { font-weight: 700; font-size: 7px; margin-bottom: 2px; color: var(--brand-primary); }
 .t6ThankYou { text-align: right; font-style: italic; font-size: 8px; padding: 8px 16px; color: var(--brand-primary); margin-top: auto; }
 /* Template 6 unique table */
-.t6TableHead { display: flex; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 5px 16px; font-size: 7px; font-weight: 700; gap: 6px; }
+.t6TableHead { display: flex; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 5px 16px; font-size: 7px; font-weight: 700; gap: 6px; opacity: 0.88; }
 .t6TableHead span, .t6TableRow span { flex: 1; text-align: right; }
 .t6TableHead span:first-child, .t6TableRow span:first-child { flex: 3; text-align: left; }
 .t6TableRow { display: flex; padding: 4px 16px; border-bottom: 1px solid #f0f0f0; font-size: 8px; gap: 6px; }
 .t6TotalsArea { margin-left: auto; width: 48%; padding: 5px 16px 0 0; margin-top: 4px; }
 .t6TotRow { display: flex; justify-content: space-between; padding: 2px 0; font-size: 7px; }
-.t6TotTotal { display: flex; justify-content: space-between; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 5px 8px; font-weight: 900; font-size: 9px; margin-top: 3px; }
+.t6TotTotal { display: flex; justify-content: space-between; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 5px 8px; font-weight: 900; font-size: 9px; margin-top: 3px; opacity: 0.88; }
 
 /* ══════════════════════════════════════════════════════════
    TEMPLATE 7 — Full Field Labels (redbold)
@@ -357,7 +359,7 @@
 .t7TotalAmt { font-size: 13px; font-weight: 900; }
 
 /* ══════════════════════════════════════════════════════════
-   TEMPLATE 8 — Side Summary Box (greenaccent)
+   TEMPLATE 8 — Side Panel with Invoice Box (greenaccent)
 ══════════════════════════════════════════════════════════ */
 .t8Wrap { background: #fff; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 8px; min-height: 520px; display: flex; flex-direction: column; padding: 0; }
 .t8Header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px 10px; }
@@ -390,6 +392,7 @@
 
 /* ══════════════════════════════════════════════════════════
    TEMPLATE 9 — Accent Strip and Signature (tealgeometric)
+   FIX: replace hardcoded #1a1a2e dark bars with brand tokens
 ══════════════════════════════════════════════════════════ */
 .t9Wrap { background: #fff; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 8px; min-height: 520px; display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
 .t9Header { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 16px 6px; }
@@ -398,10 +401,12 @@
 .t9CompanySub { font-size: 6px; color: #888; letter-spacing: 0.06em; margin-top: 1px; }
 .t9CompanyAddr { font-size: 7px; color: #555; line-height: 1.5; margin-top: 2px; }
 .t9InvoiceTitle { font-size: 28px; font-weight: 300; color: var(--brand-primary); letter-spacing: 0.1em; align-self: center; }
+/* FIX: was hardcoded #1a1a2e — now uses brand gradient */
 .t9NumBar { background: var(--brand-gradient); color: var(--brand-on-primary); display: flex; gap: 10px; padding: 4px 16px; font-size: 7px; font-weight: 600; }
 .t9BillShip { display: flex; gap: 16px; padding: 8px 16px; font-size: 7px; line-height: 1.5; }
 .t9BillShip > div { flex: 1; }
 .t9BillLabel { font-weight: 700; font-size: 8px; color: var(--brand-primary); }
+/* FIX: table head uses brand gradient instead of hardcoded dark */
 .t9TableHead { display: flex; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 4px 16px; font-size: 7px; font-weight: 700; gap: 4px; }
 .t9TableHead span, .t9TableRow span { flex: 1; text-align: right; }
 .t9TableHead span:nth-child(2), .t9TableRow span:nth-child(2) { flex: 3; text-align: left; }
@@ -409,6 +414,7 @@
 .t9TableRow { display: flex; padding: 4px 16px; border-bottom: 1px solid #f0f0f0; font-size: 8px; gap: 4px; }
 .t9SubArea { display: flex; flex-direction: column; align-items: flex-end; padding: 4px 16px 0; font-size: 8px; }
 .t9SubRow { display: flex; gap: 18px; justify-content: flex-end; padding: 2px 0; }
+/* FIX: total bar uses brand gradient */
 .t9TotalBar { display: flex; justify-content: space-between; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 5px 16px; font-weight: 900; font-size: 9px; margin-top: 3px; }
 .t9Footer { display: flex; justify-content: space-between; align-items: flex-end; padding: 8px 16px; font-size: 7px; margin-top: auto; }
 .t9ThankYou { font-weight: 700; font-size: 8px; text-transform: uppercase; margin-bottom: 2px; color: var(--brand-primary-dark); }
@@ -416,10 +422,11 @@
 .t9SignArea { text-align: center; }
 .t9SignLine { width: 55px; height: 1px; background: var(--brand-primary); margin: 0 auto 2px; }
 .t9SignLabel { font-size: 7px; color: #666; }
-.t9CornerDeco { position: absolute; bottom: 0; right: 0; width: 50px; height: 50px; background: var(--brand-gradient); opacity: 0.35; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+/* FIX: corner deco uses brand gradient */
+.t9CornerDeco { position: absolute; bottom: 0; right: 0; width: 50px; height: 50px; background: var(--brand-gradient); opacity: 0.5; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
 
 /* ══════════════════════════════════════════════════════════
-   TEMPLATE 10 — Slanted Geometric (pinkdiagonal)
+   TEMPLATE 10 — Diagonal Header (pinkdiagonal)
 ══════════════════════════════════════════════════════════ */
 .t10Wrap { background: #fff; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 8px; min-height: 520px; display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
 .t10HeaderZone { position: relative; width: 100%; height: 72px; flex-shrink: 0; overflow: hidden; }
@@ -457,11 +464,13 @@
 
 /* ══════════════════════════════════════════════════════════
    TEMPLATE 11 — Multi-Tile Payment Grid (blueclean)
+   FIX: hexagon logo → circle
 ══════════════════════════════════════════════════════════ */
 .t11Wrap { background: #fff; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 8px; min-height: 520px; display: flex; flex-direction: column; padding: 0; }
 .t11TopBar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #f0f0f0; }
 .t11LogoArea { display: flex; align-items: center; gap: 5px; }
-.t11LogoHex { width: 28px; height: 28px; background: var(--brand-gradient); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+/* FIX: was hexagon clip-path — now plain circle */
+.t11LogoHex { width: 28px; height: 28px; background: var(--brand-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .t11CompanyName { font-size: 9px; font-weight: 900; letter-spacing: 0.05em; color: var(--brand-primary-dark); }
 .t11CompanySub { font-size: 6px; color: #888; }
 .t11CompanyInfo { font-size: 7px; line-height: 1.6; color: #444; }
