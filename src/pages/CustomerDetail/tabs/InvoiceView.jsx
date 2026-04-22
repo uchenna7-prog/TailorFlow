@@ -96,7 +96,6 @@ async function downloadPDF(paperEl, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 10000)
 }
 
-// Returns a PDF Blob without triggering a download — used for direct sharing
 async function generatePDFBlob(paperEl) {
   const PDF_W = 380
   const prevWidth  = paperEl.style.width
@@ -133,7 +132,7 @@ async function generatePDFBlob(paperEl) {
 // ─────────────────────────────────────────────────────────────
 
 function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, brand, docType, buildMessage }) {
-  const [status, setStatus] = useState('idle') // idle | generating | done | error
+  const [status, setStatus] = useState('idle')
 
   if (!open) return null
 
@@ -146,7 +145,6 @@ function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, br
     typeof navigator.canShare === 'function' &&
     navigator.canShare({ files: [new File([''], 'test.pdf', { type: 'application/pdf' })] })
 
-  // ── Generate blob then call a callback ──────────────────────
   const withBlob = async (cb) => {
     if (!paperRef?.current) return
     setStatus('generating')
@@ -161,7 +159,6 @@ function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, br
     }
   }
 
-  // ── WhatsApp: share PDF file directly via Web Share API ─────
   const handleWhatsApp = () => withBlob(async (blob, file) => {
     if (canShareFiles) {
       await navigator.share({ files: [file], text: message })
@@ -177,7 +174,6 @@ function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, br
     }
   })
 
-  // ── Other apps: download PDF then open app link ──────────────
   const handleWithDownload = (appUrl) => withBlob(async (blob) => {
     const url = URL.createObjectURL(blob)
     const a   = document.createElement('a')
@@ -208,7 +204,6 @@ function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, br
     } catch { /* silent */ }
   }
 
-  // ── Native share (PDF file if supported, else text) ─────────
   const handleNativeShare = () => withBlob(async (blob, file) => {
     const shareData = canShareFiles
       ? { files: [file], text: message }
@@ -216,7 +211,6 @@ function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, br
     await navigator.share(shareData)
   })
 
-  // ── Download only ────────────────────────────────────────────
   const handleDownloadOnly = () => withBlob(async (blob) => {
     const url = URL.createObjectURL(blob)
     const a   = document.createElement('a')
@@ -229,7 +223,7 @@ function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, br
   const APPS = [
     {
       id: 'whatsapp',
-      label: isGenerating ? 'Preparing…' : canShareFiles ? 'WhatsApp' : 'WhatsApp',
+      label: isGenerating ? 'Preparing…' : 'WhatsApp',
       onClick: handleWhatsApp,
       icon: (
         <svg viewBox="0 0 32 32" width="30" height="30">
@@ -415,14 +409,12 @@ function ItemsTable({ invoice, brand }) {
 // ─────────────────────────────────────────────────────────────
 
 // ── 1. Centred Line Invoice (editable) ────────────────────────
-// Settings preview: brand name as text only, NO logo element
 function EditableTemplate({ invoice, customer, brand }) {
   const dueDate   = getDueDate(invoice, brand.dueDays)
   const lineColor = brand.colour || '#c8a96e'
   return (
     <div className={styles.tplBase}>
       <div className={styles.editHeader}>
-        {/* No logo — settings preview shows brand name text only */}
         <div className={styles.pBrandName}>{brand.name || 'Your Brand'}</div>
         {brand.tagline && <div className={styles.editTagline}>{brand.tagline}</div>}
         {brand.address && <div className={styles.editAddr}>{brand.address}</div>}
@@ -711,7 +703,7 @@ function DarkHeaderTemplate({ invoice, customer, brand }) {
           <div className={styles.t6LogoCircle}>
             {brand.logo
               ? <img src={brand.logo} alt="" style={{ width: 20, height: 20, objectFit: 'contain' }} />
-              : <span className="mi" style={{ fontSize: 13, color: '#1a1a1a' }}>checkroom</span>
+              : <span className="mi" style={{ fontSize: 13, color: 'var(--brand-on-primary)' }}>checkroom</span>
             }
           </div>
           <div>
@@ -954,10 +946,10 @@ function GreenAccentTemplate({ invoice, customer, brand }) {
 }
 
 // ── 9. Accent Table Header (tealgeometric) ────────────────────
+// FIX: replaced all hardcoded #1a1a2e with brand gradient tokens
 function TealGeometricTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#00b4c8'
-  const darkBar     = '#1a1a2e'
   const { currency, showTax, taxRate } = brand
   const subtotal = invoice.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? 0
   const tax      = calcTax(subtotal, taxRate, showTax)
@@ -979,7 +971,8 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
         </div>
         <div className={styles.t9InvoiceTitle} style={{ color: accentColor }}>INVOICE</div>
       </div>
-      <div className={styles.t9NumBar} style={{ background: darkBar }}>
+      {/* FIX: was background: darkBar (#1a1a2e) — now brand gradient via CSS class */}
+      <div className={styles.t9NumBar}>
         <span>INVOICE # {invoice.number}</span><span>|</span>
         <span>DATE: {invoice.date}</span><span>|</span>
         <span>DUE: {dueDate}</span>
@@ -998,7 +991,8 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
           {brand.email && <div>{brand.email}</div>}
         </div>
       </div>
-      <div className={styles.t9TableHead} style={{ background: accentColor }}>
+      {/* FIX: was background: accentColor inline — now brand gradient via CSS class */}
+      <div className={styles.t9TableHead}>
         <span>QTY</span>
         <span style={{ flex: 3 }}>DESCRIPTION</span>
         <span>PRICE</span><span>TOTAL</span>
@@ -1015,7 +1009,8 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
         <div className={styles.t9SubRow}><span>Subtotal</span><span>{fmt(currency, subtotal)}</span></div>
         {showTax && taxRate > 0 && <div className={styles.t9SubRow}><span>Tax ({taxRate}%)</span><span>{fmt(currency, tax)}</span></div>}
       </div>
-      <div className={styles.t9TotalBar} style={{ background: darkBar }}>
+      {/* FIX: was background: darkBar — now brand gradient via CSS class */}
+      <div className={styles.t9TotalBar}>
         <span>TOTAL</span><span>{fmt(currency, total)}</span>
       </div>
       <div className={styles.t9Footer}>
@@ -1037,7 +1032,8 @@ function TealGeometricTemplate({ invoice, customer, brand }) {
           <div className={styles.t9SignLabel}>Signature</div>
         </div>
       </div>
-      <div className={styles.t9CornerDeco} style={{ background: `linear-gradient(135deg, transparent 50%, ${accentColor} 50%)` }} />
+      {/* FIX: was inline style with accentColor — corner deco now purely brand via CSS */}
+      <div className={styles.t9CornerDeco} />
     </div>
   )
 }
@@ -1150,6 +1146,7 @@ function PinkDiagonalTemplate({ invoice, customer, brand }) {
 }
 
 // ── 11. Info Bar with Payment Tiles (blueclean) ───────────────
+// FIX: .t11LogoHex in CSS is now border-radius:50% (circle)
 function BlueCleanTemplate({ invoice, customer, brand }) {
   const dueDate     = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#5da0d0'
@@ -1163,6 +1160,7 @@ function BlueCleanTemplate({ invoice, customer, brand }) {
     <div className={styles.t11Wrap}>
       <div className={styles.t11TopBar}>
         <div className={styles.t11LogoArea}>
+          {/* FIX: circle container — CSS now uses border-radius:50% */}
           <div className={styles.t11LogoHex}>
             {brand.logo
               ? <img src={brand.logo} alt="" style={{ width: 14, height: 14, objectFit: 'contain', borderRadius: 2 }} />
