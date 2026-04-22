@@ -7,11 +7,24 @@
   background: var(--bg);
 }
 
+/* ── Desktop: push page right of the fixed sidebar ── */
+@media (min-width: 769px) {
+  .page {
+    margin-left: var(--sidebar-width, 240px);
+  }
+}
+
 .searchContainer {
   padding: 14px 20px 10px;
   flex-shrink: 0;
   position: relative;
   z-index: 100;
+}
+
+@media (min-width: 769px) {
+  .searchContainer {
+    padding: 20px 28px 12px;
+  }
 }
 
 .searchRow {
@@ -63,6 +76,7 @@
 }
 
 .filterBtn:active { background: var(--surface); }
+@media (min-width: 769px) { .filterBtn:hover { background: var(--surface); } }
 .filterBtnActive { border-color: var(--accent); color: var(--accent); background: rgba(var(--accent-rgb, 99,102,241), 0.08); }
 
 /* ── Filter dropdown ── */
@@ -78,6 +92,10 @@
   box-shadow: 0 8px 24px rgba(0,0,0,0.14);
   z-index: 200;
   animation: dropIn 0.18s ease;
+}
+
+@media (min-width: 769px) {
+  .filterDropdown { right: 28px; }
 }
 
 @keyframes dropIn {
@@ -113,6 +131,7 @@
 }
 
 .filterOption:active { background: var(--surface2); }
+@media (min-width: 769px) { .filterOption:hover { background: var(--surface2); } }
 .filterOptionActive { color: var(--text); background: var(--surface2); font-weight: 700; }
 
 .sectionLabel {
@@ -125,6 +144,10 @@
   flex-shrink: 0;
 }
 
+@media (min-width: 769px) {
+  .sectionLabel { padding: 0 28px 10px; }
+}
+
 .scrollArea {
   flex: 1;
   overflow-y: auto;
@@ -132,22 +155,69 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* ── CUSTOMER LIST (date-grouped, same pattern as orders) ── */
+@media (min-width: 769px) {
+  .scrollArea {
+    padding: 0 28px 40px;
+    /* On desktop the FAB doesn't overlap — no extra bottom clearance needed */
+  }
+}
+
+/* ══════════════════════════════════════════
+   CUSTOMER LIST (date-grouped)
+   ══════════════════════════════════════════ */
 .custGroup { margin-bottom: 16px; }
 .custGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 0 8px; }
-.custGroupDivider { height: 1px; background: var(--border); width: calc(100% + 40px); margin-left: -20px; }
+.custGroupDivider {
+  height: 1px;
+  background: var(--border);
+  width: calc(100% + 40px);
+  margin-left: -20px;
+}
+
+@media (min-width: 769px) {
+  .custGroupDivider { width: 100%; margin-left: 0; }
+}
 
 /* Each row */
-.custListItem { display: flex; align-items: center; gap: 14px; padding: 14px 0; cursor: pointer; transition: background 0.15s; background: var(--bg); position: relative; }
-.custListItem::after { content: ''; position: absolute; bottom: 0; left: 0; right: -20px; height: 1px; background: var(--border); }
+.custListItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  cursor: pointer;
+  transition: background 0.15s;
+  background: var(--bg);
+  position: relative;
+}
+.custListItem::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: -20px;
+  height: 1px;
+  background: var(--border);
+}
+@media (min-width: 769px) {
+  .custListItem::after { right: 0; }
+  .custListItem:hover  { background: var(--surface); border-radius: 10px; }
+  /* Nudge content in slightly on hover to feel inset */
+  .custListItem:hover  .custListOuter { margin-left: 4px; transition: margin 0.15s; }
+}
 .custListItemLast::after { display: none; }
 .custListItem:active { background: var(--surface); }
 
 /* Outer grey box */
-.custListOuter { width: 80px; height: 80px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.custListOuter {
+  width: 80px; height: 80px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: margin 0.15s;
+}
 /* Inner white box */
-.custListInner { width: 58px; height: 58px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.custListPhoto { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+.custListInner {
+  width: 58px; height: 58px; border-radius: 10px;
+  background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.custListPhoto    { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 .custListInitials { font-size: 1.1rem; font-weight: 800; color: var(--text2); letter-spacing: 0.5px; }
 
 /* Text */
@@ -158,7 +228,6 @@
 /* Right actions */
 .custListActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
-/* Legacy — kept for delete button reuse */
 .custDeleteBtn {
   width: 34px;
   height: 34px;
@@ -174,8 +243,11 @@
 
 .custDeleteBtn span { color: var(--danger) !important; }
 .custDeleteBtn:active { background: rgba(255, 77, 77, 0.12); border-color: var(--danger); }
+@media (min-width: 769px) { .custDeleteBtn:hover { background: rgba(255, 77, 77, 0.08); border-color: var(--danger); } }
 
-/* ── EMPTY STATE ── */
+/* ══════════════════════════════════════════
+   EMPTY STATE
+   ══════════════════════════════════════════ */
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -186,10 +258,12 @@
 }
 
 .emptyIcon { font-size: 3rem; opacity: 0.15; }
-.emptyState p { font-size: 0.85rem; color: var(--text3); }
+.emptyState p    { font-size: 0.85rem; color: var(--text3); }
 .emptyState span { font-size: 0.75rem; color: var(--text3); opacity: 0.6; }
 
-/* ── FAB ── */
+/* ══════════════════════════════════════════
+   FAB
+   ══════════════════════════════════════════ */
 .fab {
   position: fixed;
   bottom: calc(28px + var(--sb));
@@ -211,8 +285,14 @@
 }
 
 .fab:active { transform: scale(0.93); }
+@media (min-width: 769px) {
+  .fab:hover { transform: scale(1.06); box-shadow: 0 12px 32px rgba(0,0,0,0.18); }
+  .fab { bottom: 32px; right: 32px; }
+}
 
-/* ── ADD CUSTOMER FORM OVERLAY ── */
+/* ══════════════════════════════════════════
+   ADD CUSTOMER FORM OVERLAY
+   ══════════════════════════════════════════ */
 .formOverlay {
   position: fixed;
   inset: 0;
@@ -225,6 +305,20 @@
 }
 
 .formOverlayOpen { transform: translateY(0); }
+
+/* On desktop, show as a side panel sliding in from the right */
+@media (min-width: 769px) {
+  .formOverlay {
+    left: var(--sidebar-width, 240px);
+    transform: translateX(100%);
+    transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 1px solid var(--border);
+    max-width: 560px;
+  }
+  .formOverlayOpen {
+    transform: translateX(0);
+  }
+}
 
 .formHeader {
   padding: calc(12px + var(--st)) 20px 12px;
@@ -264,6 +358,10 @@
   overflow-y: auto;
   padding: 24px 20px calc(40px + var(--sb));
   -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 769px) {
+  .formBody { padding: 24px 28px 48px; }
 }
 
 .photoPicker {
@@ -331,6 +429,7 @@
   outline: none;
   transition: border-color 0.2s;
   -webkit-appearance: none;
+  box-sizing: border-box;
 }
 
 .formInput:focus { border-color: var(--text2); }
@@ -342,7 +441,9 @@
   gap: 12px;
 }
 
-/* ── CONFIRM DELETE SHEET ── */
+/* ══════════════════════════════════════════
+   CONFIRM DELETE SHEET
+   ══════════════════════════════════════════ */
 .confirmOverlay {
   position: fixed;
   inset: 0;
@@ -353,6 +454,10 @@
   justify-content: center;
 }
 
+@media (min-width: 769px) {
+  .confirmOverlay { align-items: center; }
+}
+
 .confirmSheet {
   background: var(--surface);
   border-radius: 20px 20px 0 0;
@@ -361,8 +466,19 @@
   border-top: 1px solid var(--border);
 }
 
+@media (min-width: 769px) {
+  .confirmSheet {
+    border-radius: 18px;
+    max-width: 400px;
+    padding: 28px 24px;
+    width: auto;
+    border: 1px solid var(--border2);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  }
+}
+
 .confirmSheet h4 { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
-.confirmSheet p { font-size: 0.8rem; color: var(--text2); margin-bottom: 20px; }
+.confirmSheet p  { font-size: 0.8rem; color: var(--text2); margin-bottom: 20px; }
 
 .confirmActions { display: flex; flex-direction: column; gap: 10px; }
 
@@ -390,7 +506,9 @@
   cursor: pointer;
 }
 
-/* ── TOAST ── */
+/* ══════════════════════════════════════════
+   TOAST
+   ══════════════════════════════════════════ */
 .toast {
   position: fixed;
   bottom: calc(80px + var(--sb));
@@ -413,9 +531,20 @@
   pointer-events: none;
 }
 
+@media (min-width: 769px) {
+  .toast {
+    bottom: 32px;
+    /* Centre within the content area, not the whole viewport */
+    left: calc(var(--sidebar-width, 240px) + 50%);
+    max-width: 360px;
+  }
+}
+
 .toastShow { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ── FORM TABS ── */
+/* ══════════════════════════════════════════
+   FORM TABS
+   ══════════════════════════════════════════ */
 .formTabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
 
 .formTab {
@@ -435,7 +564,10 @@
 }
 
 .formTabActive { color: var(--accent); }
-.formTabActive::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent); }
+.formTabActive::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--accent);
+}
 
 /* ── Form inline status banner ── */
 .formInlineMsg {
@@ -511,6 +643,7 @@
   width: 100%;
   margin-top: 8px;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .addCustomFieldBtn:active { border-color: var(--accent); }
@@ -524,11 +657,8 @@
   border-bottom: 1px solid var(--border);
 }
 
-.measureImgRowLast {
-  border-bottom: none;
-}
+.measureImgRowLast { border-bottom: none; }
 
-/* ↑ UPDATED: was 100px × 100px */
 .measureImg {
   width: 130px;
   height: 130px;
@@ -545,20 +675,16 @@
   gap: 6px;
 }
 
-.measureImgRight .inputLabel {
-  margin-bottom: 0;
-}
+.measureImgRight .inputLabel { margin-bottom: 0; }
 
-/* ── PHONE ROW (country code + number input side by side) ── */
+/* ── PHONE ROW ── */
 .phoneRow {
   display: flex;
   align-items: stretch;
   gap: 8px;
 }
 
-.phoneInput {
-  flex: 1;
-}
+.phoneInput { flex: 1; }
 
 /* ── COUNTRY CODE PICKER BUTTON ── */
 .ccPickerWrap {
@@ -583,10 +709,7 @@
 
 .ccBtn:active { border-color: var(--text2); }
 
-.ccFlag {
-  font-size: 1.25rem;
-  line-height: 1;
-}
+.ccFlag { font-size: 1.25rem; line-height: 1; }
 
 .ccCode {
   font-family: 'DM Sans', sans-serif;
@@ -661,6 +784,7 @@
 }
 
 .ccOption:active { background: var(--surface2); }
+@media (min-width: 769px) { .ccOption:hover { background: var(--surface2); } }
 .ccOptionActive { background: var(--surface2); }
 
 .ccOptionName {
