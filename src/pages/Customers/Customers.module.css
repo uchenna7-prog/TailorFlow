@@ -10,7 +10,7 @@
 /* ── Desktop: push page right of the fixed sidebar ── */
 @media (min-width: 769px) {
   .page {
-    margin-left: var(--sidebar-width, 240px);
+    margin-left: var(--sidebar-width, 280px);
   }
 }
 
@@ -158,7 +158,6 @@
 @media (min-width: 769px) {
   .scrollArea {
     padding: 0 28px 40px;
-    /* On desktop the FAB doesn't overlap — no extra bottom clearance needed */
   }
 }
 
@@ -199,7 +198,6 @@
 @media (min-width: 769px) {
   .custListItem::after { right: 0; }
   .custListItem:hover  { background: var(--surface); border-radius: 10px; }
-  /* Nudge content in slightly on hover to feel inset */
   .custListItem:hover  .custListOuter { margin-left: 4px; transition: margin 0.15s; }
 }
 .custListItemLast::after { display: none; }
@@ -292,6 +290,10 @@
 
 /* ══════════════════════════════════════════
    ADD CUSTOMER FORM OVERLAY
+   ══════════════════════════════════════════
+   On desktop: slides in from the right, sits
+   inside the content area only (left edge =
+   sidebar width so it never covers the sidebar)
    ══════════════════════════════════════════ */
 .formOverlay {
   position: fixed;
@@ -306,14 +308,17 @@
 
 .formOverlayOpen { transform: translateY(0); }
 
-/* On desktop, show as a side panel sliding in from the right */
 @media (min-width: 769px) {
   .formOverlay {
-    left: var(--sidebar-width, 240px);
+    left: var(--sidebar-width, 280px);
+    right: 0;
+    top: 0;
+    bottom: 0;
     transform: translateX(100%);
     transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
     border-left: 1px solid var(--border);
-    max-width: 560px;
+    /* No max-width cap — fills the full content area */
+    max-width: none;
   }
   .formOverlayOpen {
     transform: translateX(0);
@@ -534,8 +539,7 @@
 @media (min-width: 769px) {
   .toast {
     bottom: 32px;
-    /* Centre within the content area, not the whole viewport */
-    left: calc(var(--sidebar-width, 240px) + 50%);
+    left: calc(var(--sidebar-width, 280px) + ((100vw - var(--sidebar-width, 280px)) / 2));
     max-width: 360px;
   }
 }
