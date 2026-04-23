@@ -15,6 +15,7 @@ import { SectionHeader } from './components/SectionHeader/SectionHeader'
 import { TemplateModal } from './modals/TemplateModal/TemplateModal'
 import { ReceiptSettingsModal } from './modals/ReceiptSettingsModal/ReceiptSettingsModal'
 import { InvoiceSettingsModal } from './modals/InvoiceSettingsModal/InvoiceSettingsModal'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 
 export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{} }) {
@@ -73,6 +74,7 @@ export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{
       <ConfirmSheet open={clearConfirm} title="Delete All Data?" onConfirm={()=>{localStorage.clear();setClearConfirm(false);showToast('Cleared')}} onCancel={()=>setClearConfirm(false)} />
       <ConfirmSheet open={resetConfirm} title="Reset All Settings?" onConfirm={()=>{resetSettings();setResetConfirm(false);showToast('Settings reset')}} onCancel={()=>setResetConfirm(false)} />
       <Toast message={toastMsg} />
+      <BottomNav></BottomNav>
     </div>
   )
 }

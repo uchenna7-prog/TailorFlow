@@ -7,6 +7,7 @@ import ConfirmSheet     from '../../components/ConfirmSheet/ConfirmSheet'
 import Toast            from '../../components/Toast/Toast'
 import SharePortfolioModal from '../../components/SharePortfolioModal/SharePortfolioModal'
 import styles           from './Gallery.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── CONSTANTS ──────────────────────────────────────────────────
 
@@ -726,6 +727,7 @@ export default function Gallery({ onMenuClick }) {
       />
 
       <Toast message={toastMsg} />
+      <BottomNav></BottomNav>
     </div>
   )
 }

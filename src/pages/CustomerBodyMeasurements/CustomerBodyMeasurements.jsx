@@ -6,6 +6,7 @@ import { useCustomers }                   from '../../contexts/CustomerContext'
 import { useMeasurementImages }           from '../../contexts/MeasurementImagesContext'
 import Header                             from '../../components/Header/Header'
 import styles                             from './CustomerBodyMeasurements.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── Load image as base64 AND return its natural dimensions ────
 // This lets us do proper aspect-ratio fitting in the PDF cell
@@ -457,6 +458,7 @@ export default function CustomerBodyMeasurements({ onMenuClick }) {
       <div className={`${styles.toast} ${toastMsg ? styles.toastShow : ''}`}>
         {toastMsg}
       </div>
+      <BottomNav></BottomNav>
     </div>
   )
 }

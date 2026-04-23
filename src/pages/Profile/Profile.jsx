@@ -13,6 +13,7 @@ import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import BrandColourPicker from '../../components/BrandColourPicker/BrandColourPicker'
 import { getColourById, DEFAULT_COLOUR_ID } from '../../config/brandPalette'
 import styles from './Profile.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ─────────────────────────────────────────────────────────────
 // Nigerian States
@@ -1635,6 +1636,7 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
         onCancel={() => setDeleteConfirm(false)}
       />
       <Toast message={toastMsg} />
+      <BottomNav></BottomNav>
     </div>
   )
 }

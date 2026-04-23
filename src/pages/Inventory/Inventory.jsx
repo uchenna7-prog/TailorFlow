@@ -13,6 +13,7 @@ import Header       from '../../components/Header/Header'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import Toast        from '../../components/Toast/Toast'
 import styles from './Inventory.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── Constants ─────────────────────────────────────────────────
 
@@ -771,6 +772,7 @@ export default function Inventory({ onMenuClick }) {
       />
 
       <Toast message={toastMsg} />
+      <BottomNav></BottomNav>
     </div>
   )
 }

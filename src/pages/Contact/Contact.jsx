@@ -1,5 +1,6 @@
 import styles from './Contact.module.css'
 import Header from '../../components/Header/Header'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 const CONTACT = {
   whatsapp:     '+234 9079116980',
@@ -101,6 +102,7 @@ export default function Contact({ onMenuClick }) {
 
         <div style={{ height: 40 }} />
       </div>
+      <BottomNav></BottomNav>
     </div>
   )
 }

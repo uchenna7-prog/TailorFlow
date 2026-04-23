@@ -22,6 +22,7 @@ import { useOrders }    from '../../contexts/OrdersContext'
 import Header           from '../../components/Header/Header'
 import Toast            from '../../components/Toast/Toast'
 import styles from './AllPayments.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -725,6 +726,7 @@ export default function AllPayments({ onMenuClick }) {
       )}
 
       <Toast message={toastMsg} />
+      <BottomNav></BottomNav>
     </div>
   )
 }

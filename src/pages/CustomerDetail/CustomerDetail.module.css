@@ -213,11 +213,11 @@
 
 .fab {
   position: fixed;
-  bottom: calc(30px + var(--sb, 0px));
+  bottom: calc(28px + var(--sb) + 60px);
   right: 22px;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
   background: var(--text);
   color: var(--bg);
   border: none;

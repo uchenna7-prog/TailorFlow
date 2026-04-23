@@ -6,6 +6,7 @@ import Toast     from '../../components/Toast/Toast'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import { useReviews } from '../../contexts/ReviewContext'
 import styles    from './Reviews.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -509,6 +510,7 @@ export default function Reviews({ onMenuClick }) {
       />
 
       <Toast message={toastMsg} />
+      <BottomNav></BottomNav>
     </div>
   )
 }

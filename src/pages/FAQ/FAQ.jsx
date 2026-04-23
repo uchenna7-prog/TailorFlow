@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Header from '../../components/Header/Header'
 import styles from './FAQ.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ─────────────────────────────────────────────────────────────
 // FAQ data
@@ -252,6 +253,7 @@ export default function FAQ({ onMenuClick }) {
 
         <div style={{ height: 40 }} />
       </div>
+      <BottomNav></BottomNav>
     </div>
   )
 }

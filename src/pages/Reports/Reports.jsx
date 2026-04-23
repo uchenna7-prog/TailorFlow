@@ -7,6 +7,7 @@ import { usePayments }  from '../../contexts/PaymentContext'
 import { useCustomers } from '../../contexts/CustomerContext'
 import Header from '../../components/Header/Header'
 import styles from './Reports.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── Period helpers ────────────────────────────────────────────
 
@@ -504,6 +505,7 @@ export default function Reports({ onMenuClick }) {
 
         <div style={{ height: 40 }} />
       </div>
+      <BottomNav></BottomNav>
     </div>
   )
 }

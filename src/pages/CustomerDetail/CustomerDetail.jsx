@@ -18,6 +18,7 @@ import InvoiceTab      from './tabs/InvoiceTab'
 import PaymentsTab     from './tabs/PaymentsTab'
 import ReceiptTab      from './tabs/ReceiptTab'
 import styles from './CustomerDetail.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 function getInitials(name) {
   if (!name) return ''
@@ -758,6 +759,8 @@ export default function CustomerDetail({ onMenuClick }) {
           onCancel={() => setDeleteModalOpen(false)}
         />
       )}
+
+      <BottomNav></BottomNav>
     </div>
   )
 }

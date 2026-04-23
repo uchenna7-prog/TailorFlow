@@ -14,6 +14,7 @@ import Header       from '../../components/Header/Header'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import Toast        from '../../components/Toast/Toast'
 import styles from './Tasks.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -825,6 +826,7 @@ export default function Tasks({ onMenuClick }) {
       />
 
       <Toast message={toastMsg} />
+      <BottomNav></BottomNav>
     </div>
   )
 }
