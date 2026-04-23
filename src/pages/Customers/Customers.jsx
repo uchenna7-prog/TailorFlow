@@ -5,6 +5,7 @@ import { usePremium }                  from '../../contexts/PremiumContext'
 import { useMeasurementImages }        from '../../contexts/MeasurementImagesContext'
 import Header                          from '../../components/Header/Header'
 import styles                          from './Customers.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 function getInitials(name) {
   if (!name) return ''
@@ -734,6 +735,7 @@ export default function Customers({ onMenuClick }) {
       <ConfirmSheet customer={deleteTarget} onConfirm={handleDeleteConfirm} onCancel={() => setDeleteTarget(null)} />
 
       <Toast message={toastMsg} />
+      <BottomNav></BottomNav>
     </div>
   )
 }

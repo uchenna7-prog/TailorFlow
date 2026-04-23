@@ -5,6 +5,7 @@ import Header from '../../components/Header/Header'
 import styles from './Orders.module.css'
 import { useOrders } from '../../contexts/OrdersContext'
 import { useAuth }   from '../../contexts/AuthContext'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -878,6 +879,7 @@ export default function Orders({ onMenuClick, onGoToCustomer }) {
           onGoToCustomer={onGoToCustomer}
         />
       )}
+      <BottomNav></BottomNav>
     </div>
   )
 }

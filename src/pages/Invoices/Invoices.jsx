@@ -13,6 +13,7 @@ import { subscribeToInvoices, updateInvoiceStatus, deleteInvoice } from '../../s
 import InvoiceView from '../CustomerDetail/tabs/InvoiceView'
 import Header from '../../components/Header/Header'
 import styles from './Invoices.module.css'
+import BottomNav from '../../components/BottomNav/BottomNav'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -428,6 +429,8 @@ export default function Invoices({ onMenuClick }) {
           showToast={() => {}}
         />
       )}
+
+      <BottomNav></BottomNav>
     </div>
   )
 }

@@ -1,28 +1,86 @@
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 6 — Dark Corporate Header
-══════════════════════════════════════════════════════════ */
-.t6Base { background:#fff;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:7px;min-height:480px;display:flex;flex-direction:column; }
-.t6Header { background:var(--brand-gradient);color:var(--brand-on-primary);padding:10px 14px;display:flex;align-items:center;gap:14px; }
-.t6LogoArea { display:flex;align-items:center;gap:7px;flex:1; }
-.t6LogoCircle { width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-.t6CompanyName { font-size:8.5px;font-weight:900;letter-spacing:0.05em; }
-.t6CompanySub { font-size:6px;opacity:0.7;letter-spacing:0.07em; }
-.t6HeaderRight { font-size:6px;line-height:1.6;opacity:0.85; }
-.t6InvoiceRow { display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #eee; }
-.t6InvoiceLeft { display:flex;align-items:baseline;gap:4px; }
-.t6InvoiceWord { font-size:10px;font-weight:400;color:#555; }
-.t6InvoiceNum { font-size:17px;font-weight:900;color:var(--brand-primary); }
-.t6InvoiceRight { text-align:right;font-size:7px;line-height:1.7; }
-.t6Label { font-weight:700;color:var(--brand-primary); }
-.t6InfoRow { display:flex;gap:14px;padding:7px 14px 8px;border-bottom:1px solid #eee; }
-.t6InfoRow>div { flex:1;font-size:6.5px;line-height:1.6; }
-.t6InfoLabel { font-weight:700;font-size:7px;margin-bottom:2px;color:var(--brand-primary); }
-.t6TableHead { display:flex;background:var(--brand-gradient);color:var(--brand-on-primary);padding:5px 14px;font-weight:700;font-size:6.5px;gap:4px; }
-.t6TableHead span,.t6TableRow span,.t6TableRowSolid span { flex:1;text-align:right; }
-.t6TableHead span:first-child,.t6TableRow span:first-child,.t6TableRowSolid span:first-child { text-align:left; }
-.t6TableRow { display:flex;padding:4px 14px;font-size:6.5px;border-bottom:1px solid #eee;gap:4px; }
-.t6TableRowSolid { display:flex;padding:4px 14px;font-size:6.5px;border-bottom:1px solid #eee;gap:4px; }
-.t6TotalsArea { margin-left:auto;width:42%;padding:5px 14px 0 0; }
-.t6TotRow { display:flex;justify-content:space-between;padding:2px 0;font-size:7px; }
-.t6TotTotal { display:flex;justify-content:space-between;background:var(--brand-gradient);color:var(--brand-on-primary);padding:5px 8px;font-weight:900;font-size:8.5px;margin-top:3px; }
-.t6ThankYou { text-align:right;font-style:italic;font-size:7.5px;padding:7px 14px;color:var(--brand-primary);margin-top:auto; }
+
+.Base { 
+   background:#fff;
+   color:#1a1a1a;
+   font-family:'Inter',
+   sans-serif;
+   font-size:7px;
+   min-height:480px;
+   display:flex;
+   flex-direction:column; 
+}
+
+.Header { 
+   background:var(--brand-gradient);
+   color:var(--brand-on-primary);
+   padding:10px 14px;
+   display:flex;
+   align-items:center;
+   gap:14px; 
+}
+
+.LogoArea { 
+   display:flex;
+   align-items:center;
+   gap:7px;flex:1; 
+}
+
+.LogoCircle { 
+   width:26px;
+   height:26px;
+   border-radius:50%;
+   background:rgba(255,255,255,0.2);
+   border:1.5px solid rgba(255,255,255,0.5);
+   display:flex;align-items:center;
+   justify-content:center;
+   flex-shrink:0; 
+}
+
+.CompanyName { 
+   font-size:8.5px;
+   font-weight:900;
+   letter-spacing:0.05em; 
+}
+
+.CompanySub { 
+   font-size:6px;
+   opacity:0.7;
+   letter-spacing:0.07em; 
+}
+
+.HeaderRight { 
+   font-size:6px;
+   line-height:1.6;
+   opacity:0.85; 
+}
+
+.InvoiceRow { 
+   display:flex;
+   justify-content:space-between;
+   align-items:center;
+   padding:8px 14px;
+   border-bottom:1px solid #eee; 
+}
+
+.InvoiceLeft { 
+   display:flex;
+   align-items:baseline;
+   gap:4px; 
+}
+
+.InvoiceWord { font-size:10px;font-weight:400;color:#555; }
+.InvoiceNum { font-size:17px;font-weight:900;color:var(--brand-primary); }
+.InvoiceRight { text-align:right;font-size:7px;line-height:1.7; }
+.Label { font-weight:700;color:var(--brand-primary); }
+.InfoRow { display:flex;gap:14px;padding:7px 14px 8px;border-bottom:1px solid #eee; }
+.InfoRow>div { flex:1;font-size:6.5px;line-height:1.6; }
+.InfoLabel { font-weight:700;font-size:7px;margin-bottom:2px;color:var(--brand-primary); }
+.TableHead { display:flex;background:var(--brand-gradient);color:var(--brand-on-primary);padding:5px 14px;font-weight:700;font-size:6.5px;gap:4px; }
+.TableHead span,.TableRow span,.TableRowSolid span { flex:1;text-align:right; }
+.TableHead span:first-child,.TableRow span:first-child,.TableRowSolid span:first-child { text-align:left; }
+.TableRow { display:flex;padding:4px 14px;font-size:6.5px;border-bottom:1px solid #eee;gap:4px; }
+.TableRowSolid { display:flex;padding:4px 14px;font-size:6.5px;border-bottom:1px solid #eee;gap:4px; }
+.TotalsArea { margin-left:auto;width:42%;padding:5px 14px 0 0; }
+.TotRow { display:flex;justify-content:space-between;padding:2px 0;font-size:7px; }
+.TotTotal { display:flex;justify-content:space-between;background:var(--brand-gradient);color:var(--brand-on-primary);padding:5px 8px;font-weight:900;font-size:8.5px;margin-top:3px; }
+.ThankYou { text-align:right;font-style:italic;font-size:7.5px;padding:7px 14px;color:var(--brand-primary);margin-top:auto; }

@@ -312,11 +312,11 @@
 /* ── FAB ── */
 .fab {
   position: fixed;
-  bottom: calc(28px + var(--sb));
+  bottom: calc(28px + var(--sb) + 60px);
   right: 22px;
   width: 58px;
   height: 58px;
-  border-radius: 50%;
+  border-radius: 10px;
   background: var(--accent);
   color: var(--bg);
   border: none;

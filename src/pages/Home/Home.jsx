@@ -9,8 +9,9 @@ import { useAuth }          from '../../contexts/AuthContext'
 import { useNotifications } from '../../contexts/NotificationContext'
 import { useSettings }      from '../../contexts/SettingsContext'
 import { usePayments }      from '../../contexts/PaymentContext'
-import Header from '../../components/Header/Header'
-import styles from './Home.module.css'
+import Header    from '../../components/Header/Header'
+import BottomNav from '../../components/BottomNav/BottomNav'
+import styles    from './Home.module.css'
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -291,42 +292,6 @@ function NotifBanner({ onEnable, onDismiss }) {
   )
 }
 
-/**
- * MobileQuickActions — rendered in the DOM always, but the CSS class
- * `.mobileQuickNav` is `display:none` on desktop (≥ 769px) and
- * `display:flex` on mobile (≤ 768px).  This keeps it out of the
- * visual flow on large screens without any JS media-query logic.
- */
-function MobileQuickActions({ navigate }) {
-  const path = window.location.pathname
-  const navItems = [
-    { icon: 'dashboard',         label: 'Dashboard',         route: '/'             },
-    { icon: 'groups',            label: 'Customers',         route: '/customers'    },
-    { icon: 'event',             label: 'Appointments',      route: '/appointments' },
-    { icon: 'shopping_cart',     label: 'Orders',            route: '/orders'       },
-    { icon: 'assignment',        label: 'Tasks',             route: '/tasks'        },
-  ]
-  return (
-    <nav className={styles.mobileQuickNav}>
-      {navItems.map(item => {
-        const isActive = item.route === '/'
-          ? path === '/' || path === '/home'
-          : path.startsWith(item.route)
-        return (
-          <button
-            key={item.route}
-            className={`${styles.mobileQuickBtn} ${isActive ? styles.mobileQuickBtnActive : ''}`}
-            onClick={() => navigate(item.route)}
-          >
-            <span className="mi" style={{ fontSize: '1.45rem' }}>{item.icon}</span>
-            <span className={styles.mobileQuickLabel}>{item.label}</span>
-          </button>
-        )
-      })}
-    </nav>
-  )
-}
-
 function StatCard({ card, navigate }) {
   const [showTip, setShowTip] = useState(false)
   return (
@@ -372,7 +337,6 @@ function StatCard({ card, navigate }) {
     </div>
   )
 }
-
 
 function EmptyState({ icon, message, sub }) {
   return (
@@ -1130,8 +1094,8 @@ function Home({ onMenuClick }) {
 
       </main>
 
-      {/* Bottom nav — CSS shows on mobile only, hidden on desktop */}
-      <MobileQuickActions navigate={navigate} />
+      {/* ── BOTTOM NAV — CSS shows on mobile only, hidden on desktop ── */}
+      <BottomNav />
     </div>
   )
 }

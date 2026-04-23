@@ -63,7 +63,7 @@
 }
 
 .filterBtn:active { background: var(--surface); }
-.filterBtnActive { border-color: var(--accent); color: var(--accent); background: rgba(var(--accent-rgb, 99,102,241), 0.08); }
+.filterBtnActive { border-color: var(--accent); color: var(--accent); background: rgba(128, 128, 128, 0.08); }
 
 /* ── Filter dropdown ── */
 .filterDropdown {
@@ -128,7 +128,8 @@
 .scrollArea {
   flex: 1;
   overflow-y: auto;
-  padding: 0 20px calc(30px + var(--sb));
+  /* Extra bottom padding so last item isn't hidden behind BottomNav + FAB */
+  padding: 0 20px calc(140px + var(--sb));
   -webkit-overflow-scrolling: touch;
 }
 
@@ -143,10 +144,10 @@
 .custListItemLast::after { display: none; }
 .custListItem:active { background: var(--surface); }
 
-/* Outer grey box */
+/* Outer box */
 .custListOuter { width: 80px; height: 80px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-/* Inner white box */
-.custListInner { width: 58px; height: 58px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+/* Inner box — use surface2 instead of hardcoded #fff so it adapts to dark mode */
+.custListInner { width: 58px; height: 58px; border-radius: 10px; background: var(--surface2); display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .custListPhoto { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 .custListInitials { font-size: 1.1rem; font-weight: 800; color: var(--text2); letter-spacing: 0.5px; }
 
@@ -158,7 +159,6 @@
 /* Right actions */
 .custListActions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 
-/* Legacy — kept for delete button reuse */
 .custDeleteBtn {
   width: 34px;
   height: 34px;
@@ -189,21 +189,28 @@
 .emptyState p { font-size: 0.85rem; color: var(--text3); }
 .emptyState span { font-size: 0.75rem; color: var(--text3); opacity: 0.6; }
 
-/* ── FAB ── */
+/* ── FAB ──
+   On mobile the BottomNav is ~65px tall plus safe-area.
+   We push the FAB above it by adding that offset on top of
+   the standard 28px gap.
+── */
 .fab {
   position: fixed;
-  bottom: calc(28px + var(--sb));
+  bottom: calc(28px + var(--sb) + 60px);
   right: 22px;
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: 10px;
   background: var(--accent);
-  color: #ffffff;
+  /* Use bg (inverted from accent) so the icon always contrasts:
+     light mode → accent=#000, icon=#fff (bg is white)
+     dark mode  → accent=#fff, icon=#000 (bg is black)        */
+  color: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   z-index: 200;
   border: none;
   cursor: pointer;
@@ -245,8 +252,8 @@
 }
 
 .headerSaveBtn {
-  background: #000000;
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--bg);
   border: none;
   padding: 8px 20px;
   border-radius: 8px;
@@ -266,6 +273,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Photo picker — use surface2 so it's visible in dark mode */
 .photoPicker {
   width: 90px;
   height: 90px;
@@ -280,7 +288,8 @@
   justify-content: center;
 }
 
-.photoInitials { font-size: 1.5rem; font-weight: 800; color: var(--text3); }
+/* Initials inside photo picker use --text2 so they show in both modes */
+.photoInitials { font-size: 1.5rem; font-weight: 800; color: var(--text2); }
 
 .photoPreview {
   position: absolute;
@@ -298,7 +307,8 @@
   width: 28px;
   height: 28px;
   background: var(--accent);
-  color: #ffffff;
+  /* icon must contrast against accent in both modes */
+  color: var(--bg);
   border-radius: 50%;
   border: 2.5px solid var(--bg);
   display: flex;
@@ -336,6 +346,12 @@
 .formInput:focus { border-color: var(--text2); }
 .formInput::placeholder { color: var(--text3); }
 
+/* Select arrow colour adapts to theme */
+.formInput option {
+  background: var(--surface);
+  color: var(--text);
+}
+
 .inputRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -361,8 +377,8 @@
   border-top: 1px solid var(--border);
 }
 
-.confirmSheet h4 { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
-.confirmSheet p { font-size: 0.8rem; color: var(--text2); margin-bottom: 20px; }
+.confirmSheet h4 { font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.confirmSheet p  { font-size: 0.8rem; color: var(--text2); margin-bottom: 20px; }
 
 .confirmActions { display: flex; flex-direction: column; gap: 10px; }
 
@@ -467,7 +483,7 @@
   border-radius: 12px;
   border: 1px solid var(--border2);
   background: none;
-  color: var(--text3);
+  color: var(--text2);
   font-family: 'DM Sans', sans-serif;
   font-size: 0.88rem;
   font-weight: 700;
@@ -475,7 +491,8 @@
   transition: all 0.2s;
 }
 
-.sexChipActive { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+/* Active chip: accent bg, text contrasts using --bg */
+.sexChipActive { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 .sexChipError  { border-color: var(--danger); color: var(--danger); }
 
 /* ── CUSTOM BODY FIELDS ── */
@@ -524,11 +541,8 @@
   border-bottom: 1px solid var(--border);
 }
 
-.measureImgRowLast {
-  border-bottom: none;
-}
+.measureImgRowLast { border-bottom: none; }
 
-/* ↑ UPDATED: was 100px × 100px */
 .measureImg {
   width: 130px;
   height: 130px;
@@ -545,20 +559,16 @@
   gap: 6px;
 }
 
-.measureImgRight .inputLabel {
-  margin-bottom: 0;
-}
+.measureImgRight .inputLabel { margin-bottom: 0; }
 
-/* ── PHONE ROW (country code + number input side by side) ── */
+/* ── PHONE ROW ── */
 .phoneRow {
   display: flex;
   align-items: stretch;
   gap: 8px;
 }
 
-.phoneInput {
-  flex: 1;
-}
+.phoneInput { flex: 1; }
 
 /* ── COUNTRY CODE PICKER BUTTON ── */
 .ccPickerWrap {
@@ -583,10 +593,7 @@
 
 .ccBtn:active { border-color: var(--text2); }
 
-.ccFlag {
-  font-size: 1.25rem;
-  line-height: 1;
-}
+.ccFlag { font-size: 1.25rem; line-height: 1; }
 
 .ccCode {
   font-family: 'DM Sans', sans-serif;
@@ -661,7 +668,7 @@
 }
 
 .ccOption:active { background: var(--surface2); }
-.ccOptionActive { background: var(--surface2); }
+.ccOptionActive  { background: var(--surface2); }
 
 .ccOptionName {
   flex: 1;

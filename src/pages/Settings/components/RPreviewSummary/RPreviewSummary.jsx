@@ -3,6 +3,7 @@ import styles from "./RPreviewSummary.module.css";
 
 
 export function RPreviewSummary({ receipt }) {
+
   const orderTotal     = receipt.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? (parseFloat(receipt.orderPrice) || 0);
   const cumulativePaid = rResolvePaid(receipt);
   const thisPaid       = (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
@@ -11,17 +12,18 @@ export function RPreviewSummary({ receipt }) {
 
   return (
     <div className={styles.container}>
+      
       <div className={styles.sectionTitle}>Order Details</div>
 
       <div className={styles.tableHeader}>
-        <span className={styles.descriptionCol}>Description</span>
-        <span className={styles.amountCol}>Amount</span>
+        <span className={styles.descriptionColumn}>Description</span>
+        <span className={styles.amountColumn}>Amount</span>
       </div>
 
       {receipt.items?.slice(0, 3).map((item, i) => (
         <div key={i} className={styles.itemRow}>
-          <span className={styles.descriptionCol}>{item.name}</span>
-          <span className={styles.amountCol}>{rFmt(item.price)}</span>
+          <span className={styles.descriptionColumn}>{item.name}</span>
+          <span className={styles.amountColumn}>{rFmt(item.price)}</span>
         </div>
       ))}
 

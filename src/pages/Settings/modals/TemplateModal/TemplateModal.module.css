@@ -22,7 +22,6 @@
   gap: 12px;
 }
 
-/* ── DESKTOP ── */
 @media (min-width: 769px) {
   .fullOverlay {
     left: var(--sidebar-width, 280px);

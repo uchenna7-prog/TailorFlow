@@ -1,10 +1,9 @@
-/* Wrapper */
+
 .container {
   margin-top: 8px;
   font-size: 7px;
 }
 
-/* "ORDER DETAILS" heading */
 .sectionTitle {
   font-weight: 900;
   font-size: 9px;
@@ -14,7 +13,7 @@
   color: #444;
 }
 
-/* Header row (Description / Amount) */
+
 .tableHeader {
   display: flex;
   font-weight: 800;
@@ -24,7 +23,6 @@
   margin-bottom: 5px;
 }
 
-/* Each item row */
 .itemRow {
   display: flex;
   border-bottom: 1px solid #eee;
@@ -32,16 +30,14 @@
   font-size: 7px;
 }
 
-/* Shared column layout */
-.descriptionCol {
+.descriptionColumn {
   flex: 3;
 }
 
-.amountCol {
+.amountColumn {
   text-align: right;
 }
 
-/* Summary block (right-aligned totals) */
 .summaryBlock {
   margin-left: auto;
   width: 55%;
@@ -49,14 +45,13 @@
   font-size: 7px;
 }
 
-/* Generic summary row */
+
 .summaryRow {
   display: flex;
   justify-content: space-between;
   padding: 2px 0;
 }
 
-/* Bold totals row with top border */
 .summaryTotal {
   font-weight: 900;
   border-top: 1px solid #1a1a1a;
@@ -64,18 +59,15 @@
   margin-top: 2px;
 }
 
-/* "Total Paid" green value */
 .paidAmount {
   color: #16a34a;
   font-weight: 700;
 }
 
-/* Final amount when fully paid */
 .totalAmountPaid {
   color: #16a34a;
 }
 
-/* Final amount when partially paid */
 .totalAmountPartial {
   color: #1a1a1a;
 }
