@@ -1,6 +1,7 @@
 import { rResolvePaid,rFmt } from "../../utils/receiptUtils";
 import styles from "./RPreviewSummary.module.css";
 
+
 export function RPreviewSummary({ receipt }) {
   const orderTotal     = receipt.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? (parseFloat(receipt.orderPrice) || 0);
   const cumulativePaid = rResolvePaid(receipt);
