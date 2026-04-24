@@ -9,6 +9,7 @@ import { getBrandCSSVars } from '../../utils/invoiceUtils'
 import { ShareSheet } from '../../components/ShareSheet/ShareSheet'
 
 
+
 const STATUS_LABELS = {
   unpaid:    'Unpaid',
   part_paid: 'Part Payment',

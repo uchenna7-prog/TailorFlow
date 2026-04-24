@@ -15,7 +15,6 @@ export function InvoiceTemplate1({ invoice, customer, brand }) {
 
         <div className={styles.brandName}>{brand.name || 'Your Brand'}</div>
         {brand.tagline && <div className={styles.tagline}>{brand.tagline}</div>}
-        {brand.address && <div className={styles.address}>{brand.address}</div>}
 
         <div className={styles.titleRow}>
 

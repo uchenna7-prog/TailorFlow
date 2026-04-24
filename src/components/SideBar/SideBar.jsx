@@ -52,7 +52,7 @@ const NAV_SECTIONS = [
     label: 'Account',
     items: [
       { path: '/settings', label: 'Settings', icon: 'settings' },
-      { path: '/profile',  label: 'Profile',  icon: 'person'   },
+      { path: '/profile',  label: 'Account',  icon: 'person'   },
       { path: '/login',    label: 'Log out',  icon: 'logout', danger: true },
     ],
   },

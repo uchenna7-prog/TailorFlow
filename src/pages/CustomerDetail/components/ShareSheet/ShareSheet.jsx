@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { sanitizePhone } from "../../utils/invoiceUtils"
 
 export function ShareSheet({ open, onClose, paperRef, filename, docNumber, customer, brand, docType, buildMessage }) {
   const [status, setStatus] = useState('idle')
