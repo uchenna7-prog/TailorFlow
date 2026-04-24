@@ -1,22 +1,99 @@
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 7 — Full Field Labels (redbold)
-══════════════════════════════════════════════════════════ */
-.t7Wrap { background: #fff; color: #1a1a1a; font-family: 'Arial', sans-serif; font-size: 8px; min-height: 520px; display: flex; flex-direction: column; padding: 0; }
-.t7Header { display: flex; align-items: center; gap: 9px; padding: 12px 16px 8px; }
-.t7LogoCircle { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--brand-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.t7TitleGroup { display: flex; align-items: baseline; gap: 5px; flex: 1; }
-.t7InvoiceWord { font-size: 17px; font-weight: 900; letter-spacing: 0.05em; }
-.t7InvoiceNum { font-size: 13px; font-weight: 900; color: #888; }
-.t7DateBlock { text-align: right; font-size: 7px; }
-.t7DateLabel { font-size: 6px; color: #888; text-transform: uppercase; }
-.t7DateVal { font-weight: 700; font-size: 8px; color: var(--brand-primary); }
-.t7Divider { height: 2px; background: var(--brand-primary-dark); margin: 0 16px; }
-.t7FromTo { display: flex; padding: 8px 16px; }
-.t7FromToBlock { flex: 1; font-size: 7px; line-height: 1.5; }
-.t7FromLabel, .t7ToLabel { font-size: 13px; font-weight: 900; margin-bottom: 3px; color: var(--brand-primary-dark); }
-.t7FromDivider { height: 1px; background: var(--brand-primary); margin-bottom: 3px; }
-.t7InfoRow { display: flex; gap: 3px; margin-bottom: 1px; }
-.t7InfoKey { color: #aaa; font-size: 6px; text-transform: uppercase; width: 55px; flex-shrink: 0; }
+.t7Wrap { 
+   background: #fff; 
+   color: #1a1a1a; 
+   font-family: 'Arial', sans-serif; 
+   font-size: 8px; 
+   min-height: 520px; 
+   display: flex; 
+   flex-direction: column; 
+   padding: 0; 
+}
+
+.t7Header { 
+   display: flex; 
+   align-items: center; 
+   gap: 9px; 
+   padding: 12px 16px 8px; 
+}
+.t7LogoCircle { 
+   width: 26px; 
+   height: 26px; 
+   border-radius: 50%; 
+   border: 2px solid var(--brand-primary); 
+   display: flex; 
+   align-items: center; 
+   justify-content: center; 
+   flex-shrink: 0; 
+}
+.t7TitleGroup { 
+   display: flex; 
+   align-items: baseline; 
+   gap: 5px; 
+   flex: 1; 
+}
+.t7InvoiceWord { 
+   font-size: 17px; 
+   font-weight: 900; 
+   letter-spacing: 0.05em; 
+}
+.t7InvoiceNum { 
+   font-size: 13px; 
+   font-weight: 900; 
+   color: #888; 
+}
+.t7DateBlock { 
+   text-align: right; 
+   font-size: 7px; 
+}
+.t7DateLabel { 
+   font-size: 6px; 
+   color: #888; 
+   text-transform: uppercase; 
+}
+
+.t7DateVal { 
+   font-weight: 700; 
+   font-size: 8px; 
+   color: var(--brand-primary); 
+}
+
+.t7Divider { 
+   height: 2px; 
+   background: var(--brand-primary-dark); 
+   margin: 0 16px; 
+}
+
+.t7FromTo { 
+   display: flex; 
+   padding: 8px 16px; 
+}
+
+.t7FromToBlock { 
+   flex: 1; 
+   font-size: 7px; 
+   line-height: 1.5; 
+}
+
+.t7FromLabel, .t7ToLabel { 
+   font-size: 13px; 
+   font-weight: 900; 
+   margin-bottom: 3px; 
+   color: var(--brand-primary-dark); 
+}
+
+.t7FromDivider { 
+   height: 1px; 
+   background: var(--brand-primary); 
+   margin-bottom: 3px; 
+}
+
+.t7InfoRow { 
+   display: flex; 
+   gap: 3px; 
+   margin-bottom: 1px; 
+}
+.t7InfoKey { 
+   color: #aaa; font-size: 6px; text-transform: uppercase; width: 55px; flex-shrink: 0; }
 .t7InfoVal { font-weight: 700; font-size: 7px; }
 .t7ForLabel { font-size: 13px; font-weight: 900; padding: 4px 16px; color: var(--brand-primary-dark); }
 .t7PayRow { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 8px 16px; font-size: 7px; border-top: 1px solid #eee; margin-top: 8px; }

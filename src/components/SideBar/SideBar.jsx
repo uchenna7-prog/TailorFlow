@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useReviews } from '../../contexts/ReviewContext'
 import styles from './SideBar.module.css'
 
+
 const NAV_SECTIONS = [
   {
     key: 'workspace',
