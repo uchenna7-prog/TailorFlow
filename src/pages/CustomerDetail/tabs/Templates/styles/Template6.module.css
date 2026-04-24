@@ -8,28 +8,174 @@
    flex-direction: column; 
 }
 
+.header { 
+   background: var(--brand-gradient); 
+   color: var(--brand-on-primary); 
+   padding: 10px 16px; display: flex; 
+   display: flex;
+   justify-content: space-between;
+   align-items: center; 
+   gap: 14px; 
+   opacity: 0.88; 
+}
 
-.t6Header { background: var(--brand-gradient); color: var(--brand-on-primary); padding: 10px 16px; display: flex; align-items: center; gap: 14px; opacity: 0.88; }
-.t6LogoArea { display: flex; align-items: center; gap: 7px; flex: 1; }
-.t6LogoCircle { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.25); border: 1.5px solid rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.t6CompanyName { font-size: 9px; font-weight: 900; letter-spacing: 0.05em; }
-.t6CompanySub { font-size: 6px; opacity: 0.75; letter-spacing: 0.07em; }
-.t6HeaderRight { font-size: 6px; line-height: 1.6; opacity: 0.88; }
-.t6InvoiceRow { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-bottom: 1px solid #eee; }
-.t6InvoiceLeft { display: flex; align-items: baseline; gap: 4px; }
-.t6InvoiceWord { font-size: 10px; font-weight: 400; color: #555; }
-.t6InvoiceNum { font-size: 18px; font-weight: 900; color: var(--brand-primary); }
-.t6InvoiceRight { text-align: right; font-size: 7px; line-height: 1.7; }
-.t6Label { font-weight: 700; color: var(--brand-primary); }
-.t6InfoRow { display: flex; gap: 14px; padding: 7px 16px 9px; border-bottom: 1px solid #eee; }
-.t6InfoRow > div { flex: 1; font-size: 6.5px; line-height: 1.6; }
-.t6InfoLabel { font-weight: 700; font-size: 7px; margin-bottom: 2px; color: var(--brand-primary); }
-.t6ThankYou { text-align: right; font-style: italic; font-size: 8px; padding: 8px 16px; color: var(--brand-primary); margin-top: auto; }
-/* Template 6 unique table */
-.t6TableHead { display: flex; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 5px 16px; font-size: 7px; font-weight: 700; gap: 6px; opacity: 0.88; }
-.t6TableHead span, .t6TableRow span { flex: 1; text-align: right; }
-.t6TableHead span:first-child, .t6TableRow span:first-child { flex: 3; text-align: left; }
-.t6TableRow { display: flex; padding: 4px 16px; border-bottom: 1px solid #f0f0f0; font-size: 8px; gap: 6px; }
-.t6TotalsArea { margin-left: auto; width: 48%; padding: 5px 16px 0 0; margin-top: 4px; }
-.t6TotRow { display: flex; justify-content: space-between; padding: 2px 0; font-size: 7px; }
-.t6TotTotal { display: flex; justify-content: space-between; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 5px 8px; font-weight: 900; font-size: 9px; margin-top: 3px; opacity: 0.88; }
+.header > div:first-child{
+   display: flex;
+   text-align: left;
+   min-width: 45%;
+}
+
+.logoArea { 
+   display: flex; 
+   align-items: center; 
+   gap: 7px; 
+}
+
+.logoCircle { 
+   width: 45px; 
+   height: 45px; 
+   border-radius: 50%; 
+   background: rgba(255,255,255,0.25); 
+   border: 1.5px solid rgba(255,255,255,0.6); 
+   display: flex; align-items: center; 
+   justify-content: center; 
+}
+
+.companyName { 
+   font-size: 9px; 
+   font-weight: 900; 
+   letter-spacing: 0.05em; 
+}
+
+.companySub { 
+   font-size: 6px; 
+   opacity: 0.75; 
+   letter-spacing: 0.07em; 
+}
+
+.headerRight { 
+   font-size: 6px; 
+   line-height: 1.6; 
+   opacity: 0.88; 
+}
+
+.invoiceRow { 
+   display: flex; 
+   justify-content: space-between; 
+   align-items: center; 
+   padding: 8px 16px; 
+   border-bottom: 1px solid #eee; 
+}
+
+.invoiceLeft { 
+   display: flex; 
+   align-items: baseline; 
+   gap: 4px; 
+}
+
+.invoiceWord { 
+   font-size: 10px; 
+   font-weight: 400; 
+   color: #555; 
+}
+.invoiceNum { 
+   font-size: 18px; 
+   font-weight: 900; 
+   color: var(--brand-primary); 
+}
+
+.invoiceRight { 
+   text-align: right; 
+   font-size: 7px; 
+   line-height: 1.7; 
+}
+
+.label { 
+   font-weight: 700; 
+   color: var(--brand-primary); 
+}
+
+.infoRow {
+   justify-content: space-around;
+   gap: 30px;
+   display: flex; 
+   justify-content: space-between;
+   padding: 7px 16px 9px; 
+   border-bottom: 1px solid #eee; 
+}
+
+.infoRow > div { 
+   max-width: 45%; 
+   flex: 1; 
+   font-size: 6.5px; 
+   line-height: 1.6; 
+}
+
+
+
+.infoLabel { 
+   font-weight: 700; 
+   font-size: 7px; 
+   margin-bottom: 2px; 
+   color: var(--brand-primary); 
+}
+.thankYou { 
+   text-transform: uppercase;
+   text-align: right; 
+   font-style: italic; 
+   font-size: 8px; 
+   padding: 8px 16px; 
+   color: var(--brand-primary); 
+   margin-top: auto; 
+}
+
+.tableHead { 
+   display: flex; 
+   background: var(--brand-gradient); 
+   color: var(--brand-on-primary); 
+   padding: 5px 16px; 
+   font-size: 7px; 
+   font-weight: 700; 
+   gap: 6px; 
+   opacity: 0.88; 
+}
+.tableHead span, .tableRow span { 
+   flex: 1; 
+   text-align: center; 
+}
+
+.tableHead span:first-child, .tableRow span:first-child { 
+   flex: 3; 
+   text-align: left; 
+}
+
+.tableRow { 
+   display: flex; 
+   padding: 4px 16px; 
+   border-bottom: 1px solid #f0f0f0; 
+   font-size: 8px; 
+   gap: 6px; 
+}
+.totalsArea { 
+   margin-left: auto; 
+   width: 48%; 
+   padding: 5px 16px 0 0; 
+   margin-top: 4px; 
+}
+.totalRow { 
+   display: flex; 
+   justify-content: space-between; 
+   padding: 2px 0; 
+   font-size: 7px; 
+}
+.total { 
+   display: flex; 
+   justify-content: space-between; 
+   background: var(--brand-gradient); 
+   color: var(--brand-on-primary); 
+   padding: 5px 8px; 
+   font-weight: 900; 
+   font-size: 9px; 
+   margin-top: 3px; 
+   opacity: 0.88; 
+}
