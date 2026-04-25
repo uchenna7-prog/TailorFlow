@@ -1,4 +1,7 @@
 
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
+
 export function fmt(currency, amount) {
   const n = parseFloat(amount) || 0
   return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -132,26 +135,45 @@ export async function downloadPDF(paperEl, filename) {
 }
 
 export async function generatePDFBlob(paperEl) {
-  const PDF_W     = 380
-  const prevWidth = paperEl.style.width
-  const prevMaxW  = paperEl.style.maxWidth
+  const PDF_W = 380
 
-  paperEl.style.width    = `${PDF_W}px`
-  paperEl.style.maxWidth = 'none'
+  // 1. Clone node
+  const clone = paperEl.cloneNode(true)
 
-  await new Promise(r => setTimeout(r, 60))
-  const elH = paperEl.scrollHeight
-
-  const canvas = await html2canvas(paperEl, {
-    scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false,
-    width: PDF_W, height: elH, windowWidth: PDF_W, windowHeight: elH,
+  // 2. Force safe styles
+  Object.assign(clone.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    zIndex: '9999',
+    width: `${PDF_W}px`,
+    maxWidth: 'none',
+    background: '#ffffff',
+    overflow: 'visible',
   })
 
-  paperEl.style.width    = prevWidth
-  paperEl.style.maxWidth = prevMaxW
+  document.body.appendChild(clone)
+
+  await document.fonts.ready
+  await new Promise(r => setTimeout(r, 100))
+
+  const canvas = await html2canvas(clone, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff',
+  })
+
+  document.body.removeChild(clone)
 
   const imgData = canvas.toDataURL('image/png')
-  const pdf     = new jsPDF({ orientation: 'portrait', unit: 'px', format: [PDF_W, elH] })
-  pdf.addImage(imgData, 'PNG', 0, 0, PDF_W, elH)
+
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'px',
+    format: [canvas.width, canvas.height],
+  })
+
+  pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
+
   return pdf.output('blob')
 }

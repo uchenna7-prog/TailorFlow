@@ -1,5 +1,5 @@
 import styles from "../styles/Template8.module.css"
-import { getDueDate,calcTax } from "../../../utils/invoiceUtils"
+import { getDueDate,calcTax,fmt } from "../../../utils/invoiceUtils"
 
 
 export function InvoiceTemplate8({ invoice, customer, brand }) {

@@ -1,13 +1,10 @@
 import { useRef, useState } from 'react'
-import html2canvas from 'html2canvas'
-import { jsPDF } from 'jspdf'
 import { useBrand } from '../../../../contexts/BrandContext'
 import Header from '../../../../components/Header/Header'
 import styles from './InvoiceView.module.css'
 import { TEMPLATE_MAPPINGS } from '../../datas/invoiceTemplateMappings'
-import { getBrandCSSVars } from '../../utils/invoiceUtils'
+import { getBrandCSSVars,buildInvoiceWhatsAppMessage,downloadPDF } from '../../utils/invoiceUtils'
 import { ShareSheet } from '../../components/ShareSheet/ShareSheet'
-
 
 
 const STATUS_LABELS = {
