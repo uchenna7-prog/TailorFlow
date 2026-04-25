@@ -1,6 +1,5 @@
 
 import html2canvas from 'html2canvas'
-import { opacity } from 'html2canvas/dist/types/css/property-descriptors/opacity'
 import { jsPDF } from 'jspdf'
 
 export function fmt(currency, amount) {
@@ -135,19 +134,17 @@ export async function downloadPDF(paperEl, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 10000)
 }
 
-export async function generatePDFBlob(paperEl) {
-  const PDF_W = 380
+export async function generatePDFBlob(paperElement) {
 
-  // 1. Clone node
-  const clone = paperEl.cloneNode(true)
+  const PDF_WIDTH = 380
+  const clone = paperElement.cloneNode(true)
 
-  // 2. Force safe styles
   Object.assign(clone.style, {
     position: 'fixed',
     top: '-99999px',
     left: '-99999px',
     zIndex: '9999',
-    width: `${PDF_W}px`,
+    width: `${PDF_WIDTH}px`,
     maxWidth: 'none',
     background: '#ffffff',
     overflow: 'visible',
