@@ -272,11 +272,7 @@
   color: var(--success);
 }
 
-/* ── STAGE CHIP ROW (Orders tab — Change Stage section) ──────────
-   flex-wrap: wrap + width: fit-content on each chip ensures chips
-   always size to their content and NEVER stretch, even when a
-   single chip wraps onto its own line.
-   ─────────────────────────────────────────────────────────────── */
+
 .stageChipRow {
   display: flex;
   flex-wrap: wrap;
@@ -300,7 +296,6 @@
   cursor: pointer;
   transition: all 0.18s;
   white-space: nowrap;
-  width: fit-content;
   flex-shrink: 0;
 }
 

@@ -1,5 +1,3 @@
-// src/pages/CustomerDetail/tabs/OrdersTab.jsx
-
 import { useState, useEffect } from 'react'
 import { useOrders } from '../../../contexts/OrdersContext'
 import { useAuth }   from '../../../contexts/AuthContext'
@@ -24,10 +22,10 @@ const STATUSES = [
 
 const STAGES = [
   { value: 'measurement_taken', label: 'Measurement Taken', icon: 'straighten'     },
-  { value: 'fabric_ready',      label: 'Fabric Ready',      icon: 'roll_content'   },
+  { value: 'fabric_ready',      label: 'Fabric Ready',      icon: 'checkroom'   },
   { value: 'cutting',           label: 'Cutting',           icon: 'content_cut'    },
   { value: 'weaving',           label: 'Weaving',           icon: 'texture'        },
-  { value: 'sewing',            label: 'Sewing',            icon: 'send'           },
+  { value: 'sewing',            label: 'Sewing',            icon: 'construction'           },
   { value: 'embroidery',        label: 'Embroidery',        icon: 'auto_awesome'   },
   { value: 'fitting',           label: 'Fitting',           icon: 'accessibility'  },
   { value: 'adjustments',       label: 'Adjustments',       icon: 'tune'           },
