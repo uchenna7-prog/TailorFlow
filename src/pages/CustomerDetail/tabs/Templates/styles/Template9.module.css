@@ -1,34 +1,164 @@
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 9 — Accent Strip and Signature (tealgeometric)
-   FIX: replace hardcoded #1a1a2e dark bars with brand tokens
-══════════════════════════════════════════════════════════ */
-.t9Wrap { background: #fff; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 8px; min-height: 520px; display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
-.t9Header { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 16px 6px; }
-.t9LogoRow { display: flex; align-items: center; gap: 4px; }
-.t9CompanyName { font-size: 9px; font-weight: 900; letter-spacing: 0.04em; color: var(--brand-primary-dark); }
-.t9CompanySub { font-size: 6px; color: #888; letter-spacing: 0.06em; margin-top: 1px; }
-.t9CompanyAddr { font-size: 7px; color: #555; line-height: 1.5; margin-top: 2px; }
-.t9InvoiceTitle { font-size: 28px; font-weight: 300; color: var(--brand-primary); letter-spacing: 0.1em; align-self: center; }
-/* FIX: was hardcoded #1a1a2e — now uses brand gradient */
-.t9NumBar { background: var(--brand-gradient); color: var(--brand-on-primary); display: flex; gap: 10px; padding: 4px 16px; font-size: 7px; font-weight: 600; }
-.t9BillShip { display: flex; gap: 16px; padding: 8px 16px; font-size: 7px; line-height: 1.5; }
-.t9BillShip > div { flex: 1; }
-.t9BillLabel { font-weight: 700; font-size: 8px; color: var(--brand-primary); }
-/* FIX: table head uses brand gradient instead of hardcoded dark */
-.t9TableHead { display: flex; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 4px 16px; font-size: 7px; font-weight: 700; gap: 4px; }
-.t9TableHead span, .t9TableRow span { flex: 1; text-align: right; }
-.t9TableHead span:nth-child(2), .t9TableRow span:nth-child(2) { flex: 3; text-align: left; }
-.t9TableHead span:first-child, .t9TableRow span:first-child { flex: 0.5; text-align: left; }
-.t9TableRow { display: flex; padding: 4px 16px; border-bottom: 1px solid #f0f0f0; font-size: 8px; gap: 4px; }
-.t9SubArea { display: flex; flex-direction: column; align-items: flex-end; padding: 4px 16px 0; font-size: 8px; }
-.t9SubRow { display: flex; gap: 18px; justify-content: flex-end; padding: 2px 0; }
-/* FIX: total bar uses brand gradient */
-.t9TotalBar { display: flex; justify-content: space-between; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 5px 16px; font-weight: 900; font-size: 9px; margin-top: 3px; }
-.t9Footer { display: flex; justify-content: space-between; align-items: flex-end; padding: 8px 16px; font-size: 7px; margin-top: auto; }
-.t9ThankYou { font-weight: 700; font-size: 8px; text-transform: uppercase; margin-bottom: 2px; color: var(--brand-primary-dark); }
-.t9PayNote { color: #666; font-size: 7px; }
-.t9SignArea { text-align: center; }
-.t9SignLine { width: 55px; height: 1px; background: var(--brand-primary); margin: 0 auto 2px; }
-.t9SignLabel { font-size: 7px; color: #666; }
-/* FIX: corner deco uses brand gradient */
-.t9CornerDeco { position: absolute; bottom: 0; right: 0; width: 50px; height: 50px; background: var(--brand-gradient); opacity: 0.5; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.template { 
+   background: #fff; 
+   color: #1a1a1a; 
+   font-family: 'DM Sans', sans-serif; 
+   font-size: 8px; 
+   min-height: 520px; 
+   display: flex; 
+   flex-direction: column; 
+   padding: 0; 
+   position: relative; 
+   overflow: hidden; 
+}
+
+.header { 
+   display: flex; 
+   justify-content: space-between; 
+   align-items: flex-start; 
+   padding: 14px 16px 6px; 
+}
+
+.logoRow { 
+   display: flex; 
+   align-items: center; 
+   gap: 4px; 
+}
+.companyName { 
+   font-size: 9px; 
+   font-weight: 900; 
+   letter-spacing: 0.04em; 
+   color: var(--brand-primary-dark); 
+}
+.companySub { 
+   font-size: 6px; 
+   color: #888; 
+   letter-spacing: 0.06em; 
+   margin-top: 1px; 
+}
+.companyAddress { 
+   font-size: 7px; 
+   color: #555; 
+   line-height: 1.5; 
+   margin-top: 2px; 
+}
+.invoiceTitle { 
+   font-size: 28px; 
+   font-weight: 300; 
+   color: var(--brand-primary); 
+   letter-spacing: 0.1em; 
+   align-self: center; 
+}
+
+.numberBar { 
+   background: var(--brand-gradient); 
+   color: var(--brand-on-primary); 
+   display: flex; 
+   gap: 10px; 
+   padding: 4px 16px; 
+   font-size: 7px; 
+   font-weight: 600; 
+}
+.billShip { 
+   display: flex; 
+   gap: 16px; 
+   padding: 8px 16px; 
+   font-size: 7px; 
+   line-height: 1.5; 
+}
+.billShip > div { 
+   flex: 1; 
+}
+.billLabel { 
+   font-weight: 700; 
+   font-size: 8px; 
+   color: var(--brand-primary); 
+}
+
+.tableHeader { 
+   display: flex; 
+   background: var(--brand-gradient); 
+   color: var(--brand-on-primary); 
+   padding: 4px 16px; 
+   font-size: 7px; 
+   font-weight: 700; 
+   gap: 4px; 
+}
+.tableHeader span, .tableRow span { 
+   flex: 1; 
+
+}
+
+.tableRow { 
+   display: flex; 
+   padding: 4px 16px; 
+   border-bottom: 1px solid #f0f0f0; 
+   font-size: 8px; 
+   gap: 4px; 
+}
+.subArea { 
+   display: flex; 
+   flex-direction: column; 
+   align-items: flex-end; 
+   padding: 4px 16px 0; 
+   font-size: 8px; 
+}
+.subRow { 
+   display: flex; 
+   gap: 18px; 
+   justify-content: flex-end; 
+   padding: 2px 0; 
+}
+
+.totalBar { 
+   display: flex; 
+   justify-content: space-between; 
+   background: var(--brand-gradient); 
+   color: var(--brand-on-primary); 
+   padding: 5px 16px; 
+   font-weight: 900; 
+   font-size: 9px; 
+   margin-top: 3px; 
+}
+.footer { 
+   display: flex; 
+   justify-content: space-between; 
+   align-items: flex-end; 
+   padding: 8px 16px; 
+   font-size: 7px; 
+   margin-top: auto; 
+}
+.thankYou { 
+   font-weight: 700; 
+   font-size: 8px; 
+   text-transform: uppercase; 
+   margin-bottom: 2px; 
+   color: var(--brand-primary-dark); 
+}
+.paymentNote { 
+   color: #666; 
+   font-size: 7px; 
+}
+.signArea { 
+   text-align: center; 
+}
+.signLine { 
+   width: 55px; 
+   height: 1px; 
+   background: var(--brand-primary); 
+   margin: 0 auto 2px; 
+}
+.signLabel { 
+   font-size: 7px; 
+   color: #666; 
+}
+
+.cornerDecoration { 
+   position: absolute; 
+   bottom: 0; 
+   right: 0; 
+   width: 50px; 
+   height: 50px; 
+   background: var(--brand-gradient); 
+   opacity: 0.5; 
+   clip-path: polygon(100% 0, 100% 100%, 0 100%); 
+}

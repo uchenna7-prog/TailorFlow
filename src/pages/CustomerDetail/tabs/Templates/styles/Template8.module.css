@@ -1,5 +1,5 @@
 
-.Wrap { 
+.template { 
    background: #fff; 
    color: #1a1a1a; 
    font-family: 'DM Sans', sans-serif; 
@@ -10,28 +10,28 @@
    padding: 0; 
 }
 
-.Header { 
+.header { 
    display: flex; 
    justify-content: 
    space-between; 
    align-items: center; 
    padding: 14px 16px 10px; 
 }
-.LogoArea { 
+.logoArea { 
    display: flex; 
    align-items: center; 
    gap: 6px; 
 }
-.BrandName { 
+.brandName { 
    font-size: 10px; 
    font-weight: 700; 
 }
-.BrandSub { 
+.brandSub { 
    font-size: 6px; 
    color: #999; 
    letter-spacing: 0.06em; 
 }
-.InvoiceBox { 
+.invoiceBox { 
    background: var(--brand-gradient); 
    color: var(--brand-on-primary); 
    padding: 8px 14px; 
@@ -39,19 +39,26 @@
    text-align: right; 
    min-width: 80px; 
 }
-.InvoiceTitle { 
+.invoiceTitle { 
    font-size: 16px; 
    font-weight: 900; 
    letter-spacing: 0.05em; 
 }
-.InvoiceMeta { 
-   display: grid; 
-   grid-template-columns: 1fr 1fr; 
+.invoiceMeta { 
+   display: flex;
+   flex-direction: column;
+   align-items: flex-start;
    gap: 0 5px; 
    font-size: 7px; 
    margin-top: 3px; 
 }
-.TableHead { 
+
+.invoiceMeta div { 
+   display: flex; 
+   gap: 5px; 
+}
+
+.tableHeader { 
    display: flex; 
    background: var(--brand-surface); 
    padding: 5px 16px; 
@@ -61,37 +68,37 @@
    color: var(--brand-primary-dark); 
    border-bottom: 1.5px solid var(--brand-primary); 
 }
-.TableHead span, .TableRow span { 
+.tableHeader span, .tableRow span { 
    flex: 1; 
    text-align: right; 
 }
-.TableHead span:nth-child(2), .TableRow span:nth-child(2) { 
+.tableHeader span:nth-child(2), .tableRow span:nth-child(2) { 
    flex: 3; 
    text-align: left; 
 }
-.TableHead span:first-child, .TableRow span:first-child { 
+.tableHeader span:first-child, .tableRow span:first-child { 
    text-align: left; 
    flex: 0.5; 
 }
-.TableRow { 
+.tableRow { 
    display: flex; 
    padding: 4px 16px; 
    border-bottom: 1px solid #f0f0f0; 
    font-size: 8px; 
    gap: 4px; 
 }
-.Divider { 
+.divider { 
    height: 1px; 
    background: var(--brand-muted); 
    margin: 4px 16px; 
 }
-.Bottom { 
+.bottom { 
    display: flex; 
    gap: 7px; 
    padding: 8px 16px 14px; 
    margin-top: auto; 
 }
-.GreenBox { 
+.box { 
    background: var(--brand-gradient); 
    color: var(--brand-on-primary); 
    padding: 8px 10px; 
@@ -101,58 +108,54 @@
    font-size: 7px; 
    line-height: 1.5; 
 }
-.GreenBoxTitle { 
+.boxTitle { 
    font-weight: 700; 
    font-size: 8px; 
    margin-bottom: 2px; 
 }
-.GreenBoxName { 
+.boxName { 
    font-weight: 700; 
    font-size: 9px; 
 }
-.GreenBoxAddr { 
-   opacity: 0.85; 
-   font-size: 6px; 
-   margin-top: 1px; 
-}
-.GreenDivider { 
+
+.divider { 
    height: 1px; 
    background: rgba(255,255,255,0.4); 
    margin: 4px 0; 
 }
-.PaymentInfo { 
+.paymentInfo { 
    flex: 1; 
    font-size: 7px; 
    line-height: 1.6; 
 }
-.PayLabel { 
+.paymentLabel { 
    font-weight: 700; 
    font-size: 8px; 
    margin-bottom: 2px; 
    color: var(--brand-primary); 
 }
-.ThankYou { 
+.thankYou { 
    margin-top: 7px; 
    font-weight: 700; 
    font-size: 7px; 
    color: var(--brand-primary); 
 }
-.Totals { 
+.totals { 
    min-width: 80px; 
    font-size: 8px; 
 }
-.TotRow { 
+.totalRow { 
    display: flex; 
    justify-content: space-between; 
    gap: 7px; 
    padding: 2px 0; 
 }
-.TotDivider { 
+.totalDivider { 
    height: 1px; 
    background: var(--brand-primary); 
    margin: 2px 0; 
 }
-.TotTotal { 
+.total { 
    display: flex; 
    justify-content: space-between; 
    font-weight: 900; 
@@ -160,7 +163,7 @@
    gap: 7px; 
    color: var(--brand-primary-dark); 
 }
-.SignLine { 
+.signLine { 
    font-size: 6px; 
    color: #999; 
    border-top: 1px solid var(--brand-muted); 

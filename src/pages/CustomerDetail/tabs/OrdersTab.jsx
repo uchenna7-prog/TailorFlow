@@ -61,20 +61,6 @@ function todayReadable() {
   return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-// ─────────────────────────────────────────────────────────────
-// ORDER MOSAIC THUMBNAIL
-//
-// Layout (matches Image 1 reference):
-//   0 images  → icon placeholder
-//   1 image   → single full image (standard thumb)
-//   2 images  → left half + right half (side by side)
-//   3+ images → left large (full height) + right column with
-//               top-right and bottom-right stacked
-//               If total > 3, bottom-right shows "+N" overlay
-//
-// All layouts live inside orderListOuter → orderListInner so
-// the outer card size NEVER changes — images are just smaller.
-// ─────────────────────────────────────────────────────────────
 function OrderMosaic({ items }) {
   // Collect cover images only
   const covers = items
