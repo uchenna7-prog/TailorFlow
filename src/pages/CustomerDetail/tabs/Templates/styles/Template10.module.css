@@ -1,5 +1,5 @@
 
-.Wrap { 
+.template { 
    background: #fff; 
    color: #1a1a1a; 
    font-family: 'DM Sans', sans-serif; 
@@ -11,14 +11,14 @@
    position: relative; 
    overflow: hidden; 
 }
-.HeaderZone { 
+.headerZone { 
    position: relative; 
    width: 100%; 
    height: 72px; 
    flex-shrink: 0; 
    overflow: hidden; 
 }
-.FullBanner { 
+.fullBanner { 
    position: absolute; 
    inset: 0; 
    background: var(--brand-gradient); 
@@ -27,14 +27,14 @@
    align-items: flex-start; 
    padding: 10px 18px 0; 
 }
-.BannerTitle { 
+.bannerTitle { 
    color: var(--brand-on-primary); 
    font-size: 22px; 
    font-weight: 900; 
    letter-spacing: 0.05em; 
    padding-top: 2px; 
 }
-.BrandInBanner { 
+.brandInBanner { 
    position: absolute; 
    top: 7px; right: 14px; 
    display: flex; 
@@ -42,41 +42,40 @@
    gap: 6px; 
    z-index: 1; 
 }
-.BrandName { 
+.brandName { 
    font-size: 10px; 
    font-weight: 700; 
    color: #1a1a1a; 
 }
-.BrandSub { 
+.brandSub { 
    font-size: 6px; 
-   color: #888; 
    letter-spacing: 0.06em; 
 }
-.MetaRow { 
+.metaRow { 
    display: flex; 
    justify-content: space-between; 
    padding: 9px 16px 5px; 
    font-size: 7px; 
    line-height: 1.5; 
 }
-.MetaLabel { 
+.metaLabel { 
    font-weight: 700; 
    font-size: 8px; 
    margin-bottom: 1px; 
    color: var(--brand-primary); 
 }
-.MetaName { 
+.metaName { 
    font-weight: 700; 
    font-size: 9px; 
 }
-.MetaAddr { 
+.metaAddress { 
    color: #555; 
 }
-.MetaKey { 
+.metaKey { 
    color: var(--brand-primary); 
    font-weight: 600; 
 }
-.TableHead { 
+.tableHeader { 
    display: flex; 
    border: 1.5px solid var(--brand-primary); 
    padding: 4px 16px; 
@@ -86,20 +85,11 @@
    margin: 0 16px; 
    color: var(--brand-primary-dark); 
 }
-.TableHead span, .TableRow span { 
+.tableHeader span, .tableRow span { 
    flex: 1; 
-   text-align: right; 
 }
-.TableHead span:nth-child(2), .TableRow span:nth-child(2) { 
-   flex: 3; 
-   text-align: 
-   left; 
-}
-.TableHead span:first-child, .TableRow span:first-child { 
-   flex: 0.5; 
-   text-align: left; 
-}
-.TableRow { 
+
+.tableRow { 
    display: flex; 
    padding: 4px 16px; 
    border-bottom: 1px solid #f0f0f0; 
@@ -107,12 +97,12 @@
    font-size: 8px; 
    gap: 4px; 
 }
-.Divider { 
+.divider { 
    height: 1px; 
    background: var(--brand-muted); 
    margin: 5px 16px; 
 }
-.Bottom { 
+.bottom { 
    display: flex; 
    gap: 10px; 
    padding: 4px 16px 54px; 
@@ -120,53 +110,53 @@
    line-height: 1.6; 
    flex: 1; 
 }
-.ThankYou { 
+.thankYou { 
    font-weight: 700; 
    font-size: 8px; 
    margin-bottom: 3px; 
    color: var(--brand-primary-dark); 
 }
-.PayLabel { 
+.paymentLabel { 
    font-weight: 700; 
    margin-top: 4px; 
    margin-bottom: 1px; 
    color: var(--brand-primary); 
 }
-.PayInfo { 
+.paymentInfo { 
    color: #444; 
    line-height: 1.6; 
 }
-.TCLabel { 
+.label { 
    font-weight: 700; 
    margin-top: 5px; 
    margin-bottom: 1px; 
    color: var(--brand-primary); 
 }
-.TCText { 
+.text { 
    color: #666; 
 }
-.RightCol { 
+.rightColumn { 
    display: flex; 
    flex-direction: column; 
    justify-content: space-between; 
    min-width: 88px; 
    flex-shrink: 0; 
 }
-.TotalsWrap { 
+.totals { 
    font-size: 8px; 
 }
-.TotRow { 
+.totalRow { 
    display: flex; 
    justify-content: space-between; 
    gap: 8px; 
    padding: 2px 0; 
 }
-.TotDivider { 
+.totalDivider { 
    height: 1px; 
    background: var(--brand-primary); 
    margin: 3px 0; 
 }
-.TotTotal { 
+.total { 
    display: flex; 
    justify-content: space-between; 
    font-weight: 900; 
@@ -174,19 +164,19 @@
    gap: 8px; 
    color: var(--brand-primary-dark); 
 }
-.SignBlock { 
+.signBlock { 
    text-align: center; 
 }
-.SignLine { 
+.signLine { 
    height: 1px; 
    background: var(--brand-primary); 
    margin-bottom: 2px; 
 }
-.SignLabel { 
+.signLabel { 
    font-size: 7px; 
    color: #666; 
 }
-.CornerAccent { 
+.cornerAccent { 
    position: absolute; 
    bottom: 0; 
    right: 0; 

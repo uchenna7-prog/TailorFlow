@@ -1,31 +1,179 @@
-/* ══════════════════════════════════════════════════════════
-   TEMPLATE 11 — Multi-Tile Payment Grid (blueclean)
-   FIX: hexagon logo → circle
-══════════════════════════════════════════════════════════ */
-.t11Wrap { background: #fff; color: #1a1a1a; font-family: 'DM Sans', sans-serif; font-size: 8px; min-height: 520px; display: flex; flex-direction: column; padding: 0; }
-.t11TopBar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #f0f0f0; }
-.t11LogoArea { display: flex; align-items: center; gap: 5px; }
-/* FIX: was hexagon clip-path — now plain circle */
-.t11LogoHex { width: 28px; height: 28px; background: var(--brand-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.t11CompanyName { font-size: 9px; font-weight: 900; letter-spacing: 0.05em; color: var(--brand-primary-dark); }
-.t11CompanySub { font-size: 6px; color: #888; }
-.t11CompanyInfo { font-size: 7px; line-height: 1.6; color: #444; }
-.t11InvoiceTitle { font-size: 22px; font-weight: 400; padding: 8px 16px 3px; color: var(--brand-primary-dark); }
-.t11BlueBar { background: var(--brand-surface); display: flex; justify-content: space-between; padding: 4px 16px; font-size: 7px; font-weight: 600; color: var(--brand-primary); border-top: 2px solid var(--brand-primary); border-bottom: 2px solid var(--brand-primary); }
-.t11IssuedRow { display: flex; justify-content: space-between; padding: 8px 16px 3px; font-size: 7px; line-height: 1.6; }
-.t11IssuedLabel { font-size: 8px; font-weight: 700; margin-bottom: 2px; color: var(--brand-primary); }
-.t11AmountLabel { font-size: 7px; font-weight: 700; text-align: right; color: var(--brand-primary); }
-.t11AmountVal { font-size: 22px; font-weight: 300; text-align: right; color: var(--brand-primary); }
-.t11ProjectName { font-size: 10px; font-weight: 600; padding: 3px 16px 2px; }
-.t11TableHead { display: flex; background: var(--brand-gradient); color: var(--brand-on-primary); padding: 4px 16px; font-size: 7px; font-weight: 700; gap: 4px; }
-.t11TableHead span, .t11TableRow span { flex: 1; text-align: right; }
-.t11TableHead span:first-child, .t11TableRow span:first-child { flex: 3; text-align: left; }
-.t11TableRow { display: flex; padding: 4px 16px; border-bottom: 1px solid #f0f0f0; font-size: 7px; gap: 4px; color: #555; }
-.t11TotArea { margin-left: auto; width: 43%; padding: 3px 16px 0 0; border-top: 1px solid var(--brand-muted); margin-top: 2px; }
-.t11TotRow { display: flex; justify-content: space-between; padding: 2px 0; font-size: 8px; color: #555; }
-.t11TotBold { display: flex; justify-content: space-between; font-weight: 900; font-size: 8px; border-top: 1px solid var(--brand-primary); padding-top: 2px; margin-top: 2px; color: var(--brand-primary-dark); }
-.t11PayTitle { font-size: 10px; font-weight: 600; padding: 8px 16px 3px; color: var(--brand-primary-dark); }
-.t11PayBoxRow { display: flex; gap: 5px; padding: 0 16px 8px; }
-.t11PayBox { flex: 1; background: var(--brand-surface); padding: 6px 8px; font-size: 7px; line-height: 1.5; border-left: 2px solid var(--brand-primary); }
-.t11PayBoxTitle { font-weight: 700; font-size: 8px; margin-bottom: 2px; color: var(--brand-primary); }
-.t11ThankYou { text-align: right; font-size: 10px; font-weight: 700; color: var(--brand-primary); padding: 3px 16px 10px; margin-top: auto; letter-spacing: 0.05em; }
+
+.template { 
+   background: #fff; 
+   color: #1a1a1a; 
+   font-family: 'DM Sans', sans-serif; 
+   font-size: 8px; 
+   min-height: 520px; 
+   display: flex; 
+   flex-direction: column; 
+   padding: 0; 
+}
+.topBar { 
+   display: flex; 
+   align-items: center; 
+   justify-content: space-between; 
+   padding: 10px 16px; 
+   border-bottom: 1px solid #f0f0f0; 
+}
+.logoArea { 
+   max-width: 35%;
+   display: flex; 
+   align-items: center; 
+   gap: 5px; 
+}
+
+.logoCircle{ 
+   width: 45px; 
+   height: 45px; 
+   background: var(--brand-gradient); 
+   border-radius: 50%; 
+   display: flex; 
+   align-items: center; 
+   justify-content: center; 
+   flex-shrink: 0; 
+}
+.companyName { 
+   font-size: 9px; 
+   font-weight: 900; 
+   letter-spacing: 0.05em; 
+   color: var(--brand-primary-dark); 
+}
+.companySub { 
+   font-size: 6px; 
+   color: #888; 
+}
+.companyInfo { 
+   max-width: 30%;
+   font-size: 7px; 
+   line-height: 1.6; 
+   color: #444; 
+}
+.invoiceTitle { 
+   font-size: 22px; 
+   font-weight: 400; 
+   padding: 8px 16px 3px; 
+   color: var(--brand-primary-dark); 
+}
+.bar { 
+   background: var(--brand-surface); 
+   display: flex; 
+   justify-content: space-between; 
+   padding: 4px 16px; 
+   font-size: 7px; 
+   font-weight: 600; 
+   color: var(--brand-primary); 
+   border-top: 2px solid var(--brand-primary); 
+   border-bottom: 2px solid var(--brand-primary); 
+}
+.issuedRow { 
+   display: flex; 
+   justify-content: space-between; 
+   padding: 8px 16px 3px; 
+   font-size: 7px; 
+   line-height: 1.6; 
+}
+.issuedLabel { 
+   font-size: 8px; 
+   font-weight: 700; 
+   margin-bottom: 2px; 
+   color: var(--brand-primary); 
+}
+.amountLabel { 
+   font-size: 7px; 
+   font-weight: 700; 
+   text-align: right; 
+   color: var(--brand-primary); 
+}
+.amountVal { 
+   font-size: 22px; 
+   font-weight: 300; 
+   text-align: right; 
+   color: var(--brand-primary); 
+}
+.projectName { 
+   font-size: 10px; 
+   font-weight: 600; 
+   padding: 3px 16px 2px; 
+}
+.tableHead { 
+   display: flex; 
+   background: var(--brand-gradient); 
+   color: var(--brand-on-primary); 
+   padding: 4px 16px; 
+   font-size: 7px; 
+   font-weight: 700; 
+   gap: 4px; 
+}
+.tableHead span, .tableRow span { 
+   flex: 1; 
+   text-align: right; 
+}
+.tableHead span:first-child, .tableRow span:first-child { 
+   flex: 3; 
+   text-align: left; 
+}
+.tableRow { 
+   display: flex; 
+   padding: 4px 16px; 
+   border-bottom: 1px solid #f0f0f0; 
+   font-size: 7px; 
+   gap: 4px; 
+   color: #555; 
+}
+.totalArea { 
+   margin-left: auto; 
+   width: 43%; padding: 3px 16px 0 0; 
+   border-top: 1px solid var(--brand-muted); 
+   margin-top: 2px; 
+}
+.totalRow { 
+   display: flex; 
+   justify-content: space-between; 
+   padding: 2px 0; 
+   font-size: 8px; color: #555; 
+}
+.totalBold { 
+   display: flex; 
+   justify-content: space-between; 
+   font-weight: 900; 
+   font-size: 8px; 
+   border-top: 1px solid var(--brand-primary); 
+   padding-top: 2px; 
+   margin-top: 2px; 
+   color: var(--brand-primary-dark); 
+}
+.paymentTitle { 
+   font-size: 10px; 
+   font-weight: 600; 
+   padding: 8px 16px 3px; 
+   color: var(--brand-primary-dark); 
+}
+.paymentBoxRow { 
+   display: flex; 
+   gap: 5px; 
+   padding: 0 16px 8px; 
+}
+.paymentBox { 
+   flex: 1; 
+   background: var(--brand-surface); 
+   padding: 6px 8px; 
+   font-size: 7px; 
+   line-height: 1.5; 
+   border-left: 2px solid var(--brand-primary); 
+}
+.paymentBoxTitle { 
+   font-weight: 700; 
+   font-size: 8px; 
+   margin-bottom: 2px; 
+   color: var(--brand-primary); 
+}
+.thankYou { 
+   text-align: right; 
+   font-size: 10px; 
+   font-weight: 700; 
+   color: var(--brand-primary); 
+   padding: 3px 16px 10px; 
+   margin-top: auto; 
+   letter-spacing: 0.05em; 
+}

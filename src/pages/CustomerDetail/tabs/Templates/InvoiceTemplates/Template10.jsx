@@ -10,8 +10,8 @@ export function InvoiceTemplate10({ invoice, customer, brand }) {
   const total    = subtotal + tax
 
   return (
-    <div className={styles.Wrap}>
-      <div className={styles.HeaderZone}>
+    <div className={styles.template}>
+      <div className={styles.headerZone}>
         <svg
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
           viewBox="0 0 400 72"
@@ -20,79 +20,81 @@ export function InvoiceTemplate10({ invoice, customer, brand }) {
           <polygon points="0,0 400,0 400,28 0,72" fill={accentColor} />
         </svg>
         <div style={{ position: 'absolute', top: 10, left: 18, zIndex: 1 }}>
-          <span className={styles.BannerTitle}>INVOICE</span>
+          <span className={styles.bannerTitle}>INVOICE</span>
         </div>
-        <div className={styles.BrandInBanner}>
+        <div className={styles.brandInBanner}>
           {brand.logo
-            ? <img src={brand.logo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+            ? <img src={brand.logo} alt="" style={{ width: "25px", height: "25px", objectFit: 'contain' }} />
             : <span className="mi" style={{ fontSize: 14, color: '#333' }}>checkroom</span>
           }
           <div>
-            <div className={styles.BrandName}>{brand.name || brand.ownerName}</div>
-            <div className={styles.BrandSub}>TAILOR SHOP</div>
+            <div className={styles.brandName}>{brand.name || brand.ownerName}</div>
+            <div className={styles.brandSub}>TAILOR SHOP</div>
           </div>
         </div>
       </div>
-      <div className={styles.MetaRow}>
+      <div className={styles.metaRow}>
         <div>
-          <div className={styles.MetaLabel}>Invoice to:</div>
-          <div className={styles.MetaName}>{customer.name}</div>
-          {customer.phone   && <div className={styles.MetaAddr}>{customer.phone}</div>}
-          {customer.address && <div className={styles.MetaAddr}>{customer.address}</div>}
+          <div className={styles.metaLabel}>Invoice to:</div>
+          <div className={styles.metaName}>{customer.name}</div>
+          {customer.phone   && <div className={styles.metaAddress}>{customer.phone}</div>}
+          {customer.address && <div className={styles.metaAddress}>{customer.address}</div>}
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div><span className={styles.MetaKey}>Invoice#</span> <strong>{invoice.number}</strong></div>
-          <div><span className={styles.MetaKey}>Date</span> <strong>{invoice.date}</strong></div>
-          <div><span className={styles.MetaKey}>Due</span> <strong>{dueDate}</strong></div>
+          <div><span className={styles.metaKey}>Invoice#</span> <strong>{invoice.number}</strong></div>
+          <div><span className={styles.metaKey}>Date</span> <strong>{invoice.date}</strong></div>
+          <div><span className={styles.metaKey}>Due</span> <strong>{dueDate}</strong></div>
         </div>
       </div>
-      <div className={styles.TableHead}>
-        <span>SL.</span>
-        <span style={{ flex: 3 }}>Description</span>
-        <span>Price</span><span>Qty</span><span>Total</span>
+      <div className={styles.tableHeader}>
+        <span style={{ textAlign:"left"}}>SN</span>
+        <span style={{ flex: 3,textAlign:"left"}}>Description</span>
+        <span style={{ textAlign:"center"}}>Price</span>
+        <span style={{ textAlign:"center"}}>Qty</span>
+        <span style={{ textAlign:"center"}}>Total</span>
       </div>
       {invoice.items?.map((item, i) => (
-        <div key={i} className={styles.TableRow}>
-          <span>{i + 1}</span>
-          <span style={{ flex: 3 }}>{item.name}</span>
-          <span>{fmt(currency, item.price)}</span>
-          <span>1</span>
-          <span>{fmt(currency, item.price)}</span>
+        <div key={i} className={styles.tableRow}>
+          <span style={{ textAlign:"left"}}>{i + 1}</span>
+          <span style={{ flex: 3,textAlign:"left" }}>{item.name}</span>
+          <span style={{ textAlign:"center"}}>{fmt(currency, item.price)}</span>
+          <span style={{ textAlign:"center"}}>1</span>
+          <span style={{ textAlign:"center"}}>{fmt(currency, item.price)}</span>
         </div>
       ))}
-      <div className={styles.Divider} />
-      <div className={styles.Bottom}>
+      <div className={styles.divider} />
+      <div className={styles.bottom}>
         <div style={{ flex: 1 }}>
-          <div className={styles.ThankYou}>{brand.footer || 'Thank you for your business'}</div>
+          <div className={styles.thankYou}>{brand.footer || 'Thank you for your business'}</div>
           {brand.accountBank && (
             <>
-              <div className={styles.PayLabel}>Payment Info:</div>
-              <div className={styles.PayInfo}>
-                {brand.accountNumber && <span>Account #: {brand.accountNumber}<br /></span>}
-                {brand.accountName   && <span>A/C Name: {brand.accountName}<br /></span>}
-                {brand.accountBank   && <span>Bank: {brand.accountBank}</span>}
+              <div className={styles.paymentLabel}>Payment Info:</div>
+              <div className={styles.paymentInfo}>
+                {brand.accountNumber && <span>Account Number: {brand.accountNumber}<br /></span>}
+                {brand.accountBank   && <span>Bank: {brand.accountBank}<br/></span>}
+                {brand.accountName   && <span>Account Name: {brand.accountName}<br /></span>}
               </div>
             </>
           )}
           {(brand.phone || brand.email) && (
             <>
-              <div className={styles.TCLabel}>Contact</div>
-              <div className={styles.TCText}>
+              <div className={styles.label}>Contact</div>
+              <div className={styles.text}>
                 {brand.phone && <span>{brand.phone}<br /></span>}
                 {brand.email && <span>{brand.email}</span>}
               </div>
             </>
           )}
         </div>
-        <div className={styles.RightCol}>
-          <div className={styles.TotalsWrap}>
-            <div className={styles.TotRow}><span>Sub Total:</span><span>{fmt(currency, subtotal)}</span></div>
-            {showTax && taxRate > 0 && <div className={styles.TotRow}><span>Tax ({taxRate}%):</span><span>{fmt(currency, tax)}</span></div>}
-            <div className={styles.TotDivider} />
-            <div className={styles.TotTotal}><span>Total:</span><span>{fmt(currency, total)}</span></div>
+        <div className={styles.rightColumn}>
+          <div className={styles.totals}>
+            <div className={styles.totalRow}><span>Sub Total:</span><span>{fmt(currency, subtotal)}</span></div>
+            {showTax && taxRate > 0 && <div className={styles.totalRow}><span>Tax ({taxRate}%):</span><span>{fmt(currency, tax)}</span></div>}
+            <div className={styles.totalDivider} />
+            <div className={styles.totalTotal}><span>Total:</span><span>{fmt(currency, total)}</span></div>
           </div>
-          <div className={styles.SignBlock}>
-            <div className={styles.SignLine} />
+          <div className={styles.signBlock}>
+            <div className={styles.signLine} />
             <div className={styles.SignLabel}>Authorised Sign</div>
           </div>
         </div>

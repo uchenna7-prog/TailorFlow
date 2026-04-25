@@ -1,9 +1,8 @@
-/* ══════════════════════════════════════════════════════════
-   ITEMS TABLE — ItemsTable.module.css
-══════════════════════════════════════════════════════════ */
 
-/* ── TABLE ── */
-.tableWrapper { width: 100%; margin-top: 10px; }
+.tableWrapper { 
+  width: 100%; 
+  margin-top: 10px; 
+}
 
 .tHead {
   display: flex;
@@ -27,10 +26,23 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
-.tColDesc { flex: 1; padding-right: 15px; word-break: break-word; line-height: 1.4; }
-.tColNum  { flex-shrink: 0; text-align: right; min-width: 90px; font-variant-numeric: tabular-nums; }
+.tColDesc{ 
+  flex: 1; 
+  padding-right: 15px; 
+  word-break: break-word; 
+  line-height: 1.4; 
+}
+.tColNum { 
+  flex-shrink: 0; 
+  text-align: right; 
+  min-width: 90px; 
+  font-variant-numeric: tabular-nums; 
+}
 
-.itemizedSection { padding: 8px 0 12px 0; border-bottom: 1px solid #eee; }
+.itemizedSection { 
+  padding: 8px 0 12px 0; 
+  border-bottom: 1px solid #eee; 
+}
 
 .itemizedLabel {
   font-size: 7px;
@@ -49,6 +61,21 @@
   color: #555;
 }
 
-.summary      { margin-left: auto; width: 55%; margin-top: 18px; }
-.sumRow       { display: flex; justify-content: space-between; padding: 4px 0; font-size: 9px; }
-.sumTotal     { font-weight: 900; font-size: 13px; border-top: 2px solid #1a1a1a; margin-top: 8px; padding-top: 8px; }
+.summary{ 
+  margin-left: auto; 
+  width: 55%; 
+  margin-top: 18px; 
+}
+.sumRow{ 
+  display: flex; 
+  justify-content: space-between; 
+  padding: 4px 0; 
+  font-size: 9px; 
+}
+.sumTotal{ 
+  font-weight: 900; 
+  font-size: 13px; 
+  border-top: 2px solid #1a1a1a; 
+  margin-top: 8px; 
+  padding-top: 8px; 
+}

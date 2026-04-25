@@ -28,7 +28,7 @@ export function InvoiceTemplate10() {
         </div>
       </div>
       <div className={styles.t10TableHead}>
-        <span>SL.</span>
+        <span>SN</span>
         <span style={{ flex:3 }}>Description</span>
         <span>Price</span><span>Qty</span><span>Total</span>
       </div>
