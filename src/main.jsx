@@ -14,7 +14,7 @@ import { NotificationProvider }        from './contexts/NotificationContext'
 import { PremiumProvider }             from './contexts/PremiumContext'
 import { GalleryProvider }             from './contexts/GalleryContext'
 import { ReviewProvider }              from './contexts/ReviewContext'
-import { MeasurementImagesProvider }   from './contexts/MeasurementImagesContext'
+import { BodyMeasurementImagesProvider }   from './contexts/BodyMeasurementImagesContext'
 import App from './App'
 import './index.css'
 import { registerSW } from 'virtual:pwa-register'
@@ -25,7 +25,7 @@ import { registerSW } from 'virtual:pwa-register'
 //  SettingsProvider          → localStorage (no dependencies)
 //  BrandProvider             → reads SettingsContext
 //  PremiumProvider           → reads AuthContext
-//  MeasurementImagesProvider → static asset constants (no dependencies)
+
 //  CustomerProvider          → reads AuthContext
 //  GalleryProvider           → reads AuthContext
 //  ReviewProvider            → reads AuthContext
@@ -43,7 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <SettingsProvider>
           <BrandProvider>
             <PremiumProvider>
-              <MeasurementImagesProvider>
+              <BodyMeasurementImagesProvider>
                 <CustomerProvider>
                   <GalleryProvider>
                     <ReviewProvider>
@@ -63,7 +63,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                     </ReviewProvider>
                   </GalleryProvider>
                 </CustomerProvider>
-              </MeasurementImagesProvider>
+              </BodyMeasurementImagesProvider>
             </PremiumProvider>
           </BrandProvider>
         </SettingsProvider>

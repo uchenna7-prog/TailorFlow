@@ -66,7 +66,7 @@ export function BrandProvider({ children }) {
     showTax:    settings.invoiceShowTax  || false,
     taxRate:    settings.invoiceTaxRate  || 0,
     footer:     settings.invoiceFooter   || 'Thank you for your patronage 🙏',
-    template:   settings.invoiceTemplate || 'editable',
+    template:   settings.invoiceTemplate || 'invoiceTemplate1',
 
     // ── Account / payment details ──
     accountBank:   settings.accountBank   || '',

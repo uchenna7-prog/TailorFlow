@@ -30,10 +30,6 @@ const TOKEN_TO_CSS_VAR = {
   glow:         '--brand-glow',
 }
 
-/**
- * @param {string|null|undefined} colourId  - e.g. "classic-deep-gold"
- * @param {React.RefObject}       [ref]     - optional element ref; defaults to :root
- */
 export function useBrandTokens(colourId, ref = null) {
   useEffect(() => {
     const entry = getColourById(colourId) || getColourById(DEFAULT_COLOUR_ID)

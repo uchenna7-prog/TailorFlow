@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate }                 from 'react-router-dom'
 import { useCustomers }                from '../../contexts/CustomerContext'
 import { usePremium }                  from '../../contexts/PremiumContext'
-import { useMeasurementImages }        from '../../contexts/MeasurementImagesContext'
+import { useBodyMeasurementImages } from '../../contexts/BodyMeasurementImagesContext'
 import Header                          from '../../components/Header/Header'
 import styles                          from './Customers.module.css'
 import BottomNav from '../../components/BottomNav/BottomNav'
@@ -200,7 +200,7 @@ const DAYS   = Array.from({ length: 31 }, (_, i) => i + 1)
 
 // ── Add Customer Form ─────────────────────────────────────────
 function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
-  const { getMeasurementConfig } = useMeasurementImages()
+  const { getBodyMeasurementConfig } = useBodyMeasurementImages()
 
   const [formTab, setFormTab]         = useState('personal')
   const [name, setName]               = useState('')
@@ -225,7 +225,7 @@ function AddCustomerForm({ isOpen, onClose, onSave, isPremium }) {
 
   const initials        = getInitials(name) || '+'
   const { fields: measureFields,
-          imgMap }      = getMeasurementConfig(sex)
+          imgMap }      = getBodyMeasurementConfig(sex)
   const hasMeasurements = Object.values(bodyMeasurements).some(v => v !== '' && v !== undefined && v !== '0' && v !== 0)
     || customFields.some(f => f.label.trim() && f.value !== '')
 

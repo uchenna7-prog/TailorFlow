@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect }    from 'react'
 import { useParams }                      from 'react-router-dom'
 import { useCustomers }                   from '../../contexts/CustomerContext'
-import { useMeasurementImages }           from '../../contexts/MeasurementImagesContext'
+import { useBodyMeasurementImages } from '../../contexts/BodyMeasurementImagesContext'
 import Header                             from '../../components/Header/Header'
 import styles                             from './CustomerBodyMeasurements.module.css'
 import BottomNav from '../../components/BottomNav/BottomNav'
@@ -149,11 +149,11 @@ async function exportPDF(customer, allEntries, imgMap) {
 
 // ── Edit Measurements Modal ───────────────────────────────────
 function EditMeasurementsModal({ isOpen, customer, onClose, onSave }) {
-  const { getMeasurementConfig } = useMeasurementImages()
+  const { getBodyMeasurementConfig } = useBodyMeasurementImages()
 
   const sex                       = customer?.sex || ''
   const { fields: measureFields,
-          imgMap }                = getMeasurementConfig(sex)
+          imgMap }                = getBodyMeasurementConfig(sex)
   const knownSet                  = new Set(measureFields)
 
   const [draft,        setDraft]        = useState({})
@@ -306,7 +306,7 @@ function EditMeasurementsModal({ isOpen, customer, onClose, onSave }) {
 export default function CustomerBodyMeasurements({ onMenuClick }) {
   const { id }   = useParams()
   const { getCustomer, updateCustomer } = useCustomers()
-  const { getMeasurementConfig }        = useMeasurementImages()
+  const { getBodyMeasurementConfig }        = useBodyMeasurementImages()
 
   const [isScrolled, setIsScrolled] = useState(false)
   const [editOpen,   setEditOpen]   = useState(false)
@@ -336,7 +336,7 @@ export default function CustomerBodyMeasurements({ onMenuClick }) {
   const sex              = customer.sex || ''
   const bodyMeasurements = customer.bodyMeasurements || {}
 
-  const { fields: orderedFields, imgMap } = getMeasurementConfig(sex)
+  const { fields: orderedFields, imgMap } = getBodyMeasurementConfig(sex)
 
   const knownEntries = orderedFields
     .filter(f => bodyMeasurements[f] !== undefined && bodyMeasurements[f] !== '')
