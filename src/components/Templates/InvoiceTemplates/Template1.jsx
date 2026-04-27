@@ -1,5 +1,6 @@
 import styles from "../styles/Template1.module.css"
 import { ItemsTable } from "../components/InvoiceItemsTable/InvoiceItemsTable"
+import { getDueDate } from "../utils/invoiceUtils";
 
 export function InvoiceTemplate1({ invoice, customer, brand }) {
 

@@ -3,7 +3,6 @@ import { ReceiptPaymentSummary } from "../components/ReceiptPaymentSummary/Recei
 import { ItemsTable } from "../components/ReceiptItemsTable/ReceiptItemsTable"
 
 
-
 export function ReceiptTemplate1({ receipt, customer, brand }) {
 
   const format = (str) => 

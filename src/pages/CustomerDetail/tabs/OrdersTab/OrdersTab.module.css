@@ -11,12 +11,12 @@
 
 /* ── ORDER LIST ── */
 .orderGroup { margin-bottom: 16px; }
-.orderGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 16px 8px; }
+.orderGroupDate { font-size: 0.65rem; font-weight: 600; color: var(--text3); padding: 10px 16px 8px; }
 .orderGroupDivider { height: 1px; background: var(--border); width: calc(100% + 32px); margin-left: -16px; }
 
 /* Each row */
-.orderListItem { display: flex; align-items: center; gap: 14px; padding: 14px 0; cursor: pointer; transition: background 0.15s; background: var(--bg); position: relative; }
-.orderListItem::after { content: ''; position: absolute; bottom: 0; left: 3.5%; right: 0; height: 1px; background: var(--border); }
+.orderListItem { display: flex; align-items: center; gap: 12px; padding: 12px 0; cursor: pointer; transition: background 0.15s; background: var(--bg); position: relative; }
+.orderListItem::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--border); }
 .orderListItemLast::after { display: none; }
 .orderListItem:active { background: var(--surface); }
 
@@ -26,38 +26,57 @@
 .orderListInner { width: 58px; height: 58px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .orderListThumbImg { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
 
-/* Text */
+/* LEFT info column */
 .orderListInfo { flex: 1; min-width: 0; }
-.orderListDesc { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.orderListStatusRow { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
-.orderListDue { font-size: 0.78rem; font-weight: 500; color: var(--danger, #ef4444); }
+.orderListDesc { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* ── STATUS BADGE on order list cards ── */
-.orderListStatusBadge {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 800;
-  text-transform: capitalize;
-  letter-spacing: 0.3px;
-  border-radius: 6px;
-  padding: 3px 8px;
-}
-.statusBadge_pending      { color: #d97706; background: rgba(251,146,60,0.15);  border: 1px solid rgba(251,146,60,0.35); }
-.statusBadge_in_progress  { color: #2563eb; background: rgba(59,130,246,0.12);  border: 1px solid rgba(59,130,246,0.3);  }
-.statusBadge_completed    { color: #16a34a; background: rgba(34,197,94,0.12);   border: 1px solid rgba(34,197,94,0.3);   }
-.statusBadge_delivered    { color: #0891b2; background: rgba(6,182,212,0.12);   border: 1px solid rgba(6,182,212,0.3);   }
-.statusBadge_cancelled    { color: #dc2626; background: rgba(239,68,68,0.1);    border: 1px solid rgba(239,68,68,0.25);  }
+/* Customer meta row */
+.orderListMeta { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
+.orderListMetaText { font-size: 0.75rem; font-weight: 400; color: var(--text2); }
 
-/* ── STAGE LINE on order list cards ── */
+/* Stage line */
 .orderListStageLine {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--accent);
-  margin-bottom: 3px;
+  margin-top: 3px;
 }
+
+/* RIGHT column */
+.orderListRight { text-align: right; flex-shrink: 0; }
+.orderListPrice { font-size: 0.88rem; font-weight: 700; color: var(--text); white-space: nowrap; }
+.orderListQty   { font-size: 0.65rem; color: var(--text3); margin-top: 2px; }
+
+/* Due date — compact, red, no year */
+.orderListDueRight {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin-top: 4px;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+
+/* ── STATUS BADGE on order list cards ── */
+.orderListStatusBadge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.2px;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 2px 7px;
+  margin-top: 3px;
+}
+.statusBadge_pending      { color: #a16207; background: rgba(234,179,8,0.12);   border-color: rgba(234,179,8,0.3);   }
+.statusBadge_in_progress  { color: #2563eb; background: rgba(59,130,246,0.12);  border-color: rgba(59,130,246,0.3);  }
+.statusBadge_completed    { color: #15803d; background: rgba(21,128,61,0.12);   border-color: rgba(21,128,61,0.3);   }
+.statusBadge_delivered    { color: #4f46e5; background: rgba(129,140,248,0.12); border-color: rgba(129,140,248,0.3); }
+.statusBadge_cancelled    { color: #dc2626; background: rgba(239,68,68,0.12);   border-color: rgba(239,68,68,0.3);   }
 
 /* ── MODAL OVERLAY ── */
 .modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }

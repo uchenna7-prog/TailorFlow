@@ -57,6 +57,11 @@ function formatDate(ts) {
   return 'Unknown Date'
 }
 
+function formatDateShort(dateStr) {
+  if (!dateStr) return ''
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 function todayReadable() {
   return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
@@ -713,6 +718,8 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
             const statusObj = STATUSES.find(s => s.value === o.status) ?? STATUSES[0]
             const stageObj  = STAGES.find(s => s.value === o.stage)
             const itemsList = o.items || []
+            const priceStr  = o.price != null ? `₦${Number(o.price).toLocaleString()}` : '—'
+            const dueDateRaw = o.dueRaw || o.dueDate
 
             return (
               <div
@@ -722,30 +729,35 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
               >
                 <OrderMosaic items={itemsList} />
 
+                {/* LEFT: desc, customer name, stage */}
                 <div className={styles.orderListInfo}>
                   <div className={styles.orderListDesc}>{o.desc}</div>
+                  {o.customerName && (
+                    <div className={styles.orderListMeta}>
+                      <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)', verticalAlign: 'middle' }}>person</span>
+                      <span className={styles.orderListMetaText}>{o.customerName}</span>
+                    </div>
+                  )}
+                  {stageObj && (
+                    <div className={styles.orderListStageLine}>
+                      <span className="mi" style={{ fontSize: '0.78rem' }}>{stageObj.icon}</span>
+                      {stageObj.label}
+                    </div>
+                  )}
+                </div>
 
-                  <div className={styles.orderListStatusRow}>
-                    <span className={`${styles.orderListStatusBadge} ${styles[`statusBadge_${(o.status || 'pending').replace('-', '_')}`]}`}>
-                      {statusObj.label}
-                    </span>
-                  </div>
-
-                  {stageObj
-                    ? (
-                      <div className={styles.orderListStageLine}>
-                        <span className="mi" style={{ fontSize: '0.8rem' }}>{stageObj.icon}</span>
-                        {stageObj.label}
-                      </div>
-                    )
-                    : (
-                      <div className={styles.orderListStageLine} style={{ color: 'var(--text3)' }}>
-                        No stage set
-                      </div>
-                    )
-                  }
-
-                  {o.due && <div className={styles.orderListDue}>Due: {o.due}</div>}
+                {/* RIGHT: price, qty, status pill, due date */}
+                <div className={styles.orderListRight}>
+                  <div className={styles.orderListPrice}>{priceStr}</div>
+                  {o.qty > 1 && <div className={styles.orderListQty}>×{o.qty}</div>}
+                  <span className={`${styles.orderListStatusBadge} ${styles[`statusBadge_${(o.status || 'pending').replace('-', '_')}`]}`}>
+                    {statusObj.label}
+                  </span>
+                  {dueDateRaw && (
+                    <div className={styles.orderListDueRight}>
+                      Due {formatDateShort(dueDateRaw)}
+                    </div>
+                  )}
                 </div>
               </div>
             )
