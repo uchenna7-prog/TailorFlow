@@ -5,7 +5,7 @@ import { useBrand } from '../../contexts/BrandContext'
 import Header from '../Header/Header'
 import styles from './ReceiptViewer.module.css'
 import { TEMPLATE_MAPPINGS } from '../Templates/datas/receiptTemplateMaps'
-import { getBrandCSSVars, downloadPDF, resolveCumulativePaid, buildReceiptWhatsAppMessage } from './Utils'
+import { getBrandCSSVars, downloadPDF, resolveCumulativePaid, buildReceiptWhatsAppMessage } from './utils'
 import ShareSheet from '../ShareSheet/ShareSheet'
 
 
