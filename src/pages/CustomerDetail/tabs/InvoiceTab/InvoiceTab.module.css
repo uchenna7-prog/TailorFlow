@@ -10,20 +10,55 @@
 .invoiceListItem:active { background: var(--surface); }
 
 /* Outer grey box */
-.invoiceListOuter { width: 80px; height: 80px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.invoiceListOuter { width: 68px; height: 68px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 /* Inner white box */
-.invoiceListInner { width: 58px; height: 58px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.invoiceListInner { width: 50px; height: 50px; border-radius: 9px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 
-/* Order image inside card icon box (single image fallback) */
-.orderImg { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+/* Order image inside card icon box */
+.orderImg { width: 100%; height: 100%; object-fit: cover; border-radius: 9px; }
 
-/* Text */
-.invoiceListInfo { flex: 1; min-width: 0; }
-.invoiceListDesc { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.invoiceListSub { font-size: 0.78rem; font-weight: 400; color: var(--text2); margin-bottom: 3px; }
-.invoiceListStatusRow { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; }
-.invoiceListStatusText { font-size: 0.78rem; font-weight: 400; color: var(--text2); }
-.invoiceListAmount { font-size: 0.78rem; font-weight: 500; color: var(--text); }
+/* ── CENTRE: description + date + pieces ── */
+.invoiceListInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.invoiceListDesc { font-size: 0.9rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.invoiceListSub { font-size: 0.72rem; font-weight: 400; color: var(--text3); }
+.invoiceListPieces {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1px 7px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+/* ── RIGHT: status badge + amount ── */
+.invoiceListRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+  min-width: 86px;
+}
+.invoiceListStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.6rem;
+  font-weight: 800;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.invoiceListAmount {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+}
 
 /* Empty state */
 .empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 48px 20px; text-align: center; }
@@ -31,18 +66,17 @@
 .emptySub { font-size: 0.8rem; color: var(--text3); margin: 0; line-height: 1.5; }
 
 /* ── UPDATED TABLE STYLES ── */
-.tHead { 
-  display: flex; 
-  font-weight: 800; 
-  font-size: 8px; 
-  border-bottom: 2px solid #1a1a1a; 
-  padding-bottom: 5px; 
-  margin-bottom: 6px; 
-  text-transform: uppercase; 
-  letter-spacing: 0.04em; 
+.tHead {
+  display: flex;
+  font-weight: 800;
+  font-size: 8px;
+  border-bottom: 2px solid #1a1a1a;
+  padding-bottom: 5px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-/* The main "Category" row - Bold and distinct */
 .tRowMain {
   display: flex;
   padding: 8px 0;
@@ -52,7 +86,6 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* Itemized container */
 .itemizedSection {
   padding: 4px 0 10px 0;
   border-bottom: 1px solid #eee;
@@ -66,7 +99,6 @@
   margin-bottom: 4px;
 }
 
-/* The sub-items (Cloths involved) */
 .tRowSub {
   display: flex;
   padding: 3px 0;
@@ -83,27 +115,16 @@
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 /* ══════════════════════════════════════════════════════════════
-   ORDER MOSAIC THUMBNAIL — shared across Invoice / Receipt tabs
-   Same layout as OrdersTab:
-     1 item  → single full image
-     2 items → left half | right half
-     3+ items → large left (full height) | right column stacked
-     4+ items → bottom-right shows "+N" overlay
-   Lives inside invoiceListOuter → invoiceListInner so card
-   size NEVER changes.
+   ORDER MOSAIC THUMBNAIL
    ══════════════════════════════════════════════════════════════ */
-
-/* Overrides padding on invoiceListInner and sets row layout */
 .mosaicInner {
   padding: 0 !important;
   display: flex !important;
   flex-direction: row !important;
   align-items: stretch !important;
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 9px;
 }
-
-/* Large left cell — 60% width, full height */
 .mosaicLeft {
   flex: 0 0 60%;
   display: flex;
@@ -113,8 +134,6 @@
   background: #fff;
   height: 100%;
 }
-
-/* Right column — remaining 40%, split into two stacked cells */
 .mosaicRight {
   flex: 1;
   display: flex;
@@ -122,8 +141,6 @@
   overflow: hidden;
   background: #fff;
 }
-
-/* Each of the two stacked right cells */
 .mosaicRightCell {
   flex: 1;
   display: flex;
@@ -133,35 +150,25 @@
   position: relative;
   background: #fff;
 }
-
-/* Thin vertical divider between left and right */
 .mosaicDividerV {
   width: 1.5px;
   flex-shrink: 0;
   background: var(--border);
   align-self: stretch;
 }
-
-/* Thin horizontal divider between top-right and bottom-right */
 .mosaicDividerH {
   height: 1.5px;
   flex-shrink: 0;
   background: var(--border);
   width: 100%;
 }
-
 .mosaicImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
-
-/* "+N" overlay on last mosaic cell */
-.mosaicOverlayWrap {
-  position: relative;
-}
-
+.mosaicOverlayWrap { position: relative; }
 .mosaicOverlay {
   position: absolute;
   inset: 0;

@@ -24,14 +24,7 @@ const STATUS_STYLES = {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ORDER MOSAIC THUMBNAIL  (shared pattern with OrdersTab)
-// items = order.items[] — each has imgSrc
-// Layout:
-//   0 imgs  → icon placeholder
-//   1 img   → single full thumb
-//   2 imgs  → left half | right half
-//   3+ imgs → large left | right column (top + bottom stacked)
-//             4+ shows "+N" overlay on bottom-right
+// ORDER MOSAIC THUMBNAIL
 // ─────────────────────────────────────────────────────────────
 function OrderMosaic({ orderItems, fallbackIcon }) {
   const covers = (orderItems || [])
@@ -83,7 +76,6 @@ function OrderMosaic({ orderItems, fallbackIcon }) {
     )
   }
 
-  // 3+ items → large left + two stacked right
   const extra = total > 3 ? total - 3 : 0
 
   return (
@@ -141,31 +133,30 @@ function InvoiceCard({ invoice, currency, onTap, isLast, orderItems }) {
       {/* Left: mosaic thumbnail */}
       <OrderMosaic orderItems={orderItems} fallbackIcon="receipt_long" />
 
-      {/* Info */}
+      {/* Centre: order name + date */}
       <div className={styles.invoiceListInfo}>
         <div className={styles.invoiceListDesc}>{invoice.orderDesc || 'Order'}</div>
-        <div className={styles.invoiceListSub}>Generated on {invoice.date}</div>
-        <span style={{
-          display: 'inline-block',
-          marginTop: '4px',
-          padding: '2px 8px',
-          borderRadius: '6px',
-          fontSize: '0.72rem',
-          fontWeight: 600,
-          border: `1px solid ${sty.border}`,
-          background: sty.bg,
-          color: sty.color,
-        }}>
+        <div className={styles.invoiceListSub}>Generated {invoice.date}</div>
+        {pieceCount && (
+          <div className={styles.invoiceListPieces}>
+            {pieceCount} {pieceCount === 1 ? 'piece' : 'pieces'}
+          </div>
+        )}
+      </div>
+
+      {/* Right: status badge + amount */}
+      <div className={styles.invoiceListRight}>
+        <span
+          className={styles.invoiceListStatusBadge}
+          style={{
+            background: sty.bg,
+            color: sty.color,
+            borderColor: sty.border,
+          }}
+        >
           {statusLabel}
         </span>
-        <div className={styles.invoiceListAmount}>
-          {fmt('₦', total)}
-          {pieceCount && (
-            <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'var(--text3)', marginLeft: '5px' }}>
-              ({pieceCount} {pieceCount === 1 ? 'pc' : 'pcs'})
-            </span>
-          )}
-        </div>
+        <div className={styles.invoiceListAmount}>{fmt('₦', total)}</div>
       </div>
     </div>
   )
@@ -210,8 +201,6 @@ export default function InvoiceTab({
     } catch { return '₦' }
   })()
 
-  // Build order items lookup: orderId → items[]
-  // We pass the full items array so the mosaic can use all cover images
   const orderItemsMap = {}
   for (const order of orders) {
     if (order.id && order.items?.length > 0) {
@@ -234,7 +223,6 @@ export default function InvoiceTab({
     }
   }
 
-  // Group invoices by date
   const grouped = invoices.reduce((acc, inv) => {
     const key = inv.date || 'Unknown Date'
     if (!acc[key]) acc[key] = []
@@ -266,7 +254,7 @@ export default function InvoiceTab({
 
       {viewingInvoice && (
         <div className={styles.modalOverlay}>
-          <Header 
+          <Header
             type="back"
             title="Invoice Details"
             onBackClick={() => setViewingInvoice(null)}

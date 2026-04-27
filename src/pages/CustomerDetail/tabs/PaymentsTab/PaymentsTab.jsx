@@ -759,28 +759,30 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
                   fallbackColor={sm.color}
                 />
 
-                {/* CENTRE: order name + instalment count only */}
+                {/* CENTRE: order name + status badge + instalment count */}
                 <div className={styles.payListInfo}>
                   <div className={styles.payListDesc}>{p.orderDesc || 'Payment'}</div>
-                  {installCount > 1 && (
-                    <span className={styles.installCountBadge}>
-                      {installCount} payments
+                  <div className={styles.payListMeta}>
+                    <span
+                      className={styles.payListStatusBadge}
+                      style={{
+                        color: sm.color,
+                        background: sm.bg,
+                        borderColor: sm.border,
+                      }}
+                    >
+                      {sm.label}
                     </span>
-                  )}
+                    {installCount > 1 && (
+                      <span className={styles.installCountBadge}>
+                        {installCount} payments
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* RIGHT: status badge → amount → sub amount → progress bar */}
+                {/* RIGHT: amount + sub amount + progress bar — no status badge */}
                 <div className={styles.payListRight}>
-                  <span
-                    className={styles.payListStatusBadge}
-                    style={{
-                      color: sm.color,
-                      background: sm.bg,
-                      borderColor: sm.border,
-                    }}
-                  >
-                    {sm.label}
-                  </span>
                   <div className={styles.payListAmount}>
                     {fullPrice > 0 ? fmt(totalPaid) : fmt(installments[0]?.amount)}
                   </div>

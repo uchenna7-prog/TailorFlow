@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import ReceiptViewer from '../../../../components/ReceiptViewer/ReceiptViewer'
 import ConfirmSheet from '../../../../components/ConfirmSheet/ConfirmSheet'
-import styles from './ReceiptTab.module.css' 
+import styles from './ReceiptTab.module.css'
 
 function fmt(currency = '₦', amount) {
   const n = parseFloat(amount) || 0
@@ -11,14 +11,7 @@ function fmt(currency = '₦', amount) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// ORDER MOSAIC THUMBNAIL  (same pattern as OrdersTab)
-// orderItems = order.items[] / receipt.orderItems[] — each has imgSrc
-// Layout:
-//   0 imgs  → icon placeholder
-//   1 img   → single full thumb
-//   2 imgs  → left half | right half
-//   3+ imgs → large left | right column (top + bottom stacked)
-//             4+ shows "+N" overlay on bottom-right
+// ORDER MOSAIC THUMBNAIL
 // ─────────────────────────────────────────────────────────────
 function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
   const covers = (orderItems || [])
@@ -70,7 +63,6 @@ function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
     )
   }
 
-  // 3+ items → large left + two stacked right
   const extra = total > 3 ? total - 3 : 0
 
   return (
@@ -106,7 +98,7 @@ function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
   )
 }
 
-// ── Receipt card (same layout as InvoiceCard) ─────────────────
+// ── Receipt card ──────────────────────────────────────────────
 
 function ReceiptCard({ receipt, currency, onTap, isLast, orderItems }) {
   const thisPaymentAmount = (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
@@ -119,6 +111,10 @@ function ReceiptCard({ receipt, currency, onTap, isLast, orderItems }) {
   const isFullPay   = cumulativePaid >= orderTotal && orderTotal > 0
   const statusLabel = isFullPay ? 'Paid in Full' : 'Part Payment'
 
+  const statusStyle = isFullPay
+    ? { bg: 'rgba(34,197,94,0.12)',  color: '#15803d', border: 'rgba(34,197,94,0.3)'  }
+    : { bg: 'rgba(251,146,60,0.12)', color: '#c2410c', border: 'rgba(251,146,60,0.3)' }
+
   return (
     <div
       className={`${styles.invoiceListItem} ${isLast ? styles.invoiceListItemLast : ''}`}
@@ -130,23 +126,24 @@ function ReceiptCard({ receipt, currency, onTap, isLast, orderItems }) {
         fallbackColor={isFullPay ? '#22c55e' : '#fb923c'}
       />
 
+      {/* Centre: order name + date */}
       <div className={styles.invoiceListInfo}>
         <div className={styles.invoiceListDesc}>{receipt.orderDesc || 'Payment'}</div>
-        <div className={styles.invoiceListSub}>Generated on {receipt.date}</div>
-        <span style={{
-          display: 'inline-block',
-          marginTop: '4px',
-          padding: '2px 8px',
-          borderRadius: '6px',
-          fontSize: '0.72rem',
-          fontWeight: 600,
-          background: isFullPay ? 'rgba(34,197,94,0.12)'  : 'rgba(251,146,60,0.12)',
-          color:      isFullPay ? '#15803d'                : '#c2410c',
-          border:     isFullPay ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(251,146,60,0.3)',
-        }}>
+        <div className={styles.invoiceListSub}>Generated {receipt.date}</div>
+      </div>
+
+      {/* Right: status badge + amount */}
+      <div className={styles.invoiceListRight}>
+        <span
+          className={styles.invoiceListStatusBadge}
+          style={{
+            background:   statusStyle.bg,
+            color:        statusStyle.color,
+            borderColor:  statusStyle.border,
+          }}
+        >
           {statusLabel}
         </span>
-        {/* Show the amount paid in this receipt, not the running cumulative total */}
         <div className={styles.invoiceListAmount}>{fmt(currency, thisPaymentAmount)}</div>
       </div>
     </div>
@@ -187,8 +184,6 @@ export default function ReceiptTab({
     } catch { return '₦' }
   })()
 
-  // Primary: look up live order items by orderId (always up to date with images)
-  // Fallback: use receipt.orderItems in case the order was deleted
   const orderItemsMap = {}
   for (const order of orders) {
     if (order.id && order.items?.length > 0) {
@@ -219,7 +214,6 @@ export default function ReceiptTab({
           <div className={styles.invoiceGroupDate}>{date}</div>
           <div className={styles.invoiceGroupDivider} />
           {dateReceipts.map((r, idx) => {
-            // Prefer live order items → fall back to what was stored on the receipt
             const orderItems = orderItemsMap[r.orderId] ?? r.orderItems ?? []
             return (
               <ReceiptCard

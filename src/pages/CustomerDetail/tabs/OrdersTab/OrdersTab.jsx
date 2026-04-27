@@ -715,10 +715,11 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
           <div className={styles.orderGroupDate}>{date}</div>
           <div className={styles.orderGroupDivider} />
           {dateOrders.map((o, idx) => {
-            const statusObj = STATUSES.find(s => s.value === o.status) ?? STATUSES[0]
-            const stageObj  = STAGES.find(s => s.value === o.stage)
-            const itemsList = o.items || []
-            const priceStr  = o.price != null ? `₦${Number(o.price).toLocaleString()}` : '—'
+            const statusObj  = STATUSES.find(s => s.value === o.status) ?? STATUSES[0]
+            const stageObj   = STAGES.find(s => s.value === o.stage)
+            const itemsList  = o.items || []
+            const itemCount  = itemsList.length
+            const priceStr   = o.price != null ? `₦${Number(o.price).toLocaleString()}` : '—'
             const dueDateRaw = o.dueRaw || o.dueDate
 
             return (
@@ -729,13 +730,15 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
               >
                 <OrderMosaic items={itemsList} />
 
-                {/* LEFT: desc, customer name, stage */}
+                {/* LEFT: desc, item count, stage */}
                 <div className={styles.orderListInfo}>
                   <div className={styles.orderListDesc}>{o.desc}</div>
-                  {o.customerName && (
+                  {itemCount > 0 && (
                     <div className={styles.orderListMeta}>
-                      <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)', verticalAlign: 'middle' }}>person</span>
-                      <span className={styles.orderListMetaText}>{o.customerName}</span>
+                      <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)', verticalAlign: 'middle' }}>checkroom</span>
+                      <span className={styles.orderListMetaText}>
+                        {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                      </span>
                     </div>
                   )}
                   {stageObj && (
@@ -746,10 +749,9 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
                   )}
                 </div>
 
-                {/* RIGHT: price, qty, status pill, due date */}
+                {/* RIGHT: price, status pill, due date */}
                 <div className={styles.orderListRight}>
                   <div className={styles.orderListPrice}>{priceStr}</div>
-                  {o.qty > 1 && <div className={styles.orderListQty}>×{o.qty}</div>}
                   <span className={`${styles.orderListStatusBadge} ${styles[`statusBadge_${(o.status || 'pending').replace('-', '_')}`]}`}>
                     {statusObj.label}
                   </span>
