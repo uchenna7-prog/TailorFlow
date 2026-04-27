@@ -141,6 +141,7 @@
    color: var(--brand-primary); 
 }
 .totals { 
+   margin-left: auto;
    min-width: 80px; 
    font-size: 8px; 
 }

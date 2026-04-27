@@ -27,10 +27,10 @@ export function InvoiceTemplate10({ invoice, customer, brand }) {
         <div className={styles.brandInBanner}>
           {brand.logo
             ? <img src={brand.logo} alt="" style={{ width: "25px", height: "25px", objectFit: 'contain' }} />
-            : <span className="mi" style={{ fontSize: 14, color: '#333' }}>checkroom</span>
+            : <span className="mi" style={{ fontSize: 14,  color: "var(--brand-on-primary)" }}>checkroom</span>
           }
           <div>
-            <div className={styles.brandName}>{brand.name || brand.ownerName}</div>
+            <div className={styles.brandName} style={{ color: "var(--brand-on-primary)" }} >{brand.name || brand.ownerName}</div>
             <div className={styles.brandSub}>TAILOR SHOP</div>
           </div>
         </div>

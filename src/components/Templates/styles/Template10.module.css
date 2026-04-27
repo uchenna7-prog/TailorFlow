@@ -48,6 +48,7 @@
    color: #1a1a1a; 
 }
 .brandSub { 
+   color: var(--brand-muted);
    font-size: 6px; 
    letter-spacing: 0.06em; 
 }

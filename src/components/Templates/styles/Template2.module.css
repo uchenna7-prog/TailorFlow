@@ -53,6 +53,7 @@
 }
 
 .footerCenteredText { 
+  margin-top: auto;
   background:var(--brand-muted) ;
   font-weight:900;
   color:var(--brand-primary-dark);

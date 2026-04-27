@@ -3,11 +3,33 @@ import { ReceiptPaymentSummary } from "../components/ReceiptPaymentSummary/Recei
 import { ItemsTable } from "../components/ReceiptItemsTable/ReceiptItemsTable"
 
 
+
 export function ReceiptTemplate1({ receipt, customer, brand }) {
+
+  const format = (str) => 
+  str.charAt(0).toUpperCase() + str.slice(1);
+
+  const getPaymentMethod = (receipt) => {
+    if (!receipt.payments?.length) return "N/A";
+
+    const uniqueMethods = [
+      ...new Set(
+        receipt.payments
+          .map(p => p.method?.toLowerCase())
+          .filter(Boolean)
+      )
+    ];
+
+    if (uniqueMethods.length === 0) return "N/A";
+
+    return uniqueMethods.map(format).join(" + ");
+  };
+  const paymentMethods = getPaymentMethod(receipt)
 
   const lineColor = brand.colour || '#0057D7'
 
   return (
+
     <div className={styles.template}>
 
       <div className={styles.header}>
@@ -26,38 +48,84 @@ export function ReceiptTemplate1({ receipt, customer, brand }) {
       </div>
 
       <div className={styles.metaRow}>
+
         <div>
 
           <div className={styles.metaLabel}>RECEIVED FROM</div>
-          <div className={styles.metaValue}>{customer.name}</div>
-          {customer.phone && <div className={styles.metaSub}>{customer.phone}</div>}
+          <div>{customer.name}</div>
+          {customer.phone   && <div>{customer.phone}</div>}
+          {customer.address && <div>{customer.address}</div>}
 
         </div>
 
         <div style={{ textAlign: 'right' }}>
 
-          <div className={styles.metaKey}>RECEIPT #</div>
-          <div className={styles.metaValue}>{receipt.number}</div>
-          <div className={styles.metaSub}>{receipt.date}</div>
+          <div>
+            <span className={styles.metaKey}>RECEIPT #:</span>
+            <span className={styles.metaValue}> {receipt.number}</span>
+          </div>
+
+          <div>
+            <span className={styles.metaKey}>Issue Date:</span>
+            <span className={styles.metaValue}> {receipt.date}</span>
+          </div>
+
 
         </div>
+
       </div>
+
       <ItemsTable receipt={receipt} brand={brand} />
-      
-      <ReceiptPaymentSummary receipt={receipt} brand={brand} />
 
-      {(brand.phone || brand.email || brand.footer) && (
+      <ReceiptPaymentSummary receipt={receipt} brand={brand}/>
 
-        <div className={styles.footRight}>
+      {(brand.accountBank || brand.phone || brand.email || brand.footer) && (
 
-          <strong style={{fontWeight:900,color:"var(--brand-primary-dark)"}}>Notes:</strong><br />
-          {brand.phone   && <span>{brand.phone}<br /></span>}
-          {brand.email   && <span>{brand.email}<br /></span>}
-          {brand.footer  && <span>{brand.footer}</span>}
+        <div className={styles.footer}>
+
+          {brand.accountBank && (
+
+            <div className={styles.footerLeft}>
+
+              <strong style={{fontWeight:900,color:"var(--brand-primary-dark)"}}>Payment Details:</strong><br />
+
+              <div>
+                <div>
+
+                  {receipt.payments && (
+                    <div>Payment Method(s) : {paymentMethods}</div>
+                  )}
+
+                  {brand.name && (
+                    <div>Received By : {brand.name}</div>
+                  )}
+                  
+                </div>
+              </div>
+
+            </div>
+
+          )}
+
+          {(brand.phone || brand.email || brand.footer) && (
+
+            <div className={styles.footRight}>
+
+              <strong style={{fontWeight:900,color:"var(--brand-primary-dark)"}}>Notes:</strong><br />
+              {brand.phone   && <span>{brand.phone}<br /></span>}
+              {brand.email   && <span>{brand.email}<br /></span>}
+              {brand.footer  && <span>{brand.footer}</span>}
+
+            </div>
+
+          )}
 
         </div>
 
       )}
+
     </div>
+
   )
+
 }

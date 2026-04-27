@@ -24,7 +24,7 @@ export const getBrandSampleData = (brand) => {
     email: 'info@adeolacouture.ng',
     website: 'adeolacouture.ng',
     currency: '₦',
-    footer: 'Thank you for your payment!',
+    footer: 'Thank you for your patronage🙏',
     showTax: false,
     taxRate: 0,
     dueDays: 14,
