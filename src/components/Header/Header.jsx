@@ -180,7 +180,7 @@ function Header({
             {/* ── BOT / AGENT BUTTON ── */}
             {showBotButton && (
               <button
-                className={styles.botBtn}
+                className={styles.iconBtn}
                 onClick={handleBotClick}
                 aria-label="Open Agent"
                 title="TailorFlow Agent"
@@ -191,7 +191,7 @@ function Header({
                     {agentPendingCount > 9 ? '9+' : agentPendingCount}
                   </span>
                 )}
-                {agentPendingCount > 0 && <span className={styles.botPulse} />}
+           
               </button>
             )}
 

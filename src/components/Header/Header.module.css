@@ -52,7 +52,7 @@
   justify-content: center;
   background: none;
   border: none;
-  color: var(--text);
+  color: var(--text2);
   border-radius: 10px;
   transition: background 0.15s;
   position: relative;
@@ -111,15 +111,15 @@
   }
 }
 
-/* ── NOTIFICATION BADGE ── */
+/* ── NOTIFICATION BADGE (red — unread alerts) ── */
 .notifDot {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  min-width: 16px;
-  height: 16px;
+  top: 5px;
+  right: 5px;
+  min-width: 15px;
+  height: 15px;
   border-radius: 10px;
-  background: var(--warning);
+  background: #ef4444;
   border: 2px solid var(--bg);
   font-size: 0.5rem;
   font-weight: 800;
@@ -129,38 +129,20 @@
   justify-content: center;
   padding: 0 3px;
   line-height: 1;
+  pointer-events: none;
 }
 
-/* ── BOT / AGENT BUTTON ── */
-.botBtn {
-  position: relative;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 11px;
-  background: var(--text);
-  border: none;
-  cursor: pointer;
-  color: var(--bg);
-  flex-shrink: 0;
-  transition: opacity 0.15s, transform 0.1s;
-}
-
-.botBtn:hover  { opacity: 0.80; }
-.botBtn:active { transform: scale(0.94); opacity: 1; }
-
+/* ── AGENT BADGE (indigo — pending tasks, distinct from alerts) ── */
 .botBadge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: 5px;
+  right: 5px;
   min-width: 15px;
   height: 15px;
-  border-radius: 8px;
-  background: var(--warning);
+  border-radius: 10px;
+  background: #6366f1;
   border: 2px solid var(--bg);
-  font-size: 9px;
+  font-size: 0.5rem;
   font-weight: 800;
   color: #fff;
   display: flex;
@@ -168,30 +150,7 @@
   justify-content: center;
   padding: 0 3px;
   line-height: 1;
-}
-
-.botPulse {
-  position: absolute;
-  inset: -2px;
-  border-radius: 13px;
-  animation: botPulse 2s ease-out infinite;
   pointer-events: none;
-}
-
-@keyframes botPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.35); }
-  70%  { box-shadow: 0 0 0 7px rgba(0, 0, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
-}
-
-:root[data-theme="dark"] .botPulse {
-  animation: botPulseDark 2s ease-out infinite;
-}
-
-@keyframes botPulseDark {
-  0%   { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.25); }
-  70%  { box-shadow: 0 0 0 7px rgba(255, 255, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
 /* ── NOTIFICATION OVERLAY — mobile full screen ── */
@@ -292,6 +251,7 @@
 }
 
 .notifIcon {
+  background: red;
   width: 38px;
   height: 38px;
   border-radius: 12px;
@@ -414,9 +374,9 @@
 }
 
 .notifTabBadgeAlert {
-  background: rgba(251,146,60,0.15);
-  color: var(--warning);
-  border-color: rgba(251,146,60,0.35);
+  background: rgba(239,68,68,0.12);
+  color: #ef4444;
+  border-color: rgba(239,68,68,0.3);
 }
 
 .markAllBtn {

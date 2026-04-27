@@ -53,7 +53,7 @@ export function InvoiceTemplate2({ invoice, customer, brand }) {
 
       </div>
 
-      <InvoiceItemsTable invoice={invoice} brand={brand} />
+      <ItemsTable invoice={invoice} brand={brand} />
 
       {brand.accountBank && (
         <div className={styles.paymentInfo}>
