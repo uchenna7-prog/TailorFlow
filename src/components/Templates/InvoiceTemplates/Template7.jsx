@@ -51,9 +51,9 @@ export function InvoiceTemplate7({ invoice, customer, brand }) {
           {[
             ['NAME:', brand.ownerName || brand.name],
             ['COMPANY:', (brand.name || '').toUpperCase()],
-            ['ADDRESS:', (brand.address || '').toUpperCase()],
             ['PHONE:', (brand.phone || '').toUpperCase()],
             ['EMAIL:', (brand.email || '')],
+            ['ADDRESS:', (brand.address || '').toUpperCase()]
           ].filter(([,v]) => v).map(([l, v]) => (
             <div key={l} className={styles.infoRow}>
               <span className={styles.infoKey}>{l}</span>

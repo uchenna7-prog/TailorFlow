@@ -49,11 +49,11 @@ export function InvoiceTemplate10({ invoice, customer, brand }) {
         </div>
       </div>
       <div className={styles.tableHeader}>
-        <span style={{ textAlign:"left"}}>SN</span>
+        <span style={{flex: 1, textAlign:"left"}}>SN</span>
         <span style={{ flex: 3,textAlign:"left"}}>Item Description</span>
-        <span style={{ textAlign:"center"}}>Unit Price</span>
-        <span style={{ textAlign:"center"}}>Qty</span>
-        <span style={{ textAlign:"center"}}>Total</span>
+        <span style={{flex: 1, textAlign:"center"}}>Unit Price</span>
+        <span style={{flex: 1, textAlign:"center"}}>Qty</span>
+        <span style={{flex: 1, textAlign:"center"}}>Total</span>
       </div>
       {invoice.items?.map((item, i) => {
         const qty = item.qty ?? 1;
@@ -62,13 +62,13 @@ export function InvoiceTemplate10({ invoice, customer, brand }) {
 
         return (
           <div key={i} className={styles.tableRow}>
-            <span style={{ textAlign: "left" }}>{i + 1}</span>
+            <span style={{flex: 1, textAlign: "left" }}>{i + 1}</span>
             <span style={{ flex: 3, textAlign: "left" }}>{item.name}</span>
-            <span style={{ textAlign: "center" }}>
+            <span style={{flex: 1, textAlign: "center" }}>
               {fmt(currency, unitPrice)}
             </span>
-            <span style={{ textAlign: "center" }}>{qty}</span>
-            <span style={{ textAlign: "center" }}>
+            <span style={{flex: 1, textAlign: "center" }}>{qty}</span>
+            <span style={{flex: 1, textAlign: "center" }}>
               {fmt(currency, lineAmount)}
             </span>
           </div>

@@ -22,7 +22,7 @@ export function InvoiceTemplate5({ invoice, customer, brand }) {
 
         <div className={styles.topRight}>
           <div>{invoice.date}</div>
-          <div><strong>Invoice No. {invoice.number}</strong></div>
+          <div><strong>Invoice No: {invoice.number}</strong></div>
         </div>
 
       </div>
@@ -110,9 +110,9 @@ export function InvoiceTemplate5({ invoice, customer, brand }) {
         ) : <div />}
         <div className={styles.footerItem} style={{ textAlign: 'right' }}>
           <div><strong>{brand.name || brand.ownerName}</strong></div>
-          {brand.address && <div>{brand.address}</div>}
           {brand.phone   && <div>{brand.phone}</div>}
           {brand.email   && <div>{brand.email}</div>}
+          {brand.address && <div>{brand.address}</div>}
         </div>
       </div>
     </div>

@@ -21,8 +21,8 @@ export const getBrandSampleData = (brand) => {
     tagline: 'Crafted with love, fitted for you',
     address: '14 Bode Thomas St, Surulere, Lagos',
     phone: '+234 801 234 5678',
-    email: 'info@adeolacouture.ng',
-    website: 'adeolacouture.ng',
+    email: 'info@adeolastitches.ng',
+    website: 'adeolastitches.ng',
     currency: '₦',
     footer: 'Thank you for your patronage🙏',
     showTax: false,
@@ -40,6 +40,7 @@ export const getBrandSampleData = (brand) => {
   name: 'Mrs. Chidinma Okafor',
   phone: '+234 801 234 5678',
   address: '22 Akin Adesola St, Victoria Island',
+  email:"chidinmaokafor@gmail.com"
 }
 
 export const INVOICE_SAMPLE_DATA = {

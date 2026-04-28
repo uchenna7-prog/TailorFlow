@@ -30,8 +30,8 @@ export function InvoiceTemplate2({ invoice, customer, brand }) {
 
           <strong>BILL FROM</strong><br />
           {brand.name}<br />
+          {brand.phone}<br />
           {brand.address && <span>{brand.address}<br /></span>}
-          {brand.phone}
 
         </div>
 
@@ -40,6 +40,7 @@ export function InvoiceTemplate2({ invoice, customer, brand }) {
           <strong>BILL TO</strong><br />
           {customer.name}<br />
           {customer.phone}
+          {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
           
         </div>
 

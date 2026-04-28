@@ -40,6 +40,7 @@ export function InvoiceTemplate9({ invoice, customer, brand }) {
           <span className={styles.billLabel}>Bill to:</span>
           <div><strong>{customer.name}</strong></div>
           {customer.phone   && <div>{customer.phone}</div>}
+          {customer.email   && <div>{customer.email}</div>}
           {customer.address && <div>{customer.address}</div>}
         </div>
         <div>
@@ -47,14 +48,15 @@ export function InvoiceTemplate9({ invoice, customer, brand }) {
           <div><strong>{brand.name || brand.ownerName}</strong></div>
           {brand.phone && <div>{brand.phone}</div>}
           {brand.email && <div>{brand.email}</div>}
+          {brand.address  && <div>{brand.address}</div>}
         </div>
       </div>
       <div className={styles.tableHeader}>
        
         <span style={{ flex: 3,textAlign:"left"}}>ITEM DESCRIPTION</span>
-        <span style={{ textAlign:"center"}}>QTY</span>
-        <span style={{ textAlign:"center"}}>UNIT PRICE</span>
-        <span style={{ textAlign:"center"}}>TOTAL</span>
+        <span style={{flex: 1, textAlign:"center"}}>QTY</span>
+        <span style={{flex: 1, textAlign:"center"}}>UNIT PRICE</span>
+        <span style={{flex: 1, textAlign:"center"}}>TOTAL</span>
 
       </div>
       {invoice.items?.map((item, i) => {
@@ -65,11 +67,11 @@ export function InvoiceTemplate9({ invoice, customer, brand }) {
         return (
           <div key={i} className={styles.tableRow}>
             <span style={{ flex: 3, textAlign: "left" }}>{item.name}</span>
-            <span style={{ textAlign: "center" }}>{qty}</span>
-            <span style={{ textAlign: "center" }}>
+            <span style={{ flex: 1, textAlign: "center" }}>{qty}</span>
+            <span style={{flex: 1, textAlign: "center" }}>
               {fmt(currency, unitPrice)}
             </span>
-            <span style={{ textAlign: "right" }}>
+            <span style={{flex: 1, textAlign: "right" }}>
               {fmt(currency, lineAmount)}
             </span>
           </div>

@@ -20,7 +20,7 @@ export function InvoiceTemplate6({ invoice, customer, brand }) {
 
           <div className={styles.logoCircle}>
             {brand.logo
-              ? <img src={brand.logo} alt="" style={{ width: 45, height: 45, objectFit: 'contain' }} />
+              ? <img src={brand.logo} alt="" style={{ width: "45px", height: "45px", objectFit: 'contain' }} />
               : <span className="mi" style={{ fontSize: 13, color: 'var(--brand-on-primary)' }}>checkroom</span>
             }
           </div>
@@ -66,6 +66,7 @@ export function InvoiceTemplate6({ invoice, customer, brand }) {
         <div>
           <div className={styles.infoLabel}>BILL FROM:</div>
           {brand.name || brand.ownerName}<br />
+          {brand.phone   && <div>{brand.phone}</div>}
           {brand.address}
         </div>
         <div>

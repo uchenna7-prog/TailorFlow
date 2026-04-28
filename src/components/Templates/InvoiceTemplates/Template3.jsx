@@ -35,8 +35,8 @@ export function InvoiceTemplate3({ invoice, customer, brand }) {
 
             <div className={styles.metaLabel}>BILL FROM</div>
             <div className={styles.metaVal}>{brand.name}</div>
-            {brand.address && <div className={styles.metaSub}>{brand.address}</div>}
             {brand.phone   && <div className={styles.metaSub}>{brand.phone}</div>}
+            {brand.address && <div className={styles.metaSub}>{brand.address}</div>}
 
           </div>
 
@@ -45,6 +45,7 @@ export function InvoiceTemplate3({ invoice, customer, brand }) {
             <div className={styles.metaLabel}>BILL TO:</div>
             <div className={styles.metaVal}>{customer.name}</div>
             {customer.phone && <div className={styles.metaSub}>{customer.phone}</div>}
+            {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
 
           </div>
 
