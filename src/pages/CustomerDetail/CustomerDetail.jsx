@@ -513,7 +513,7 @@ export default function CustomerDetail({ onMenuClick }) {
       isFullPayment: isFullPay,
       balance,
       notes: payment.notes || '',
-      template: settingsSnap.invoiceTemplate || 'receiptTemplate1',
+      template: settingsSnap.receiptTemplate || 'receiptTemplate1',
       brandSnapshot,
     }
 

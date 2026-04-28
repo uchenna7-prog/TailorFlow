@@ -22,18 +22,18 @@ export default function InvoiceViewer({
   onDelete, 
   showToast 
 }) {
-  const { brand: liveBrand } = useBrand()
+  const { brand } = useBrand()
   const paperRef  = useRef(null)
   const [invoice,    setInvoice]    = useState(initialInvoice)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [showShare,  setShowShare]  = useState(false)
 
-  const templateKey = invoice.template || 'invoiceTemplate1'
+  const templateKey = brand.invoiceTemplate || 'invoiceTemplate1'
   const Template = TEMPLATE_MAPPINGS[templateKey] || TEMPLATE_MAPPINGS.invoiceTemplate1
 
   const effectiveBrand = invoice.brandSnapshot
-    ? { ...liveBrand, ...invoice.brandSnapshot }
-    : liveBrand
+    ? { ...brand, ...invoice.brandSnapshot }
+    : brand
 
   const brandCSSVars = getBrandCSSVars(effectiveBrand.colour)
   const filename     = `Invoice-${invoice.number}-${customer.name.replace(/\s+/g, '_')}.pdf`

@@ -21,7 +21,7 @@ export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{
   const { settings, updateSetting, updateMany, resetSettings } = useSettings()
   const { brand } = useBrand()
   const [toastMsg,setToastMsg]=useState('')
-  const [templateModal,setTemplateModal]=useState(false)
+  const [templateModalOpen,setTemplateModalOpen]=useState(false)
   const [invoiceModal,setInvoiceModal]=useState(false)
   const [receiptModal,setReceiptModal]=useState(false)
   const [clearConfirm,setClearConfirm]=useState(false)
@@ -42,12 +42,13 @@ export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{
         <SectionHeader icon="receipt_long" label="Invoice & Receipt" />
         <SettingRow icon="tune" label="Invoice Settings" sub={`${settings.invoiceCurrency} · ${settings.invoicePrefix} · Due ${settings.invoiceDueDays}d`} onClick={()=>setInvoiceModal(true)} chevron />
         <SettingRow icon="request_quote" label="Receipt Settings" sub="Prefix, footer text and receipt defaults" onClick={()=>setReceiptModal(true)} chevron />
+        
         <SettingRow 
           icon="description" 
           label="Templates" 
           sub="Choose your preferred invoice and receipt designs" 
-          value={settings.invoiceTemplate} 
-          onClick={()=>setTemplateModal(true)} 
+          value={`${settings.invoiceTemplate} · ${settings.receiptTemplate}`}
+          onClick={()=>setTemplateModalOpen(true)} 
           chevron 
         />
 
@@ -69,12 +70,14 @@ export default function Settings({ onMenuClick, isPremium=false, onUpgrade=()=>{
       </div>
 
       <TemplateModal
-        isOpen={templateModal}
-        currentTemplate={settings.invoiceTemplate}
+        isOpen={templateModalOpen}
+        currentInvoiceTemplate={settings.invoiceTemplate || 'invoiceTemplate1'}
+        currentReceiptTemplate={settings.receiptTemplate || 'receiptTemplate1'}
         colourId={brand.colourId}
-        onClose={() => setTemplateModal(false)}
-        onSelect={v => {
-          updateMany({ invoiceTemplate: v, receiptTemplate: v })  // ← saves to both
+        onClose={() => setTemplateModalOpen(false)}
+        onSelect={obj => {
+   
+          updateMany({ invoiceTemplate: obj.invoiceTemplate, receiptTemplate: obj.receiptTemplate })  // ← saves to both
           showToast('Template selected')
         }}
       />

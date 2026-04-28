@@ -239,7 +239,6 @@ export default function ReceiptTab({
         />
       )}
 
-  
 
       <ConfirmSheet
         open={!!deleteTarget}

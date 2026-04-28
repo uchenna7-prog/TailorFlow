@@ -10,22 +10,23 @@ import ShareSheet from '../ShareSheet/ShareSheet'
 
 
 
+
 export default function ReceiptViewer({ receipt: initialReceipt, customer, onClose, onDelete, showToast }) {
-  const { brand: liveBrand } = useBrand()
+  const { brand } = useBrand()
   const paperRef  = useRef(null)
   const [receipt,    setReceipt]    = useState(initialReceipt)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [showShare,  setShowShare]  = useState(false)
 
-  const templateKey = receipt.template || liveBrand.template || 'receiptTemplate1'
+  const templateKey = receipt.template || brand.receiptTemplate || 'receiptTemplate1'
   const Template    = TEMPLATE_MAPPINGS[templateKey] || TEMPLATE_MAPPINGS.receiptTemplate1
 
   // FIX: if the receipt has a brandSnapshot, use it exclusively for all brand
   // fields so the frozen-at-generation colours/details are always shown.
   // Only fall back to the live brand for fields the snapshot doesn't have.
   const effectiveBrand = receipt.brandSnapshot
-    ? { ...liveBrand, ...receipt.brandSnapshot }
-    : liveBrand
+    ? { ...brand, ...receipt.brandSnapshot }
+    : brand
 
   // Derive isolated CSS variables from the frozen snapshot colour.
   // This overrides the global --brand-* tokens (set by useBrandTokens)

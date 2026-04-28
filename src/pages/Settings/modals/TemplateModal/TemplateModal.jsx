@@ -7,9 +7,17 @@ import { INVOICE_TEMPLATE_GROUPS } from "../../datas/invoiceTemplateGroups"
 import { RECEIPT_TEMPLATE_GROUPS } from "../../datas/receiptTemplateGroups"
 import { CUSTOMER_SAMPLE_DATA,INVOICE_SAMPLE_DATA,getBrandSampleData,RECEIPT_SAMPLE_DATA } from "../../datas/sampleDatas"
 
-export function TemplateModal({ isOpen, currentTemplate, colourId, onClose, onSelect }) {
+export function TemplateModal({ 
+  isOpen, 
+  currentInvoiceTemplate,
+  currentReceiptTemplate, 
+  colourId, 
+  onClose, 
+  onSelect 
+}) {
 
-  const [selected, setSelected] = useState(currentTemplate || 'invoiceTemplate1')
+  const [selectedInvoice, setSelectedInvoice] = useState(currentInvoiceTemplate || 'invoiceTemplate1')
+  const [selectedReceipt, setSelectedReceipt] = useState(currentReceiptTemplate || 'receiptTemplate1')
   const [activeTab, setActiveTab] = useState('invoice')
   const modalRef = useRef(null)
   const {brand} = useBrand()
@@ -28,7 +36,15 @@ export function TemplateModal({ isOpen, currentTemplate, colourId, onClose, onSe
         type="back"
         title="Templates"
         onBackClick={onClose}
-        customActions={[{ label: 'Select', onClick: () => { onSelect(selected); onClose() } }]}
+        customActions={[
+          { 
+            label: 'Select',
+            onClick: () => { 
+              onSelect({ invoiceTemplate: selectedInvoice, receiptTemplate: selectedReceipt }); 
+              onClose() 
+            } 
+          }
+        ]}
       />
       
       <div className={styles.tabsContainer}>
@@ -77,38 +93,50 @@ export function TemplateModal({ isOpen, currentTemplate, colourId, onClose, onSe
 
               {activeTab === "invoice" && group.templates.map(template => (
 
-                  <div key={t.id} className={styles.templateContainer} onClick={() => setSelected(template.id)}>
+                  <div key={template.id} className={styles.templateContainer} onClick={() => setSelectedInvoice(template.id)}>
 
-                    <div className={`${styles.fullPreviewContainer} ${selected === template.id ? styles.fullPreviewActive : ''}`}>
+                    <div className={`${styles.fullPreviewContainer} ${selectedInvoice === template.id ? styles.fullPreviewActive : ''}`}>
+                      
                       <template.Component 
                       invoice ={INVOICE_SAMPLE_DATA} 
                       customer={CUSTOMER_SAMPLE_DATA} 
                       brand={getBrandSampleData(brand)}/>
+
                     </div>
+
                     <div className={styles.templateInfo}>
-                      <div className={`${styles.radio} ${selected === t.id ? styles.radioActive : ''}`} />
+                      
+                      <div className={`${styles.radio} ${selectedInvoice === template.id ? styles.radioActive : ''}`} />
+
                       <div className={styles.templateLabelGroup}>
-                        <span className={styles.templateLabel}>{t.label}</span>
-                        {t.description && <span className={styles.templateDescription}>{t.description}</span>}
+                        <span className={styles.templateLabel}>{template.label}</span>
+                        {template.description && <span className={styles.templateDescription}>{template.description}</span>}
                       </div>
+
                     </div>
                   </div>
                 )) }
 
-                {activeTab === "receipt" && group.templates.map(t => (
-                  <div key={t.id} className={styles.templateContainer} onClick={() => setSelected(t.id)}>
-                    <div className={`${styles.fullPreviewContainer} ${selected === t.id ? styles.fullPreviewActive : ''}`}>
-                      <t.Component 
+                {activeTab === "receipt" && group.templates.map(template => (
+
+                  <div key={template.id} className={styles.templateContainer} onClick={() => setSelectedReceipt(template.id)}>
+
+                    <div className={`${styles.fullPreviewContainer} ${selectedReceipt === template.id ? styles.fullPreviewActive : ''}`}>
+                      <template.Component 
                       receipt ={RECEIPT_SAMPLE_DATA} 
                       customer={CUSTOMER_SAMPLE_DATA} 
                       brand={getBrandSampleData(brand)}/>
                     </div>
+
                     <div className={styles.templateInfo}>
-                      <div className={`${styles.radio} ${selected === t.id ? styles.radioActive : ''}`} />
+
+                      <div className={`${styles.radio} ${selectedReceipt === template.id ? styles.radioActive : ''}`} />
+
                       <div className={styles.templateLabelGroup}>
-                        <span className={styles.templateLabel}>{t.label}</span>
-                        {t.description && <span className={styles.templateDescription}>{t.description}</span>}
+                        <span className={styles.templateLabel}>{template.label}</span>
+                        {template.description && <span className={styles.templateDescription}>{template.description}</span>}
                       </div>
+
                     </div>
                   </div>
                 )) }
