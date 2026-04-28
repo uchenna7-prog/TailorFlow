@@ -23,13 +23,29 @@
 .orderGroupDate { font-size: 0.72rem; font-weight: 500; color: var(--text3); padding: 10px 16px 8px; }
 .orderGroupDivider { height: 1px; background: var(--border); width: calc(100% + 32px); margin-left: -16px; }
 
-.orderListItem { display: flex; align-items: center; gap: 14px; padding: 14px 0; cursor: pointer; transition: background 0.15s; background: var(--bg); position: relative; }
+.orderListItem { 
+  display: flex; 
+  align-items: center; 
+  gap: 14px; padding: 14px 0; 
+  cursor: pointer; 
+  transition: background 0.15s; 
+  background: var(--bg); 
+  position: relative; 
+}
 .orderListItem::after { content: ''; position: absolute; bottom: 0; left: 3.5%; right: 0; height: 1px; background: var(--border); }
 .orderListItemLast::after { display: none; }
 .orderListItem:active { background: var(--surface); }
 
 /* Outer grey box */
-.orderListOuter { width: 80px; height: 80px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.orderListOuter { width: 80px;
+   height: 80px; border-radius: 12px; 
+   background: var(--surface); 
+   border: 1px solid var(--border); 
+   display: flex; 
+   align-items: center; 
+   justify-content: center; 
+   flex-shrink: 0; 
+  }
 /* Inner white box */
 .orderListInner { width: 58px; height: 58px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .orderListThumbImg { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }

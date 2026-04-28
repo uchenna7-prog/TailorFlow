@@ -76,7 +76,7 @@ function Header({
   type = 'default',
   title,
   customActions = [],
-  backIcon = 'arrow_back',
+  backIcon = 'arrow_back_ios',
   agentPendingCount = 2,
 }) {
   const [notifOpen, setNotifOpen] = useState(false)
