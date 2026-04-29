@@ -261,7 +261,7 @@ async function renderElementToBlob(element, cssVars) {
 
   // ── 6. Capture ───────────────────────────────────────────────
   const canvas = await html2canvas(iDoc.body, {
-    scale:           3,
+    scale:           1.5,
     useCORS:         true,
     allowTaint:      true,
     backgroundColor: '#ffffff',
@@ -278,9 +278,9 @@ async function renderElementToBlob(element, cssVars) {
   document.body.removeChild(iframe)
 
   // ── 8. Build PDF ─────────────────────────────────────────────
-  const imgData = canvas.toDataURL('image/png')
+  const imgData = canvas.toDataURL('image/jpeg',0.82)
   const pdf     = new jsPDF({ orientation: 'portrait', unit: 'px', format: [PDF_WIDTH, height] })
-  pdf.addImage(imgData, 'PNG', 0, 0, PDF_WIDTH, height)
+  pdf.addImage(imgData, 'JPEG', 0, 0, PDF_WIDTH, height)
 
   return pdf.output('blob')
 }
