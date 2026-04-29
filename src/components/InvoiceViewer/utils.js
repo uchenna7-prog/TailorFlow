@@ -97,7 +97,7 @@ export function getBrandCSSVars(colour) {
 
 // ── WhatsApp message ──────────────────────────────────────────
 
-export function buildReceiptWhatsAppMessage(receipt, customer, brand) {
+export function buildInvoiceWhatsAppMessage(receipt, customer, brand) {
   const currency       = brand?.currency || '₦'
   const firstName      = customer.name?.split(' ')[0] || customer.name
   const cumulativePaid = resolveCumulativePaid(receipt)
