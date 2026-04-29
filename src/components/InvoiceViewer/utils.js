@@ -19,21 +19,21 @@ export function fmt(currency, amount) {
 
 // ── Payment helpers ───────────────────────────────────────────
 
-export function resolveCumulativePaid(receipt) {
-  if (receipt.cumulativePaid != null) return parseFloat(receipt.cumulativePaid)
-  return (receipt.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
+export function resolveCumulativePaid(invoice) {
+  if (invoice.cumulativePaid != null) return parseFloat(invoice.cumulativePaid)
+  return (invoice.payments || []).reduce((s, p) => s + (parseFloat(p.amount) || 0), 0)
 }
 
-export function buildPaymentRows(receipt) {
-  const previous = receipt.previousInstallments || []
-  const current  = receipt.payments || []
+export function buildPaymentRows(invoice) {
+  const previous = invoice.previousInstallments || []
+  const current  = invoice.payments || []
   const rows     = []
 
   if (previous.length > 0) {
     previous.forEach((p, i) => rows.push({ ...p, _isCurrent: false, _sn: i + 1 }))
-  } else if (parseFloat(receipt.previousPaid) > 0) {
+  } else if (parseFloat(invoice.previousPaid) > 0) {
     rows.push({
-      id: '__prev__', amount: receipt.previousPaid,
+      id: '__prev__', amount: invoice.previousPaid,
       date: 'Prior payments', method: null,
       _isCurrent: false, _sn: 1,
     })
@@ -97,38 +97,38 @@ export function getBrandCSSVars(colour) {
 
 // ── WhatsApp message ──────────────────────────────────────────
 
-export function buildInvoiceWhatsAppMessage(receipt, customer, brand) {
+export function buildInvoiceWhatsAppMessage(invoice, customer, brand) {
   const currency       = brand?.currency || '₦'
   const firstName      = customer.name?.split(' ')[0] || customer.name
-  const cumulativePaid = resolveCumulativePaid(receipt)
-  const orderTotal     = receipt.orderPrice
-    ? parseFloat(receipt.orderPrice)
-    : receipt.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? 0
+  const cumulativePaid = resolveCumulativePaid(invoice)
+  const orderTotal     = invoice.orderPrice
+    ? parseFloat(invoice.orderPrice)
+    : invoice.items?.reduce((s, i) => s + (parseFloat(i.price) || 0), 0) ?? 0
   const balanceLeft = Math.max(0, orderTotal - cumulativePaid)
   const isFullPay   = balanceLeft <= 0
 
   const lines = [
     `Hi ${firstName},`,
     '',
-    `Here is your payment receipt from *${brand?.name || 'us'}*. 🧾`,
+    `Here is your payment invoice from *${brand?.name || 'us'}*. 🧾`,
     '',
-    '*Receipt Details*',
-    `Receipt No: *${receipt.number}*`,
-    `Date: ${receipt.date}`,
+    '*invoice Details*',
+    `invoice No: *${invoice.number}*`,
+    `Date: ${invoice.date}`,
     '',
   ]
 
-  if (receipt.items?.length > 0) {
+  if (invoice.items?.length > 0) {
     lines.push('*Order Breakdown*')
-    receipt.items.forEach(item => lines.push(`• ${item.name} — ${fmt(currency, item.price)}`))
+    invoice.items.forEach(item => lines.push(`• ${item.name} — ${fmt(currency, item.price)}`))
     lines.push(`Order Total: ${fmt(currency, orderTotal)}`)
     lines.push('')
   }
 
-  if (receipt.payments?.length > 0) {
-    lines.push(`*Payment${receipt.payments.length > 1 ? 's' : ''} Received*`)
-    receipt.payments.forEach((p, idx) => {
-      const label  = receipt.payments.length > 1 ? `Payment ${idx + 1}` : 'Amount Paid'
+  if (invoice.payments?.length > 0) {
+    lines.push(`*Payment${invoice.payments.length > 1 ? 's' : ''} Received*`)
+    invoice.payments.forEach((p, idx) => {
+      const label  = invoice.payments.length > 1 ? `Payment ${idx + 1}` : 'Amount Paid'
       const method = p.method ? ` (${p.method.charAt(0).toUpperCase() + p.method.slice(1)})` : ''
       lines.push(`${label}${method}: *${fmt(currency, p.amount)}*`)
     })
