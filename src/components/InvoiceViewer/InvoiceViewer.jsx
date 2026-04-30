@@ -32,38 +32,39 @@ export default function InvoiceViewer({
   const filename       = `Invoice-${invoice.number}-${customer.name.replace(/\s+/g, '_')}.pdf`
 
   const handleDownload = async () => {
-    if (!paperRef.current || pdfLoading) return
-    setPdfLoading(true)
-    showToast?.('Generating PDF…')
-    try {
-      await downloadPDF(paperRef.current, filename, brandCSSVars)
-      showToast?.('PDF downloaded ✓')
-    } catch (err) {
-      console.error(err)
-      showToast?.('PDF failed — please try again.')
-    } finally {
-      setPdfLoading(false)
-    }
+  if (!paperRef.current || pdfLoading) return
+  setPdfLoading(true)
+  showToast?.('Generating PDF…')
+  try {
+    const exactHeight = Math.ceil(paperRef.current.getBoundingClientRect().height)
+    await downloadPDF(paperRef.current, filename, brandCSSVars, exactHeight)
+    showToast?.('PDF downloaded ✓')
+  } catch (err) {
+    console.error(err)
+    showToast?.('PDF failed — please try again.')
+  } finally {
+    setPdfLoading(false)
   }
+}
 
-  const handleShare = async () => {
-    if (!paperRef.current || shareLoading) return
-    setShareLoading(true)
-    showToast?.('Preparing…')
-    try {
-      const message = buildInvoiceWhatsAppMessage(invoice, customer, effectiveBrand)
-      await sharePDF(paperRef.current, filename, message, brandCSSVars)
-      showToast?.('Shared ✓')
-    } catch (err) {
-      // User cancelled the share sheet — not a real error
-      if (err?.name !== 'AbortError') {
-        console.error(err)
-        showToast?.('Share failed — please try again.')
-      }
-    } finally {
-      setShareLoading(false)
+const handleShare = async () => {
+  if (!paperRef.current || shareLoading) return
+  setShareLoading(true)
+  showToast?.('Preparing…')
+  try {
+    const exactHeight = Math.ceil(paperRef.current.getBoundingClientRect().height)
+    const message = buildInvoiceWhatsAppMessage(invoice, customer, effectiveBrand)
+    await sharePDF(paperRef.current, filename, message, brandCSSVars, exactHeight)
+    showToast?.('Shared ✓')
+  } catch (err) {
+    if (err?.name !== 'AbortError') {
+      console.error(err)
+      showToast?.('Share failed — please try again.')
     }
+  } finally {
+    setShareLoading(false)
   }
+}
 
   return (
     <div className={styles.overlay}>

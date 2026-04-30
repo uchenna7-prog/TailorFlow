@@ -151,9 +151,9 @@ export function buildInvoiceWhatsAppMessage(invoice, customer, brand) {
 
 // ── PDF core ──────────────────────────────────────────────────
 
-async function renderElementToBlob(element, cssVars) {
+async function renderElementToBlob(element, cssVars,exactHeight) {
   const PDF_WIDTH = 380
-  const INITIAL_HEIGHT = 1200
+  const INITIAL_HEIGHT = Math.max(800,element.scrollHeight + 100)
 
   // ── 1. Collect all stylesheets ───────────────────────────────
   const styleTexts = await Promise.all(
@@ -252,7 +252,7 @@ async function renderElementToBlob(element, cssVars) {
     if (bottom > trueHeight) trueHeight = bottom
   })
 
-  const height = Math.ceil(trueHeight) + 8
+  const height = exactHeight || (Math.ceil(trueHeight) + 8)
 
   iframe.style.height                  = `${height}px`
   iDoc.documentElement.style.minHeight = `${height}px`
@@ -286,12 +286,12 @@ async function renderElementToBlob(element, cssVars) {
   return pdf.output('blob')
 }
 
-export async function generatePDFBlob(element, cssVars) {
+export async function generatePDFBlob(element, cssVars,exactHeight) {
   return renderElementToBlob(element, cssVars)
 }
 
-export async function downloadPDF(element, filename, cssVars) {
-  const blob = await renderElementToBlob(element, cssVars)
+export async function downloadPDF(element, filename, cssVars,exactHeight) {
+  const blob = await renderElementToBlob(element, cssVars,exactHeight)
   const url  = URL.createObjectURL(blob)
   const a    = document.createElement('a')
   a.href     = url
@@ -300,8 +300,8 @@ export async function downloadPDF(element, filename, cssVars) {
   setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }
 
-export async function sharePDF(element, filename, message, cssVars) {
-  const blob = await renderElementToBlob(element, cssVars)
+export async function sharePDF(element, filename, message, cssVars,exactHeight) {
+  const blob = await renderElementToBlob(element, cssVars,exactHeight)
   const file = new File([blob], filename, { type: 'application/pdf' })
 
   const canShareFile = typeof navigator.share === 'function'
