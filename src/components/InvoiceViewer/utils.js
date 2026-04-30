@@ -196,9 +196,9 @@ async function renderElementToBlob(element, cssVars, exactHeight) {
     <html style="width:${PDF_WIDTH}px; min-height:${INITIAL_HEIGHT}px;">
       <head>
         <meta charset="utf-8"/>
-        <link rel="preconnect" href="https://fonts.googleapis.com"/>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
+       <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
         <style>
           * { box-sizing: border-box; margin: 0; padding: 0; }
           html, body {
@@ -206,7 +206,7 @@ async function renderElementToBlob(element, cssVars, exactHeight) {
             min-height: ${INITIAL_HEIGHT}px;
             background: #fff;
             overflow: visible;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: "Manrope", sans-serif;
           }
           ${styleTexts.join('\n')}
         </style>
