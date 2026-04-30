@@ -44,7 +44,7 @@ export function ReceiptTemplate11({ receipt, customer, brand }) {
 
       </div>
 
-      <div className={styles.receiptTitle}>receipt</div>
+      <div className={styles.receiptTitle}>Receipt</div>
 
       <div className={styles.bar} style={{ background : "var(--brand-muted)", color : accentColor }}>
         <span>RECEIPT # {receipt.number}</span>

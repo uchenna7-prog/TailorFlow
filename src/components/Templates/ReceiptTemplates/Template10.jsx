@@ -38,7 +38,7 @@ export function ReceiptTemplate10({ receipt, customer, brand }) {
       </div>
       <div className={styles.metaRow}>
         <div>
-          <div className={styles.metaLabel}>receipt To :</div>
+          <div className={styles.metaLabel}>Receipt To :</div>
           <div className={styles.metaName}>{customer.name}</div>
           {customer.phone   && <div className={styles.metaAddress}>{customer.phone}</div>}
           {customer.address && <div className={styles.metaAddress}>{customer.address}</div>}

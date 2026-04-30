@@ -19,7 +19,7 @@ export function ReceiptTemplate3({ receipt, customer, brand }) {
 
         <div className={styles.customBannerRight}>
 
-          <div className={styles.customBannerTitle}>receipt</div>
+          <div className={styles.customBannerTitle}>RECEIPT</div>
           <div className={styles.customBannerReceiptNumber}>{receipt.number}</div>
 
         </div>
@@ -32,7 +32,7 @@ export function ReceiptTemplate3({ receipt, customer, brand }) {
 
           <div className={styles.metaItem}>
 
-            <div className={styles.metaLabel}>RECEIVED BY :</div>
+            <div className={styles.metaLabel}>RECEIVED BY</div>
             <div className={styles.metaVal}>{brand.name}</div>
             {brand.phone   && <div className={styles.metaSub}>{brand.phone}</div>}
             {brand.address && <div className={styles.metaSub}>{brand.address}</div>}
@@ -41,7 +41,7 @@ export function ReceiptTemplate3({ receipt, customer, brand }) {
 
           <div className={styles.metaItem}>
 
-            <div className={styles.metaLabel}>RECEIVED FROM :</div>
+            <div className={styles.metaLabel}>RECEIVED FROM</div>
             <div className={styles.metaVal}>{customer.name}</div>
             {customer.phone && <div className={styles.metaSub}>{customer.phone}</div>}
             {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
@@ -50,14 +50,14 @@ export function ReceiptTemplate3({ receipt, customer, brand }) {
 
           <div className={styles.metaItem}>
 
-            <div className={styles.metaLabel}>ISSUE DATE :</div>
+            <div className={styles.metaLabel}>ISSUE DATE</div>
             <div className={styles.metaSub}>{receipt.date}</div>
 
           </div>
 
           <div className={styles.metaItem} style={{ textAlign : 'right' }}>
 
-            <div className={styles.metaLabel}>DUE DATE :</div>
+            <div className={styles.metaLabel}>DUE DATE</div>
       
 
           </div>

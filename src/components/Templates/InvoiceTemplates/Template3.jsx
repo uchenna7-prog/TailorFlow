@@ -33,7 +33,7 @@ export function InvoiceTemplate3({ invoice, customer, brand }) {
 
           <div className={styles.metaItem}>
 
-            <div className={styles.metaLabel}>BILL FROM :</div>
+            <div className={styles.metaLabel}>BILL FROM</div>
             <div className={styles.metaVal}>{brand.name}</div>
             {brand.phone   && <div className={styles.metaSub}>{brand.phone}</div>}
             {brand.address && <div className={styles.metaSub}>{brand.address}</div>}
@@ -42,7 +42,7 @@ export function InvoiceTemplate3({ invoice, customer, brand }) {
 
           <div className={styles.metaItem}>
 
-            <div className={styles.metaLabel}>BILL TO :</div>
+            <div className={styles.metaLabel}>BILL TO</div>
             <div className={styles.metaVal}>{customer.name}</div>
             {customer.phone && <div className={styles.metaSub}>{customer.phone}</div>}
             {customer.address && <div className={styles.metaSub}>{customer.address}</div>}
@@ -51,14 +51,14 @@ export function InvoiceTemplate3({ invoice, customer, brand }) {
 
           <div className={styles.metaItem}>
 
-            <div className={styles.metaLabel}>ISSUE DATE :</div>
+            <div className={styles.metaLabel}>ISSUE DATE</div>
             <div className={styles.metaSub}>{invoice.date}</div>
 
           </div>
 
           <div className={styles.metaItem} style={{ textAlign : 'right' }}>
 
-            <div className={styles.metaLabel}>DUE DATE :</div>
+            <div className={styles.metaLabel}>DUE DATE</div>
             <div className={styles.metaSub}>{dueDate}</div>
 
           </div>
