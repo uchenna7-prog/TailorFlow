@@ -7,31 +7,27 @@
    display: flex; 
    flex-direction: column; 
 }
-
 .header { 
    background: var(--brand-gradient); 
    color: var(--brand-on-primary); 
-   padding: 10px 16px; display: flex; 
+   padding: 10px 16px;
    display: flex;
    justify-content: space-between;
    align-items: center; 
    gap: 14px; 
    opacity: 0.88; 
 }
-
-.header > div:first-child{
+.header > div:first-child {
    display: flex;
    text-align: left;
    min-width: 0;
-   flex:1;
+   flex: 1;
 }
-
 .logoArea { 
    display: flex; 
    align-items: center; 
    gap: 7px; 
 }
-
 .logoCircle { 
    width: 45px; 
    height: 45px; 
@@ -42,79 +38,65 @@
    align-items: center; 
    justify-content: center; 
 }
-
 .companyName { 
    font-size: 9px; 
    font-weight: 900; 
    letter-spacing: 0.05em; 
 }
-
 .companySub { 
    font-size: 6px; 
    opacity: 0.75; 
    letter-spacing: 0.07em; 
 }
-
 .headerRight { 
    font-size: 6px; 
    line-height: 1.6; 
    opacity: 0.88; 
 }
-
-.invoiceRow,.receiptRow { 
+.invoiceRow, .receiptRow { 
    display: flex; 
    justify-content: space-between; 
    align-items: center; 
    padding: 8px 16px; 
    border-bottom: 1px solid #eee; 
 }
-
-.invoiceLeft,.receiptLeft { 
+.invoiceLeft, .receiptLeft { 
    display: flex; 
    align-items: baseline; 
    gap: 4px; 
 }
-
-.invoiceWord,.receiptWord { 
+.invoiceWord, .receiptWord { 
    font-size: 10px; 
    font-weight: 400; 
    color: #555; 
 }
-.invoiceNum,.receiptNum { 
+.invoiceNum, .receiptNum { 
    font-size: 18px; 
    font-weight: 900; 
    color: var(--brand-primary); 
 }
-
-.invoiceRight,.receiptRight { 
+.invoiceRight, .receiptRight { 
    text-align: right; 
    font-size: 7px; 
    line-height: 1.7; 
 }
-
 .label { 
    font-weight: 700; 
    color: var(--brand-primary); 
 }
-
 .infoRow {
-   justify-content: space-around;
-   gap: 30px;
    display: flex; 
    justify-content: space-between;
+   gap: 30px;
    padding: 7px 16px 9px; 
    border-bottom: 1px solid #eee; 
 }
-
 .infoRow > div { 
    min-width: 0;
    flex: 1; 
    font-size: 6.5px; 
    line-height: 1.6; 
 }
-
-
-
 .infoLabel { 
    font-weight: 700; 
    font-size: 7px; 
@@ -131,39 +113,68 @@
    margin-top: auto; 
 }
 
-.tableHead { 
-   display: flex; 
-   background: var(--brand-gradient); 
-   color: var(--brand-on-primary); 
-   padding: 5px 16px; 
-   font-size: 7px; 
-   font-weight: 700; 
-   gap: 6px; 
-   opacity: 0.88; 
-}
-.tableHead span, .tableRow span { 
-   flex: 1; 
-   text-align: center; 
-   font-size: 9px;
+/* ── Table ── */
+.tableWrapper {
+  padding: 0 16px;
 }
 
-.tableHead span:first-child, .tableRow span:first-child { 
-   flex: 3; 
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.colDesc  { width: 46%; }
+.colPrice { width: 18%; }
+.colQty   { width: 12%; }
+.colTotal { width: 24%; }
+
+.tableHead {
+  background: var(--brand-gradient);
+  color: var(--brand-on-primary);
+  opacity: 0.88;
+}
+
+.tableHead th {
+  padding: 5px 4px;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.tableRow {
+  border-bottom: 1px dashed #ebebeb;
+}
+
+.tableRow td {
+  padding: 6px 4px;
+  font-size: 9px;
+}
+
+/* Column alignment */
+th.colDesc,  td.colDesc  { 
    text-align: left; 
+   word-break: break-word; 
 }
 
-.tableRow { 
-   display: flex; 
-   padding: 6px 0;
-   border-bottom: 1px dashed #ebebeb;
-   font-size: 8px; 
-   gap: 6px; 
+th.colQty, td.colQty {
+  text-align: center;
+  padding-left: 6px;   
+  padding-right: 6px;  
 }
 
-.tableBody{
-   padding: 5px 16px; 
+th.colPrice, td.colPrice {
+  text-align: center;
+  padding-right: 8px;  
+}
+th.colTotal, td.colTotal { 
+   text-align: center; 
 }
 
+.tableBody {
+  padding: 5px 0;
+}
+
+/* ── Rest unchanged ── */
 .totalsArea { 
    margin-left: auto; 
    width: 48%; 

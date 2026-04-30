@@ -9,38 +9,33 @@
   flex-direction: column;
   gap: 7px;
 }
-.top{ 
+.top { 
   display: flex; 
   justify-content: space-between; 
   align-items: flex-start; 
 }
-
-.title{ 
+.title { 
   font-size: 30px; 
   font-weight: 900; 
   letter-spacing: -1px; 
   line-height: 1; 
   color: var(--brand-on-primary); 
 }
-
-.topRight{ 
+.topRight { 
   text-align: right; 
   font-size: 7px; 
   line-height: 1.6; 
   opacity: 0.9; 
 }
-
-.divider    { 
+.divider { 
   height: 1px; 
   background: rgba(255,255,255,0.35); 
   margin: 2px 0; 
 }
-
 .billedTo { 
   font-size: 7px; 
   line-height: 1.5; 
 }
-
 .billedLabel { 
   font-weight: 700; 
   font-size: 6.5px; 
@@ -50,51 +45,75 @@
   letter-spacing: 0.05em; 
 }
 
-.tableHead { 
-  display: flex; 
-  font-weight: 700; 
-  font-size: 6.5px; 
-  padding: 3px 0; 
-  border-bottom: 1px solid rgba(255,255,255,0.4); 
+/* ── Table ── */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.tableHead span, .tableRow span { 
-  flex: 1; 
-  text-align: center; 
+.colDesc  { width: 46%; }
+.colPrice { width: 18%; }
+.colQty   { width: 12%; }
+.colTotal { width: 24%; }
+
+.tableHead {
+  border-bottom: 1px solid rgba(255,255,255,0.4);
+}
+
+.tableHead th {
+  padding: 3px 4px;
+  font-size: 6.5px;
+  font-weight: 700;
+}
+
+.tableRow {
+  border-bottom: 1px solid rgba(255, 234, 234, 0.5);
+}
+
+.tableRow td {
+  padding: 6px 4px;
   font-size: 9px;
 }
 
-.tableHead span:first-child, .tableRow span:first-child { 
-  flex: 3; 
-  text-align: left; 
+/* Column alignment */
+th.colDesc,  td.colDesc  { 
+   text-align: left; 
+   word-break: break-word; 
 }
 
-.tableRow { 
-  display: flex; 
-  font-size: 7px; 
-  padding: 6px 0;
-  border-bottom: 1px dashed #ebebeb;
+th.colQty, td.colQty {
+  text-align: center;
+  padding-left: 6px;   
+  padding-right: 6px;  
 }
 
+th.colPrice, td.colPrice {
+  text-align: center;
+  padding-right: 8px;  
+}
+th.colTotal, td.colTotal { 
+   text-align: center; 
+}
+
+/* ── Rest unchanged ── */
 .totalsSection { 
   font-size: 7px; 
   padding: 4px 0; 
 }
-
 .totalRow { 
   display: flex; 
   justify-content: space-between; 
   padding: 2px 0; 
 }
-
 .totalBold { 
   font-weight: 900; 
   font-size: 8.5px; 
   border-top: 1px solid rgba(255,255,255,0.5); 
-  padding-top: 3px; margin-top: 2px; 
+  padding-top: 3px;
+  margin-top: 2px; 
 }
-
-.footer{ 
+.footer { 
   display: flex; 
   justify-content: space-between; 
   font-size: 6.5px; 
@@ -103,13 +122,11 @@
   padding-top: 8px; 
   border-top: 1px solid rgba(255,255,255,0.35); 
 }
-
-.footerItem{
+.footerItem {
   min-width: 0;
-  flex:1;
+  flex: 1;
 }
-
-.footerLabel{ 
+.footerLabel { 
   font-weight: 700; 
   margin-bottom: 2px; 
 }

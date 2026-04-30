@@ -41,7 +41,7 @@
    line-height: 1.5; 
    margin-top: 2px; 
 }
-.invoiceTitle,.receiptTitle { 
+.invoiceTitle, .receiptTitle { 
    font-size: 28px; 
    font-weight: 300; 
    color: var(--brand-primary); 
@@ -74,33 +74,67 @@
    color: var(--brand-primary); 
 }
 
-.tableHeader { 
-   display: flex; 
-   background: var(--brand-gradient); 
-   color: var(--brand-on-primary); 
-   padding: 4px 16px; 
-   font-size: 7px; 
-   font-weight: 700; 
-   gap: 4px; 
-}
-.tableHeader span, .tableRow span { 
-   font-size: 9px;
-   flex: 1; 
-
+/* ── Table ── */
+.tableWrapper {
+  padding: 0 16px;
 }
 
-.tableRow { 
-   display: flex; 
-   padding: 6px 0;
-   border-bottom: 1px dashed #ebebeb;
-   font-size: 8px; 
-   gap: 4px; 
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.tableBody{
-   padding: 5px 16px; 
+.colDesc  { width: 46%; }
+.colQty   { width: 12%; }
+.colPrice { width: 21%; }
+.colTotal { width: 21%; }
+
+.tableHeader {
+  background: var(--brand-gradient);
+  color: var(--brand-on-primary);
 }
 
+.tableHeader th {
+  padding: 4px 4px;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.tableRow {
+  border-bottom: 1px dashed #ebebeb;
+}
+
+.tableRow td {
+  padding: 6px 4px;
+  font-size: 9px;
+}
+
+/* Column alignment */
+th.colDesc,  td.colDesc  { 
+   text-align: left; 
+   word-break: break-word; 
+}
+
+th.colQty, td.colQty {
+  text-align: center;
+  padding-left: 6px;   
+  padding-right: 6px;  
+}
+
+th.colPrice, td.colPrice {
+  text-align: center;
+  padding-right: 8px;  
+}
+th.colTotal, td.colTotal { 
+   text-align: center; 
+}
+
+.tableBody {
+  padding: 5px 0;
+}
+
+/* ── Rest unchanged ── */
 .subArea { 
    display: flex; 
    flex-direction: column; 
@@ -114,7 +148,6 @@
    justify-content: flex-end; 
    padding: 2px 0; 
 }
-
 .totalBar { 
    display: flex; 
    justify-content: space-between; 
@@ -156,7 +189,6 @@
    font-size: 7px; 
    color: #666; 
 }
-
 .cornerDecoration {
   width: 50px;
   height: 50px;

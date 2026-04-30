@@ -153,7 +153,7 @@ export function buildInvoiceWhatsAppMessage(invoice, customer, brand) {
 
 async function renderElementToBlob(element, cssVars) {
   const PDF_WIDTH = 380
-  const INITIAL_HEIGHT = 5000
+  const INITIAL_HEIGHT = 1200
 
   // ── 1. Collect all stylesheets ───────────────────────────────
   const styleTexts = await Promise.all(

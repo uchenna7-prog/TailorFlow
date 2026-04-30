@@ -28,32 +28,33 @@ export function ItemsTable({ invoice, brand }) {
         <div className={styles.orderDescAmount}>{fmt(currency, subtotal)}</div>
       </div>
 
-      {/* Column headers */}
-      <div className={styles.headerRow}>
-        <span className={styles.colItem}>Item</span>
-        <span className={styles.colPrice}>Unit Price</span>
-        <span className={styles.colQty}>Qty</span>
-        <span className={styles.colAmount}>Amount</span>
-      </div>
-
-      {/* Line items */}
-      {invoice.items?.length > 0 && (
-        <div className={styles.itemsBody}>
-          {invoice.items.map((item, idx) => {
-            const qty        = item.qty ?? 1
-            const unitPrice  = parseFloat(item.price) || 0
-            const lineAmount = qty * unitPrice
-            return (
-              <div key={idx} className={styles.itemRow}>
-                <span className={styles.itemName}>{item.name}</span>
-                <span className={styles.itemUnitPrice}>{fmt(currency, unitPrice)}</span>
-                <span className={styles.itemQty}>{qty}</span>
-                <span className={styles.itemLineAmount}>{fmt(currency, lineAmount)}</span>
-              </div>
-            )
-          })}
-        </div>
-      )}
+      <table className={styles.tableEl}>
+        <thead>
+          <tr className={styles.headerRow}>
+            <th className={styles.colItem}>Item</th>
+            <th className={styles.colPrice}>Unit Price</th>
+            <th className={styles.colQty}>Qty</th>
+            <th className={styles.colAmount}>Amount</th>
+          </tr>
+        </thead>
+        {invoice.items?.length > 0 && (
+          <tbody className={styles.itemsBody}>
+            {invoice.items.map((item, idx) => {
+              const qty        = item.qty ?? 1
+              const unitPrice  = parseFloat(item.price) || 0
+              const lineAmount = qty * unitPrice
+              return (
+                <tr key={idx} className={styles.itemRow}>
+                  <td className={`${styles.colItem} ${styles.itemName}`}>{item.name}</td>
+                  <td className={`${styles.colPrice} ${styles.itemUnitPrice}`}>{fmt(currency, unitPrice)}</td>
+                  <td className={`${styles.colQty} ${styles.itemQty}`}>{qty}</td>
+                  <td className={`${styles.colAmount} ${styles.itemLineAmount}`}>{fmt(currency, lineAmount)}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        )}
+      </table>
 
       {/* Summary block */}
       <div className={styles.summaryBlock}>

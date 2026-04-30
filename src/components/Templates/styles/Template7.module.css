@@ -8,7 +8,6 @@
    flex-direction: column; 
    padding: 0; 
 }
-
 .header { 
    display: flex; 
    align-items: center; 
@@ -50,54 +49,45 @@
    color: #888; 
    text-transform: uppercase; 
 }
-
 .dateValue { 
    font-weight: 700; 
    font-size: 8px; 
    color: var(--brand-primary); 
 }
-
 .divider { 
    height: 2px; 
    background: var(--brand-primary-dark); 
    margin: 0 16px; 
 }
-
 .fromTo { 
    display: flex; 
    padding: 8px 16px; 
 }
-
 .fromToBlock { 
    flex: 1; 
    font-size: 7px; 
    line-height: 1.5; 
 }
-
 .fromLabel, .toLabel { 
    font-size: 13px; 
    font-weight: 900; 
    margin-bottom: 3px; 
    color: var(--brand-primary-dark); 
 }
-
 .fromDivider { 
    height: 1px; 
    background: var(--brand-primary); 
    margin-bottom: 3px; 
 }
-
 .infoRow { 
    display: flex; 
    gap: 3px; 
    margin-bottom: 1px; 
 }
-
 .infoValue { 
    font-weight: 700; 
    font-size: 7px; 
 }
-
 .forLabel { 
    font-size: 13px; 
    font-weight: 900; 
@@ -105,44 +95,73 @@
    color: var(--brand-primary-dark); 
 }
 
-.tableHeader { 
-   display: flex; 
-   align-items: center; 
-   background: var(--brand-gradient); 
-   color: var(--brand-on-primary); 
-   padding: 4px 16px; 
-   font-size: 7px; 
-   font-weight: 700; 
-   gap: 4px; 
+/* ── Table ── */
+.tableWrapper {
+  padding: 0 16px;
 }
 
-.tableRow { 
-   display: flex; 
-   align-items: center; 
-   padding: 6px 0;
-   border-bottom: 1px dashed #ebebeb;
-   font-size: 7.5px; 
-   gap: 6px; 
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.tableRow > span , .tableHeader > span{
-   font-size: 9px;
+.colSn    { width: 24px; }
+.colDesc  { width: auto; }
+.colQty   { width: 12%; }
+.colPrice { width: 22%; }
+.colTotal { width: 22%; }
+
+.tableHeader {
+  background: var(--brand-gradient);
+  color: var(--brand-on-primary);
 }
 
-.tableBody{
-   padding: 5px 16px; 
+.tableHeader th {
+  padding: 4px 4px;
+  font-size: 7px;
+  font-weight: 700;
 }
 
-.numColumn { 
-   width: 16px; 
-   flex-shrink: 0; 
+.tableRow {
+  border-bottom: 1px dashed #ebebeb;
 }
-.price { 
-   flex: 1; 
-   text-align: right; 
-   font-weight: 900; 
-   color: var(--brand-primary); 
+
+.tableRow td {
+  padding: 6px 4px;
+  font-size: 9px;
 }
+
+/* Column alignment */
+th.colSn,    td.colSn    { text-align: left; width: 24px; flex-shrink: 0; }
+th.colDesc,  td.colDesc  { 
+   text-align: left; 
+   word-break: break-word; 
+}
+
+th.colQty, td.colQty {
+  text-align: center;
+  padding-left: 6px;   
+  padding-right: 6px;  
+}
+
+th.colPrice, td.colPrice {
+  text-align: center;
+  padding-right: 8px;  
+}
+th.colTotal, td.colTotal { 
+   text-align: center; 
+}
+
+td.colTotal {
+  color: var(--brand-primary);
+}
+
+.tableBody {
+  padding: 5px 0;
+}
+
+/* ── Rest unchanged ── */
 .totalBar { 
    display: flex; 
    justify-content: space-between; 
@@ -158,23 +177,19 @@
    font-size: 13px; 
    font-weight: 900; 
 }
-
-.footer{ 
+.footer { 
   display: flex; 
   justify-content: space-between; 
   align-items: center;
   font-size: 6.5px; 
   line-height: 1.5; 
   padding-top: 8px; 
-
 }
-
-.footerLabel{ 
+.footerLabel { 
   font-weight: 700; 
   margin-bottom: 5px; 
-  color:var(--brand-primary-dark)
+  color: var(--brand-primary-dark); 
 }
-
 .footerLeft { 
    display: flex; 
    flex-wrap: wrap; 
@@ -184,8 +199,6 @@
    font-size: 7px; 
    margin-top: 8px; 
 }
-
-
-.footerRight{
+.footerRight {
    padding: 8px 16px; 
 }

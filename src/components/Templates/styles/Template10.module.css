@@ -8,189 +8,222 @@
   flex-direction: column;
   padding: 0;
   position: relative;
-  overflow: hidden;        /* keep for the live preview rounded corners */
+  overflow: hidden;
 }
-.headerZone { 
-   position: relative; 
-   width: 100%; 
-   height: 72px; 
-   flex-shrink: 0; 
-   overflow: hidden; 
+.headerZone {
+  position: relative;
+  width: 100%;
+  height: 72px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
-.fullBanner { 
-   position: absolute; 
-   inset: 0; 
-   background: var(--brand-gradient); 
-   clip-path: polygon(0 0, 100% 0, 100% 28px, 0 100%); 
-   display: flex; 
-   align-items: flex-start; 
-   padding: 10px 18px 0; 
+.fullBanner {
+  position: absolute;
+  inset: 0;
+  background: var(--brand-gradient);
+  clip-path: polygon(0 0, 100% 0, 100% 28px, 0 100%);
+  display: flex;
+  align-items: flex-start;
+  padding: 10px 18px 0;
 }
-.bannerTitle { 
-   color: var(--brand-on-primary); 
-   font-size: 22px; 
-   font-weight: 900; 
-   letter-spacing: 0.05em; 
-   padding-top: 2px; 
+.bannerTitle {
+  color: var(--brand-on-primary);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  padding-top: 2px;
 }
-.brandInBanner { 
-   position: absolute; 
-   top: 7px; right: 14px; 
-   display: flex; 
-   align-items: center; 
-   gap: 6px; 
-   z-index: 1; 
+.brandInBanner {
+  position: absolute;
+  top: 7px; right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 1;
 }
-.brandName { 
-   font-size: 10px; 
-   font-weight: 700; 
-   color: #1a1a1a; 
+.brandName {
+  font-size: 10px;
+  font-weight: 700;
+  color: #1a1a1a;
 }
-.brandSub { 
-   color: var(--brand-on-primary);
-   font-size: 6px; 
-   letter-spacing: 0.06em; 
+.brandSub {
+  color: var(--brand-on-primary);
+  font-size: 6px;
+  letter-spacing: 0.06em;
 }
-.metaRow { 
-   display: flex; 
-   justify-content: space-between; 
-   padding: 9px 16px 5px; 
-   font-size: 7px; 
-   line-height: 1.5; 
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 16px 5px;
+  font-size: 7px;
+  line-height: 1.5;
 }
-.metaLabel { 
-   font-weight: 700; 
-   font-size: 8px; 
-   margin-bottom: 1px; 
-   color: var(--brand-primary); 
+.metaLabel {
+  font-weight: 700;
+  font-size: 8px;
+  margin-bottom: 1px;
+  color: var(--brand-primary);
 }
-.metaName { 
-   font-weight: 700; 
-   font-size: 9px; 
+.metaName {
+  font-weight: 700;
+  font-size: 9px;
 }
-.metaAddress { 
-   color: #555; 
+.metaAddress {
+  color: #555;
 }
-.metaKey { 
-   color: var(--brand-primary); 
-   font-weight: 600; 
-}
-.tableHeader { 
-   display: flex; 
-   border: 1.5px solid var(--brand-primary); 
-   padding: 4px 16px; 
-   font-size: 7px; 
-   font-weight: 700; 
-   gap: 4px; 
-   margin: 0 16px; 
-   color: var(--brand-primary-dark); 
-}
-.tableHeader span, .tableRow span { 
-   flex: 1; 
-   font-size: 9px;
+.metaKey {
+  color: var(--brand-primary);
+  font-weight: 600;
 }
 
-.tableRow { 
-   display: flex; 
-   padding: 6px 0; 
-   border-bottom: 1px solid #f0f0f0; 
-   margin: 0 16px; 
-   font-size: 8px; 
-   gap: 4px; 
-   font-size: 9px;
+/* ── Table ── */
+.tableWrapper {
+  margin: 0 16px;
 }
 
-.tableBody{
-   padding: 5px 16px; 
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.divider { 
-   height: 1px; 
-   background: var(--brand-muted); 
-   margin: 5px 16px; 
+/* Column widths */
+.colSn    { width: 8%; }
+.colDesc  { width: 42%; }
+.colPrice { width: 18%; }
+.colQty   { width: 10%; }
+.colTotal { width: 22%; }
+
+.tableHeader {
+  border: 1.5px solid var(--brand-primary);
 }
-.bottom { 
-   display: flex; 
-   gap: 10px; 
-   padding: 4px 16px 54px; 
-   font-size: 7px; 
-   line-height: 1.6; 
-   flex: 1; 
+
+.tableHeader th {
+  padding: 4px 4px;
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--brand-primary-dark);
 }
-.thankYou { 
-   font-weight: 700; 
-   font-size: 8px; 
-   margin-bottom: 3px; 
-   color: var(--brand-primary-dark); 
+
+.tableRow {
+   border-bottom: 1px dashed #ebebeb;
 }
-.paymentLabel { 
-   font-weight: 700; 
-   margin-top: 4px; 
-   margin-bottom: 1px; 
-   color: var(--brand-primary); 
+
+.tableRow td {
+  padding: 6px 4px;
+  font-size: 9px;
 }
-.paymentInfo { 
-   color: #444; 
-   line-height: 1.6; 
+
+/* Column alignment — header and body mirror each other */
+th.colSn,  td.colSn  { text-align: center; }
+th.colDesc,  td.colDesc  { 
+   text-align: left; 
+   word-break: break-word; 
 }
-.label { 
-   font-weight: 700; 
-   margin-top: 5px; 
-   margin-bottom: 1px; 
-   color: var(--brand-primary); 
+
+th.colQty, td.colQty {
+  text-align: center;
+  padding-left: 6px;   
+  padding-right: 6px;  
 }
-.text { 
-   color: #666; 
+
+th.colPrice, td.colPrice {
+  text-align: center;
+  padding-right: 8px;  
 }
-.rightColumn { 
-   display: flex; 
-   flex-direction: column; 
-   justify-content: space-between; 
-   min-width: 88px; 
-   flex-shrink: 0; 
-}
-.totals { 
-   font-size: 8px; 
-}
-.totalRow { 
-   display: flex; 
-   justify-content: space-between; 
-   gap: 8px; 
-   padding: 2px 0; 
-}
-.totalDivider { 
-   height: 1px; 
-   background: var(--brand-primary); 
-   margin: 3px 0; 
-}
-.total { 
-   display: flex; 
-   justify-content: space-between; 
-   font-weight: 900; 
-   font-size: 9px; 
-   gap: 8px; 
-   color: var(--brand-primary-dark); 
-}
-.signBlock { 
+th.colTotal, td.colTotal { 
    text-align: center; 
 }
-.signLine { 
-   height: 1px; 
-   background: var(--brand-primary); 
-   margin-bottom: 2px; 
-}
-.signLabel { 
-   font-size: 7px; 
-   color: #666; 
-}
-.cornerAccent { 
-   position: absolute; 
-   bottom: 0; 
-   right: 0; 
-   width: 65px; 
-   height: 55px; 
-   background: var(--brand-gradient); 
-   clip-path: polygon(100% 0, 100% 100%, 0 100%); 
+.tableBody { /* kept for any wrapper usage */
+  padding: 5px 0;
 }
 
-
+/* ── Rest unchanged ── */
+.divider {
+  height: 1px;
+  background: var(--brand-muted);
+  margin: 5px 16px;
+}
+.bottom {
+  display: flex;
+  gap: 10px;
+  padding: 4px 16px 54px;
+  font-size: 7px;
+  line-height: 1.6;
+  flex: 1;
+}
+.thankYou {
+  font-weight: 700;
+  font-size: 8px;
+  margin-bottom: 3px;
+  color: var(--brand-primary-dark);
+}
+.paymentLabel {
+  font-weight: 700;
+  margin-top: 4px;
+  margin-bottom: 1px;
+  color: var(--brand-primary);
+}
+.paymentInfo {
+  color: #444;
+  line-height: 1.6;
+}
+.label {
+  font-weight: 700;
+  margin-top: 5px;
+  margin-bottom: 1px;
+  color: var(--brand-primary);
+}
+.text {
+  color: #666;
+}
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 88px;
+  flex-shrink: 0;
+}
+.totals {
+  font-size: 8px;
+}
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+}
+.totalDivider {
+  height: 1px;
+  background: var(--brand-primary);
+  margin: 3px 0;
+}
+.total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 900;
+  font-size: 9px;
+  gap: 8px;
+  color: var(--brand-primary-dark);
+}
+.signBlock {
+  text-align: center;
+}
+.signLine {
+  height: 1px;
+  background: var(--brand-primary);
+  margin-bottom: 2px;
+}
+.signLabel {
+  font-size: 7px;
+  color: #666;
+}
+.cornerAccent {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 65px;
+  height: 55px;
+  background: var(--brand-gradient);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}

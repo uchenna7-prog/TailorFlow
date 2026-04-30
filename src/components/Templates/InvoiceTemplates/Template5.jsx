@@ -40,29 +40,32 @@ export function InvoiceTemplate5({ invoice, customer, brand }) {
 
       <div className={styles.divider} />
 
-      <div className={styles.tableHead}>
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles.tableHead}>
+            <th className={styles.colDesc}>Item Description</th>
+            <th className={styles.colPrice}>Unit Price</th>
+            <th className={styles.colQty}>Qty</th>
+            <th className={styles.colTotal}>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {invoice.items?.map((item, i) => {
+            const qty = item.qty ?? 1;
+            const unitPrice = parseFloat(item.price) || 0;
+            const lineAmount = qty * unitPrice;
 
-        <span style={{ flex: 3 }}>Item Description</span>
-        <span>Unit Price</span>
-        <span>Qty</span>
-        <span>Total</span>
-
-      </div>
-
-      {invoice.items?.map((item, i) => {
-        const qty = item.qty ?? 1;
-        const unitPrice = parseFloat(item.price) || 0;
-        const lineAmount = qty * unitPrice;
-
-        return (
-          <div key={i} className={styles.tableRow}>
-            <span style={{ flex: 3 }}>{item.name}</span>
-            <span>{fmt(currency, unitPrice)}</span>
-            <span>{qty}</span>
-            <span>{fmt(currency, lineAmount)}</span>
-          </div>
-        );
-      })}
+            return (
+              <tr key={i} className={styles.tableRow}>
+                <td className={styles.colDesc}>{item.name}</td>
+                <td className={styles.colPrice}>{fmt(currency, unitPrice)}</td>
+                <td className={styles.colQty}>{qty}</td>
+                <td className={styles.colTotal}>{fmt(currency, lineAmount)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
 
       <div className={styles.divider} />
 

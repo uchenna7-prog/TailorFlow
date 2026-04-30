@@ -56,31 +56,39 @@ export function InvoiceTemplate4({ invoice, customer, brand }) {
 
           </div>
 
-        <div className={styles.table}>
+        <div>
 
-          <div className={styles.tableHeader} style={{ borderColor: barColor }}>
+          <div className={styles.table}>
+            <table
+              className={styles.tableEl}
+              style={{ borderColor: barColor }}
+            >
+              <thead>
+                <tr className={styles.tableHeader} style={{ borderColor: barColor }}>
+                  <th className={styles.colDesc}>Item Description</th>
+                  <th className={styles.colPrice}>Unit Price</th>
+                  <th className={styles.colQty}>Qty</th>
+                  <th className={styles.colTotal}>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoice.items?.map((item, i) => {
+                  const qty = item.qty ?? 1;
+                  const unitPrice = parseFloat(item.price) || 0;
+                  const lineAmount = qty * unitPrice;
 
-            <span style={{ flex: 3 }}>Item Description</span>
-            <span>Unit Price</span>
-            <span>Qty</span>
-            <span>Total</span>
-
+                  return (
+                    <tr key={i} className={styles.tableRow}>
+                      <td className={styles.colDesc}>{item.name}</td>
+                      <td className={styles.colPrice}>{fmt(currency, unitPrice)}</td>
+                      <td className={styles.colQty}>{qty}</td>
+                      <td className={styles.colTotal}>{fmt(currency, lineAmount)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-
-          {invoice.items?.map((item, i) => {
-            const qty = item.qty ?? 1;
-            const unitPrice = parseFloat(item.price) || 0;
-            const lineAmount = qty * unitPrice;
-
-            return (
-              <div key={i} className={styles.tableRow}>
-                <span style={{ flex: 3 }}>{item.name}</span>
-                <span>{fmt(currency, unitPrice)}</span>
-                <span>{qty}</span>
-                <span>{fmt(currency, lineAmount)}</span>
-              </div>
-            );
-          })}
 
           <div className={styles.totalsArea}>
 

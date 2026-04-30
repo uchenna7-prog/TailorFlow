@@ -77,37 +77,40 @@ export function ReceiptTemplate6({ receipt, customer, brand }) {
           {customer.address}
         </div>
       </div>
-      <div className={styles.tableHead}>
-        <span style={{ flex: 3 }}>ITEM DESCRIPTION</span>
-        <span>UNIT PRICE</span>
-        <span>QTY</span>
-        <span>TOTAL</span>
-      </div>
+         <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr className={styles.tableHead}>
+                      <th className={styles.colDesc}>ITEM DESCRIPTION</th>
+                      <th className={styles.colPrice}>UNIT PRICE</th>
+                      <th className={styles.colQty}>QTY</th>
+                      <th className={styles.colTotal}>TOTAL</th>
+                    </tr>
+                  </thead>
+                  <tbody className={styles.tableBody}>
+                    {receipt.items?.map((item, i) => {
+                      const qty = item.qty ?? 1;
+                      const unitPrice = parseFloat(item.price) || 0;
+                      const lineAmount = qty * unitPrice;
+        
+                      return (
+                        <tr key={i} className={styles.tableRow}>
+                          <td className={styles.colDesc}>{item.name}</td>
+                          <td className={styles.colPrice}>{fmt(currency, unitPrice)}</td>
+                          <td className={styles.colQty}>{qty}</td>
+                          <td className={styles.colTotal}>{fmt(currency, lineAmount)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
 
-      <div className={styles.tableBody}>
-
-        {receipt.items?.map((item, i) => {
-        const qty = item.qty ?? 1;
-        const unitPrice = parseFloat(item.price) || 0;
-        const lineAmount = qty * unitPrice;
-
-        return (
-          <div key={i} className={styles.tableRow}>
-            <span style={{ flex: 3 }}>{item.name}</span>
-            <span>{fmt(currency, unitPrice)}</span>
-            <span>{qty}</span>
-            <span>{fmt(currency, lineAmount)}</span>
-          </div>
-        );
-      })}
+                <ReceiptPaymentSummary receipt={receipt} brand={brand} />
+                
+              </div>
       
-       <ReceiptPaymentSummary receipt={receipt} brand={brand} />
+       
       
-      </div>
-
-      
-     
-
       <div className={styles.thankYou}>{brand.footer || 'THANK YOU FOR YOUR BUSINESS'}</div>
     </div>
   )

@@ -51,32 +51,36 @@ export function InvoiceTemplate9({ invoice, customer, brand }) {
           {brand.address  && <div>{brand.address}</div>}
         </div>
       </div>
-      <div className={styles.tableHeader}>
-       
-        <span style={{ flex: 3,textAlign:"left"}}>ITEM DESCRIPTION</span>
-        <span style={{flex: 1, textAlign:"center"}}>QTY</span>
-        <span style={{flex: 1, textAlign:"center"}}>UNIT PRICE</span>
-        <span style={{flex: 1, textAlign:"center"}}>TOTAL</span>
 
-      </div>
-      {invoice.items?.map((item, i) => {
-        const qty = item.qty ?? 1;
-        const unitPrice = parseFloat(item.price) || 0;
-        const lineAmount = qty * unitPrice;
+      <div className={styles.tableWrapper}>
+        
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles.tableHeader}>
+            <th className={styles.colDesc}>ITEM DESCRIPTION</th>
+            <th className={styles.colQty}>QTY</th>
+            <th className={styles.colPrice}>UNIT PRICE</th>
+            <th className={styles.colTotal}>TOTAL</th>
+          </tr>
+        </thead>
+        <tbody className={styles.tableBody}>
+          {invoice.items?.map((item, i) => {
+            const qty = item.qty ?? 1;
+            const unitPrice = parseFloat(item.price) || 0;
+            const lineAmount = qty * unitPrice;
 
-        return (
-          <div key={i} className={styles.tableRow}>
-            <span style={{ flex: 3, textAlign: "left" }}>{item.name}</span>
-            <span style={{ flex: 1, textAlign: "center" }}>{qty}</span>
-            <span style={{flex: 1, textAlign: "center" }}>
-              {fmt(currency, unitPrice)}
-            </span>
-            <span style={{flex: 1, textAlign: "right" }}>
-              {fmt(currency, lineAmount)}
-            </span>
-          </div>
-        );
-      })}
+            return (
+              <tr key={i} className={styles.tableRow}>
+                <td className={styles.colDesc}>{item.name}</td>
+                <td className={styles.colQty}>{qty}</td>
+                <td className={styles.colPrice}>{fmt(currency, unitPrice)}</td>
+                <td className={styles.colTotal}>{fmt(currency, lineAmount)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
       <div className={styles.subArea}>
         <div className={styles.subRow}>
           

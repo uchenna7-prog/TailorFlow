@@ -47,33 +47,40 @@ export function InvoiceTemplate10({ invoice, customer, brand }) {
           <div><span className={styles.metaKey}>Date</span> <strong>{invoice.date}</strong></div>
           <div><span className={styles.metaKey}>Due</span> <strong>{dueDate}</strong></div>
         </div>
-      </div>
-      <div className={styles.tableHeader}>
-        <span style={{flex: 1, textAlign:"left"}}>SN</span>
-        <span style={{ flex: 3,textAlign:"left"}}>Item Description</span>
-        <span style={{flex: 1, textAlign:"center"}}>Unit Price</span>
-        <span style={{flex: 1, textAlign:"center"}}>Qty</span>
-        <span style={{flex: 1, textAlign:"center"}}>Total</span>
-      </div>
-      {invoice.items?.map((item, i) => {
-        const qty = item.qty ?? 1;
-        const unitPrice = parseFloat(item.price) || 0;
-        const lineAmount = qty * unitPrice;
 
-        return (
-          <div key={i} className={styles.tableRow}>
-            <span style={{flex: 1, textAlign: "left" }}>{i + 1}</span>
-            <span style={{ flex: 3, textAlign: "left" }}>{item.name}</span>
-            <span style={{flex: 1, textAlign: "center" }}>
-              {fmt(currency, unitPrice)}
-            </span>
-            <span style={{flex: 1, textAlign: "center" }}>{qty}</span>
-            <span style={{flex: 1, textAlign: "center" }}>
-              {fmt(currency, lineAmount)}
-            </span>
-          </div>
-        );
-      })}
+      </div>
+
+     <div className={styles.tableWrapper}>
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles.tableHeader}>
+            <th className={styles.colSn}>SN</th>
+            <th className={styles.colDesc}>Item Description</th>
+            <th className={styles.colPrice}>Unit Price</th>
+            <th className={styles.colQty}>Qty</th>
+            <th className={styles.colTotal}>Total</th>
+          </tr>
+        </thead>
+        <tbody className={styles.tableBody}>
+          {invoice.items?.map((item, i) => {
+            const qty = item.qty ?? 1;
+            const unitPrice = parseFloat(item.price) || 0;
+            const lineAmount = qty * unitPrice;
+
+            return (
+              <tr key={i} className={styles.tableRow}>
+                <td className={styles.colSn}>{i + 1}</td>
+                <td className={styles.colDesc}>{item.name}</td>
+                <td className={styles.colPrice}>{fmt(currency, unitPrice)}</td>
+                <td className={styles.colQty}>{qty}</td>
+                <td className={styles.colTotal}>{fmt(currency, lineAmount)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+
       <div className={styles.divider} />
       <div className={styles.bottom}>
         <div style={{ flex: 1 }}>
