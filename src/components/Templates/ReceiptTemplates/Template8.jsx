@@ -95,7 +95,6 @@ export function ReceiptTemplate8({ receipt, customer, brand }) {
             {brand.name && (
               <div>Received By: {brand.name}</div>
             )}
-            {brand.footer && <div className={styles.thankYou}>{brand.footer}</div>}
           </div>
         )}
         <div className={styles.totals}>
@@ -105,7 +104,18 @@ export function ReceiptTemplate8({ receipt, customer, brand }) {
           <div className={styles.total}><span>Total: </span><span>{fmt(currency, total)}</span></div>
           <div className={styles.signLine}>Authorised Sign</div>
         </div>
+
+
       </div>
+
+      {brand.footer && (
+        <div className={styles.thankYouFooter}>
+          <div className={styles.thankYouLine} />
+          <div className={styles.thankYouText}>{brand.footer}</div>
+          <div className={styles.thankYouLine} />
+        </div>
+      )}
+      
     </div>
   )
 }

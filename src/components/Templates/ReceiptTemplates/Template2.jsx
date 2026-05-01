@@ -14,7 +14,7 @@ export function ReceiptTemplate2({ receipt, customer, brand }) {
 
         <div>
 
-          <div className={styles.title}>receipt</div>
+          <div className={styles.title}>RECEIPT</div>
           <div className={styles.receiptNumber}>{receipt.number}</div>
 
         </div>

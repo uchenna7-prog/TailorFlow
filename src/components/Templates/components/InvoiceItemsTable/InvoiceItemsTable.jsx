@@ -24,8 +24,9 @@ export function ItemsTable({ invoice, brand }) {
 
       {/* Order name + total — sits above the column headers */}
       <div className={styles.orderDescriptionRow}>
+        <div className={styles.orderText}>ORDER:</div>
         <div className={styles.orderDescLabel}>{invoice.orderDesc || 'Garment Order'}</div>
-        <div className={styles.orderDescAmount}>{fmt(currency, subtotal)}</div>
+
       </div>
 
       <table className={styles.tableEl}>

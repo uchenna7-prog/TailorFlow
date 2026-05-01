@@ -56,9 +56,19 @@ export function InvoiceTemplate4({ invoice, customer, brand }) {
 
           </div>
 
+
+
         <div>
 
+
           <div className={styles.table}>
+
+            <div className={styles.orderDescriptionRow}>
+              <div className={styles.orderText}>ORDER:</div>
+              <div className={styles.orderDescLabel}>{invoice.orderDesc || 'Garment Order'}</div>
+      
+            </div>
+            
             <table
               className={styles.tableEl}
               style={{ borderColor : barColor }}

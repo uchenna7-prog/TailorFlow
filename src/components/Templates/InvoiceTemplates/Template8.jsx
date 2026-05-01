@@ -93,10 +93,9 @@ export function InvoiceTemplate8({ invoice, customer, brand }) {
         {brand.accountBank && (
           <div className={styles.paymentInfo}>
             <div className={styles.paymentLabel}>Payment Infomation</div>
-            {brand.accountNumber && <div>Account Number: {brand.accountNumber}</div>}
+            {brand.accountNumber && <div>Account No: {brand.accountNumber}</div>}
             {brand.accountBank   && <div>Bank: {brand.accountBank}</div>}
             {brand.accountName   && <div>Account Name: {brand.accountName}</div>}
-            {brand.footer  && <div className={styles.thankYou}>{brand.footer}</div>}
           </div>
         )}
         <div className={styles.totals}>
@@ -107,6 +106,15 @@ export function InvoiceTemplate8({ invoice, customer, brand }) {
           <div className={styles.signLine}>Authorised Sign</div>
         </div>
       </div>
+
+      {brand.footer && (
+        <div className={styles.thankYouFooter}>
+          <div className={styles.thankYouLine} />
+          <div className={styles.thankYouText}>{brand.footer}</div>
+          <div className={styles.thankYouLine} />
+        </div>
+      )}
+
     </div>
   )
 }

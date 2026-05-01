@@ -1,13 +1,3 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   ReceiptPaymentSummary.module.css
-
-   Brand color usage — intentional, not decorative:
-     --brand-primary      → "Payment History" section label only
-     --brand-primary-dark → top border of history section, last row border,
-                            totals divider, paid-in-full badge + label
-   Everything else (method names, dates, subtotal labels, amounts) uses
-   plain neutral grays so the brand color stays meaningful where it appears.
-   ───────────────────────────────────────────────────────────────────────── */
 
 
 .container {
@@ -20,8 +10,6 @@
 /* ── Payment history section ────────────────────────────────────────────── */
 
 .historySection {
-  margin-top: 14px;
-  border-top: 1.5px solid var(--brand-primary-dark);
   padding-top: 10px;
 }
 

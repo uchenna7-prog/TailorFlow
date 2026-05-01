@@ -44,6 +44,23 @@
   font-weight: 900; 
 }
 
+.orderDescriptionRow {
+  display: flex;
+  gap:5px;
+  align-items: baseline;
+  padding:8px 0 ;
+  margin-bottom: 2px;
+}
+.orderText{
+  font-weight: 900;
+}
+
+.orderDescLabel {
+  font-size: 11px;
+  color: #0a0a0a;
+}
+
+
 /* ── Table ── */
 .table { 
   margin-top: 10px; 

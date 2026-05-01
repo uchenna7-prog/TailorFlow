@@ -56,6 +56,13 @@ export function ReceiptTemplate4({ receipt, customer, brand }) {
 
 
           <div className={styles.table}>
+
+            
+            <div className={styles.orderDescriptionRow}>
+              <div className={styles.orderText}>ORDER:</div>
+              <div className={styles.orderDescLabel}>{receipt.orderDesc || 'Garment Order'}</div>
+      
+            </div>
             <table
               className={styles.tableEl}
               style={{ borderColor : barColor }}

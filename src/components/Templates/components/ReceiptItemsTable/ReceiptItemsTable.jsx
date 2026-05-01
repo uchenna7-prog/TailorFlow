@@ -22,11 +22,11 @@ export function ItemsTable({ receipt, brand }) {
   return (
     <div className={styles.table} ref={tableRef}>
 
-      {/* Order name + total — sits above the column headers */}
-      <div className={styles.orderDescriptionRow}>
-        <div className={styles.orderDescLabel}>{receipt.orderDesc || 'Garment Order'}</div>
-        <div className={styles.orderDescAmount}>{fmt(currency, subtotal)}</div>
-      </div>
+    <div className={styles.orderDescriptionRow}>
+      <div className={styles.orderText}>ORDER:</div>
+      <div className={styles.orderDescLabel}>{receipt.orderDesc || 'Garment Order'}</div>
+
+    </div>
 
       <table className={styles.tableEl}>
         <thead>
@@ -56,28 +56,13 @@ export function ItemsTable({ receipt, brand }) {
         )}
       </table>
 
-      {/* Summary block */}
-      <div className={styles.summaryBlock}>
-
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryKey}>Subtotal</span>
-          <span className={styles.summaryVal}>{fmt(currency, subtotal)}</span>
-        </div>
-
-        {showTax && taxRate > 0 && (
-          <div className={styles.summaryRow}>
-            <span className={styles.summaryKey}>Tax ({taxRate}%)</span>
-            <span className={styles.summaryVal}>{fmt(currency, tax)}</span>
-          </div>
-        )}
-
-        <div className={styles.summaryDivider} />
-
-        <div className={styles.summaryTotalRow}>
-          <span className={styles.summaryTotalKey}>Total Due</span>
-          <span className={styles.summaryTotalVal}>{fmt(currency, total)}</span>
-        </div>
-
+      {/* Order Total — full width section divider */}
+      <div className={styles.orderTotalWrap}>
+      
+       
+        <div className={styles.orderTotalLabel}>Order Total</div>
+       
+        <div className={styles.orderTotalValue}>{fmt(currency, total)}</div>
       </div>
 
     </div>

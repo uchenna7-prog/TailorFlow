@@ -5,23 +5,20 @@
 
 .orderDescriptionRow {
   display: flex;
-  justify-content: space-between;
+  gap:5px;
   align-items: baseline;
   padding: 10px 0 12px;
   border-bottom: 1.5px solid var(--brand-primary-dark, #a07d20);
 }
+.orderText{
+  font-weight: 900;
+}
+
 .orderDescLabel {
   font-size: 11px;
-  font-weight: 900;
   color: #0a0a0a;
 }
-.orderDescAmount {
-  font-size: 11px;
-  font-weight: 700;
-  color: #0a0a0a;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-}
+
 
 /* ── Table ── */
 .tableEl {
@@ -30,7 +27,6 @@
   table-layout: fixed;
 }
 
-
 .colDesc  { width: 42%; }
 .colPrice { width: 18%; }
 .colQty   { width: 10%; }
@@ -38,11 +34,9 @@
 
 .headerRow th {
   padding: 7px 0 6px;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--brand-primary-dark) ;
+  color: var(--brand-primary-dark);
   border-bottom: 1px solid #e8e4de;
 }
 
@@ -58,7 +52,6 @@
   padding: 6px 0;
   border-bottom: 1px dashed #ebebeb;
 }
-
 
 th.colItem,  td.colItem  { 
    text-align: left; 
@@ -78,9 +71,6 @@ th.colPrice, td.colPrice  {
 th.colAmount, td.colAmount { 
    text-align: center; 
 }
-
-
-
 
 /* Body cell text styles */
 .itemName {
@@ -115,51 +105,23 @@ th.colAmount, td.colAmount {
   border-bottom: 1.5px solid var(--brand-primary-dark, #a07d20);
 }
 
-/* ── Summary block ── */
-.summaryBlock {
-  margin-left: auto;
-  width: 55%;
-  margin-top: 14px;
-  padding-top: 10px;
-}
-.summaryRow {
+/* ── Order Total bar ── */
+.orderTotalWrap {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  column-gap: 12px;
-  padding: 4px 0;
+  padding:7px 0px;
 }
-.summaryKey {
-  font-size: 9px;
-  color: #6b7280;
+
+.orderTotalLabel {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--brand-primary-dark);
 }
-.summaryVal {
-  font-size: 9px;
-  font-weight: 500;
-  color: #1a1a1a;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-}
-.summaryDivider {
-  height: 1.5px;
-  background: var(--brand-primary-dark, #a07d20);
-  margin: 8px 0;
-}
-.summaryTotalRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  column-gap: 12px;
-  padding: 4px 0;
-}
-.summaryTotalKey {
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--brand-primary-dark, #a07d20);
-  letter-spacing: 0.03em;
-}
-.summaryTotalVal {
-  font-size: 13px;
+.orderTotalValue {
+  font-size: 11px;
   font-weight: 900;
   color: #1a1a1a;
   font-variant-numeric: tabular-nums;

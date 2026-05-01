@@ -171,12 +171,6 @@ th.colTotal, td.colTotal {
    margin-bottom: 2px; 
    color: var(--brand-primary); 
 }
-.thankYou { 
-   margin-top: 7px; 
-   font-weight: 700; 
-   font-size: 10px; 
-   color: var(--brand-primary); 
-}
 .totals { 
    margin-left: auto;
   flex-shrink: 0;
@@ -208,4 +202,24 @@ th.colTotal, td.colTotal {
    padding-top: 2px; 
    margin-top: 10px; 
    text-align: center; 
+}
+
+/* ── Thank You Footer ── */
+.thankYouFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 12px;
+
+}
+.thankYouLine {
+  flex: 1;
+  height: 1px;
+  background: var(--brand-muted);
+}
+.thankYouText {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--brand-primary);
+  white-space: nowrap;
 }

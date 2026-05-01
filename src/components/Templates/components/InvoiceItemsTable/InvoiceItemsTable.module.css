@@ -5,23 +5,20 @@
 
 .orderDescriptionRow {
   display: flex;
-  justify-content: space-between;
+  gap:5px;
   align-items: baseline;
   padding: 10px 0 12px;
   border-bottom: 1.5px solid var(--brand-primary-dark, #a07d20);
 }
+.orderText{
+  font-weight: 900;
+}
+
 .orderDescLabel {
   font-size: 11px;
-  font-weight: 900;
   color: #0a0a0a;
 }
-.orderDescAmount {
-  font-size: 11px;
-  font-weight: 700;
-  color: #0a0a0a;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-}
+
 
 /* ── Table ── */
 .tableEl {
@@ -65,19 +62,16 @@ th.colItem,  td.colItem  {
 
 th.colQty,   td.colQty  {
   text-align: center;
-  padding-left: 6px;   
-  padding-right: 6px;  
+  
 }
 
 th.colPrice, td.colPrice  {
-  text-align: center;
-  padding-right: 8px;  
+  text-align: center; 
   word-break: break-word; 
-}
-
-th.colPrice{
   text-wrap: nowrap;
 }
+
+
 th.colAmount, td.colAmount { 
    text-align: center; 
 }
