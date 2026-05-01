@@ -127,6 +127,7 @@ export function ReceiptTemplate7({ receipt, customer, brand }) {
           <div className={styles.orderTotalLabel}>Order Total</div>
           
           <div className={styles.orderTotalValue}>{fmt(currency, total)}</div>
+
         </div>
 
          <ReceiptPaymentSummary receipt={receipt} brand={brand} />

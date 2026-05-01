@@ -250,17 +250,12 @@
 .paidLabel {
   font-size: 10px;
   font-weight: 800;
-  color: #1a7a4a;
+  color: #16a34a;
   letter-spacing: 0.01em;
   text-transform: uppercase;
 }
 
-.paidSubLabel {
-  font-size: 7px;
-  color: #3a9e68;
-  margin-top: 2px;
-  font-variant-numeric: tabular-nums;
-}
+
 
 .paidAmount {
   color: #16a34a;

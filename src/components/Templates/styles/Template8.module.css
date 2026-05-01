@@ -225,6 +225,8 @@ th.colTotal, td.colTotal {
   align-items: center;
   gap: 8px;
   padding: 8px 16px 12px;
+  text-transform: uppercase;
+  font-style:italic ;
 
 }
 .thankYouLine {

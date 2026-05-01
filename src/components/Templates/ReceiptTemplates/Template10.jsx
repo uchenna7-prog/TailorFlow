@@ -103,7 +103,7 @@ export function ReceiptTemplate10({ receipt, customer, brand }) {
               <div className={styles.paymentInfo}>
 
                 {brand.name && (
-                  <div>Received By : {brand.name}</div>
+                  <div>Received By: {brand.name}</div>
                 )}
 
               </div>
