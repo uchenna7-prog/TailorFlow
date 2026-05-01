@@ -77,7 +77,7 @@
   border-radius: 10px;
   transition: opacity 0.15s, transform 0.1s;
   color: var(--bg);
-  font-family: 'DM Sans', sans-serif;
+  font-family: "Manrope", sans-serif;
   text-transform: capitalize;
 }
 
@@ -341,7 +341,7 @@
   cursor: pointer;
   position: relative;
   transition: color 0.2s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: "Manrope", sans-serif;
 }
 
 .notifTabActive {
@@ -389,7 +389,7 @@
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: "Manrope", sans-serif;
   white-space: nowrap;
   transition: background 0.15s;
 }

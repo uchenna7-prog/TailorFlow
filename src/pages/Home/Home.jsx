@@ -1222,7 +1222,7 @@ function Home({ onMenuClick }) {
                         {/* RIGHT: price, qty, status pill, due date */}
                         <div className={styles.listRight}>
                           <div className={styles.listPrice}>{priceStr}</div>
-                          {order.qty > 1 && <div className={styles.listQty}>×{order.qty}</div>}
+                          {order.qty > 1 && <div className={styles.listQty}>{order.qty} items</div>}
                           <StatusPill status={order.status} />
                           {dueDateShort && (
                             <div className={styles.listDueRight}>{dueDateShort}</div>
