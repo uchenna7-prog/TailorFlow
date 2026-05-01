@@ -48,7 +48,9 @@
    letter-spacing: 0.05em; 
    color: var(--brand-primary-dark); 
 }
-
+.tagline{
+   font-size: 7.5px;
+}
 
 .invoiceTitle, .receiptTitle { 
    font-size: 22px; 

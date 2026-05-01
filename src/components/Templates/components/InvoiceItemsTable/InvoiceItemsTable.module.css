@@ -32,7 +32,7 @@
 
 
 .colDesc  { width: 42%; }
-.colPrice { width: 25%; }
+.colPrice { width: 23%; }
 .colQty   { width: 10%; }
 .colAmount { width: 25%; }
 
@@ -73,6 +73,10 @@ th.colPrice, td.colPrice  {
   text-align: center;
   padding-right: 8px;  
   word-break: break-word; 
+}
+
+th.colPrice{
+  text-wrap: nowrap;
 }
 th.colAmount, td.colAmount { 
    text-align: center; 

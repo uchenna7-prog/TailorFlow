@@ -29,7 +29,8 @@ export function ReceiptTemplate11({ receipt, customer, brand }) {
 
           <div>
             <div className={styles.companyName}>{(brand.name || brand.ownerName || '').toUpperCase()}</div>
-        
+            {brand.tagline && <div className={styles.tagline}>{brand.tagline}</div>}
+
           </div>
 
         </div>
@@ -48,7 +49,7 @@ export function ReceiptTemplate11({ receipt, customer, brand }) {
 
       <div className={styles.bar} style={{ background : "var(--brand-muted)", color : accentColor }}>
         <span>RECEIPT # {receipt.number}</span>
-        <span>DATE ISSUED : {receipt.date}</span>
+        <span>DATE ISSUED: {receipt.date}</span>
 
       </div>
 
@@ -110,7 +111,7 @@ export function ReceiptTemplate11({ receipt, customer, brand }) {
                 <div>
 
                   {brand.name && (
-                  <div>Received By  : {brand.name}</div>
+                  <div>Received By: {brand.name}</div>
                 )}
 
                 </div>

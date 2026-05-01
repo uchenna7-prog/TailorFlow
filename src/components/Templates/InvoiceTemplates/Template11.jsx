@@ -28,6 +28,7 @@ export function InvoiceTemplate11({ invoice, customer, brand }) {
 
           <div>
             <div className={styles.companyName}>{(brand.name || brand.ownerName || '').toUpperCase()}</div>
+            {brand.tagline && <div className={styles.tagline}>{brand.tagline}</div>}
       
           </div>
 
@@ -46,9 +47,9 @@ export function InvoiceTemplate11({ invoice, customer, brand }) {
       <div className={styles.invoiceTitle}>Invoice</div>
 
       <div className={styles.bar} style={{ background : "var(--brand-muted)", color : accentColor }}>
-        <span>INVOICE : #{invoice.number}</span>
-        <span>DATE ISSUED : {invoice.date}</span>
-        <span>DUE DATE : {dueDate}</span>
+        <span>INVOICE: #{invoice.number}</span>
+        <span>DATE ISSUED: {invoice.date}</span>
+        <span>DUE DATE: {dueDate}</span>
       </div>
 
       <div className={styles.issuedRow}>

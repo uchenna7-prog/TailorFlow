@@ -62,9 +62,9 @@
    background: var(--brand-gradient); 
    color: var(--brand-on-primary); 
    display: flex; 
-   gap: 8.5px; 
+   gap: 7px; 
    padding: 4px 16px; 
-   font-size: 10px; 
+   font-size: 9px; 
    font-weight: 600; 
 }
 .billShip { 

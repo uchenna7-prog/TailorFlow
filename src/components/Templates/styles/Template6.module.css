@@ -28,36 +28,37 @@
 
 }
 .logoArea {
-  display: flex;
-  align-items: center;
-  gap: 7px;
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .logoCircle { 
-  width: 45px; 
-  height: 45px; 
-  border-radius: 50%; 
+    width: 45px; 
+   height: 45px; 
+   border-radius: 50%; 
+   display: flex; 
+   align-items: center; 
+   justify-content: center; 
+   flex-shrink: 0; 
   background: rgba(255,255,255,0.25); 
   border: 1.5px solid rgba(255,255,255,0.6); 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-  flex-shrink: 0;
+
 }
 .companyName {
-  font-size: 9px;
-  font-weight: 900;
-  word-break: break-word;
-  white-space: nowrap;
-  overflow: hidden;
+  font-size: 10px; 
+   font-weight: 900; 
+   letter-spacing: 0.05em; 
+   color: var(--brand-on-primary); 
 }
-.companySub { 
-   font-size: 6.5px; 
-   opacity: 0.75; 
-   letter-spacing: 0.07em; 
+.tagline{
+   font-size: 7.5px;
 }
+
+
+
 .headerRight {
   font-size: 9px;
   line-height: 1.6;

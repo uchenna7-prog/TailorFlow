@@ -27,7 +27,10 @@ export function ReceiptTemplate6({ receipt, customer, brand }) {
           </div>
 
           <div>
+            
             <div className={styles.companyName}>{(brand.name || brand.ownerName || 'YOUR BRAND').toUpperCase()}</div>
+            {brand.tagline && <div className={styles.tagline}>{brand.tagline}</div>}
+            
           </div>
 
         </div>

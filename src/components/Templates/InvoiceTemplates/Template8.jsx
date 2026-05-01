@@ -2,6 +2,7 @@ import styles from "../styles/Template8.module.css"
 import { getDueDate,calcTax,fmt } from "../utils/invoiceUtils"
 
 
+
 export function InvoiceTemplate8({ invoice, customer, brand }) {
   const dueDate    = getDueDate(invoice, brand.dueDays)
   const accentColor = brand.colour || '#0057D7'
@@ -92,17 +93,17 @@ export function InvoiceTemplate8({ invoice, customer, brand }) {
         {brand.accountBank && (
           <div className={styles.paymentInfo}>
             <div className={styles.paymentLabel}>Payment Infomation</div>
-            {brand.accountNumber && <div>Account Number : {brand.accountNumber}</div>}
-            {brand.accountBank   && <div>Bank : {brand.accountBank}</div>}
-            {brand.accountName   && <div>Account Name : {brand.accountName}</div>}
+            {brand.accountNumber && <div>Account Number: {brand.accountNumber}</div>}
+            {brand.accountBank   && <div>Bank: {brand.accountBank}</div>}
+            {brand.accountName   && <div>Account Name: {brand.accountName}</div>}
             {brand.footer  && <div className={styles.thankYou}>{brand.footer}</div>}
           </div>
         )}
         <div className={styles.totals}>
-          <div className={styles.totalRow}><span>Sub Total :</span><span>{fmt(currency, subtotal)}</span></div>
+          <div className={styles.totalRow}><span>Sub Total: </span><span>{fmt(currency, subtotal)}</span></div>
           {showTax && taxRate > 0 && <div className={styles.totalRow}><span>Tax ({taxRate}%) :</span><span>{fmt(currency, tax)}</span></div>}
           <div className={styles.totalDivider} />
-          <div className={styles.total}><span>Total :</span><span>{fmt(currency, total)}</span></div>
+          <div className={styles.total}><span>Total: </span><span>{fmt(currency, total)}</span></div>
           <div className={styles.signLine}>Authorised Sign</div>
         </div>
       </div>

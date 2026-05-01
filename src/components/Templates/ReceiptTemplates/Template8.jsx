@@ -1,6 +1,7 @@
 import styles from "../styles/Template8.module.css"
 import { calcTax,fmt } from "../utils/receiptUtils"
-import { ReceiptPaymentSummary } from "../components/ReceiptPaymentSummary/ReceiptPaymentSummary"
+import { resolveCumulativePaid, buildPaymentRows } from '../../ReceiptViewer/utils'
+
 
 export function ReceiptTemplate8({ receipt, customer, brand }) {
 
@@ -82,7 +83,7 @@ export function ReceiptTemplate8({ receipt, customer, brand }) {
 
         <div className={styles.box} style={{ background : accentColor }}>
 
-          <div className={styles.boxTitle}>Receipt to :</div>
+          <div className={styles.boxTitle}>Receipt to: </div>
           <div className={styles.boxName}>{customer.name}</div>
           {customer.phone   && <div className={styles.boxAddr}>{customer.phone}</div>}
           {customer.address && <div className={styles.boxAddr}>{customer.address}</div>}
@@ -92,16 +93,16 @@ export function ReceiptTemplate8({ receipt, customer, brand }) {
           <div className={styles.paymentInfomation}>
             <div className={styles.paymentLabel}>Payment Details</div>
             {brand.name && (
-              <div>Received By : {brand.name}</div>
+              <div>Received By: {brand.name}</div>
             )}
             {brand.footer && <div className={styles.thankYou}>{brand.footer}</div>}
           </div>
         )}
         <div className={styles.totals}>
-          <div className={styles.totalRow}><span>Sub Total :</span><span>{fmt(currency, subtotal)}</span></div>
+          <div className={styles.totalRow}><span>Sub Total: </span><span>{fmt(currency, subtotal)}</span></div>
           {showTax && taxRate > 0 && <div className={styles.totalRow}><span>Tax ({taxRate}%) :</span><span>{fmt(currency, tax)}</span></div>}
           <div className={styles.totalDivider} />
-          <div className={styles.total}><span>Total :</span><span>{fmt(currency, total)}</span></div>
+          <div className={styles.total}><span>Total: </span><span>{fmt(currency, total)}</span></div>
           <div className={styles.signLine}>Authorised Sign</div>
         </div>
       </div>

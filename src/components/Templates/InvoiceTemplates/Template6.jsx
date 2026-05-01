@@ -27,7 +27,7 @@ export function InvoiceTemplate6({ invoice, customer, brand }) {
 
           <div>
             <div className={styles.companyName}>{(brand.name || brand.ownerName || 'YOUR BRAND').toUpperCase()}</div>
-            
+            {brand.tagline && <div className={styles.tagline}>{brand.tagline}</div>}
           </div>
 
         </div>
