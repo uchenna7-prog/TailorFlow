@@ -20,6 +20,8 @@ export const RECEIPT_SAMPLE_DATA = {
   cumulativePaid: '60000',
 }
 
+
+
 export const getBrandSampleData = (brand) => {
   return {
     name: 'Emeka Tailors',

@@ -31,19 +31,24 @@ export function ReceiptPaymentSummary({ receipt, brand, isTemplate5 = false  }) 
     : (parseFloat(receipt.orderPrice) || 0)
 
   const tax              = calcTax(orderTotal, taxRate, showTax)
-  const thisPaymentTotal = (receipt.payments || []).reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
+
+  // ── Build payment rows ────────────────────────────────────────────────────
+  const paymentRows = buildPaymentRows(receipt)
+
+  // Previously paid = all non-latest rows
+  const previouslyPaid = paymentRows
+    .filter(p => !p._isCurrent)
+    .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
+
+  // This payment = sum of latest-date rows only
+  const thisPaymentTotal = paymentRows
+    .filter(p => p._isCurrent)
+    .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
+
   const balanceRemaining = parseFloat(receipt.balance) >= 0
     ? parseFloat(receipt.balance)
     : Math.max(0, orderTotal - resolveCumulativePaid(receipt))
   const isFullyPaid      = receipt.isFullPayment ?? (balanceRemaining <= 0)
-
-  // ── Build payment rows (previous installments + current payments) ─────────
-  const paymentRows = buildPaymentRows(receipt)
-
-  // Derive previously paid (all rows except current ones)
-  const previouslyPaid = paymentRows
-    .filter(p => !p._isCurrent)
-    .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
 
   // ── "This Receipt" label ─────────────────────────────────────────────────
   const currentRows    = paymentRows.filter(p => p._isCurrent)
@@ -112,11 +117,13 @@ export function ReceiptPaymentSummary({ receipt, brand, isTemplate5 = false  }) 
             style={{ color : isTemplate5 ? 'var(--brand-on-primary)' : 'var(--brand-primary)' }}>
               Previously Paid
             </span>
-            <span className={styles.totalsVal}>{fmt(currency, previouslyPaid)}</span>
+            <span className={styles.totalsVal}
+            style={{ color : isTemplate5 ? 'var(--brand-on-primary)' : 'var(--brand-primary)' }}>
+              {fmt(currency, previouslyPaid)}</span>
           </div>
         )}
 
-        {paymentRows.length > 0 && (
+        {paymentRows.length > 0 && thisPaymentTotal > 0 && (
           <div className={styles.totalsRow}>
             <span className={styles.totalsKey}
             style={{ color : isTemplate5 ? 'var(--brand-on-primary)' : 'var(--brand-primary)' }}>
@@ -156,7 +163,6 @@ export function ReceiptPaymentSummary({ receipt, brand, isTemplate5 = false  }) 
           <div className={styles.paidCallout}>
             <div>
               <div className={styles.paidLabel}>✓ PAID IN FULL</div>
-             
             </div>
             <span className={styles.paidAmount}>{fmt(currency, orderTotal)}</span>
           </div>

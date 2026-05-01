@@ -40,7 +40,24 @@ export function buildPaymentRows(receipt) {
   }
 
   const offset = rows.length
-  current.forEach((p, i) => rows.push({ ...p, _isCurrent: true, _sn: offset + i + 1 }))
+  current.forEach((p, i) => rows.push({ ...p, _isCurrent: false, _sn: offset + i + 1 }))
+
+  // Find the latest date across all rows that have a real date
+  const allDates = rows
+    .map(p => p.date)
+    .filter(d => d && d !== 'Prior payments')
+    .map(d => new Date(d).getTime())
+    .filter(t => !isNaN(t))
+
+  if (allDates.length > 0) {
+    const latestTime = Math.max(...allDates)
+    rows.forEach(p => {
+      if (p.date && p.date !== 'Prior payments') {
+        const t = new Date(p.date).getTime()
+        if (!isNaN(t) && t === latestTime) p._isCurrent = true
+      }
+    })
+  }
 
   return rows
 }
