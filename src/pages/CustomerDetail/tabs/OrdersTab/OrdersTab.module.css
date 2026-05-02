@@ -1154,3 +1154,33 @@
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0);   }
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   ADD THESE TWO CLASSES TO YOUR OrdersTab.module.css
+   Place them near the .clothPickerList / .clothPickerItem section
+   ───────────────────────────────────────────────────────────── */
+
+/* Hint shown below the list when there are hidden measurements */
+.clothHiddenHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text3);
+  padding: 10px 4px 4px;
+}
+
+/* Empty state when search yields no results */
+.clothEmptySearch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text3);
+  text-align: center;
+}
