@@ -255,6 +255,7 @@ export default function CustomerDetail({ onMenuClick }) {
   const [toastMsg,      setToastMsg]      = useState('')
   const [invoicesState, setInvoicesState] = useState([])
   const [receipts,      setReceipts]      = useState([])
+  const [payments, setPayments] = useState([])
   const [isScrolled,    setIsScrolled]    = useState(false)
 
   const [editModalOpen,   setEditModalOpen]   = useState(false)
@@ -563,13 +564,14 @@ export default function CustomerDetail({ onMenuClick }) {
   const hasPhoto = isPremium && customer.photo
 
   const handleFabClick = () => {
-    if (activeTab === 'dress')    document.dispatchEvent(new CustomEvent('openMeasureModal'))
-    if (activeTab === 'orders')   document.dispatchEvent(new CustomEvent('openOrderModal'))
-    if (activeTab === 'invoice')  document.dispatchEvent(new CustomEvent('openInvoiceModal'))
-    if (activeTab === 'payments') document.dispatchEvent(new CustomEvent('openPaymentModal'))
+    if (activeTab === 'dress')     document.dispatchEvent(new CustomEvent('openMeasureModal'))
+    if (activeTab === 'orders')    document.dispatchEvent(new CustomEvent('openOrderModal'))
+    if (activeTab === 'invoice')   document.dispatchEvent(new CustomEvent('openInvoiceModal'))
+    if (activeTab === 'payments')  document.dispatchEvent(new CustomEvent('openPaymentModal'))
+    if (activeTab === 'receipts')  document.dispatchEvent(new CustomEvent('openReceiptModal'))
   }
 
-  const showFab = ['dress', 'orders', 'invoice', 'payments'].includes(activeTab)
+  const showFab = ['dress', 'orders', 'invoice', 'payments', 'receipts'].includes(activeTab)
 
   const tabItemCounts = {
     dress:    data.measurements?.length ?? 0,
@@ -755,21 +757,26 @@ export default function CustomerDetail({ onMenuClick }) {
             showToast={showToast}
           />
         )}
+        
         {activeTab === 'payments' && (
-          <PaymentsTab
-            customerId={id}
-            orders={orders}
-            showToast={showToast}
-            onGenerateReceipt={handleGenerateReceipt}
-            onInvoicePaid={handleInvoicePaid}
-          />
+        <PaymentsTab
+          customerId={id}
+          orders={orders}
+          showToast={showToast}
+          onGenerateReceipt={handleGenerateReceipt}
+          onInvoicePaid={handleInvoicePaid}
+          onPaymentsChange={setPayments}
+        />
         )}
+
         {activeTab === 'receipts' && (
           <ReceiptTab
             receipts={receipts}
             customer={customer}
             orders={orders}
+            payments={payments}
             onDelete={handleDeleteReceipt}
+            onGenerateReceipt={handleGenerateReceipt}
             showToast={showToast}
           />
         )}

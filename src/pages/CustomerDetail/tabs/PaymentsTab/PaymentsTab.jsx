@@ -706,7 +706,7 @@ function PaymentDetail({ payment, onClose, onDelete, onStatusChange, onAddInstal
 // PAYMENTS TAB — main export
 // ─────────────────────────────────────────────────────────────
 
-export default function PaymentsTab({ customerId, orders, showToast, onGenerateReceipt, onInvoicePaid }) {
+export default function PaymentsTab({ customerId, orders, showToast, onGenerateReceipt, onInvoicePaid, onPaymentsChange }) {
   const { user } = useAuth()
 
   const [payments,       setPayments]       = useState([])
@@ -721,13 +721,13 @@ export default function PaymentsTab({ customerId, orders, showToast, onGenerateR
       user.uid,
       customerId,
       (data) => {
-        setPayments(data)
-        // Keep the detail view in sync if it's open
-        setViewingPayment(prev => {
-          if (!prev) return null
-          return data.find(p => p.id === prev.id) ?? null
-        })
-      },
+      setPayments(data)
+      onPaymentsChange?.(data)   // ← add this line
+      setViewingPayment(prev => {
+        if (!prev) return null
+        return data.find(p => p.id === prev.id) ?? null
+  })
+    },
       (err) => console.error('[PaymentsTab]', err)
     )
     return unsubscribe

@@ -1,8 +1,9 @@
 // src/pages/CustomerDetail/tabs/ReceiptTab/ReceiptTab.jsx
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ReceiptViewer from '../../../../components/ReceiptViewer/ReceiptViewer'
 import ConfirmSheet from '../../../../components/ConfirmSheet/ConfirmSheet'
+import Header from '../../../../components/Header/Header'
 import styles from './ReceiptTab.module.css'
 
 
@@ -24,8 +25,6 @@ function getCurrency() {
   }
 }
 
-// Groups an array of receipts by their date field
-// Returns: { "Jan 1 2025": [receipt, receipt], ... }
 function groupReceiptsByDate(receipts) {
   return receipts.reduce((groups, receipt) => {
     const date = receipt.date || 'Unknown Date'
@@ -35,7 +34,6 @@ function groupReceiptsByDate(receipts) {
   }, {})
 }
 
-// Builds a map of orderId -> order items, for looking up images per receipt
 function buildOrderItemsMap(orders) {
   const map = {}
   for (const order of orders) {
@@ -46,12 +44,11 @@ function buildOrderItemsMap(orders) {
   return map
 }
 
-// Gets the payment status label and styles for a receipt
 function getPaymentStatus(receipt) {
-  const thisPayment   = (receipt.payments || []).reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
-  const totalPaid     = receipt.cumulativePaid != null ? parseFloat(receipt.cumulativePaid) : thisPayment
-  const orderTotal    = parseFloat(receipt.orderPrice) || totalPaid
-  const isPaidInFull  = totalPaid >= orderTotal && orderTotal > 0
+  const thisPayment  = (receipt.payments || []).reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0)
+  const totalPaid    = receipt.cumulativePaid != null ? parseFloat(receipt.cumulativePaid) : thisPayment
+  const orderTotal   = parseFloat(receipt.orderPrice) || totalPaid
+  const isPaidInFull = totalPaid >= orderTotal && orderTotal > 0
 
   return {
     thisPayment,
@@ -63,22 +60,42 @@ function getPaymentStatus(receipt) {
   }
 }
 
+function getTotalPaid(installments) {
+  return (installments || []).reduce((sum, inst) => sum + (parseFloat(inst.amount) || 0), 0)
+}
+
+function capitalise(str = '') {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
 
 // ─────────────────────────────────────────────────────────────
 // ORDER MOSAIC THUMBNAIL
-// Shows 1, 2, or 3+ item images in a tiled thumbnail box
 // ─────────────────────────────────────────────────────────────
 
-function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
+function OrderMosaic({ orderItems, fallbackIcon, fallbackColor, size = 68 }) {
   const images     = (orderItems || []).map(item => item.imgSrc ?? null).filter(Boolean)
   const totalItems = (orderItems || []).length
+  const innerSize  = Math.round(size * 0.74)
+  const radius     = Math.round(size * 0.176)
+  const innerRadius = Math.round(innerSize * 0.18)
 
-  // No images — show a fallback icon
+  const outerStyle = {
+    width: size, height: size, borderRadius: radius,
+    background: 'var(--surface)', border: '1px solid var(--border)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  }
+  const innerStyle = {
+    width: innerSize, height: innerSize, borderRadius: innerRadius,
+    background: '#fff', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', overflow: 'hidden',
+  }
+
   if (images.length === 0) {
     return (
-      <div className={styles.mosaicOuterBox}>
-        <div className={styles.mosaicInnerBox}>
-          <span className="mi" style={{ fontSize: '1.5rem', color: fallbackColor || 'var(--text3)' }}>
+      <div style={outerStyle}>
+        <div style={innerStyle}>
+          <span className="mi" style={{ fontSize: '1.4rem', color: fallbackColor || 'var(--text3)' }}>
             {fallbackIcon || 'receipt'}
           </span>
         </div>
@@ -86,78 +103,446 @@ function OrderMosaic({ orderItems, fallbackIcon, fallbackColor }) {
     )
   }
 
-  // Single image — full bleed
   if (totalItems === 1) {
     return (
-      <div className={styles.mosaicOuterBox}>
-        <div className={styles.mosaicInnerBox}>
-          <img src={images[0]} alt="" className={styles.mosaicFullImage} />
+      <div style={outerStyle}>
+        <div style={innerStyle}>
+          <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
       </div>
     )
   }
 
-  // Two items — left/right split
+  const extraCount = totalItems > 3 ? totalItems - 3 : 0
+  const splitStyle = { ...innerStyle, padding: 0, flexDirection: 'row', alignItems: 'stretch' }
+
   if (totalItems === 2) {
     return (
-      <div className={styles.mosaicOuterBox}>
-        <div className={`${styles.mosaicInnerBox} ${styles.mosaicTiled}`}>
-          <div className={styles.mosaicTileLeft}>
-            <img src={images[0]} alt="" className={styles.mosaicTileImage} />
+      <div style={outerStyle}>
+        <div style={splitStyle}>
+          <div style={{ flex: '0 0 60%', overflow: 'hidden' }}>
+            <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
-          <div className={styles.mosaicDividerVertical} />
-          <div className={styles.mosaicTileRight}>
-            <div className={styles.mosaicTileCell}>
-              {images[1]
-                ? <img src={images[1]} alt="" className={styles.mosaicTileImage} />
-                : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
-              }
-            </div>
+          <div style={{ width: 1.5, background: 'var(--border)', flexShrink: 0 }} />
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+            {images[1]
+              ? <img src={images[1]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
+            }
           </div>
         </div>
       </div>
     )
   }
 
-  // Three or more — left + two stacked on right
-  const extraCount = totalItems > 3 ? totalItems - 3 : 0
-
   return (
-    <div className={styles.mosaicOuterBox}>
-      <div className={`${styles.mosaicInnerBox} ${styles.mosaicTiled}`}>
-
-        <div className={styles.mosaicTileLeft}>
+    <div style={outerStyle}>
+      <div style={splitStyle}>
+        <div style={{ flex: '0 0 60%', overflow: 'hidden' }}>
           {images[0]
-            ? <img src={images[0]} alt="" className={styles.mosaicTileImage} />
-            : <span className="mi" style={{ fontSize: '0.9rem', color: 'var(--text3)' }}>checkroom</span>
+            ? <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>checkroom</span>
           }
         </div>
-
-        <div className={styles.mosaicDividerVertical} />
-
-        <div className={styles.mosaicTileRight}>
-
-          <div className={styles.mosaicTileCell}>
+        <div style={{ width: 1.5, background: 'var(--border)', flexShrink: 0 }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {images[1]
-              ? <img src={images[1]} alt="" className={styles.mosaicTileImage} />
-              : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+              ? <img src={images[1]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
             }
           </div>
-
-          <div className={styles.mosaicDividerHorizontal} />
-
-          <div className={`${styles.mosaicTileCell} ${extraCount > 0 ? styles.mosaicTileCellWithOverlay : ''}`}>
+          <div style={{ height: 1.5, background: 'var(--border)', flexShrink: 0 }} />
+          <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {images[2]
-              ? <img src={images[2]} alt="" className={styles.mosaicTileImage} />
-              : <span className="mi" style={{ fontSize: '0.75rem', color: 'var(--text3)' }}>checkroom</span>
+              ? <img src={images[2]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
             }
             {extraCount > 0 && (
-              <div className={styles.mosaicExtraOverlay}>+{extraCount}</div>
+              <div style={{
+                position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: '0.6rem', fontWeight: 800,
+              }}>
+                +{extraCount}
+              </div>
             )}
           </div>
-
         </div>
       </div>
+    </div>
+  )
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// RECEIPT PICKER MODAL — two-step: pick order → pick payment
+// ─────────────────────────────────────────────────────────────
+
+function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSelectPayment }) {
+  // step: 'order' | 'payment'
+  const [step,           setStep]           = useState('order')
+  const [selectedOrder,  setSelectedOrder]  = useState(null)
+  const [search,         setSearch]         = useState('')
+  const searchRef                           = useRef(null)
+  const currency                            = getCurrency()
+
+  // Reset on open/close
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => searchRef.current?.focus(), 350)
+    } else {
+      setStep('order')
+      setSelectedOrder(null)
+      setSearch('')
+    }
+  }, [isOpen])
+
+  // When an order is picked, move to step 2
+  function handlePickOrder(order) {
+    setSelectedOrder(order)
+    setSearch('')
+    setStep('payment')
+  }
+
+  function handleBack() {
+    setStep('order')
+    setSelectedOrder(null)
+    setSearch('')
+  }
+
+  // ── Step 1: order list ──────────────────────────────────────
+
+  // Only show orders that have at least one recorded payment
+  const ordersWithPayments = orders.filter(order =>
+    payments.some(p => String(p.orderId) === String(order.id))
+  )
+
+  const filteredOrders = ordersWithPayments.filter(order => {
+    if (!search.trim()) return true
+    const q = search.toLowerCase()
+    return (
+      (order.desc   || '').toLowerCase().includes(q) ||
+      (order.status || '').toLowerCase().includes(q) ||
+      (order.due    || '').toLowerCase().includes(q) ||
+      (order.takenAt || '').toLowerCase().includes(q) ||
+      (order.items || []).some(i => (i.name || '').toLowerCase().includes(q))
+    )
+  })
+
+  // ── Step 2: payment/installment list ───────────────────────
+
+  const orderPayment = selectedOrder
+    ? payments.find(p => String(p.orderId) === String(selectedOrder.id))
+    : null
+
+  const installments = orderPayment?.installments || []
+
+  // Build set of already-receipted installment ids for this payment
+  const receiptedInstallmentIds = new Set(
+    receipts
+      .filter(r => String(r.paymentId) === String(orderPayment?.id))
+      .flatMap(r => r.installmentIds || [])
+  )
+
+  const filteredInstallments = installments.filter(inst => {
+    if (!search.trim()) return true
+    const q = search.toLowerCase()
+    return (
+      (inst.date   || '').toLowerCase().includes(q) ||
+      (inst.method || '').toLowerCase().includes(q) ||
+      String(inst.amount).includes(q)
+    )
+  })
+
+  const totalPaid  = getTotalPaid(installments)
+  const fullPrice  = parseFloat(orderPayment?.orderPrice) || 0
+  const balance    = fullPrice > 0 ? Math.max(0, fullPrice - totalPaid) : 0
+  const orderItems = selectedOrder?.items || []
+
+  return (
+    <div className={`${styles.pickerOverlay} ${isOpen ? styles.pickerOverlay_open : ''}`}>
+
+      {/* Header */}
+      <div className={styles.pickerHeader}>
+        <button
+          className={styles.pickerCloseBtn}
+          onClick={step === 'payment' ? handleBack : onClose}
+        >
+          <span className="mi">
+            {step === 'payment' ? 'arrow_back' : 'keyboard_arrow_down'}
+          </span>
+        </button>
+        <div className={styles.pickerHeaderText}>
+          {step === 'order' ? (
+            <>
+              <span className={styles.pickerTitle}>Select Order</span>
+              <span className={styles.pickerSubtitle}>Choose an order to generate a receipt from</span>
+            </>
+          ) : (
+            <>
+              {/* Breadcrumb */}
+              <span className={styles.pickerBreadcrumb}>
+                {selectedOrder?.desc || 'Order'}
+              </span>
+              <span className={styles.pickerTitle}>Select Payment</span>
+              <span className={styles.pickerSubtitle}>Choose a payment to receipt</span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Search bar */}
+      <div className={styles.pickerSearchWrap}>
+        <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)' }}>search</span>
+        <input
+          ref={searchRef}
+          type="text"
+          className={styles.pickerSearchInput}
+          placeholder={
+            step === 'order'
+              ? 'Search by garment, status, date...'
+              : 'Search by amount, method, date...'
+          }
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        {search.length > 0 && (
+          <button className={styles.pickerSearchClear} onClick={() => setSearch('')}>
+            <span className="mi" style={{ fontSize: '1rem' }}>close</span>
+          </button>
+        )}
+      </div>
+
+      {/* ── STEP 1: Order list ── */}
+      {step === 'order' && (
+        <>
+          <div className={styles.pickerCountLine}>
+            {filteredOrders.length} {filteredOrders.length === 1 ? 'order' : 'orders'} with payments
+            {search.trim() ? ` matching "${search}"` : ''}
+          </div>
+
+          <div className={styles.pickerList}>
+
+            {ordersWithPayments.length === 0 && (
+              <div className={styles.pickerEmpty}>
+                <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>payments</span>
+                <p>No payments recorded yet.</p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text3)', marginTop: 4 }}>
+                  Go to the Payments tab to record a payment first.
+                </p>
+              </div>
+            )}
+
+            {ordersWithPayments.length > 0 && filteredOrders.length === 0 && (
+              <div className={styles.pickerEmpty}>
+                <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>search_off</span>
+                <p>No orders match your search</p>
+              </div>
+            )}
+
+            {filteredOrders.map((order, index) => {
+              const payment      = payments.find(p => String(p.orderId) === String(order.id))
+              const installs     = payment?.installments || []
+              const paid         = getTotalPaid(installs)
+              const price        = parseFloat(order.price) || 0
+              const bal          = price > 0 ? Math.max(0, price - paid) : 0
+              const isFullyPaid  = price > 0 && paid >= price
+              const installCount = installs.length
+              const isLast       = index === filteredOrders.length - 1
+
+              return (
+                <div
+                  key={order.id}
+                  className={`${styles.pickerOrderCard} ${isLast ? styles.pickerOrderCard_last : ''}`}
+                  onClick={() => handlePickOrder(order)}
+                >
+                  <OrderMosaic orderItems={order.items || []} fallbackIcon="receipt" size={62} />
+
+                  <div className={styles.pickerOrderInfo}>
+                    {/* Row 1: title + total price */}
+                    <div className={styles.pickerOrderTop}>
+                      <span className={styles.pickerOrderTitle}>{order.desc || 'Untitled Order'}</span>
+                      <span className={styles.pickerOrderPrice}>{formatMoney(currency, price)}</span>
+                    </div>
+
+                    {/* Row 2: paid so far + instalment count */}
+                    <div className={styles.pickerOrderMeta}>
+                      <span className={styles.pickerMetaChip}>
+                        <span className="mi" style={{ fontSize: '0.72rem', color: '#22c55e' }}>payments</span>
+                        {formatMoney(currency, paid)} paid
+                      </span>
+                      {installCount > 1 && (
+                        <span className={styles.pickerMetaChip}>
+                          <span className="mi" style={{ fontSize: '0.72rem' }}>receipt_long</span>
+                          {installCount} payments
+                        </span>
+                      )}
+                      {order.takenAt && (
+                        <span className={styles.pickerMetaDate}>
+                          <span className="mi" style={{ fontSize: '0.72rem' }}>event</span>
+                          {order.takenAt}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Row 3: balance + status */}
+                    <div className={styles.pickerOrderBadges}>
+                      {isFullyPaid ? (
+                        <span className={styles.pickerFullPaidBadge}>
+                          <span className="mi" style={{ fontSize: '0.7rem' }}>check_circle</span>
+                          Fully Paid
+                        </span>
+                      ) : (
+                        <span className={styles.pickerBalanceBadge}>
+                          Balance: {formatMoney(currency, bal)}
+                        </span>
+                      )}
+                      {order.items?.length > 0 && (
+                        <span className={styles.pickerMetaChip}>
+                          <span className="mi" style={{ fontSize: '0.72rem' }}>checkroom</span>
+                          {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Row 4: garment names */}
+                    {order.items?.length > 0 && (
+                      <div className={styles.pickerGarmentNames}>
+                        {order.items.map(i => i.name).filter(Boolean).join(' · ')}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Arrow indicator */}
+                  <div className={styles.pickerChevron}>
+                    <span className="mi" style={{ fontSize: '1.2rem', color: 'var(--text3)' }}>chevron_right</span>
+                  </div>
+                </div>
+              )
+            })}
+
+            <div style={{ height: 40 }} />
+          </div>
+        </>
+      )}
+
+      {/* ── STEP 2: Payment/installment list ── */}
+      {step === 'payment' && orderPayment && (
+        <>
+          {/* Summary strip for the selected order */}
+          <div className={styles.pickerOrderSummary}>
+            <OrderMosaic orderItems={orderItems} fallbackIcon="receipt" size={44} />
+            <div className={styles.pickerOrderSummaryInfo}>
+              <div className={styles.pickerOrderSummaryTitle}>{selectedOrder?.desc}</div>
+              <div className={styles.pickerOrderSummaryMeta}>
+                {formatMoney(currency, totalPaid)} paid
+                {fullPrice > 0 && ` · ${formatMoney(currency, fullPrice)} total`}
+                {balance > 0 && (
+                  <span style={{ color: '#ef4444', marginLeft: 4 }}>
+                    · {formatMoney(currency, balance)} balance
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.pickerCountLine}>
+            {filteredInstallments.length} {filteredInstallments.length === 1 ? 'payment' : 'payments'}
+            {search.trim() ? ` matching "${search}"` : ''}
+            {' '}— tap one to generate a receipt
+          </div>
+
+          <div className={styles.pickerList}>
+
+            {filteredInstallments.length === 0 && (
+              <div className={styles.pickerEmpty}>
+                <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>search_off</span>
+                <p>No payments match your search</p>
+              </div>
+            )}
+
+            {filteredInstallments.map((inst, index) => {
+              const isReceiptedAlready = receiptedInstallmentIds.has(String(inst.id))
+              const isLast             = index === filteredInstallments.length - 1
+              const paidBefore         = getTotalPaid(installments.slice(0, index))
+              const paidAfter          = paidBefore + (parseFloat(inst.amount) || 0)
+              const balAfter           = fullPrice > 0 ? Math.max(0, fullPrice - paidAfter) : null
+
+              return (
+                <div
+                  key={inst.id ?? index}
+                  className={`${styles.pickerInstallCard} ${isReceiptedAlready ? styles.pickerInstallCard_receipted : ''} ${isLast ? styles.pickerInstallCard_last : ''}`}
+                  onClick={() => onSelectPayment(orderPayment, inst)}
+                >
+                  {/* Left: payment number circle */}
+                  <div className={styles.pickerInstallNumber}>
+                    <span>{index + 1}</span>
+                  </div>
+
+                  {/* Centre: amount + date + method + balance info */}
+                  <div className={styles.pickerInstallInfo}>
+                    <div className={styles.pickerInstallTop}>
+                      <span className={styles.pickerInstallAmount}>
+                        {formatMoney(currency, inst.amount)}
+                      </span>
+                      {isReceiptedAlready && (
+                        <span className={styles.pickerReceiptedTag}>
+                          <span className="mi" style={{ fontSize: '0.75rem' }}>receipt_long</span>
+                          Receipted
+                        </span>
+                      )}
+                      {!isReceiptedAlready && (
+                        <span className={styles.pickerGenerateTag}>
+                          <span className="mi" style={{ fontSize: '0.75rem' }}>add_circle</span>
+                          Generate
+                        </span>
+                      )}
+                    </div>
+
+                    <div className={styles.pickerInstallMeta}>
+                      {inst.date && (
+                        <span className={styles.pickerMetaDate}>
+                          <span className="mi" style={{ fontSize: '0.68rem' }}>event</span>
+                          {inst.date}
+                        </span>
+                      )}
+                      {inst.method && (
+                        <span className={styles.pickerMetaChip}>
+                          <span className="mi" style={{ fontSize: '0.68rem' }}>
+                            {inst.method === 'cash' ? 'payments' : inst.method === 'card' ? 'credit_card' : 'swap_horiz'}
+                          </span>
+                          {capitalise(inst.method)}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Balance after this payment */}
+                    {balAfter !== null && (
+                      <div className={styles.pickerInstallBalance}>
+                        Balance after: {' '}
+                        <span style={{ color: balAfter > 0 ? '#ef4444' : '#22c55e', fontWeight: 700 }}>
+                          {balAfter > 0 ? formatMoney(currency, balAfter) : 'Fully Paid'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+
+            <div style={{ height: 40 }} />
+          </div>
+        </>
+      )}
+
+      {/* Edge case: order selected but no payment found (shouldn't normally happen) */}
+      {step === 'payment' && !orderPayment && (
+        <div className={styles.pickerEmpty} style={{ marginTop: 40 }}>
+          <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>error_outline</span>
+          <p>No payment record found for this order.</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -179,15 +564,14 @@ function ReceiptCard({ receipt, currency, onTap, isLast, orderItems }) {
         orderItems={orderItems}
         fallbackIcon="receipt"
         fallbackColor={isPaidInFull ? '#22c55e' : '#fb923c'}
+        size={68}
       />
 
-      {/* Centre: order name + generated date */}
       <div className={styles.receiptRowInfo}>
         <div className={styles.receiptRowTitle}>{receipt.orderDesc || 'Payment'}</div>
         <div className={styles.receiptRowDate}>Generated {receipt.date}</div>
       </div>
 
-      {/* Right: payment status badge + amount */}
       <div className={styles.receiptRowRight}>
         <span className={styles.receiptStatusBadge} style={badgeStyle}>
           {label}
@@ -202,7 +586,7 @@ function ReceiptCard({ receipt, currency, onTap, isLast, orderItems }) {
 
 
 // ─────────────────────────────────────────────────────────────
-// EMPTY STATE — shown when no receipts exist
+// EMPTY STATE
 // ─────────────────────────────────────────────────────────────
 
 function EmptyState() {
@@ -211,9 +595,10 @@ function EmptyState() {
       <span className="mi" style={{ fontSize: '2.5rem', color: 'var(--text3)' }}>receipt</span>
       <p className={styles.emptyStateTitle}>No receipts yet</p>
       <p className={styles.emptyStateSubtitle}>
-        Go to the Payments tab, open a payment, and tap{' '}
-        <strong>Generate Receipt</strong>.
+        Tap <strong>+</strong> to generate a receipt from a recorded payment,
+        or open a payment on the Payments tab.
       </p>
+
     </div>
   )
 }
@@ -224,18 +609,47 @@ function EmptyState() {
 // ─────────────────────────────────────────────────────────────
 
 export default function ReceiptTab({
-  receipts = [],
-  orders   = [],
+  receipts         = [],
+  orders           = [],
+  payments         = [],
   customer,
   onDelete,
+  onGenerateReceipt,
   showToast,
 }) {
   const [viewingReceipt, setViewingReceipt] = useState(null)
   const [deleteTarget,   setDeleteTarget]   = useState(null)
+  const [pickerOpen,     setPickerOpen]     = useState(false)
+  const [generating,     setGenerating]     = useState(false)
 
   const currency      = getCurrency()
   const orderItemsMap = buildOrderItemsMap(orders)
   const groupedByDate = groupReceiptsByDate(receipts)
+
+  // Listen for FAB click from CustomerDetail
+  useEffect(() => {
+    const openPicker = () => setPickerOpen(true)
+    document.addEventListener('openReceiptModal', openPicker)
+    return () => document.removeEventListener('openReceiptModal', openPicker)
+  }, [])
+
+  // Called when a specific installment is selected in step 2
+  async function handleSelectPayment(payment, installment) {
+    setGenerating(true)
+    try {
+      // Pass the full payment + the specific installment so
+      // CustomerDetail's handleGenerateReceipt can build the receipt correctly.
+      // We attach the selected installment as a hint — CustomerDetail already
+      // handles building installmentIds from receipts, so we just need to
+      // signal which payment object to use.
+      await onGenerateReceipt(payment, installment)
+      setPickerOpen(false)
+    } catch {
+      showToast('Failed to generate receipt. Try again.')
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   function handleConfirmDelete() {
     onDelete(deleteTarget)
@@ -244,11 +658,15 @@ export default function ReceiptTab({
     if (viewingReceipt?.id === deleteTarget) setViewingReceipt(null)
   }
 
-  if (receipts.length === 0) return <EmptyState />
-
   return (
     <>
-      {Object.entries(groupedByDate).map(([date, dateReceipts]) => (
+      {/* Empty state */}
+      {receipts.length === 0 && (
+        <EmptyState  />
+      )}
+
+      {/* Receipt list grouped by date */}
+      {receipts.length > 0 && Object.entries(groupedByDate).map(([date, dateReceipts]) => (
         <div key={date} className={styles.dateGroup}>
           <div className={styles.dateGroupLabel}>{date}</div>
           <div className={styles.dateGroupDivider} />
@@ -266,6 +684,18 @@ export default function ReceiptTab({
         </div>
       ))}
 
+      {/* Two-step picker modal */}
+      <ReceiptPickerModal
+        isOpen={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        orders={orders}
+        payments={payments}
+        receipts={receipts}
+        onSelectPayment={handleSelectPayment}
+        generating={generating}
+      />
+
+      {/* Receipt viewer */}
       {viewingReceipt && (
         <ReceiptViewer
           receipt={viewingReceipt}
@@ -276,6 +706,7 @@ export default function ReceiptTab({
         />
       )}
 
+      {/* Delete confirm */}
       <ConfirmSheet
         open={!!deleteTarget}
         title="Delete this receipt?"
