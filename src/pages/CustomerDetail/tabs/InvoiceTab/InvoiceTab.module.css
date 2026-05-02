@@ -189,7 +189,7 @@
 
 /* ─────────────────────────────────────────────────────────────
    ORDER PICKER MODAL
-   Full-screen overlay — mirrors MeasurementTab's formOverlay
+   Full-screen overlay — mirrors OrderModal (formOverlay) exactly
    ───────────────────────────────────────────────────────────── */
 
 .pickerOverlay {
@@ -210,36 +210,46 @@
   transform: translateY(0);
 }
 
-/* ── Subtitle bar below the Header ── */
-.pickerSubtitleBar {
-  text-transform: uppercase;
-  margin: 16px 0;
-  font-size: 0.8rem;
-  color: var(--text3);
-  font-weight: 900;
-  padding: 0 16px 12px;
-  flex-shrink: 0;
+/* Scrollable area below the header — matches .formScrollBody */
+.pickerScrollBody {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 100px;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* ── Search bar ── */
-.pickerSearchWrap {
+
+/* ─────────────────────────────────────────────────────────────
+   STEP HEADING — "1. Select Order" / "2. Generate Invoice"
+   Matches OrderModal's .stepHeading exactly
+   ───────────────────────────────────────────────────────────── */
+
+.stepHeading {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   CLOTH SEARCH BAR — reused from OrderModal
+   ───────────────────────────────────────────────────────────── */
+
+.clothSearchBar {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 16px 6px;
   background: var(--surface);
-  border: 1.5px solid var(--border2);
+  border: 1px solid var(--border2);
   border-radius: 12px;
   padding: 0 12px;
-  flex-shrink: 0;
-  transition: border-color 0.15s;
+  margin-bottom: 10px;
 }
 
-.pickerSearchWrap:focus-within {
-  border-color: var(--accent);
-}
-
-.pickerSearchInput {
+.clothSearchInput {
   flex: 1;
   background: transparent;
   border: none;
@@ -247,44 +257,182 @@
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
   font-size: 0.85rem;
-  font-weight: 500;
-  padding: 11px 0;
+  font-weight: 600;
+  padding: 12px 0;
 }
 
-.pickerSearchInput::placeholder {
-  color: var(--text3);
+
+/* ─────────────────────────────────────────────────────────────
+   CLOTH PICKER LIST + ITEMS — reused from OrderModal
+   ───────────────────────────────────────────────────────────── */
+
+/* List of order options to pick from */
+.clothPickerList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
-.pickerSearchClear {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text3);
+/* Single order option row */
+.clothPickerItem {
   display: flex;
   align-items: center;
-  padding: 0;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
 }
 
-/* ── Count line — shown only when search is active ── */
-.pickerCountLine {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text3);
-  padding: 0 16px 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.clothPickerItem_selected {
+  border-color: var(--accent);
+  background: var(--surface2);
+}
+
+.clothPickerItem_generating {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Small square thumbnail */
+.clothThumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
-/* ── Scrollable order list ── */
-.pickerList {
+.clothThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Order name + due date text */
+.clothInfo {
   flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0 16px;
 }
 
-/* ── Empty search result ── */
+.clothInfo h5 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.clothInfo span {
+  font-size: 0.65rem;
+  color: var(--text3);
+  font-weight: 600;
+}
+
+/* Circle checkmark on the right */
+.clothCheckCircle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.clothCheckCircle_checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   GENERATE CARD — Step 2: shown after selecting an order
+   Matches OrderModal's .pricingCard / .detailsCard style
+   ───────────────────────────────────────────────────────────── */
+
+.generateCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+/* Selected order summary row inside the card */
+.generateOrderSummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.generateOrderName {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.generateOrderPrice {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Dashed divider — matches .orderTotalRow's top border in OrderModal */
+.generateDivider {
+  border-top: 2px dashed var(--border);
+  margin: 0 -2px;
+}
+
+/* Primary generate button — full width, accent coloured */
+.generateInlineButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.generateInlineButton:active {
+  opacity: 0.8;
+}
+
+.generateInlineButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   PICKER EMPTY STATE
+   ───────────────────────────────────────────────────────────── */
+
 .pickerEmpty {
   display: flex;
   flex-direction: column;
@@ -299,162 +447,26 @@
   color: var(--text3);
 }
 
-/* ── Each order card in the picker ── */
-.pickerOrderCard {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px ;
-  margin-bottom: 16px;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.12s, opacity 0.2s;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-}
 
-/* Divider below each card — indented to align with text */
-.pickerOrderCard::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 70px;
-  right: 0;
-  height: 1px;
-  background: var(--border);
-}
+/* ─────────────────────────────────────────────────────────────
+   SPINNER — used inside checkmark circle when generating
+   ───────────────────────────────────────────────────────────── */
 
-.pickerOrderCard_last::after {
-  display: none;
-}
-
-.pickerOrderCard:active {
-  background: var(--surface);
-}
-
-/* Invoiced cards: slightly muted */
-.pickerOrderCard_invoiced {
-  opacity: 0.72;
-}
-
-/* Card being generated: non-interactive */
-.pickerOrderCard_generating {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* ── Order info — vertical stack ── */
-.pickerOrderInfo {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-/* Order name — full, wraps naturally, no truncation */
-.pickerOrderTitle {
-  font-size: 11px;
-  font-weight: 900;
-  color: var(--text);
-  word-break: break-word;
-}
-
-/* Price — sits right below the name, prominent */
-.pickerOrderPrice {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--text);
-}
-
-/* Item count — muted secondary line */
-.pickerOrderMeta {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--text3);
-  margin-top: 1px;
-}
-
-/* Due date — red, small */
-.pickerOrderDue {
-  font-size: 9px;
-  font-weight: 600;
-  color: #dc2626;
-  margin-top: 1px;
-}
-
-/* ── Right-side action indicator ── */
-.pickerOrderAction {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
+.pickerSpinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: pickerSpin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
-/* "Invoiced" tag — green */
-.pickerInvoicedTag {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.58rem;
-  font-weight: 800;
-  color: #15803d;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.22);
-  border-radius: 9px;
-  padding: 6px 8px;
-  white-space: nowrap;
-  line-height: 1;
-  min-width: 52px;
-  text-align: center;
-}
-
-/* "Create" tag — accent */
-.pickerGenerateTag {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.58rem;
-  font-weight: 800;
-  color: var(--accent);
-  background: rgba(200, 135, 58, 0.08);
-  border: 1px solid rgba(200, 135, 58, 0.18);
-  border-radius: 9px;
-  padding: 6px 8px;
-  white-space: nowrap;
-  line-height: 1;
-  min-width: 52px;
-  text-align: center;
-}
-
-/* "Creating…" tag — shown while invoice is being generated */
-.pickerCreatingTag {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.58rem;
-  font-weight: 800;
-  color: var(--text2);
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 9px;
-  padding: 6px 8px;
-  white-space: nowrap;
-  line-height: 1;
-  min-width: 52px;
-  text-align: center;
-}
-
-/* Spinner inside the "Creating…" tag */
-.pickerSpinner {
+.pickerSpinnerWhite {
   width: 14px;
   height: 14px;
-  border: 2px solid var(--border2);
-  border-top-color: var(--accent);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
   border-radius: 50%;
   animation: pickerSpin 0.7s linear infinite;
   flex-shrink: 0;
