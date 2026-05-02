@@ -2,10 +2,11 @@
   position: fixed;
   inset: 0;
   background: var(--bg);
-  z-index: 200;
+  z-index: 3500;
   display: flex;
   flex-direction: column;
   animation: slideUp 0.25s ease;
+
 }
 
 @keyframes slideUp {
@@ -92,7 +93,6 @@
 @media (min-width: 769px) {
   .overlay {
     left: var(--sidebar-width, 280px);
-    z-index: 200;
     animation: fadeIn 0.2s ease;
   }
 

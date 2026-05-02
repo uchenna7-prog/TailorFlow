@@ -176,16 +176,20 @@ function OrderMosaic({ orderItems, fallbackIcon, fallbackColor, size = 68 }) {
 
 
 // ─────────────────────────────────────────────────────────────
-// RECEIPT PICKER MODAL — two-step: pick order → pick payment
+// RECEIPT PICKER MODAL
+// Full-screen — two steps: pick order → pick installment.
+// Uses the Header component. Tapping an installment shows an
+// inline "Generating…" spinner on that card while the receipt
+// is being created, then the modal closes.
 // ─────────────────────────────────────────────────────────────
 
-function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSelectPayment }) {
+function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSelectPayment, generating }) {
   // step: 'order' | 'payment'
-  const [step,           setStep]           = useState('order')
-  const [selectedOrder,  setSelectedOrder]  = useState(null)
-  const [search,         setSearch]         = useState('')
-  const searchRef                           = useRef(null)
-  const currency                            = getCurrency()
+  const [step,          setStep]          = useState('order')
+  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [search,        setSearch]        = useState('')
+  const searchRef                         = useRef(null)
+  const currency                          = getCurrency()
 
   // Reset on open/close
   useEffect(() => {
@@ -198,7 +202,6 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
     }
   }, [isOpen])
 
-  // When an order is picked, move to step 2
   function handlePickOrder(order) {
     setSelectedOrder(order)
     setSearch('')
@@ -213,7 +216,6 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
 
   // ── Step 1: order list ──────────────────────────────────────
 
-  // Only show orders that have at least one recorded payment
   const ordersWithPayments = orders.filter(order =>
     payments.some(p => String(p.orderId) === String(order.id))
   )
@@ -222,15 +224,15 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
     if (!search.trim()) return true
     const q = search.toLowerCase()
     return (
-      (order.desc   || '').toLowerCase().includes(q) ||
-      (order.status || '').toLowerCase().includes(q) ||
-      (order.due    || '').toLowerCase().includes(q) ||
+      (order.desc    || '').toLowerCase().includes(q) ||
+      (order.status  || '').toLowerCase().includes(q) ||
+      (order.due     || '').toLowerCase().includes(q) ||
       (order.takenAt || '').toLowerCase().includes(q) ||
-      (order.items || []).some(i => (i.name || '').toLowerCase().includes(q))
+      (order.items   || []).some(i => (i.name || '').toLowerCase().includes(q))
     )
   })
 
-  // ── Step 2: payment/installment list ───────────────────────
+  // ── Step 2: installment list ────────────────────────────────
 
   const orderPayment = selectedOrder
     ? payments.find(p => String(p.orderId) === String(selectedOrder.id))
@@ -238,7 +240,6 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
 
   const installments = orderPayment?.installments || []
 
-  // Build set of already-receipted installment ids for this payment
   const receiptedInstallmentIds = new Set(
     receipts
       .filter(r => String(r.paymentId) === String(orderPayment?.id))
@@ -260,37 +261,50 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
   const balance    = fullPrice > 0 ? Math.max(0, fullPrice - totalPaid) : 0
   const orderItems = selectedOrder?.items || []
 
+  // Header back/close action
+  const handleHeaderBack = step === 'payment' ? handleBack : onClose
+
   return (
     <div className={`${styles.pickerOverlay} ${isOpen ? styles.pickerOverlay_open : ''}`}>
 
-      {/* Header */}
-      <div className={styles.pickerHeader}>
-        <button
-          className={styles.pickerCloseBtn}
-          onClick={step === 'payment' ? handleBack : onClose}
-        >
-          <span className="mi">
-            {step === 'payment' ? 'arrow_back' : 'keyboard_arrow_down'}
-          </span>
-        </button>
-        <div className={styles.pickerHeaderText}>
-          {step === 'order' ? (
+      {/* Full-screen header using the shared Header component */}
+      <Header
+        type="back"
+        title={step === 'order' ? 'New Receipt' : 'Select Payment'}
+        onBackClick={generating ? undefined : handleHeaderBack}
+      />
+
+      {/* Subtitle + optional breadcrumb */}
+      <div className={styles.pickerSubtitleBar}>
+        {step === 'order'
+          ? 'Choose an order to generate a receipt from'
+          : (
             <>
-              <span className={styles.pickerTitle}>Select Order</span>
-              <span className={styles.pickerSubtitle}>Choose an order to generate a receipt from</span>
+              <span className={styles.pickerBreadcrumb}>{selectedOrder?.desc || 'Order'}</span>
+              {' · '}Choose a payment to receipt
             </>
-          ) : (
-            <>
-              {/* Breadcrumb */}
-              <span className={styles.pickerBreadcrumb}>
-                {selectedOrder?.desc || 'Order'}
-              </span>
-              <span className={styles.pickerTitle}>Select Payment</span>
-              <span className={styles.pickerSubtitle}>Choose a payment to receipt</span>
-            </>
-          )}
-        </div>
+          )
+        }
       </div>
+
+      {/* Order summary strip — step 2 only */}
+      {step === 'payment' && orderPayment && (
+        <div className={styles.pickerOrderSummary}>
+          <OrderMosaic orderItems={orderItems} fallbackIcon="receipt" size={44} />
+          <div className={styles.pickerOrderSummaryInfo}>
+            <div className={styles.pickerOrderSummaryTitle}>{selectedOrder?.desc}</div>
+            <div className={styles.pickerOrderSummaryMeta}>
+              {formatMoney(currency, totalPaid)} paid
+              {fullPrice > 0 && ` · ${formatMoney(currency, fullPrice)} total`}
+              {balance > 0 && (
+                <span style={{ color: '#ef4444', marginLeft: 4 }}>
+                  · {formatMoney(currency, balance)} balance
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search bar */}
       <div className={styles.pickerSearchWrap}>
@@ -301,8 +315,8 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
           className={styles.pickerSearchInput}
           placeholder={
             step === 'order'
-              ? 'Search by garment, status, date...'
-              : 'Search by amount, method, date...'
+              ? 'Search orders…'
+              : 'Search by amount, method, date…'
           }
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -314,229 +328,191 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
         )}
       </div>
 
+      {/* Count line */}
+      <div className={styles.pickerCountLine}>
+        {step === 'order'
+          ? `${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'} with payments${search.trim() ? ` matching "${search}"` : ''}`
+          : `${filteredInstallments.length} ${filteredInstallments.length === 1 ? 'payment' : 'payments'}${search.trim() ? ` matching "${search}"` : ''} — tap one to receipt`
+        }
+      </div>
+
       {/* ── STEP 1: Order list ── */}
       {step === 'order' && (
-        <>
-          <div className={styles.pickerCountLine}>
-            {filteredOrders.length} {filteredOrders.length === 1 ? 'order' : 'orders'} with payments
-            {search.trim() ? ` matching "${search}"` : ''}
-          </div>
+        <div className={styles.pickerList}>
 
-          <div className={styles.pickerList}>
-
-            {ordersWithPayments.length === 0 && (
-              <div className={styles.pickerEmpty}>
-                <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>payments</span>
-                <p>No payments recorded yet.</p>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text3)', marginTop: 4 }}>
-                  Go to the Payments tab to record a payment first.
-                </p>
-              </div>
-            )}
-
-            {ordersWithPayments.length > 0 && filteredOrders.length === 0 && (
-              <div className={styles.pickerEmpty}>
-                <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>search_off</span>
-                <p>No orders match your search</p>
-              </div>
-            )}
-
-            {filteredOrders.map((order, index) => {
-              const payment      = payments.find(p => String(p.orderId) === String(order.id))
-              const installs     = payment?.installments || []
-              const paid         = getTotalPaid(installs)
-              const price        = parseFloat(order.price) || 0
-              const bal          = price > 0 ? Math.max(0, price - paid) : 0
-              const isFullyPaid  = price > 0 && paid >= price
-              const installCount = installs.length
-              const isLast       = index === filteredOrders.length - 1
-
-              return (
-                <div
-                  key={order.id}
-                  className={`${styles.pickerOrderCard} ${isLast ? styles.pickerOrderCard_last : ''}`}
-                  onClick={() => handlePickOrder(order)}
-                >
-                  <OrderMosaic orderItems={order.items || []} fallbackIcon="receipt" size={62} />
-
-                  <div className={styles.pickerOrderInfo}>
-                    {/* Row 1: title + total price */}
-                    <div className={styles.pickerOrderTop}>
-                      <span className={styles.pickerOrderTitle}>{order.desc || 'Untitled Order'}</span>
-                      <span className={styles.pickerOrderPrice}>{formatMoney(currency, price)}</span>
-                    </div>
-
-                    {/* Row 2: paid so far + instalment count */}
-                    <div className={styles.pickerOrderMeta}>
-                      <span className={styles.pickerMetaChip}>
-                        <span className="mi" style={{ fontSize: '0.72rem', color: '#22c55e' }}>payments</span>
-                        {formatMoney(currency, paid)} paid
-                      </span>
-                      {installCount > 1 && (
-                        <span className={styles.pickerMetaChip}>
-                          <span className="mi" style={{ fontSize: '0.72rem' }}>receipt_long</span>
-                          {installCount} payments
-                        </span>
-                      )}
-                      {order.takenAt && (
-                        <span className={styles.pickerMetaDate}>
-                          <span className="mi" style={{ fontSize: '0.72rem' }}>event</span>
-                          {order.takenAt}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Row 3: balance + status */}
-                    <div className={styles.pickerOrderBadges}>
-                      {isFullyPaid ? (
-                        <span className={styles.pickerFullPaidBadge}>
-                          <span className="mi" style={{ fontSize: '0.7rem' }}>check_circle</span>
-                          Fully Paid
-                        </span>
-                      ) : (
-                        <span className={styles.pickerBalanceBadge}>
-                          Balance: {formatMoney(currency, bal)}
-                        </span>
-                      )}
-                      {order.items?.length > 0 && (
-                        <span className={styles.pickerMetaChip}>
-                          <span className="mi" style={{ fontSize: '0.72rem' }}>checkroom</span>
-                          {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Row 4: garment names */}
-                    {order.items?.length > 0 && (
-                      <div className={styles.pickerGarmentNames}>
-                        {order.items.map(i => i.name).filter(Boolean).join(' · ')}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Arrow indicator */}
-                  <div className={styles.pickerChevron}>
-                    <span className="mi" style={{ fontSize: '1.2rem', color: 'var(--text3)' }}>chevron_right</span>
-                  </div>
-                </div>
-              )
-            })}
-
-            <div style={{ height: 40 }} />
-          </div>
-        </>
-      )}
-
-      {/* ── STEP 2: Payment/installment list ── */}
-      {step === 'payment' && orderPayment && (
-        <>
-          {/* Summary strip for the selected order */}
-          <div className={styles.pickerOrderSummary}>
-            <OrderMosaic orderItems={orderItems} fallbackIcon="receipt" size={44} />
-            <div className={styles.pickerOrderSummaryInfo}>
-              <div className={styles.pickerOrderSummaryTitle}>{selectedOrder?.desc}</div>
-              <div className={styles.pickerOrderSummaryMeta}>
-                {formatMoney(currency, totalPaid)} paid
-                {fullPrice > 0 && ` · ${formatMoney(currency, fullPrice)} total`}
-                {balance > 0 && (
-                  <span style={{ color: '#ef4444', marginLeft: 4 }}>
-                    · {formatMoney(currency, balance)} balance
-                  </span>
-                )}
-              </div>
+          {ordersWithPayments.length === 0 && (
+            <div className={styles.pickerEmpty}>
+              <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>payments</span>
+              <p>No payments recorded yet.</p>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text3)', marginTop: 4 }}>
+                Go to the Payments tab to record a payment first.
+              </p>
             </div>
-          </div>
+          )}
 
-          <div className={styles.pickerCountLine}>
-            {filteredInstallments.length} {filteredInstallments.length === 1 ? 'payment' : 'payments'}
-            {search.trim() ? ` matching "${search}"` : ''}
-            {' '}— tap one to generate a receipt
-          </div>
+          {ordersWithPayments.length > 0 && filteredOrders.length === 0 && (
+            <div className={styles.pickerEmpty}>
+              <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>search_off</span>
+              <p>No orders match your search</p>
+            </div>
+          )}
 
-          <div className={styles.pickerList}>
+          {filteredOrders.map((order, index) => {
+            const payment      = payments.find(p => String(p.orderId) === String(order.id))
+            const installs     = payment?.installments || []
+            const paid         = getTotalPaid(installs)
+            const price        = parseFloat(order.price) || 0
+            const bal          = price > 0 ? Math.max(0, price - paid) : 0
+            const isFullyPaid  = price > 0 && paid >= price
+            const installCount = installs.length
+            const isLast       = index === filteredOrders.length - 1
+            const garmentNames = (order.items || []).map(i => i.name).filter(Boolean).join(' · ')
 
-            {filteredInstallments.length === 0 && (
-              <div className={styles.pickerEmpty}>
-                <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>search_off</span>
-                <p>No payments match your search</p>
-              </div>
-            )}
+            return (
+              <div
+                key={order.id}
+                className={`${styles.pickerOrderCard} ${isLast ? styles.pickerOrderCard_last : ''}`}
+                onClick={() => handlePickOrder(order)}
+              >
+                <OrderMosaic orderItems={order.items || []} fallbackIcon="receipt" size={56} />
 
-            {filteredInstallments.map((inst, index) => {
-              const isReceiptedAlready = receiptedInstallmentIds.has(String(inst.id))
-              const isLast             = index === filteredInstallments.length - 1
-              const paidBefore         = getTotalPaid(installments.slice(0, index))
-              const paidAfter          = paidBefore + (parseFloat(inst.amount) || 0)
-              const balAfter           = fullPrice > 0 ? Math.max(0, fullPrice - paidAfter) : null
-
-              return (
-                <div
-                  key={inst.id ?? index}
-                  className={`${styles.pickerInstallCard} ${isReceiptedAlready ? styles.pickerInstallCard_receipted : ''} ${isLast ? styles.pickerInstallCard_last : ''}`}
-                  onClick={() => onSelectPayment(orderPayment, inst)}
-                >
-                  {/* Left: payment number circle */}
-                  <div className={styles.pickerInstallNumber}>
-                    <span>{index + 1}</span>
+                <div className={styles.pickerOrderInfo}>
+                  {/* Row 1: title + total price */}
+                  <div className={styles.pickerOrderTop}>
+                    <span className={styles.pickerOrderTitle}>{order.desc || 'Untitled Order'}</span>
+                    <span className={styles.pickerOrderPrice}>{formatMoney(currency, price)}</span>
                   </div>
 
-                  {/* Centre: amount + date + method + balance info */}
-                  <div className={styles.pickerInstallInfo}>
-                    <div className={styles.pickerInstallTop}>
-                      <span className={styles.pickerInstallAmount}>
-                        {formatMoney(currency, inst.amount)}
+                  {/* Row 2: garment names or item count */}
+                  {garmentNames ? (
+                    <div className={styles.pickerGarmentNames}>{garmentNames}</div>
+                  ) : installCount > 0 ? (
+                    <div className={styles.pickerGarmentNames}>
+                      {installCount} {installCount === 1 ? 'payment' : 'payments'} recorded
+                    </div>
+                  ) : null}
+
+                  {/* Row 3: paid + balance/fully paid badge */}
+                  <div className={styles.pickerOrderBadges}>
+                    <span className={styles.pickerPaidChip}>
+                      {formatMoney(currency, paid)} paid
+                    </span>
+                    {isFullyPaid ? (
+                      <span className={styles.pickerFullPaidBadge}>
+                        <span className="mi" style={{ fontSize: '0.65rem' }}>check_circle</span>
+                        Fully Paid
                       </span>
-                      {isReceiptedAlready && (
-                        <span className={styles.pickerReceiptedTag}>
-                          <span className="mi" style={{ fontSize: '0.75rem' }}>receipt_long</span>
-                          Receipted
-                        </span>
-                      )}
-                      {!isReceiptedAlready && (
-                        <span className={styles.pickerGenerateTag}>
-                          <span className="mi" style={{ fontSize: '0.75rem' }}>add_circle</span>
-                          Generate
-                        </span>
-                      )}
-                    </div>
-
-                    <div className={styles.pickerInstallMeta}>
-                      {inst.date && (
-                        <span className={styles.pickerMetaDate}>
-                          <span className="mi" style={{ fontSize: '0.68rem' }}>event</span>
-                          {inst.date}
-                        </span>
-                      )}
-                      {inst.method && (
-                        <span className={styles.pickerMetaChip}>
-                          <span className="mi" style={{ fontSize: '0.68rem' }}>
-                            {inst.method === 'cash' ? 'payments' : inst.method === 'card' ? 'credit_card' : 'swap_horiz'}
-                          </span>
-                          {capitalise(inst.method)}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Balance after this payment */}
-                    {balAfter !== null && (
-                      <div className={styles.pickerInstallBalance}>
-                        Balance after: {' '}
-                        <span style={{ color: balAfter > 0 ? '#ef4444' : '#22c55e', fontWeight: 700 }}>
-                          {balAfter > 0 ? formatMoney(currency, balAfter) : 'Fully Paid'}
-                        </span>
-                      </div>
+                    ) : (
+                      <span className={styles.pickerBalanceBadge}>
+                        {formatMoney(currency, bal)} balance
+                      </span>
                     )}
                   </div>
                 </div>
-              )
-            })}
 
-            <div style={{ height: 40 }} />
-          </div>
-        </>
+                <div className={styles.pickerChevron}>
+                  <span className="mi" style={{ fontSize: '1.2rem', color: 'var(--text3)' }}>chevron_right</span>
+                </div>
+              </div>
+            )
+          })}
+
+          <div style={{ height: 40 }} />
+        </div>
       )}
 
-      {/* Edge case: order selected but no payment found (shouldn't normally happen) */}
+      {/* ── STEP 2: Installment list ── */}
+      {step === 'payment' && orderPayment && (
+        <div className={styles.pickerList}>
+
+          {filteredInstallments.length === 0 && (
+            <div className={styles.pickerEmpty}>
+              <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>search_off</span>
+              <p>No payments match your search</p>
+            </div>
+          )}
+
+          {filteredInstallments.map((inst, index) => {
+            const isReceiptedAlready = receiptedInstallmentIds.has(String(inst.id))
+            const isGenerating       = generating === inst.id
+            const isLast             = index === filteredInstallments.length - 1
+            const paidBefore         = getTotalPaid(installments.slice(0, index))
+            const paidAfter          = paidBefore + (parseFloat(inst.amount) || 0)
+            const balAfter           = fullPrice > 0 ? Math.max(0, fullPrice - paidAfter) : null
+
+            return (
+              <div
+                key={inst.id ?? index}
+                className={`
+                  ${styles.pickerInstallCard}
+                  ${isReceiptedAlready ? styles.pickerInstallCard_receipted : ''}
+                  ${isGenerating       ? styles.pickerInstallCard_generating : ''}
+                  ${isLast             ? styles.pickerInstallCard_last : ''}
+                `}
+                onClick={() => !isGenerating && onSelectPayment(orderPayment, inst)}
+              >
+                {/* Left: payment number circle */}
+                <div className={styles.pickerInstallNumber}>
+                  <span>{index + 1}</span>
+                </div>
+
+                {/* Centre: amount + date + method + balance */}
+                <div className={styles.pickerInstallInfo}>
+                  <div className={styles.pickerInstallTop}>
+                    <span className={styles.pickerInstallAmount}>
+                      {formatMoney(currency, inst.amount)}
+                    </span>
+
+                    {/* Right-side tag — generating / receipted / generate */}
+                    {isGenerating ? (
+                      <div className={styles.pickerCreatingTag}>
+                        <div className={styles.pickerSpinner} />
+                        <span>Generating</span>
+                      </div>
+                    ) : isReceiptedAlready ? (
+                      <div className={styles.pickerReceiptedTag}>
+                        <span className="mi" style={{ fontSize: '0.75rem' }}>receipt_long</span>
+                        <span>Receipted</span>
+                      </div>
+                    ) : (
+                      <div className={styles.pickerGenerateTag}>
+                        <span className="mi" style={{ fontSize: '0.75rem' }}>add_circle</span>
+                        <span>Generate</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={styles.pickerInstallMeta}>
+                    {inst.date && (
+                      <span className={styles.pickerMetaDate}>
+                        {inst.date}
+                      </span>
+                    )}
+                    {inst.method && (
+                      <span className={styles.pickerMethodPill}>
+                        {capitalise(inst.method)}
+                      </span>
+                    )}
+                  </div>
+
+                  {balAfter !== null && (
+                    <div className={styles.pickerInstallBalance}>
+                      Balance after:{' '}
+                      <span style={{ color: balAfter > 0 ? '#ef4444' : '#22c55e', fontWeight: 700 }}>
+                        {balAfter > 0 ? formatMoney(currency, balAfter) : 'Fully Paid'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+
+          <div style={{ height: 40 }} />
+        </div>
+      )}
+
+      {/* Edge case: no payment found for selected order */}
       {step === 'payment' && !orderPayment && (
         <div className={styles.pickerEmpty} style={{ marginTop: 40 }}>
           <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>error_outline</span>
@@ -598,7 +574,6 @@ function EmptyState() {
         Tap <strong>+</strong> to generate a receipt from a recorded payment,
         or open a payment on the Payments tab.
       </p>
-
     </div>
   )
 }
@@ -620,7 +595,8 @@ export default function ReceiptTab({
   const [viewingReceipt, setViewingReceipt] = useState(null)
   const [deleteTarget,   setDeleteTarget]   = useState(null)
   const [pickerOpen,     setPickerOpen]     = useState(false)
-  const [generating,     setGenerating]     = useState(false)
+  // generating holds the installment id currently being processed, or null
+  const [generating,     setGenerating]     = useState(null)
 
   const currency      = getCurrency()
   const orderItemsMap = buildOrderItemsMap(orders)
@@ -633,21 +609,19 @@ export default function ReceiptTab({
     return () => document.removeEventListener('openReceiptModal', openPicker)
   }, [])
 
-  // Called when a specific installment is selected in step 2
   async function handleSelectPayment(payment, installment) {
-    setGenerating(true)
+    // Show inline spinner on this specific installment card, keep modal open
+    setGenerating(installment.id)
     try {
-      // Pass the full payment + the specific installment so
-      // CustomerDetail's handleGenerateReceipt can build the receipt correctly.
-      // We attach the selected installment as a hint — CustomerDetail already
-      // handles building installmentIds from receipts, so we just need to
-      // signal which payment object to use.
       await onGenerateReceipt(payment, installment)
-      setPickerOpen(false)
+      // Brief pause so user sees the generating state resolve before close
+      setTimeout(() => {
+        setPickerOpen(false)
+        setGenerating(null)
+      }, 400)
     } catch {
+      setGenerating(null)
       showToast('Failed to generate receipt. Try again.')
-    } finally {
-      setGenerating(false)
     }
   }
 
@@ -662,7 +636,7 @@ export default function ReceiptTab({
     <>
       {/* Empty state */}
       {receipts.length === 0 && (
-        <EmptyState  />
+        <EmptyState />
       )}
 
       {/* Receipt list grouped by date */}
@@ -684,10 +658,13 @@ export default function ReceiptTab({
         </div>
       ))}
 
-      {/* Two-step picker modal */}
+      {/* Two-step picker modal — full screen */}
       <ReceiptPickerModal
         isOpen={pickerOpen}
-        onClose={() => setPickerOpen(false)}
+        onClose={() => {
+          if (generating) return  // prevent closing mid-generation
+          setPickerOpen(false)
+        }}
         orders={orders}
         payments={payments}
         receipts={receipts}

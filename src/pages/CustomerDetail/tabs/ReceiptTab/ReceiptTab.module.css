@@ -158,73 +158,38 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   RECEIPT PICKER MODAL — bottom sheet, two steps
+   RECEIPT PICKER MODAL — full screen overlay
    ───────────────────────────────────────────────────────────── */
 
 .pickerOverlay {
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
-  height: 92dvh;
+  height: 100%;
   background: var(--bg);
-  border-radius: 20px 20px 0 0;
   z-index: 3500;
   display: flex;
   flex-direction: column;
   transform: translateY(100%);
   transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.12);
 }
 
 .pickerOverlay_open {
   transform: translateY(0);
 }
 
-/* Pull indicator */
-.pickerOverlay::before {
-  content: '';
-  display: block;
-  width: 36px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--border2);
-  margin: 10px auto 0;
+/* ── Subtitle bar below the Header ── */
+.pickerSubtitleBar {
+  font-size: 0.75rem;
+  color: var(--text3);
+  font-weight: 400;
+  padding: 0 16px 10px;
   flex-shrink: 0;
-}
-
-/* ── Header ── */
-.pickerHeader {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 16px 12px;
-  flex-shrink: 0;
-}
-
-.pickerCloseBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  color: var(--text2);
-  margin-top: 2px;
-}
-
-.pickerHeaderText {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
 }
 
 .pickerBreadcrumb {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--accent);
   white-space: nowrap;
@@ -233,17 +198,37 @@
   max-width: 240px;
 }
 
-.pickerTitle {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.2;
+/* ── Order summary strip (shown at top of step 2) ── */
+.pickerOrderSummary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 16px 10px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  flex-shrink: 0;
 }
 
-.pickerSubtitle {
+.pickerOrderSummaryInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.pickerOrderSummaryTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pickerOrderSummaryMeta {
   font-size: 0.72rem;
   color: var(--text3);
-  font-weight: 400;
+  margin-top: 2px;
 }
 
 /* ── Search bar ── */
@@ -251,7 +236,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 16px 8px;
+  margin: 0 16px 6px;
   background: var(--surface);
   border: 1.5px solid var(--border2);
   border-radius: 12px;
@@ -299,39 +284,6 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   flex-shrink: 0;
-}
-
-/* ── Order summary strip (shown at top of step 2) ── */
-.pickerOrderSummary {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 16px 10px;
-  padding: 10px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  flex-shrink: 0;
-}
-
-.pickerOrderSummaryInfo {
-  flex: 1;
-  min-width: 0;
-}
-
-.pickerOrderSummaryTitle {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pickerOrderSummaryMeta {
-  font-size: 0.72rem;
-  color: var(--text3);
-  margin-top: 2px;
 }
 
 /* ── Scrollable list ── */
@@ -486,6 +438,15 @@
   white-space: nowrap;
 }
 
+.pickerPaidChip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text3);
+  white-space: nowrap;
+}
+
 .pickerGarmentNames {
   font-size: 0.68rem;
   color: var(--text3);
@@ -537,6 +498,12 @@
 /* Receipted cards: slightly muted */
 .pickerInstallCard_receipted {
   opacity: 0.75;
+}
+
+/* Card being generated: non-interactive */
+.pickerInstallCard_generating {
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 /* Payment number circle */
@@ -591,6 +558,19 @@
   margin-top: 1px;
 }
 
+.pickerMethodPill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
 /* "Receipted" tag — green */
 .pickerReceiptedTag {
   display: flex;
@@ -625,73 +605,39 @@
   line-height: 1;
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   RECEIPT TABLE STYLES (used inside ReceiptViewer)
-   ───────────────────────────────────────────────────────────── */
-
-.tableHead {
-  display: flex;
-  font-weight: 800;
-  font-size: 8px;
-  border-bottom: 2px solid #1a1a1a;
-  padding-bottom: 5px;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.tableRowMain {
-  display: flex;
-  padding: 8px 0;
-  font-size: 10px;
-  font-weight: 900;
-  color: #000;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.tableItemizedSection {
-  padding: 4px 0 10px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.tableItemizedLabel {
-  font-size: 7px;
-  font-weight: 800;
-  color: #888;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.tableRowSub {
-  display: flex;
-  padding: 3px 0;
-  font-size: 8.5px;
-  color: #444;
-  font-style: normal;
-}
-
-.tableColDescription {
-  flex: 2;
-}
-
-.tableColNumber {
-  flex: 1;
-  text-align: right;
-}
-
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--bg);
-  z-index: 3000;
+/* "Generating…" tag — shown while receipt is being created */
+.pickerCreatingTag {
   display: flex;
   flex-direction: column;
-  animation: receiptSlideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--text2);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 5px 8px;
+  white-space: nowrap;
+  line-height: 1;
 }
+
+/* Spinner inside the "Generating…" tag */
+.pickerSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: pickerSpin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pickerSpin {
+  to { transform: rotate(360deg); }
+}
+
+
 
 @keyframes receiptSlideUp {
   from { transform: translateY(100%); }

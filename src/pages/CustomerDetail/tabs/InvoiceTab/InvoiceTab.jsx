@@ -26,11 +26,11 @@ const STATUS_STYLES = {
 }
 
 const ORDER_STATUS_LABELS = {
-  pending:     'Pending',
+  pending:       'Pending',
   'in-progress': 'In Progress',
-  completed:   'Completed',
-  delivered:   'Delivered',
-  cancelled:   'Cancelled',
+  completed:     'Completed',
+  delivered:     'Delivered',
+  cancelled:     'Cancelled',
 }
 
 const ORDER_STATUS_STYLES = {
@@ -223,14 +223,16 @@ function OrderMosaic({ orderItems, fallbackIcon, size = 68 }) {
 
 // ─────────────────────────────────────────────────────────────
 // ORDER PICKER MODAL
-// Slides up from the bottom — shows all orders with full detail
-// Invoiced orders show an "Invoiced" tag + tapping opens existing invoice
+// Full-screen overlay (like MeasurementTab) — Header component
+// at the top, scrollable order list below.
+// Tapping an un-invoiced order shows an inline "Creating…" state
+// on that card while the invoice is being generated.
 // ─────────────────────────────────────────────────────────────
 
-function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrder }) {
-  const [search, setSearch]       = useState('')
-  const searchRef                 = useRef(null)
-  const currency                  = getCurrency()
+function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrder, generating }) {
+  const [search, setSearch] = useState('')
+  const searchRef           = useRef(null)
+  const currency            = getCurrency()
 
   // Focus search when modal opens
   useEffect(() => {
@@ -245,12 +247,12 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrder }) 
     if (!search.trim()) return true
     const q = search.toLowerCase()
     return (
-      (order.desc  || '').toLowerCase().includes(q) ||
+      (order.desc   || '').toLowerCase().includes(q) ||
       (order.status || '').toLowerCase().includes(q) ||
       (order.stage  || '').toLowerCase().replace(/_/g, ' ').includes(q) ||
       (order.due    || '').toLowerCase().includes(q) ||
       (order.takenAt || '').toLowerCase().includes(q) ||
-      (order.items || []).some(i => (i.name || '').toLowerCase().includes(q))
+      (order.items  || []).some(i => (i.name || '').toLowerCase().includes(q))
     )
   })
 
@@ -260,15 +262,16 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrder }) 
   return (
     <div className={`${styles.pickerOverlay} ${isOpen ? styles.pickerOverlay_open : ''}`}>
 
-      {/* Header */}
-      <div className={styles.pickerHeader}>
-        <button className={styles.pickerCloseBtn} onClick={onClose}>
-          <span className="mi">keyboard_arrow_down</span>
-        </button>
-        <div className={styles.pickerHeaderText}>
-          <span className={styles.pickerTitle}>Select Order</span>
-          <span className={styles.pickerSubtitle}>Choose an order to create or view an invoice</span>
-        </div>
+      {/* Full-screen header using the shared Header component */}
+      <Header
+        type="back"
+        title="New Invoice"
+        onBackClick={onClose}
+      />
+
+      {/* Subtitle line */}
+      <div className={styles.pickerSubtitleBar}>
+        Choose an order to create or view an invoice
       </div>
 
       {/* Search bar */}
@@ -278,7 +281,7 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrder }) 
           ref={searchRef}
           type="text"
           className={styles.pickerSearchInput}
-          placeholder="Search by garment, status, stage, date..."
+          placeholder="Search orders…"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -292,7 +295,7 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrder }) 
       {/* Count line */}
       <div className={styles.pickerCountLine}>
         {filtered.length} {filtered.length === 1 ? 'order' : 'orders'}
-        {search.trim() ? ` matching "${search}"` : ' total'}
+        {search.trim() ? ` matching "${search}"` : ''}
       </div>
 
       {/* Orders list */}
@@ -306,81 +309,84 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrder }) 
         )}
 
         {filtered.map((order, index) => {
-          const isInvoiced    = invoicedOrderIds.has(String(order.id))
-          const existingInv   = isInvoiced ? invoices.find(inv => String(inv.orderId) === String(order.id)) : null
-          const items         = order.items || []
-          const itemCount     = items.length
-          const price         = parseFloat(order.price) || 0
-          const statusStyle   = ORDER_STATUS_STYLES[order.status] || ORDER_STATUS_STYLES.pending
-          const statusLabel   = ORDER_STATUS_LABELS[order.status] || 'Pending'
-          const stageLabel    = order.stage ? STAGE_LABELS[order.stage] : null
-          const stageIcon     = order.stage ? STAGE_ICONS[order.stage]  : null
-          const isLast        = index === filtered.length - 1
+          const isInvoiced  = invoicedOrderIds.has(String(order.id))
+          const existingInv = isInvoiced ? invoices.find(inv => String(inv.orderId) === String(order.id)) : null
+          const isGenerating = generating === order.id
+          const items       = order.items || []
+          const itemCount   = items.length
+          const price       = parseFloat(order.price) || 0
+          const statusStyle = ORDER_STATUS_STYLES[order.status] || ORDER_STATUS_STYLES.pending
+          const statusLabel = ORDER_STATUS_LABELS[order.status] || 'Pending'
+          const stageLabel  = order.stage ? STAGE_LABELS[order.stage] : null
+          const stageIcon   = order.stage ? STAGE_ICONS[order.stage]  : null
+          const isLast      = index === filtered.length - 1
+
+          // Garment names joined
+          const garmentNames = items.map(i => i.name).filter(Boolean).join(' · ')
 
           return (
             <div
               key={order.id}
-              className={`${styles.pickerOrderCard} ${isInvoiced ? styles.pickerOrderCard_invoiced : ''} ${isLast ? styles.pickerOrderCard_last : ''}`}
-              onClick={() => onSelectOrder(order, existingInv)}
+              className={`
+                ${styles.pickerOrderCard}
+                ${isInvoiced   ? styles.pickerOrderCard_invoiced   : ''}
+                ${isGenerating ? styles.pickerOrderCard_generating : ''}
+                ${isLast       ? styles.pickerOrderCard_last       : ''}
+              `}
+              onClick={() => !isGenerating && onSelectOrder(order, existingInv)}
             >
               {/* Thumbnail */}
-              <OrderMosaic orderItems={items} fallbackIcon="receipt_long" size={62} />
+              <OrderMosaic orderItems={items} fallbackIcon="receipt_long" size={56} />
 
               {/* Main info */}
               <div className={styles.pickerOrderInfo}>
 
                 {/* Row 1: title + price */}
                 <div className={styles.pickerOrderTop}>
-                  <span className={styles.pickerOrderTitle}>{order.desc || 'Untitled Order'}</span>
-                  <span className={styles.pickerOrderPrice}>{formatMoney(currency, price)}</span>
+                  <span className={styles.pickerOrderTitle}>
+                    {order.desc || 'Untitled Order'}
+                  </span>
+                  <span className={styles.pickerOrderPrice}>
+                    {formatMoney(currency, price)}
+                  </span>
                 </div>
 
-                {/* Row 2: item count + date taken */}
-                <div className={styles.pickerOrderMeta}>
-                  {itemCount > 0 && (
-                    <span className={styles.pickerMetaChip}>
-                      <span className="mi" style={{ fontSize: '0.72rem' }}>checkroom</span>
-                      {itemCount} {itemCount === 1 ? 'item' : 'items'}
-                    </span>
-                  )}
-                  {order.takenAt && (
-                    <span className={styles.pickerMetaDate}>
-                      <span className="mi" style={{ fontSize: '0.72rem' }}>event</span>
-                      {order.takenAt}
-                    </span>
-                  )}
-                </div>
+                {/* Row 2: garment names (if any) */}
+                {garmentNames ? (
+                  <div className={styles.pickerGarmentNames}>{garmentNames}</div>
+                ) : itemCount > 0 ? (
+                  <div className={styles.pickerGarmentNames}>
+                    {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                  </div>
+                ) : null}
 
-                {/* Row 3: stage + status + due */}
+                {/* Row 3: status badge + stage badge + due date */}
                 <div className={styles.pickerOrderBadges}>
-                  {stageLabel && (
-                    <span className={styles.pickerStageBadge}>
-                      <span className="mi" style={{ fontSize: '0.7rem' }}>{stageIcon}</span>
-                      {stageLabel}
-                    </span>
-                  )}
                   <span className={styles.pickerStatusBadge} style={statusStyle}>
                     {statusLabel}
                   </span>
+                  {stageLabel && (
+                    <span className={styles.pickerStageBadge}>
+                      <span className="mi" style={{ fontSize: '0.65rem' }}>{stageIcon}</span>
+                      {stageLabel}
+                    </span>
+                  )}
                   {order.due && (
                     <span className={styles.pickerDueBadge}>
-                      <span className="mi" style={{ fontSize: '0.68rem' }}>schedule</span>
                       Due {order.due}
                     </span>
                   )}
                 </div>
-
-                {/* Row 4: garment names if available */}
-                {items.length > 0 && (
-                  <div className={styles.pickerGarmentNames}>
-                    {items.map(i => i.name).filter(Boolean).join(' · ')}
-                  </div>
-                )}
               </div>
 
               {/* Right indicator */}
               <div className={styles.pickerOrderAction}>
-                {isInvoiced ? (
+                {isGenerating ? (
+                  <div className={styles.pickerCreatingTag}>
+                    <div className={styles.pickerSpinner} />
+                    <span>Creating</span>
+                  </div>
+                ) : isInvoiced ? (
                   <div className={styles.pickerInvoicedTag}>
                     <span className="mi" style={{ fontSize: '0.8rem' }}>receipt_long</span>
                     <span>Invoiced</span>
@@ -413,7 +419,7 @@ function InvoiceCard({ invoice, currency, onTap, isLast, orderItems }) {
   const statusKey  = invoice.status || 'unpaid'
   const badgeLabel = STATUS_LABELS[statusKey] || invoice.status
   const badgeStyle = STATUS_STYLES[statusKey] || STATUS_STYLES.unpaid
-  const itemCount = invoice.items?.length > 0 ? invoice.items.length : (invoice.qty || null)
+  const itemCount  = invoice.items?.length > 0 ? invoice.items.length : (invoice.qty || null)
 
   return (
     <div
@@ -499,17 +505,18 @@ export default function InvoiceTab({
       return
     }
 
-    // Otherwise generate immediately
+    // Show inline "Creating…" state on the card, keep modal open
     setGenerating(order.id)
     try {
       await onGenerateInvoice(order.id)
-      setPickerOpen(false)
-      // onGenerateInvoice in CustomerDetail already switches to invoice tab
-      // and the new invoice will appear via the invoices prop update
+      // Small delay so the user sees the success transition before modal closes
+      setTimeout(() => {
+        setPickerOpen(false)
+        setGenerating(null)
+      }, 400)
     } catch {
-      showToast('Failed to generate invoice. Try again.')
-    } finally {
       setGenerating(null)
+      showToast('Failed to generate invoice. Try again.')
     }
   }
 
@@ -529,7 +536,6 @@ export default function InvoiceTab({
   }
 
   // Keep viewingInvoice in sync when invoices prop updates
-  // (e.g. status change from PaymentsTab)
   useEffect(() => {
     if (!viewingInvoice) return
     const updated = invoices.find(inv => inv.id === viewingInvoice.id)
@@ -564,10 +570,13 @@ export default function InvoiceTab({
         </div>
       ))}
 
-      {/* Order picker modal */}
+      {/* Order picker modal — full screen */}
       <OrderPickerModal
         isOpen={pickerOpen}
-        onClose={() => setPickerOpen(false)}
+        onClose={() => {
+          if (generating) return  // prevent closing mid-generation
+          setPickerOpen(false)
+        }}
         orders={orders}
         invoices={invoices}
         onSelectOrder={handleSelectOrder}
