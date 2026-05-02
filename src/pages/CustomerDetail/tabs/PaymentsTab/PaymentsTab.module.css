@@ -1,7 +1,5 @@
 /* ─────────────────────────────────────────────────────────────
    PaymentsTab.module.css
-   All class names are prefixed with the concept they style.
-   No shared/generic names — safe to use alongside other tabs.
    ───────────────────────────────────────────────────────────── */
 
 
@@ -28,7 +26,7 @@
 }
 
 
-/* ── DATE GROUP (wrapper for all payments on the same date) ── */
+/* ── DATE GROUP ── */
 
 .dateGroup {
   margin-bottom: 16px;
@@ -49,7 +47,7 @@
 }
 
 
-/* ── PAYMENT ROW (one payment in the list) ── */
+/* ── PAYMENT ROW ── */
 
 .paymentRow {
   display: flex;
@@ -62,7 +60,6 @@
   transition: background 0.15s;
 }
 
-/* Bottom border line under each row */
 .paymentRow::after {
   content: '';
   position: absolute;
@@ -73,7 +70,6 @@
   background: var(--border);
 }
 
-/* Last row in a group — no bottom border */
 .paymentRowLast::after {
   display: none;
 }
@@ -82,7 +78,6 @@
   background: var(--surface);
 }
 
-/* Centre column: title + meta row */
 .paymentRowInfo {
   flex: 1;
   min-width: 0;
@@ -100,7 +95,6 @@
   text-overflow: ellipsis;
 }
 
-/* Row holding the status badge + instalment count pill */
 .paymentRowMeta {
   display: flex;
   align-items: center;
@@ -108,7 +102,6 @@
   flex-wrap: wrap;
 }
 
-/* Status badge in the centre column */
 .paymentStatusBadge {
   display: inline-flex;
   align-items: center;
@@ -121,7 +114,6 @@
   letter-spacing: 0.01em;
 }
 
-/* Instalment count pill e.g. "3 payments" */
 .installmentCountBadge {
   display: inline-flex;
   align-items: center;
@@ -135,7 +127,6 @@
   letter-spacing: 0.02em;
 }
 
-/* Right column: amount + sub-amount + progress bar */
 .paymentRowRight {
   display: flex;
   flex-direction: column;
@@ -160,7 +151,6 @@
   margin-top: -2px;
 }
 
-/* Mini progress bar showing how much of the order has been paid */
 .miniProgressTrack {
   width: 100%;
   height: 3px;
@@ -178,10 +168,8 @@
 
 /* ─────────────────────────────────────────────────────────────
    ORDER MOSAIC THUMBNAIL
-   A small tiled image box showing up to 3 order item images.
    ───────────────────────────────────────────────────────────── */
 
-/* Grey outer box */
 .mosaicOuterBox {
   width: 68px;
   height: 68px;
@@ -194,7 +182,6 @@
   flex-shrink: 0;
 }
 
-/* White inner box — default centered (used for icon + single image) */
 .mosaicInnerBox {
   width: 50px;
   height: 50px;
@@ -206,7 +193,6 @@
   overflow: hidden;
 }
 
-/* Modifier: tiled layout (2 or 3 images side by side) */
 .mosaicTiled {
   padding: 0 !important;
   display: flex !important;
@@ -216,7 +202,6 @@
   border-radius: 9px;
 }
 
-/* Single full-bleed image */
 .mosaicFullImage {
   width: 100%;
   height: 100%;
@@ -224,7 +209,6 @@
   border-radius: 9px;
 }
 
-/* Left tile (larger, 60% width) */
 .mosaicTileLeft {
   flex: 0 0 60%;
   display: flex;
@@ -235,7 +219,6 @@
   height: 100%;
 }
 
-/* Right tile column (stacks two cells vertically) */
 .mosaicTileRight {
   flex: 1;
   display: flex;
@@ -244,7 +227,6 @@
   background: #fff;
 }
 
-/* One cell inside the right column */
 .mosaicTileCell {
   flex: 1;
   display: flex;
@@ -255,7 +237,6 @@
   background: #fff;
 }
 
-/* Image inside any tile */
 .mosaicTileImage {
   width: 100%;
   height: 100%;
@@ -263,7 +244,6 @@
   display: block;
 }
 
-/* Thin vertical divider between left and right tiles */
 .mosaicDividerVertical {
   width: 1.5px;
   flex-shrink: 0;
@@ -271,7 +251,6 @@
   align-self: stretch;
 }
 
-/* Thin horizontal divider between top and bottom right cells */
 .mosaicDividerHorizontal {
   height: 1.5px;
   flex-shrink: 0;
@@ -279,12 +258,10 @@
   width: 100%;
 }
 
-/* Cell that has an overlay (used when there are 4+ items) */
 .mosaicTileCellWithOverlay {
   position: relative;
 }
 
-/* Dark overlay showing "+N" extra item count */
 .mosaicExtraOverlay {
   position: absolute;
   inset: 0;
@@ -301,8 +278,8 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   ADD PAYMENT MODAL — full-screen overlay (slide-up from bottom)
-   Matches ReceiptTab's pickerOverlay pattern exactly.
+   ADD PAYMENT MODAL — full-screen overlay (slide-up)
+   Matches OrderModal / InvoiceTab pickerOverlay exactly.
    ───────────────────────────────────────────────────────────── */
 
 .pickerOverlay {
@@ -323,36 +300,46 @@
   transform: translateY(0);
 }
 
-/* ── Subtitle bar directly below the Header ── */
-.pickerSubtitleBar {
-  text-transform: uppercase;
-  margin: 16px 0;
-  font-size: 0.8rem;
-  color: var(--text3);
-  font-weight: 900;
-  padding: 0 16px 12px;
-  flex-shrink: 0;
+/* Scrollable body — matches formScrollBody from OrderModal */
+.pickerScrollBody {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 100px;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* ── Search bar ── */
-.pickerSearchWrap {
+
+/* ─────────────────────────────────────────────────────────────
+   STEP HEADING — "1. Select Order" / "2. Payment Details"
+   Identical to OrderModal .stepHeading
+   ───────────────────────────────────────────────────────────── */
+
+.stepHeading {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   CLOTH SEARCH BAR — reused from OrderModal
+   ───────────────────────────────────────────────────────────── */
+
+.clothSearchBar {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 16px 6px;
   background: var(--surface);
-  border: 1.5px solid var(--border2);
+  border: 1px solid var(--border2);
   border-radius: 12px;
   padding: 0 12px;
-  flex-shrink: 0;
-  transition: border-color 0.15s;
+  margin-bottom: 10px;
 }
 
-.pickerSearchWrap:focus-within {
-  border-color: var(--accent);
-}
-
-.pickerSearchInput {
+.clothSearchInput {
   flex: 1;
   background: transparent;
   border: none;
@@ -360,44 +347,261 @@
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
   font-size: 0.85rem;
-  font-weight: 500;
-  padding: 11px 0;
+  font-weight: 600;
+  padding: 12px 0;
 }
 
-.pickerSearchInput::placeholder {
-  color: var(--text3);
+
+/* ─────────────────────────────────────────────────────────────
+   CLOTH PICKER LIST + ITEMS — reused from OrderModal
+   ───────────────────────────────────────────────────────────── */
+
+.clothPickerList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
-.pickerSearchClear {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text3);
+.clothPickerItem {
   display: flex;
   align-items: center;
-  padding: 0;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
 }
 
-/* ── Count line — shown only when search is active ── */
-.pickerCountLine {
-  font-size: 0.65rem;
+.clothPickerItem_selected {
+  border-color: var(--accent);
+  background: var(--surface2);
+  /* Round only the top when accordion is open below */
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+
+.clothThumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.clothThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.clothInfo {
+  flex: 1;
+}
+
+.clothInfo h5 {
+  font-size: 0.9rem;
   font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.clothInfo span {
+  font-size: 0.65rem;
   color: var(--text3);
-  padding: 0 16px 8px;
+  font-weight: 600;
+}
+
+.clothCheckCircle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.clothCheckCircle_checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   ACCORDION BODY
+   Slides open below the selected order card.
+   Connected visually to the card above via shared border.
+   ───────────────────────────────────────────────────────────── */
+
+.accordionBody {
+  background: var(--surface2);
+  border: 1px solid var(--accent);
+  border-top: none;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  padding: 16px 14px 14px;
+  /* Animate open */
+  animation: accordionOpen 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+@keyframes accordionOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   INLINE PAYMENT FORM CARD
+   The form itself inside the accordion.
+   Matches detailsCard / pricingCard from OrderModal.
+   ───────────────────────────────────────────────────────────── */
+
+.inlineFormCard {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Order value reference line at the top of the form */
+.inlineOrderTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.inlineOrderTotalLabel {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text3);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.5px;
+}
+
+.inlineOrderTotalValue {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+/* Notice shown when a part-payment already exists */
+.inlineFormNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(251, 146, 60, 0.08);
+  border: 1px solid rgba(251, 146, 60, 0.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* Balance remaining row inside notice */
+.inlineBalanceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.inlineBalanceLabel {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inlineBalanceValue {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #ef4444;
+}
+
+/* Dashed divider above the save button — matches orderTotalRow */
+.inlineFormDivider {
+  border-top: 2px dashed var(--border);
+  margin: 4px 0 16px;
+}
+
+/* Primary save / record button */
+.inlineSaveButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.inlineSaveButton:active {
+  opacity: 0.8;
+}
+
+.inlineSaveButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Spinner inside the save button */
+.inlineSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: inlineSpin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
-/* ── Scrollable list area ── */
-.pickerList {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0 16px;
+@keyframes inlineSpin {
+  to { transform: rotate(360deg); }
 }
 
-/* ── Empty / no-results state ── */
+
+/* ── PICKER EMPTY STATE ── */
+
 .pickerEmpty {
   display: flex;
   flex-direction: column;
@@ -411,206 +615,6 @@
   font-size: 0.82rem;
   color: var(--text3);
   margin: 0;
-}
-
-/* ── Order card (step 1) ── */
-.pickerOrderCard {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px;
-  margin-bottom: 16px;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.12s, opacity 0.2s;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-}
-
-.pickerOrderCard::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 70px;
-  right: 0;
-  height: 1px;
-  background: var(--border);
-}
-
-.pickerOrderCard_last::after {
-  display: none;
-}
-
-.pickerOrderCard:active {
-  background: var(--surface);
-}
-
-/* ── Order info — vertical stack ── */
-.pickerOrderInfo {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-/* Order name — full, wraps naturally */
-.pickerOrderTitle {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.35;
-  word-break: break-word;
-}
-
-/* Price */
-.pickerOrderPrice {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--text);
-}
-
-/* Due date — red, small */
-.pickerOrderDue {
-  font-size: 9px;
-  font-weight: 600;
-  color: #dc2626;
-  margin-top: 1px;
-}
-
-/* "Paid in full" badge — green */
-.pickerFullPaidBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 5px;
-  background: rgba(34, 197, 94, 0.1);
-  color: #15803d;
-  border: 1px solid rgba(34, 197, 94, 0.25);
-  white-space: nowrap;
-  align-self: flex-start;
-  margin-top: 2px;
-}
-
-/* "Payment in progress" badge — orange */
-.pickerBalanceBadge {
-  display: inline-flex;
-  align-items: center;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 5px;
-  background: rgba(251, 146, 60, 0.1);
-  color: #c2410c;
-  border: 1px solid rgba(251, 146, 60, 0.25);
-  white-space: nowrap;
-  align-self: flex-start;
-  margin-top: 2px;
-}
-
-/* Chevron on the right of each order card */
-.pickerChevron {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ORDER CONTEXT CARD — bold header shown on step 2
-   Mirrors ReceiptPickerModal's orderContextCard exactly.
-   ───────────────────────────────────────────────────────────── */
-
-.orderContextCard {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin: 16px 0 14px;
-  padding: 14px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  flex-shrink: 0;
-}
-
-.orderContextLeft {
-  flex-shrink: 0;
-  padding-top: 2px;
-}
-
-.orderContextBody {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Order name — large and bold, the hero element */
-.orderContextName {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.3;
-  word-break: break-word;
-}
-
-/* Three-stat row: Total · Paid · Balance */
-.orderContextStats {
-  display: flex;
-  align-items: center;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.orderContextStat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 8px 4px;
-}
-
-.orderContextStatLabel {
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.orderContextStatValue {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: var(--text);
-  white-space: nowrap;
-}
-
-/* Thin vertical divider between stats */
-.orderContextDivider {
-  width: 1px;
-  height: 32px;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
-/* Footer line: "Due …" */
-.orderContextFooter {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--text3);
-}
-
-
-/* ── Payment form body (step 2, no duplicate) ── */
-.pickerFormBody {
-  padding-top: 4px;
 }
 
 
@@ -636,7 +640,6 @@
   to   { transform: translateY(0);    }
 }
 
-/* Scrollable body area inside any full-screen modal */
 .modalBody {
   flex: 1;
   overflow-y: auto;
@@ -662,7 +665,6 @@
   letter-spacing: 0.5px;
 }
 
-/* "(optional)" text inside a field label */
 .fieldLabelOptional {
   color: var(--text3);
   font-weight: 600;
@@ -706,9 +708,8 @@
 }
 
 
-/* ── TYPE / STATUS CHIPS (Full Payment / Part Payment) ── */
+/* ── TYPE / STATUS CHIPS ── */
 
-/* Row holding the chips side by side */
 .chipRow {
   display: flex;
   gap: 8px;
@@ -734,7 +735,7 @@
 }
 
 
-/* ── PAYMENT METHOD CHIPS (Cash / Transfer / Card / Other) ── */
+/* ── PAYMENT METHOD CHIPS ── */
 
 .methodChipRow {
   display: flex;
@@ -759,62 +760,6 @@
   background: var(--surface2);
   border-color: var(--accent);
   color: var(--accent);
-}
-
-
-/* ── DUPLICATE PAYMENT NOTICE ── */
-
-.duplicatePaymentNotice {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 28px 20px 8px;
-  gap: 10px;
-}
-
-.duplicatePaymentIconCircle {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-}
-
-.duplicatePaymentTitle {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.3;
-}
-
-.duplicatePaymentBody {
-  font-size: 0.85rem;
-  color: var(--text2);
-  line-height: 1.6;
-  max-width: 300px;
-}
-
-.duplicatePaymentDismissBtn {
-  margin-top: 8px;
-  padding: 13px 32px;
-  border-radius: 12px;
-  border: 1px solid var(--border2);
-  background: var(--surface);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.duplicatePaymentDismissBtn:active {
-  opacity: 0.7;
 }
 
 
@@ -857,7 +802,7 @@
 }
 
 
-/* ── PAYMENT BREAKDOWN CARD ── */
+/* ── BREAKDOWN CARD ── */
 
 .breakdownCard {
   background: var(--surface);
@@ -880,7 +825,6 @@
   margin-bottom: 0;
 }
 
-/* Full-width progress bar showing total payment progress */
 .paymentProgressTrack {
   height: 6px;
   background: var(--border);
@@ -897,7 +841,7 @@
 }
 
 
-/* ── INSTALLMENT LIST (simple list when no order price is known) ── */
+/* ── INSTALLMENT LIST ── */
 
 .installmentList {
   display: flex;
@@ -979,9 +923,8 @@
 }
 
 
-/* ── ACTION BUTTONS at the bottom of Payment Detail ── */
+/* ── ACTION BUTTONS (Payment Detail) ── */
 
-/* Dashed button to record another payment / instalment */
 .addInstallmentBtn {
   width: 100%;
   margin-top: 16px;
@@ -1006,7 +949,6 @@
   color: var(--accent);
 }
 
-/* Solid button to generate a receipt */
 .generateReceiptBtn {
   width: 100%;
   margin-top: 12px;
@@ -1034,11 +976,66 @@
 }
 
 
+/* ── DUPLICATE / EXISTING PAYMENT NOTICE ── */
+
+.duplicatePaymentNotice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 20px 8px;
+  gap: 10px;
+}
+
+.duplicatePaymentIconCircle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.duplicatePaymentTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.duplicatePaymentBody {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.6;
+  max-width: 300px;
+}
+
+.duplicatePaymentDismissBtn {
+  margin-top: 8px;
+  padding: 13px 32px;
+  border-radius: 12px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.duplicatePaymentDismissBtn:active {
+  opacity: 0.7;
+}
+
+
 /* ─────────────────────────────────────────────────────────────
    BOTTOM SHEET (Add Installment modal)
    ───────────────────────────────────────────────────────────── */
 
-/* Dark backdrop behind the sheet */
 .sheetOverlay {
   position: fixed;
   inset: 0;
@@ -1048,7 +1045,6 @@
   align-items: flex-end;
 }
 
-/* The sheet itself slides up from the bottom */
 .bottomSheet {
   width: 100%;
   background: var(--surface);
@@ -1063,7 +1059,6 @@
   to   { transform: translateY(0);    }
 }
 
-/* Drag handle at the top of the sheet */
 .bottomSheetHandle {
   width: 36px;
   height: 4px;
@@ -1092,7 +1087,6 @@
   padding: 20px;
 }
 
-/* Red badge showing the remaining balance */
 .remainingBalanceBadge {
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.3);
@@ -1103,7 +1097,6 @@
   margin-bottom: 18px;
 }
 
-/* Primary confirm button inside the sheet */
 .confirmActionBtn {
   width: 100%;
   padding: 16px;
@@ -1121,4 +1114,88 @@
 .confirmActionBtn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   ORDER CONTEXT CARD (kept for PaymentDetail internal use)
+   ───────────────────────────────────────────────────────────── */
+
+.orderContextCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 16px 0 14px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.orderContextLeft {
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.orderContextBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orderContextName {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.orderContextStats {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.orderContextStat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+}
+
+.orderContextStatLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.orderContextStatValue {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.orderContextDivider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.orderContextFooter {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text3);
 }
