@@ -29,9 +29,15 @@
 
 .profileSection {
   display: flex;
+  flex-direction: column;
   gap: 12px;
   padding: 18px;
   border-bottom: 1px solid var(--border);
+}
+
+.topColumn{
+  display: flex;
+  gap: 10px;
 }
 
 .profileSectionFree {
@@ -41,23 +47,17 @@
   border-bottom: 1px solid var(--border);
 }
 
-.leftColumn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
 
 .avatar {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   background: var(--surface2);
   display: grid;
   place-items: center;
-  font-weight: 700;
-  font-size: 28px;
-  border: 2px solid var(--accent);
+  font-weight: 500;
+  font-size: 25px;
+  border: 2px solid var(--border);
   color: var(--accent);
   overflow: hidden;
 }
@@ -77,16 +77,21 @@
 }
 
 .name {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 500;
 }
-
-.meta {
+.primaryDetailsContainer{
+  flex-wrap: wrap;
+  display: flex;
+  gap:6px;
+  align-items: center;
+}
+.meta,.metaAddress {
   display: flex;
   gap: 4px;
   color: var(--text2);
   font-size: 0.75rem;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .metaInline {
@@ -97,9 +102,9 @@
   align-items: center;
 }
 
-.metaItem {
+.metaItem,.metaItemAddress {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
   color: var(--text2);
   font-size: 0.8rem;
@@ -109,20 +114,24 @@
   content: '|';
   margin-left: 10px;
   color: var(--border);
-  opacity: 0.5;
+  opacity: 0.9;
+}
+
+.verticalBar{
+
+  color: var(--border);
+  opacity: 0.9;
 }
 
 .birthday {
   font-weight: 600;
-  font-size: 0.8rem;
   color: var(--warning);
   white-space: nowrap;
 }
 
 .actions {
   display: flex;
-  justify-content: space-around;
-  gap: 6px;
+  gap: 45px;
   margin: 12px 0;
   padding: 0 12px;
 }
@@ -145,7 +154,7 @@
 
 .stickyTabsWrapper {
   position: sticky;
-  top: 56px;
+  top: 70px;
   z-index: 100;
   background: var(--bg);
   border-top: 1px solid var(--border);
@@ -508,3 +517,23 @@
 }
 
 .deleteConfirmBtn:active { opacity: 0.82; }
+
+
+@media(max-width:600px){
+  .fab {
+
+  bottom: calc(28px + var(--sb));
+
+}
+
+.metaItemAddress,.metaAddress {
+  align-items: flex-start;
+}
+
+.actions {
+
+  justify-content: space-around;
+  gap: 0px;
+
+}
+}

@@ -767,9 +767,9 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
                 {/* Name, date, unit + field count */}
                 <div className={styles.measurementRowInfo}>
                   <div className={styles.measurementRowName}>{measurement.name}</div>
-                  <div className={styles.measurementRowMeta}>{measurement.date}</div>
+             
                   <div className={styles.measurementRowMeta}>
-                    {unitShort} · {measurement.fields.length} field{measurement.fields.length !== 1 ? 's' : ''}
+                    {measurement.fields.length} measurement{measurement.fields.length !== 1 ? 's' : ''}
                   </div>
                 </div>
 

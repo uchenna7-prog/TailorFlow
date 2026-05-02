@@ -18,7 +18,6 @@ import InvoiceTab      from './tabs/InvoiceTab/InvoiceTab'
 import PaymentsTab     from './tabs/PaymentsTab/PaymentsTab'
 import ReceiptTab      from './tabs/ReceiptTab/ReceiptTab'
 import styles from './CustomerDetail.module.css'
-import BottomNav from '../../components/BottomNav/BottomNav'
 
 function getInitials(name) {
   if (!name) return ''
@@ -566,10 +565,11 @@ export default function CustomerDetail({ onMenuClick }) {
   const handleFabClick = () => {
     if (activeTab === 'dress')    document.dispatchEvent(new CustomEvent('openMeasureModal'))
     if (activeTab === 'orders')   document.dispatchEvent(new CustomEvent('openOrderModal'))
+    if (activeTab === 'invoice')  document.dispatchEvent(new CustomEvent('openInvoiceModal'))
     if (activeTab === 'payments') document.dispatchEvent(new CustomEvent('openPaymentModal'))
   }
 
-  const showFab = ['dress', 'orders', 'payments'].includes(activeTab)
+  const showFab = ['dress', 'orders', 'invoice', 'payments'].includes(activeTab)
 
   const tabItemCounts = {
     dress:    data.measurements?.length ?? 0,
@@ -605,23 +605,61 @@ export default function CustomerDetail({ onMenuClick }) {
       </div>
 
       <div className={styles.profileContainer}>
-        {isPremium ? (
+        {true ? (
           <div className={styles.profileSection}>
-            <div className={styles.leftColumn}>
-              <div className={styles.avatar}>
-                {hasPhoto
-                  ? <img src={customer.photo} className={styles.avatarImg} alt={customer.name} />
-                  : initials
-                }
+
+            <>
+              <div className={styles.topColumn}>
+
+                <div className={styles.avatar}>
+                  {hasPhoto
+                    ? <img src={customer.photo} className={styles.avatarImg} alt={customer.name} />
+                    : initials
+                  }
+                </div>
+
+                <div className={styles.rightColumn}>
+
+                  <div className={styles.name}>{customer.name}</div>
+
+                  <div className={styles.primaryDetailsContainer}>
+
+                    <span className={styles.meta}><span className="mi">call</span>{customer.phone}</span>
+
+                    {customer.sex &&(
+
+                      <div className={`${styles.metaItem} ${styles.sex}`}>
+                        <span className={styles.verticalBar} >|</span>
+                        <span className="mi">person</span>
+                        <span>{customer.sex}</span>
+                      </div>
+                      
+                      
+                    )}
+
+                    {birthday && (
+
+                      <div className={`${styles.metaItem} ${styles.birthday}`}>
+                        <span className="mi">cake</span>
+                        <span>{birthday}</span>
+                      </div>
+                    )}
+
+                  </div>
+
+                 
+                
               </div>
-              {birthday && <div className={styles.birthday}>🎈 {birthday}</div>}
-            </div>
-            <div className={styles.rightColumn}>
-              <div className={styles.name}>{customer.name}{customer.sex && ` (${customer.sex})`}</div>
-              <div className={styles.meta}><span className="mi">call</span>{customer.phone}</div>
-              {customer.email   && <div className={styles.meta}><span className="mi">mail_outline</span>{customer.email}</div>}
-              {customer.address && <div className={styles.meta}><span className="mi">place</span>{customer.address}</div>}
-            </div>
+
+        
+              </div>
+              
+                
+            </>
+           
+            {customer.email   && <div className={styles.meta}><span className="mi">mail_outline</span>{customer.email}</div>}
+            {customer.address && <div className={styles.metaAddress}><span className="mi">place</span>{customer.address}</div>}
+            
           </div>
         ) : (
           <div className={styles.profileSectionFree}>
@@ -644,7 +682,7 @@ export default function CustomerDetail({ onMenuClick }) {
                 </div>
               )}
               {customer.address && (
-                <div className={styles.metaItem}>
+                <div className={styles.metaItemAddress}>
                   <span className="mi">place</span>
                   <span>{customer.address}</span>
                 </div>
@@ -713,6 +751,7 @@ export default function CustomerDetail({ onMenuClick }) {
             onSave={data.saveInvoice}
             onDelete={data.deleteInvoice}
             onStatusChange={data.updateInvoiceStatus}
+            onGenerateInvoice={handleGenerateInvoice}
             showToast={showToast}
           />
         )}
@@ -760,7 +799,6 @@ export default function CustomerDetail({ onMenuClick }) {
         />
       )}
 
-      <BottomNav></BottomNav>
     </div>
   )
 }

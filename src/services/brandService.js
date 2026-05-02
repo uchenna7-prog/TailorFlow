@@ -28,7 +28,7 @@ export async function saveBrandToFirestore(uid, settings) {
     brandName:      settings.brandName      || '',
     brandTagline:   settings.brandTagline   || '',
     brandColourId:  settings.brandColourId  || DEFAULT_COLOUR_ID,
-    brandColour:    settings.brandColour    || '#D4AF37',
+    brandColour:    settings.brandColour    || '#3737d4',
     // brandLogo intentionally omitted — base64 strings exceed Firestore's
     // 1MB document limit and cause the entire write to fail.
     // Store logo via Firebase Storage and save the download URL instead.

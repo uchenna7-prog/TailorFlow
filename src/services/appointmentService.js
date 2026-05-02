@@ -1,9 +1,3 @@
-// src/services/appointmentService.js
-// ─────────────────────────────────────────────────────────────
-// Firestore CRUD + real-time listener for appointments.
-// Path: users/{uid}/appointments/{appointmentId}
-// ─────────────────────────────────────────────────────────────
-
 import {
   collection,
   doc,

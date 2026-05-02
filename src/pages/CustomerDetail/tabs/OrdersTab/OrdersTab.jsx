@@ -25,18 +25,19 @@ const STATUSES = [
 ]
 
 const STAGES = [
-  { value: 'measurement_taken', label: 'Measurement Taken', icon: 'straighten'    },
-  { value: 'fabric_ready',      label: 'Fabric Ready',      icon: 'checkroom'     },
-  { value: 'cutting',           label: 'Cutting',           icon: 'content_cut'   },
-  { value: 'weaving',           label: 'Weaving',           icon: 'texture'       },
-  { value: 'sewing',            label: 'Sewing',            icon: 'construction'  },
-  { value: 'embroidery',        label: 'Embroidery',        icon: 'auto_awesome'  },
-  { value: 'fitting',           label: 'Fitting',           icon: 'accessibility' },
-  { value: 'adjustments',       label: 'Adjustments',       icon: 'tune'          },
-  { value: 'finishing',         label: 'Finishing',         icon: 'dry_cleaning'  },
-  { value: 'quality_check',     label: 'Quality Check',     icon: 'fact_check'    },
-  { value: 'ready',             label: 'Ready',             icon: 'check_circle'  },
+  { value: 'measurement_taken', color: '#a16207'    },
+  { value: 'fabric_ready',      color: '#a16207'    },
+  { value: 'cutting',           color: '#2563eb'  },
+  { value: 'weaving',           color: '#2563eb'     },
+  { value: 'sewing',            color: '#2563eb' },
+  { value: 'embroidery',        color: '#2563eb'  },
+  { value: 'fitting',           color: '#2563eb' },
+  { value: 'adjustments',       color: '#2563eb'     },
+  { value: 'finishing',         color: '#2563eb'  },
+  { value: 'quality_check',     color: '#2563eb'   },
+  { value: 'ready',             color: '#15803d'  },
 ]
+
 
 // When a stage is set, auto-update the order status to match
 const STAGE_AUTO_STATUS = {
@@ -896,6 +897,8 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
           {ordersInGroup.map((order, index) => {
             const statusInfo  = STATUSES.find(s => s.value === order.status) ?? STATUSES[0]
             const stageInfo   = STAGES.find(s => s.value === order.stage)
+            const stageColor = STAGES.find(s => s.color)
+            console.log(stageColor)
             const items       = order.items || []
             const itemCount   = items.length
             const priceText   = order.price != null ? `₦${Number(order.price).toLocaleString()}` : '—'
@@ -917,7 +920,6 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
 
                   {itemCount > 0 && (
                     <div className={styles.orderRowMeta}>
-                      <span className="mi" style={{ fontSize: '0.78rem', color: 'var(--text3)', verticalAlign: 'middle' }}>checkroom</span>
                       <span className={styles.orderRowMetaText}>
                         {itemCount} {itemCount === 1 ? 'item' : 'items'}
                       </span>
@@ -926,8 +928,8 @@ export default function OrdersTab({ customerId, orders, measurements, showToast,
 
                   {stageInfo && (
                     <div className={styles.orderRowStage}>
-                      <span className="mi" style={{ fontSize: '0.78rem' }}>{stageInfo.icon}</span>
-                      {stageInfo.label}
+                      <span  style={{ fontSize: '0.78rem',color:stageColor.color }}>{stageInfo.label}</span>
+                      
                     </div>
                   )}
                 </div>
