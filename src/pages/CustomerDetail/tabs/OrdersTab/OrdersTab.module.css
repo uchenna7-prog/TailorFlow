@@ -1,22 +1,20 @@
 /* ═══════════════════════════════════════════════════════════════
    OrdersTab.module.css
-   Styles for the Orders tab — list, modal form, and detail panel.
    ═══════════════════════════════════════════════════════════════ */
 
 
 /* ─────────────────────────────────────────────────────────────
    EMPTY STATE
-   Shown when the customer has no orders yet
    ───────────────────────────────────────────────────────────── */
 
 .emptyState {
-  text-align:      center;
-  padding-top:     60px;
-  padding-bottom:  20px;
-  display:         flex;
-  flex-direction:  column;
-  align-items:     center;
-  gap:             10px;
+  text-align:     center;
+  padding-top:    60px;
+  padding-bottom: 20px;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            10px;
 }
 
 .emptyState p {
@@ -43,7 +41,6 @@
 .orderGroupDivider {
   height:      1px;
   background:  var(--border);
-  /* stretch beyond the parent's padding */
   width:       calc(100% + 32px);
   margin-left: -16px;
 }
@@ -51,21 +48,19 @@
 
 /* ─────────────────────────────────────────────────────────────
    ORDER ROW
-   Each individual order in the list
    ───────────────────────────────────────────────────────────── */
 
 .orderRow {
-  display:         flex;
-  align-items:     center;
-  gap:             12px;
-  padding:         12px 0;
-  cursor:          pointer;
-  transition:      background 0.15s;
-  background:      var(--bg);
-  position:        relative;
+  display:    flex;
+  align-items: center;
+  gap:        12px;
+  padding:    12px 0;
+  cursor:     pointer;
+  transition: background 0.15s;
+  background: var(--bg);
+  position:   relative;
 }
 
-/* Thin divider line below each row */
 .orderRow::after {
   content:    '';
   position:   absolute;
@@ -76,7 +71,6 @@
   background: var(--border);
 }
 
-/* Last row in a group — no bottom divider */
 .orderRow_last::after {
   display: none;
 }
@@ -85,7 +79,6 @@
   background: var(--surface);
 }
 
-/* Left info column: description, item count, stage */
 .orderRowInfo {
   flex:      1;
   min-width: 0;
@@ -101,7 +94,6 @@
   text-overflow: ellipsis;
 }
 
-/* "X items" meta line */
 .orderRowMeta {
   margin-bottom: 2px;
 }
@@ -112,7 +104,6 @@
   color:       var(--text2);
 }
 
-/* Current stage line (e.g. "✂ Cutting") */
 .orderRowStage {
   display:     flex;
   align-items: center;
@@ -123,9 +114,8 @@
   margin-top:  3px;
 }
 
-/* Right column: price, status badge, due date */
 .orderRowRight {
-  text-align: right;
+  text-align:  right;
   flex-shrink: 0;
 }
 
@@ -136,7 +126,6 @@
   white-space: nowrap;
 }
 
-/* Due date shown in red below the status badge */
 .orderRowDueDate {
   font-size:      0.6rem;
   font-weight:    700;
@@ -149,7 +138,6 @@
 
 /* ─────────────────────────────────────────────────────────────
    ORDER STATUS BADGE
-   Coloured pill shown on each order row
    ───────────────────────────────────────────────────────────── */
 
 .orderStatusBadge {
@@ -197,23 +185,20 @@
 
 /* ─────────────────────────────────────────────────────────────
    ORDER MOSAIC THUMBNAIL
-   Shows 1–3 garment images in a tiled layout
    ───────────────────────────────────────────────────────────── */
 
-/* Outer grey rounded box */
 .mosaicContainer {
-  width:        80px;
-  height:       80px;
-  border-radius: 12px;
-  background:   var(--surface);
-  border:       1px solid var(--border);
-  display:      flex;
-  align-items:  center;
+  width:           80px;
+  height:          80px;
+  border-radius:   12px;
+  background:      var(--surface);
+  border:          1px solid var(--border);
+  display:         flex;
+  align-items:     center;
   justify-content: center;
-  flex-shrink:  0;
+  flex-shrink:     0;
 }
 
-/* Inner white rounded box */
 .mosaicBox {
   width:           58px;
   height:          58px;
@@ -225,7 +210,6 @@
   overflow:        hidden;
 }
 
-/* Single image — fills the whole box */
 .mosaicSingleImage {
   width:         100%;
   height:        100%;
@@ -233,7 +217,6 @@
   border-radius: 10px;
 }
 
-/* Split layout: left panel + right column side by side */
 .mosaicBox_split {
   padding:        0 !important;
   display:        flex !important;
@@ -243,7 +226,6 @@
   border-radius:  10px;
 }
 
-/* Left side — takes 60% width */
 .mosaicPanel_left {
   flex:            0 0 60%;
   display:         flex;
@@ -254,7 +236,6 @@
   height:          100%;
 }
 
-/* Right side — takes remaining 40%, split into two cells vertically */
 .mosaicPanel_right {
   flex:           1;
   display:        flex;
@@ -263,7 +244,6 @@
   background:     #fff;
 }
 
-/* Each cell in the right column */
 .mosaicCell {
   flex:            1;
   display:         flex;
@@ -274,7 +254,6 @@
   background:      #fff;
 }
 
-/* Thin vertical divider between left and right panels */
 .mosaicDivider_vertical {
   width:       1.5px;
   flex-shrink: 0;
@@ -282,7 +261,6 @@
   align-self:  stretch;
 }
 
-/* Thin horizontal divider between the two right cells */
 .mosaicDivider_horizontal {
   height:      1.5px;
   flex-shrink: 0;
@@ -290,7 +268,6 @@
   width:       100%;
 }
 
-/* Any image inside a mosaic panel */
 .mosaicPanelImage {
   width:      100%;
   height:     100%;
@@ -298,12 +275,10 @@
   display:    block;
 }
 
-/* Cell with "+N more" overlay */
 .mosaicCell_hasOverlay {
   position: relative;
 }
 
-/* Dark "+N" count overlay on the last mosaic cell */
 .mosaicOverlay {
   position:        absolute;
   inset:           0;
@@ -321,7 +296,6 @@
 
 /* ─────────────────────────────────────────────────────────────
    NEW ORDER FORM MODAL
-   Full-screen overlay that slides up from the bottom
    ───────────────────────────────────────────────────────────── */
 
 .formOverlay {
@@ -342,20 +316,18 @@
   transform: translateY(0);
 }
 
-/* Scrollable area below the header */
 .formScrollBody {
-  flex:                      1;
-  overflow-y:                auto;
-  padding-bottom:            100px;
+  flex:                       1;
+  overflow-y:                 auto;
+  padding-bottom:             100px;
   -webkit-overflow-scrolling: touch;
 }
 
 
 /* ─────────────────────────────────────────────────────────────
-   FORM SECTIONS — Shared within OrderModal
+   FORM SECTIONS
    ───────────────────────────────────────────────────────────── */
 
-/* Step heading: "1. Select Clothes" etc. */
 .stepHeading {
   font-size:      0.65rem;
   font-weight:    800;
@@ -365,7 +337,6 @@
   margin-bottom:  12px;
 }
 
-/* Cloth search input bar */
 .clothSearchBar {
   display:       flex;
   align-items:   center;
@@ -389,7 +360,6 @@
   padding:     12px 0;
 }
 
-/* List of cloth type options to pick from */
 .clothPickerList {
   display:        flex;
   flex-direction: column;
@@ -397,7 +367,6 @@
   margin-bottom:  4px;
 }
 
-/* Single cloth type option row */
 .clothPickerItem {
   display:       flex;
   align-items:   center;
@@ -415,7 +384,6 @@
   background:   var(--surface2);
 }
 
-/* Small square thumbnail for a cloth type */
 .clothThumb {
   width:           38px;
   height:          38px;
@@ -436,7 +404,6 @@
   border-radius: 8px;
 }
 
-/* Cloth name + measurement count text */
 .clothInfo {
   flex: 1;
 }
@@ -453,7 +420,6 @@
   font-weight: 600;
 }
 
-/* Circle checkmark on the right of each cloth item */
 .clothCheckCircle {
   width:           22px;
   height:          22px;
@@ -474,10 +440,73 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   PRICING SECTION — Price & Qty per selected item
+   CLOTH HIDDEN HINT
+   Shown below the list when results are capped at 3
    ───────────────────────────────────────────────────────────── */
 
-/* Card wrapping all item pricing rows */
+.clothHiddenHint {
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  margin-top:      10px;
+  padding:         10px 14px;
+  background:      var(--surface);
+  border:          1px dashed var(--border2);
+  border-radius:   12px;
+}
+
+/* Three small dots on the left */
+.clothHiddenHintDots {
+  display:     flex;
+  align-items: center;
+  gap:         3px;
+  flex-shrink: 0;
+}
+
+.clothHiddenHintDots span {
+  display:       block;
+  width:         4px;
+  height:        4px;
+  border-radius: 50%;
+  background:    var(--text3);
+  opacity:       0.5;
+}
+
+/* The hint text */
+.clothHiddenHintText {
+  font-size:   0.72rem;
+  font-weight: 600;
+  color:       var(--text3);
+  line-height: 1.4;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   CLOTH EMPTY SEARCH
+   Shown when a search query returns zero results
+   ───────────────────────────────────────────────────────────── */
+
+.clothEmptySearch {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             8px;
+  padding:         28px 16px 20px;
+  background:      var(--surface);
+  border:          1px solid var(--border);
+  border-radius:   14px;
+  margin-top:      4px;
+  text-align:      center;
+  color:           var(--text3);
+  font-size:       0.8rem;
+  font-weight:     600;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   PRICING SECTION
+   ───────────────────────────────────────────────────────────── */
+
 .pricingCard {
   display:        flex;
   flex-direction: column;
@@ -489,7 +518,6 @@
   margin-bottom:  20px;
 }
 
-/* One row per selected item */
 .pricingRow {
   display:        flex;
   align-items:    flex-start;
@@ -503,7 +531,6 @@
   padding-bottom: 0;
 }
 
-/* Item name above the price/qty inputs */
 .pricingItemName {
   font-size:     0.8rem;
   font-weight:   700;
@@ -511,14 +538,12 @@
   margin-bottom: 8px;
 }
 
-/* Row containing price + qty + computed amount side by side */
 .pricingInputRow {
   display:     flex;
   gap:         10px;
   align-items: flex-end;
 }
 
-/* Each field column (price, qty, amount) */
 .pricingField {
   display:        flex;
   flex-direction: column;
@@ -526,7 +551,6 @@
   min-width:      0;
 }
 
-/* Small uppercase label above each input */
 .fieldLabel {
   font-size:      0.58rem;
   font-weight:    800;
@@ -537,25 +561,22 @@
   display:        block;
 }
 
-/* Red asterisk on required fields */
 .requiredStar {
   color:       var(--danger, #ef4444);
   margin-left: 1px;
 }
 
-/* Number input for price and qty */
 .pricingInput {
-  width:        100%;
-  background:   var(--bg);
-  border:       1px solid var(--border2);
+  width:         100%;
+  background:    var(--bg);
+  border:        1px solid var(--border2);
   border-radius: 8px;
-  padding:      8px 10px;
-  color:        var(--text);
-  font-size:    0.9rem;
-  font-weight:  700;
-  outline:      none;
-  font-family:  'DM Sans', sans-serif;
-  /* Hide the native number spinners */
+  padding:       8px 10px;
+  color:         var(--text);
+  font-size:     0.9rem;
+  font-weight:   700;
+  outline:       none;
+  font-family:   'DM Sans', sans-serif;
   -moz-appearance: textfield;
 }
 
@@ -569,7 +590,6 @@
   border-color: var(--accent);
 }
 
-/* Read-only computed line total (qty × price) */
 .pricingAmount {
   width:         100%;
   background:    var(--surface2);
@@ -585,7 +605,6 @@
   text-overflow: ellipsis;
 }
 
-/* Inline validation error for missing price/qty */
 .pricingError {
   display:       flex;
   align-items:   center;
@@ -600,7 +619,6 @@
   margin-top:    4px;
 }
 
-/* Dashed total row at the bottom of the pricing card */
 .orderTotalRow {
   margin-top:      10px;
   padding-top:     12px;
@@ -616,7 +634,7 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   DETAILS CARD — Step 3 of the order form
+   DETAILS CARD — Step 3
    ───────────────────────────────────────────────────────────── */
 
 .detailsCard {
@@ -626,38 +644,36 @@
   padding:       20px;
 }
 
-/* Underline-style text input (no visible box border) */
 .underlineInput {
-  width:             100%;
-  background:        transparent;
-  border:            none;
-  color:             var(--text);
-  font-size:         1.05rem;
-  font-weight:       700;
-  outline:           none;
-  border-bottom:     1px solid var(--border2);
-  padding-bottom:    10px;
-  margin-bottom:     20px;
-  font-family:       'DM Sans', sans-serif;
+  width:          100%;
+  background:     transparent;
+  border:         none;
+  color:          var(--text);
+  font-size:      1.05rem;
+  font-weight:    700;
+  outline:        none;
+  border-bottom:  1px solid var(--border2);
+  padding-bottom: 10px;
+  margin-bottom:  20px;
+  font-family:    'DM Sans', sans-serif;
 }
 
 .underlineInput::placeholder {
   color: var(--text3);
 }
 
-/* Notes textarea */
 .notesTextarea {
-  width:         100%;
-  background:    transparent;
-  border:        none;
-  border-bottom: 1px solid var(--border2);
-  color:         var(--text);
-  font-size:     0.9rem;
-  font-weight:   500;
-  outline:       none;
-  resize:        none;
-  min-height:    70px;
-  font-family:   'DM Sans', sans-serif;
+  width:          100%;
+  background:     transparent;
+  border:         none;
+  border-bottom:  1px solid var(--border2);
+  color:          var(--text);
+  font-size:      0.9rem;
+  font-weight:    500;
+  outline:        none;
+  resize:         none;
+  min-height:     70px;
+  font-family:    'DM Sans', sans-serif;
   padding-bottom: 8px;
 }
 
@@ -667,7 +683,7 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   PRIORITY CHIPS — Normal / Urgent / VIP
+   PRIORITY CHIPS
    ───────────────────────────────────────────────────────────── */
 
 .priorityChipRow {
@@ -710,7 +726,7 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   STAGE CHIPS — Measurement Taken / Cutting / Sewing etc.
+   STAGE CHIPS
    ───────────────────────────────────────────────────────────── */
 
 .stageChipRow {
@@ -752,7 +768,6 @@
 
 /* ─────────────────────────────────────────────────────────────
    ORDER DETAIL PANEL
-   Slides in from the right when an order is tapped
    ───────────────────────────────────────────────────────────── */
 
 .detailPanel {
@@ -774,15 +789,13 @@
   transform: translateX(0);
 }
 
-/* Scrollable content area below the header */
 .detailScrollBody {
-  flex:                      1;
-  overflow-y:                auto;
-  padding:                   20px;
+  flex:                       1;
+  overflow-y:                 auto;
+  padding:                    20px;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Dates line at the very bottom of the detail panel */
 .detailFooterDates {
   font-size:  0.7rem;
   color:      var(--text3);
@@ -793,7 +806,6 @@
 
 /* ─────────────────────────────────────────────────────────────
    PRIORITY BANNER
-   Coloured label at the top of the detail panel
    ───────────────────────────────────────────────────────────── */
 
 .priorityBanner {
@@ -827,14 +839,14 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   INFO GRID — 2×2 summary cells (price, status, stage, due)
+   INFO GRID
    ───────────────────────────────────────────────────────────── */
 
 .infoGrid {
-  display:       grid;
+  display:               grid;
   grid-template-columns: 1fr 1fr;
-  gap:           12px;
-  margin-bottom: 20px;
+  gap:                   12px;
+  margin-bottom:         20px;
 }
 
 .infoGridCell {
@@ -861,7 +873,7 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   SECTION CARD — Reusable card used for garments, stage, status
+   SECTION CARD
    ───────────────────────────────────────────────────────────── */
 
 .sectionCard {
@@ -872,7 +884,6 @@
   margin-bottom: 16px;
 }
 
-/* Small uppercase label at the top of a section card */
 .sectionCardLabel {
   font-size:      0.6rem;
   font-weight:    800;
@@ -882,7 +893,6 @@
   margin-bottom:  10px;
 }
 
-/* One garment row inside the garments section */
 .garmentRow {
   display:         flex;
   align-items:     center;
@@ -895,7 +905,6 @@
   margin-bottom: 0;
 }
 
-/* Small square garment image thumbnail */
 .garmentThumb {
   width:           36px;
   height:          36px;
@@ -930,7 +939,7 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   STATUS BUTTONS — Change Status section in detail panel
+   STATUS BUTTONS
    ───────────────────────────────────────────────────────────── */
 
 .statusButton {
@@ -955,10 +964,9 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   ACTION BUTTONS — Share Review, Generate Invoice
+   ACTION BUTTONS
    ───────────────────────────────────────────────────────────── */
 
-/* Green WhatsApp share review link button */
 .shareReviewButton {
   width:          100%;
   display:        flex;
@@ -984,26 +992,25 @@
   background: rgba(34, 197, 94, 0.14);
 }
 
-/* Invoice generation button */
 .generateInvoiceButton {
-  width:          100%;
-  margin-top:     20px;
-  padding:        16px;
-  border-radius:  14px;
-  border:         1px solid var(--border2);
-  background:     var(--surface);
-  color:          var(--text2);
-  font-family:    'DM Sans', sans-serif;
-  font-size:      0.82rem;
-  font-weight:    800;
-  display:        flex;
-  align-items:    center;
+  width:           100%;
+  margin-top:      20px;
+  padding:         16px;
+  border-radius:   14px;
+  border:          1px solid var(--border2);
+  background:      var(--surface);
+  color:           var(--text2);
+  font-family:     'DM Sans', sans-serif;
+  font-size:       0.82rem;
+  font-weight:     800;
+  display:         flex;
+  align-items:     center;
   justify-content: center;
-  gap:            8px;
-  cursor:         pointer;
-  transition:     border-color 0.2s, color 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  gap:             8px;
+  cursor:          pointer;
+  transition:      border-color 0.2s, color 0.2s;
+  text-transform:  uppercase;
+  letter-spacing:  0.8px;
 }
 
 .generateInvoiceButton:active {
@@ -1013,18 +1020,18 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   LIGHTBOX — Full-screen image viewer (structure kept for future use)
+   LIGHTBOX
    ───────────────────────────────────────────────────────────── */
 
 .lightboxOverlay {
-  position:   fixed;
-  inset:      0;
-  z-index:    9000;
-  background: rgba(0, 0, 0, 0.96);
-  display:    flex;
-  align-items: center;
+  position:        fixed;
+  inset:           0;
+  z-index:         9000;
+  background:      rgba(0, 0, 0, 0.96);
+  display:         flex;
+  align-items:     center;
   justify-content: center;
-  animation:  lightboxFadeIn 0.2s ease;
+  animation:       lightboxFadeIn 0.2s ease;
 }
 
 @keyframes lightboxFadeIn {
@@ -1033,21 +1040,21 @@
 }
 
 .lightboxImageWrapper {
-  width:       100%;
-  height:      100%;
-  display:     flex;
-  align-items: center;
+  width:           100%;
+  height:          100%;
+  display:         flex;
+  align-items:     center;
   justify-content: center;
-  padding:     60px 16px 80px;
-  box-sizing:  border-box;
+  padding:         60px 16px 80px;
+  box-sizing:      border-box;
 }
 
 .lightboxImage {
-  max-width:        100%;
-  max-height:       100%;
-  object-fit:       contain;
-  border-radius:    10px;
-  user-select:      none;
+  max-width:         100%;
+  max-height:        100%;
+  object-fit:        contain;
+  border-radius:     10px;
+  user-select:       none;
   -webkit-user-drag: none;
 }
 
@@ -1076,14 +1083,14 @@
 }
 
 .lightboxCounter {
-  position:    absolute;
-  top:         calc(18px + var(--st, 0px));
-  left:        16px;
-  background:  rgba(255, 255, 255, 0.18);
-  color:       #fff;
-  font-size:   0.72rem;
-  font-weight: 800;
-  padding:     5px 12px;
+  position:      absolute;
+  top:           calc(18px + var(--st, 0px));
+  left:          16px;
+  background:    rgba(255, 255, 255, 0.18);
+  color:         #fff;
+  font-size:     0.72rem;
+  font-weight:   800;
+  padding:       5px 12px;
   border-radius: 20px;
   pointer-events: none;
   letter-spacing: 0.3px;
@@ -1113,7 +1120,7 @@
   background: rgba(255, 255, 255, 0.35);
 }
 
-.lightboxArrow_left  { left: 12px;  }
+.lightboxArrow_left  { left:  12px; }
 .lightboxArrow_right { right: 12px; }
 
 .lightboxDots {
@@ -1128,16 +1135,16 @@
 }
 
 .lightboxDot {
-  width:           7px;
-  height:          7px;
-  border-radius:   50%;
-  background:      rgba(255, 255, 255, 0.4);
-  border:          none;
-  padding:         0;
-  cursor:          pointer;
-  pointer-events:  all;
-  transition:      background 0.2s, transform 0.2s;
-  flex-shrink:     0;
+  width:          7px;
+  height:         7px;
+  border-radius:  50%;
+  background:     rgba(255, 255, 255, 0.4);
+  border:         none;
+  padding:        0;
+  cursor:         pointer;
+  pointer-events: all;
+  transition:     background 0.2s, transform 0.2s;
+  flex-shrink:    0;
 }
 
 .lightboxDot_active {
@@ -1153,34 +1160,4 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0);   }
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ADD THESE TWO CLASSES TO YOUR OrdersTab.module.css
-   Place them near the .clothPickerList / .clothPickerItem section
-   ───────────────────────────────────────────────────────────── */
-
-/* Hint shown below the list when there are hidden measurements */
-.clothHiddenHint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text3);
-  padding: 10px 4px 4px;
-}
-
-/* Empty state when search yields no results */
-.clothEmptySearch {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 28px 16px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text3);
-  text-align: center;
 }
