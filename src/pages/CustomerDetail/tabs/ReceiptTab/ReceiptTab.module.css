@@ -78,7 +78,6 @@
   font-size: 0.68rem;
   font-weight: 700;
   color: var(--text2);
-  font-family: 'DM Mono', monospace, 'DM Sans', sans-serif;
 }
 
 .receiptRowDate {
@@ -165,7 +164,6 @@
   transform: translateY(0);
 }
 
-/* Scrollable body — matches formScrollBody from OrderModal */
 .pickerScrollBody {
   flex: 1;
   overflow-y: auto;
@@ -175,7 +173,7 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   STEP HEADING — "1. Select Order" / "2. Select Payment"
+   STEP HEADING
    ───────────────────────────────────────────────────────────── */
 
 .stepHeading {
@@ -403,8 +401,11 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   INSTALLMENT PICKER — individual payment cards
-   Bigger, cleaner layout with clear sections
+   INSTALLMENT PICKER CARDS
+   Three zones:
+     Left  — number circle + amount block
+     Centre — date + method pill
+     Right  — action tag (Generate / Receipted / Generating)
    ───────────────────────────────────────────────────────────── */
 
 .installmentPickerList {
@@ -439,7 +440,7 @@
   pointer-events: none;
 }
 
-/* Left block: number circle + amount + balance */
+/* ── Left zone ── */
 .installmentLeft {
   display: flex;
   align-items: center;
@@ -484,7 +485,7 @@
   white-space: nowrap;
 }
 
-/* Centre: date + method pill — stacked vertically */
+/* ── Centre zone ── */
 .installmentMeta {
   flex: 1;
   display: flex;
@@ -495,17 +496,19 @@
 }
 
 .installmentDate {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--text2);
   display: flex;
   align-items: center;
   gap: 3px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text2);
+  white-space: nowrap;
 }
 
 .installmentMethodPill {
   display: inline-flex;
   align-items: center;
+  gap: 3px;
   font-size: 0.65rem;
   font-weight: 700;
   color: var(--text2);
@@ -514,10 +517,9 @@
   border-radius: 6px;
   padding: 3px 8px;
   white-space: nowrap;
-  gap: 3px;
 }
 
-/* Right-side action tag */
+/* ── Right zone ── */
 .installmentAction {
   display: flex;
   flex-direction: column;
