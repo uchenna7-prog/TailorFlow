@@ -1,118 +1,178 @@
-import { calcTax } from "../../utils/receiptUtils"
-import styles from "./ReceiptItemsTable.module.css"
-import { fmt } from "../../utils/receiptUtils"
-import { useBrandTokens } from "../../../../hooks/useBrandTokens"
-import { useRef } from "react"
+.table {
+  width: 100%;
+  margin-top: 10px;
+}
 
-export function ItemsTable({ receipt, brand }) {
+.orderDescriptionRow {
+  display: flex;
+  gap: 5px;
+  align-items: baseline;
+  padding: 10px 0 12px;
+  border-bottom: 1.5px solid var(--brand-primary-dark);
+}
 
-  const tableRef = useRef()
+.orderText {
+  font-weight: 900;
+}
 
-  useBrandTokens(brand.colourId, tableRef)
+.orderDescLabel {
+  font-size: 11px;
+  color: #0a0a0a;
+}
 
-  const { currency, showTax, taxRate: brandTaxRate } = brand
 
-  const subtotal = receipt.items?.length > 0
-    ? receipt.items.reduce((sum, item) => sum + ((item.qty ?? 1) * (parseFloat(item.price) || 0)), 0)
-    : 0
+/* ── Table ── */
+.tableEl {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
 
-  // Prefer frozen values from the receipt object; fall back to brand/calc
-  const shippingFee    = parseFloat(receipt.shippingFee)    || 0
-  const discountAmount = parseFloat(receipt.discountAmount) || 0
-  const discountType   = receipt.discountType   || null   // 'percent' | 'flat' | null
-  const discountValue  = parseFloat(receipt.discountValue)  || 0
-  const useTax         = receipt.taxRate != null ? receipt.taxRate > 0 : (showTax && brandTaxRate > 0)
-  const taxRate        = receipt.taxRate != null ? receipt.taxRate : brandTaxRate
-  const taxAmount      = parseFloat(receipt.taxAmount) || calcTax(subtotal, taxRate, useTax)
-  const grandTotal     = receipt.totalAmount != null
-    ? parseFloat(receipt.totalAmount)
-    : subtotal + shippingFee - discountAmount + taxAmount
+.colDesc   { width: 42%; }
+.colPrice  { width: 18%; }
+.colQty    { width: 10%; }
+.colAmount { width: 22%; }
 
-  const discountLabel = discountType === 'percent'
-    ? `Discount (${discountValue}%)`
-    : 'Discount'
+.headerRow th {
+  padding: 7px 0 6px;
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--brand-primary-dark);
+  border-bottom: 1px solid #e8e4de;
+}
 
-  const hasExtras = shippingFee > 0 || discountAmount > 0 || (useTax && taxAmount > 0)
+.itemsBody {
+  padding: 4px 0 10px;
+}
 
-  return (
-    <div className={styles.table} ref={tableRef}>
+.itemsBody tr:last-child td {
+  border-bottom: none;
+}
 
-      {/* Order descriptor */}
-      <div className={styles.orderDescriptionRow}>
-        <div className={styles.orderText}>ORDER:</div>
-        <div className={styles.orderDescLabel}>{receipt.orderDesc || 'Garment Order'}</div>
-      </div>
+.itemRow td {
+  padding: 6px 0;
+  border-bottom: 1px dashed #ebebeb;
+}
 
-      <table className={styles.tableEl}>
-        <thead>
-          <tr className={styles.headerRow}>
-            <th className={styles.colItem}>Item</th>
-            <th className={styles.colPrice}>Unit Price</th>
-            <th className={styles.colQty}>Qty</th>
-            <th className={styles.colAmount}>Amount</th>
-          </tr>
-        </thead>
-        {receipt.items?.length > 0 && (
-          <tbody className={styles.itemsBody}>
-            {receipt.items.map((item, idx) => {
-              const qty        = item.qty ?? 1
-              const unitPrice  = parseFloat(item.price) || 0
-              const lineAmount = qty * unitPrice
-              return (
-                <tr key={idx} className={styles.itemRow}>
-                  <td className={`${styles.colItem} ${styles.itemName}`}>{item.name}</td>
-                  <td className={`${styles.colPrice} ${styles.itemUnitPrice}`}>{fmt(currency, unitPrice)}</td>
-                  <td className={`${styles.colQty} ${styles.itemQty}`}>{qty}</td>
-                  <td className={`${styles.colAmount} ${styles.itemLineAmount}`}>{fmt(currency, lineAmount)}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        )}
-      </table>
+th.colItem,  td.colItem  {
+  text-align: left;
+  word-break: break-word;
+}
 
-      {/* ── Full-width summary section ── */}
-      <div className={styles.summarySection}>
+th.colQty,  td.colQty {
+  text-align: center;
+}
 
-        {/* Breakdown rows — only shown when there are extras beyond subtotal */}
-        {hasExtras && (
-          <div className={styles.breakdownBlock}>
-            <div className={styles.breakdownRow}>
-              <span className={styles.breakdownKey}>Subtotal</span>
-              <span className={styles.breakdownVal}>{fmt(currency, subtotal)}</span>
-            </div>
+th.colPrice, td.colPrice {
+  text-align: center;
+  text-wrap: nowrap;
+  word-break: break-word;
+}
 
-            {shippingFee > 0 && (
-              <div className={styles.breakdownRow}>
-                <span className={styles.breakdownKey}>Shipping &amp; Delivery</span>
-                <span className={styles.breakdownVal}>{fmt(currency, shippingFee)}</span>
-              </div>
-            )}
+th.colAmount, td.colAmount {
+  text-align: center;
+}
 
-            {discountAmount > 0 && (
-              <div className={styles.breakdownRow}>
-                <span className={`${styles.breakdownKey} ${styles.breakdownKeyDiscount}`}>{discountLabel}</span>
-                <span className={`${styles.breakdownVal} ${styles.breakdownValDiscount}`}>−{fmt(currency, discountAmount)}</span>
-              </div>
-            )}
+/* Body cell text styles */
+.itemName {
+  font-size: 9px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.itemUnitPrice {
+  font-size: 9px;
+  font-weight: 400;
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+.itemQty {
+  font-size: 9px;
+  font-weight: 400;
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+}
+.itemLineAmount {
+  font-size: 9px;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
 
-            {useTax && taxAmount > 0 && (
-              <div className={styles.breakdownRow}>
-                <span className={styles.breakdownKey}>VAT ({taxRate}%)</span>
-                <span className={styles.breakdownVal}>{fmt(currency, taxAmount)}</span>
-              </div>
-            )}
-          </div>
-        )}
+/* tbody bottom border */
+.tableEl tbody {
+  border-bottom: 1.5px solid var(--brand-primary-dark, #a07d20);
+}
 
-        {/* Grand total bar — always shown, full width */}
-        <div className={styles.orderTotalWrap}>
-          <div className={styles.orderTotalLabel}>Order Total</div>
-          <div className={styles.orderTotalValue}>{fmt(currency, grandTotal)}</div>
-        </div>
 
-      </div>
+/* ── Full-width summary section ── */
+.summarySection {
+  width: 100%;
+  margin-top: 0;
+}
 
-    </div>
-  )
+/* Breakdown block — subtotal, shipping, discount, tax rows */
+.breakdownBlock {
+  width: 100%;
+  padding: 8px 0 4px;
+  border-bottom: 1px dashed #d4d4d4;
+  margin-bottom: 0;
+}
+
+.breakdownRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.breakdownKey {
+  font-size: 9.5px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.breakdownVal {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Discount row — green */
+.breakdownKeyDiscount {
+  color: #15803d;
+}
+
+.breakdownValDiscount {
+  color: #15803d;
+  font-weight: 700;
+}
+
+
+/* ── Grand total bar — full width, premium feel ── */
+.orderTotalWrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+}
+
+.orderTotalLabel {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--brand-primary-dark);
+}
+
+.orderTotalValue {
+  font-size: 11px;
+  font-weight: 900;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
