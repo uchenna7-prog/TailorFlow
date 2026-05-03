@@ -190,7 +190,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
   const [pricingError,    setPricingError]    = useState('')
   const [shippingFee,     setShippingFee]     = useState('')
   const [discountValue,   setDiscountValue]   = useState('')
-  const [discountType,    setDiscountType]    = useState('fixed') // 'fixed' | 'percent'
+  const [discountType,    setDiscountType]    = useState('fixed')
 
   function resetForm() {
     setSelectedItems([])
@@ -228,22 +228,15 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
     return sum + (parseFloat(item.price) || 0) * (parseInt(item.qty, 10) || 0)
   }, 0)
 
-  const shippingAmount = parseFloat(shippingFee) || 0
-
-  // Discount: applied to subtotal only
-  const rawDiscountInput = parseFloat(discountValue) || 0
-  const discountAmount   = discountType === 'percent'
+  const shippingAmount     = parseFloat(shippingFee) || 0
+  const rawDiscountInput   = parseFloat(discountValue) || 0
+  const discountAmount     = discountType === 'percent'
     ? Math.round(subtotal * (Math.min(rawDiscountInput, 100) / 100) * 100) / 100
-    : Math.min(rawDiscountInput, subtotal) // fixed discount can't exceed subtotal
-
+    : Math.min(rawDiscountInput, subtotal)
   const discountedSubtotal = subtotal - discountAmount
-
-  // taxRate is stored as a plain percent number (e.g. 3 = 3%)
-  // Tax applies to the discounted subtotal, not the original
-  const taxMultiplier = taxEnabled ? (taxRate / 100) : 0
-  const taxAmount     = Math.round(discountedSubtotal * taxMultiplier * 100) / 100
-
-  const grandTotal = discountedSubtotal + shippingAmount + taxAmount
+  const taxMultiplier      = taxEnabled ? (taxRate / 100) : 0
+  const taxAmount          = Math.round(discountedSubtotal * taxMultiplier * 100) / 100
+  const grandTotal         = discountedSubtotal + shippingAmount + taxAmount
 
   const totalQty = selectedItems.reduce((sum, item) => {
     return sum + (parseInt(item.qty, 10) || 0)
@@ -258,8 +251,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
       )
     : measurements.slice(0, VISIBLE_MEASUREMENT_LIMIT)
 
-  const hiddenCount = isSearching ? 0 : Math.max(0, measurements.length - VISIBLE_MEASUREMENT_LIMIT)
-
+  const hiddenCount     = isSearching ? 0 : Math.max(0, measurements.length - VISIBLE_MEASUREMENT_LIMIT)
   const taxPercentLabel = taxEnabled ? `${taxRate}%` : null
 
   function handleSave() {
@@ -302,7 +294,6 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
       status:         'pending',
       stage:          null,
       takenAt:        getTodayReadable(),
-      // Charges — all frozen at creation time
       shippingFee:      shippingAmount,
       discountType:     discountAmount > 0 ? discountType : null,
       discountValue:    discountAmount > 0 ? rawDiscountInput : 0,
@@ -374,12 +365,10 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
                       : <span className="mi" style={{ fontSize: '1.1rem' }}>checkroom</span>
                     }
                   </div>
-
                   <div className={styles.clothInfo}>
                     <h5>{measurement.name}</h5>
                     <span>{measurement.fields?.length || 0} measurements</span>
                   </div>
-
                   <div className={`${styles.clothCheckCircle} ${isSelected ? styles.clothCheckCircle_checked : ''}`}>
                     {isSelected && <span className="mi" style={{ fontSize: '0.9rem' }}>check</span>}
                   </div>
@@ -407,7 +396,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
           )}
 
 
-          {/* ── Steps 2 & 3 — hidden until at least one item is selected ── */}
+          {/* ── Steps 2 & 3 — hidden until at least one item selected ── */}
           {hasItems && (
             <>
               {/* ── Step 2: Price & Quantity ── */}
@@ -419,25 +408,30 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
                 {selectedItems.map((item, idx) => {
                   const lineAmount = (parseFloat(item.price) || 0) * (parseInt(item.qty, 10) || 0)
                   const showAmount = lineAmount > 0
+                  const isLast     = idx === selectedItems.length - 1
 
                   return (
-                    <div
-                      key={item.id}
-                      className={styles.pricingRow}
-                      style={idx === selectedItems.length - 1 ? { borderBottom: 'none', paddingBottom: 0 } : {}}
-                    >
-                      <div className={styles.pricingItemHeader}>
-                        <div className={styles.clothThumb} style={{ width: 32, height: 32, flexShrink: 0 }}>
+                    <div key={item.id} className={`${styles.pricingItem} ${isLast ? styles.pricingItem_last : ''}`}>
+
+                      {/* Item identity row: thumb + name on left, amount on right */}
+                      <div className={styles.pricingItemMeta}>
+                        <div className={styles.pricingThumb}>
                           {item.imgSrc
                             ? <img src={item.imgSrc} alt="" />
-                            : <span className="mi" style={{ fontSize: '0.9rem' }}>checkroom</span>
+                            : <span className="mi" style={{ fontSize: '0.85rem' }}>checkroom</span>
                           }
                         </div>
-                        <div className={styles.pricingItemName}>{item.name}</div>
+                        <span className={styles.pricingItemName}>{item.name}</span>
+                        {showAmount && (
+                          <span className={styles.pricingItemAmount}>
+                            ₦{lineAmount.toLocaleString()}
+                          </span>
+                        )}
                       </div>
 
-                      <div className={styles.pricingFieldsStack}>
-                        <div className={styles.pricingFieldFull}>
+                      {/* Price + Qty inputs side by side, full width */}
+                      <div className={styles.pricingInputRow}>
+                        <div className={styles.pricingFieldPrice}>
                           <label className={styles.fieldLabel}>
                             Price (₦) <span className={styles.requiredStar}>*</span>
                           </label>
@@ -451,9 +445,9 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
                           />
                         </div>
 
-                        <div className={styles.pricingFieldFull}>
+                        <div className={styles.pricingFieldQty}>
                           <label className={styles.fieldLabel}>
-                            Quantity <span className={styles.requiredStar}>*</span>
+                            Qty <span className={styles.requiredStar}>*</span>
                           </label>
                           <input
                             type="number"
@@ -465,13 +459,8 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
                             onChange={e => updateItemField(item.id, 'qty', e.target.value)}
                           />
                         </div>
-
-                        {showAmount && (
-                          <p className={styles.pricingItemAmount}>
-                            ₦{lineAmount.toLocaleString()}
-                          </p>
-                        )}
                       </div>
+
                     </div>
                   )
                 })}
@@ -497,7 +486,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
 
               <div className={styles.chargesCard}>
 
-                {/* ── Shipping ── */}
+                {/* Shipping */}
                 <div className={styles.chargeRow}>
                   <div className={styles.chargeRowLeft}>
                     <div className={styles.chargeIconBox}>
@@ -523,7 +512,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
 
                 <div className={styles.chargeDivider} />
 
-                {/* ── Discount ── */}
+                {/* Discount */}
                 <div className={styles.chargeRow}>
                   <div className={styles.chargeRowLeft}>
                     <div className={styles.chargeIconBox}>
@@ -534,10 +523,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
                       <div className={styles.chargeRowSub}>Deducted from the order subtotal</div>
                     </div>
                   </div>
-
-                  {/* Discount type toggle + input */}
                   <div className={styles.discountInputGroup}>
-                    {/* ₦ / % toggle */}
                     <div className={styles.discountTypeToggle}>
                       <button
                         className={`${styles.discountTypeBtn} ${discountType === 'fixed' ? styles.discountTypeBtn_active : ''}`}
@@ -561,7 +547,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
                   </div>
                 </div>
 
-                {/* Tax — only if enabled in settings */}
+                {/* Tax */}
                 {taxEnabled && (
                   <>
                     <div className={styles.chargeDivider} />
@@ -588,41 +574,34 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
                   </>
                 )}
 
-                {/* ── Breakdown summary ── */}
+                {/* Breakdown */}
                 <div className={styles.chargeTotalBlock}>
                   <div className={styles.chargeSummaryRow}>
                     <span className={styles.chargeSummaryLabel}>Subtotal</span>
                     <span className={styles.chargeSummaryValue}>₦{subtotal.toLocaleString()}</span>
                   </div>
-
                   {discountAmount > 0 && (
                     <div className={styles.chargeSummaryRow}>
                       <span className={`${styles.chargeSummaryLabel} ${styles.chargeSummaryLabel_discount}`}>
-                        Discount
-                        {discountType === 'percent' && rawDiscountInput > 0 && (
-                          <span className={styles.discountPercentHint}> ({rawDiscountInput}%)</span>
-                        )}
+                        Discount{discountType === 'percent' && rawDiscountInput > 0 ? ` (${rawDiscountInput}%)` : ''}
                       </span>
                       <span className={`${styles.chargeSummaryValue} ${styles.chargeSummaryValue_discount}`}>
                         −₦{discountAmount.toLocaleString()}
                       </span>
                     </div>
                   )}
-
                   {shippingAmount > 0 && (
                     <div className={styles.chargeSummaryRow}>
                       <span className={styles.chargeSummaryLabel}>Shipping</span>
                       <span className={styles.chargeSummaryValue}>₦{shippingAmount.toLocaleString()}</span>
                     </div>
                   )}
-
                   {taxEnabled && taxAmount > 0 && (
                     <div className={styles.chargeSummaryRow}>
                       <span className={styles.chargeSummaryLabel}>Tax ({taxPercentLabel})</span>
                       <span className={styles.chargeSummaryValue}>₦{taxAmount.toLocaleString()}</span>
                     </div>
                   )}
-
                   <div className={styles.chargeTotalDivider} />
                   <div className={styles.chargeTotalRow}>
                     <span>Grand Total</span>
@@ -635,7 +614,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
           )}
 
 
-          {/* ── Final Details — step number shifts when no items selected ── */}
+          {/* ── Final Details ── */}
           <p className={styles.stepHeading} style={{ marginTop: 24 }}>
             {hasItems ? '4' : '2'}. Final Details
           </p>
@@ -705,9 +684,9 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
 function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, onStageChange, onGenerateInvoice, onShareReviewLink }) {
   if (!order) return null
 
-  const priorityBanner = PRIORITY_BANNER_CONFIG[order.priority] ?? PRIORITY_BANNER_CONFIG.normal
-  const placedOnDate   = order.takenAt || order.date || formatFirestoreDate(order.createdAt)
-  const currentStage   = STAGES.find(s => s.value === order.stage)
+  const priorityBanner  = PRIORITY_BANNER_CONFIG[order.priority] ?? PRIORITY_BANNER_CONFIG.normal
+  const placedOnDate    = order.takenAt || order.date || formatFirestoreDate(order.createdAt)
+  const currentStage    = STAGES.find(s => s.value === order.stage)
 
   const subtotal        = Number(order.price          || 0)
   const shippingFee     = Number(order.shippingFee    || 0)
@@ -718,9 +697,7 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
 
   const hasCharges      = shippingFee > 0 || discountAmount > 0 || taxAmount > 0
   const taxPercentLabel = taxRate > 0 ? `${taxRate}%` : null
-
-  // Build a readable discount label e.g. "10%" or fixed amount
-  const discountLabel = order.discountType === 'percent' && order.discountValue > 0
+  const discountLabel   = order.discountType === 'percent' && order.discountValue > 0
     ? `${order.discountValue}% off`
     : null
 
@@ -774,7 +751,6 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           </div>
         </div>
 
-        {/* Garments */}
         {order.items && order.items.length > 0 && (
           <div className={styles.sectionCard}>
             <div className={styles.sectionCardLabel}>Selected Garments</div>
@@ -804,7 +780,6 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
           </div>
         )}
 
-        {/* Charges breakdown */}
         {hasCharges && (
           <div className={styles.sectionCard}>
             <div className={styles.sectionCardLabel}>Charges &amp; Fees</div>
