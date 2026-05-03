@@ -62,7 +62,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .receiptRowTitle {
@@ -74,8 +74,15 @@
   text-overflow: ellipsis;
 }
 
+.receiptRowNumber {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text2);
+  font-family: 'DM Mono', monospace, 'DM Sans', sans-serif;
+}
+
 .receiptRowDate {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 400;
   color: var(--text3);
 }
@@ -169,7 +176,6 @@
 
 /* ─────────────────────────────────────────────────────────────
    STEP HEADING — "1. Select Order" / "2. Select Payment"
-   Identical to OrderModal .stepHeading
    ───────────────────────────────────────────────────────────── */
 
 .stepHeading {
@@ -183,7 +189,7 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   CLOTH SEARCH BAR — reused from OrderModal
+   CLOTH SEARCH BAR
    ───────────────────────────────────────────────────────────── */
 
 .clothSearchBar {
@@ -211,7 +217,7 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   CLOTH PICKER LIST + ITEMS — reused from OrderModal
+   CLOTH PICKER LIST + ITEMS
    ───────────────────────────────────────────────────────────── */
 
 .clothPickerList {
@@ -279,8 +285,8 @@
 }
 
 .clothCheckCircle {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 1.5px solid var(--border2);
   display: flex;
@@ -299,8 +305,6 @@
 
 /* ─────────────────────────────────────────────────────────────
    ACCORDION BODY
-   Slides open below the selected order card.
-   Connected visually via shared accent border.
    ───────────────────────────────────────────────────────────── */
 
 .accordionBody {
@@ -352,7 +356,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 8px 4px;
+  padding: 10px 4px;
 }
 
 .inlineOrderStatLabel {
@@ -364,7 +368,7 @@
 }
 
 .inlineOrderStatValue {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 800;
   color: var(--text);
   white-space: nowrap;
@@ -372,12 +376,12 @@
 
 .inlineOrderStatDivider {
   width: 1px;
-  height: 32px;
+  height: 36px;
   background: var(--border);
   flex-shrink: 0;
 }
 
-/* Dashed divider — matches orderTotalRow pattern in OrderModal */
+/* Dashed divider */
 .inlineFormDivider {
   border-top: 2px dashed var(--border);
   margin: 0 0 16px;
@@ -399,23 +403,24 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   INSTALLMENT PICKER — individual payment cards inside accordion
+   INSTALLMENT PICKER — individual payment cards
+   Bigger, cleaner layout with clear sections
    ───────────────────────────────────────────────────────────── */
 
 .installmentPickerList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .installmentPickerCard {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 14px;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
   transition: background 0.12s, border-color 0.15s;
 }
@@ -425,7 +430,8 @@
 }
 
 .installmentPickerCard_receipted {
-  opacity: 0.65;
+  opacity: 0.6;
+  cursor: default;
 }
 
 .installmentPickerCard_generating {
@@ -433,10 +439,18 @@
   pointer-events: none;
 }
 
-/* Numbered circle on the left */
+/* Left block: number circle + amount + balance */
+.installmentLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Numbered circle */
 .installmentNumber {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--surface);
   border: 1.5px solid var(--border2);
@@ -444,57 +458,22 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 800;
   color: var(--text2);
-  margin-top: 2px;
 }
 
-/* Centre info column */
-.installmentInfo {
-  flex: 1;
-  min-width: 0;
+/* Amount + balance stacked */
+.installmentAmountBlock {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.installmentTopRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
 .installmentAmount {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 800;
   color: var(--text);
-}
-
-.installmentMeta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.installmentDate {
-  font-size: 0.65rem;
-  font-weight: 500;
-  color: var(--text3);
-}
-
-.installmentMethodPill {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--text2);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 1px 6px;
   white-space: nowrap;
 }
 
@@ -502,6 +481,40 @@
   font-size: 0.65rem;
   color: var(--text3);
   font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Centre: date + method pill — stacked vertically */
+.installmentMeta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.installmentDate {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.installmentMethodPill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  gap: 3px;
 }
 
 /* Right-side action tag */
@@ -518,17 +531,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  font-size: 0.58rem;
+  gap: 4px;
+  font-size: 0.6rem;
   font-weight: 800;
   color: #15803d;
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.22);
-  border-radius: 9px;
-  padding: 6px 8px;
+  border-radius: 10px;
+  padding: 8px 10px;
   white-space: nowrap;
   line-height: 1;
-  min-width: 56px;
+  min-width: 62px;
   text-align: center;
 }
 
@@ -537,17 +550,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  font-size: 0.58rem;
+  gap: 4px;
+  font-size: 0.6rem;
   font-weight: 800;
   color: var(--accent);
   background: rgba(200, 135, 58, 0.08);
   border: 1px solid rgba(200, 135, 58, 0.18);
-  border-radius: 9px;
-  padding: 6px 8px;
+  border-radius: 10px;
+  padding: 8px 10px;
   white-space: nowrap;
   line-height: 1;
-  min-width: 56px;
+  min-width: 62px;
   text-align: center;
 }
 
@@ -556,23 +569,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  font-size: 0.58rem;
+  gap: 6px;
+  font-size: 0.6rem;
   font-weight: 800;
   color: var(--text2);
   background: var(--surface);
   border: 1px solid var(--border2);
-  border-radius: 9px;
-  padding: 6px 8px;
+  border-radius: 10px;
+  padding: 8px 10px;
   white-space: nowrap;
   line-height: 1;
-  min-width: 56px;
+  min-width: 62px;
   text-align: center;
 }
 
 .actionSpinner {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border: 2px solid var(--border2);
   border-top-color: var(--accent);
   border-radius: 50%;
