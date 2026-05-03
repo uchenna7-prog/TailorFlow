@@ -84,33 +84,25 @@ function isPaymentFullyReceipted(payment, receipts) {
 
 
 // ─────────────────────────────────────────────────────────────
-// ORDER MOSAIC THUMBNAIL
+// ORDER MOSAIC — CSS-module version matching InvoiceTab exactly
+// size="sm" → 38px picker thumbs
+// size="md" → 68px receipt list rows
 // ─────────────────────────────────────────────────────────────
 
-function OrderMosaic({ orderItems, fallbackIcon, fallbackColor, size = 68 }) {
-  const images      = (orderItems || []).map(item => item.imgSrc ?? null).filter(Boolean)
-  const totalItems  = (orderItems || []).length
-  const innerSize   = Math.round(size * 0.74)
-  const radius      = Math.round(size * 0.176)
-  const innerRadius = Math.round(innerSize * 0.18)
+function OrderMosaic({ items = [], size = 'md' }) {
+  const images     = items.map(item => item.imgSrc ?? null).filter(Boolean)
+  const totalItems = items.length
+  const isSm       = size === 'sm'
 
-  const outerStyle = {
-    width: size, height: size, borderRadius: radius,
-    background: 'var(--surface)', border: '1px solid var(--border)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-  }
-  const innerStyle = {
-    width: innerSize, height: innerSize, borderRadius: innerRadius,
-    background: '#fff', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', overflow: 'hidden',
-  }
+  const outerCls = isSm ? styles.mosaicOuter_sm : styles.mosaicOuter
+  const innerCls = isSm ? styles.mosaicInner_sm : styles.mosaicInner
 
   if (images.length === 0) {
     return (
-      <div style={outerStyle}>
-        <div style={innerStyle}>
-          <span className="mi" style={{ fontSize: '1.4rem', color: fallbackColor || 'var(--text3)' }}>
-            {fallbackIcon || 'receipt'}
+      <div className={outerCls}>
+        <div className={innerCls}>
+          <span className="mi" style={{ fontSize: isSm ? '1rem' : '1.4rem', color: 'var(--text3)' }}>
+            receipt_long
           </span>
         </div>
       </div>
@@ -119,67 +111,61 @@ function OrderMosaic({ orderItems, fallbackIcon, fallbackColor, size = 68 }) {
 
   if (totalItems === 1) {
     return (
-      <div style={outerStyle}>
-        <div style={innerStyle}>
-          <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div className={outerCls}>
+        <div className={innerCls}>
+          <img src={images[0]} alt="" className={styles.mosaicSingleImage} />
+        </div>
+      </div>
+    )
+  }
+
+  if (totalItems === 2) {
+    return (
+      <div className={outerCls}>
+        <div className={`${innerCls} ${styles.mosaicSplit}`}>
+          <div className={styles.mosaicLeft}>
+            <img src={images[0]} alt="" className={styles.mosaicPanelImg} />
+          </div>
+          <div className={styles.mosaicDividerV} />
+          <div className={styles.mosaicRight}>
+            <div className={styles.mosaicCell}>
+              {images[1]
+                ? <img src={images[1]} alt="" className={styles.mosaicPanelImg} />
+                : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
+              }
+            </div>
+          </div>
         </div>
       </div>
     )
   }
 
   const extraCount = totalItems > 3 ? totalItems - 3 : 0
-  const splitStyle = { ...innerStyle, padding: 0, flexDirection: 'row', alignItems: 'stretch' }
-
-  if (totalItems === 2) {
-    return (
-      <div style={outerStyle}>
-        <div style={splitStyle}>
-          <div style={{ flex: '0 0 60%', overflow: 'hidden' }}>
-            <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-          <div style={{ width: 1.5, background: 'var(--border)', flexShrink: 0 }} />
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-            {images[1]
-              ? <img src={images[1]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
-            }
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div style={outerStyle}>
-      <div style={splitStyle}>
-        <div style={{ flex: '0 0 60%', overflow: 'hidden' }}>
+    <div className={outerCls}>
+      <div className={`${innerCls} ${styles.mosaicSplit}`}>
+        <div className={styles.mosaicLeft}>
           {images[0]
-            ? <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ? <img src={images[0]} alt="" className={styles.mosaicPanelImg} />
             : <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>checkroom</span>
           }
         </div>
-        <div style={{ width: 1.5, background: 'var(--border)', flexShrink: 0 }} />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className={styles.mosaicDividerV} />
+        <div className={styles.mosaicRight}>
+          <div className={styles.mosaicCell}>
             {images[1]
-              ? <img src={images[1]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <img src={images[1]} alt="" className={styles.mosaicPanelImg} />
               : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
             }
           </div>
-          <div style={{ height: 1.5, background: 'var(--border)', flexShrink: 0 }} />
-          <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className={styles.mosaicDividerH} />
+          <div className={`${styles.mosaicCell} ${extraCount > 0 ? styles.mosaicCell_overlay : ''}`}>
             {images[2]
-              ? <img src={images[2]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <img src={images[2]} alt="" className={styles.mosaicPanelImg} />
               : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
             }
             {extraCount > 0 && (
-              <div style={{
-                position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontSize: '0.6rem', fontWeight: 800,
-              }}>
-                +{extraCount}
-              </div>
+              <div className={styles.mosaicOverlay}>+{extraCount}</div>
             )}
           </div>
         </div>
@@ -203,7 +189,6 @@ function InlineInstallmentList({ order, payment, receipts, generating, onSelectP
   const isFullyPaid  = fullPrice > 0 && totalPaid >= fullPrice
   const balance      = fullPrice > 0 ? Math.max(0, fullPrice - totalPaid) : 0
 
-  // Build the set of receipted installment IDs for THIS payment only
   const receiptedInstallmentIds = new Set(
     receipts
       .filter(r => String(r.paymentId) === String(payment?.id))
@@ -255,7 +240,6 @@ function InlineInstallmentList({ order, payment, receipts, generating, onSelectP
       {/* Installment cards — each is independently actionable */}
       <div className={styles.installmentPickerList}>
         {installments.map((inst, index) => {
-          // Only check if THIS specific installment has been receipted
           const isReceipted  = receiptedInstallmentIds.has(String(inst.id))
           const isGenerating = generating === inst.id
 
@@ -271,7 +255,6 @@ function InlineInstallmentList({ order, payment, receipts, generating, onSelectP
                 ${isReceipted  ? styles.installmentPickerCard_receipted  : ''}
                 ${isGenerating ? styles.installmentPickerCard_generating : ''}
               `}
-              // Pass only this single installment — no batching
               onClick={() => !isGenerating && !isReceipted && onSelectPayment(payment, inst)}
             >
               {/* Left: payment number + amount block */}
@@ -342,8 +325,6 @@ function InlineInstallmentList({ order, payment, receipts, generating, onSelectP
 
 // ─────────────────────────────────────────────────────────────
 // RECEIPT PICKER MODAL
-// Only shows orders where at least one installment still needs
-// a receipt. Orders fully receipted are hidden.
 // ─────────────────────────────────────────────────────────────
 
 function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSelectPayment, generating }) {
@@ -351,7 +332,6 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
   const [search,          setSearch]          = useState('')
   const expandedRef                           = useRef(null)
 
-  // Reset on open/close
   useEffect(() => {
     if (!isOpen) {
       setSelectedOrderId(null)
@@ -359,7 +339,6 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
     }
   }, [isOpen])
 
-  // Scroll expanded form into view when order is selected
   useEffect(() => {
     if (selectedOrderId && expandedRef.current) {
       setTimeout(() => {
@@ -368,13 +347,9 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
     }
   }, [selectedOrderId])
 
-  // Only show orders that:
-  // 1. Have at least one payment recorded
-  // 2. Have at least one installment that has NOT been receipted yet
   const ordersNeedingReceipt = orders.filter(order => {
     const payment = payments.find(p => String(p.orderId) === String(order.id))
     if (!payment) return false
-    // Hide fully receipted orders
     return !isPaymentFullyReceipted(payment, receipts)
   })
 
@@ -406,10 +381,8 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
       <div className={styles.pickerScrollBody}>
         <div style={{ padding: '20px' }}>
 
-          {/* ── Step 1: Select Order ── */}
           <p className={styles.stepHeading}>1. Select Order</p>
 
-          {/* Search bar — only when more than 5 qualifying orders */}
           {showSearch && (
             <div className={styles.clothSearchBar}>
               <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)' }}>search</span>
@@ -431,7 +404,6 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
             </div>
           )}
 
-          {/* Empty state — all orders fully receipted or no payments yet */}
           {ordersNeedingReceipt.length === 0 && (
             <div className={styles.pickerEmpty}>
               <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>receipt_long</span>
@@ -440,7 +412,6 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
             </div>
           )}
 
-          {/* No search results */}
           {ordersNeedingReceipt.length > 0 && filteredOrders.length === 0 && (
             <div className={styles.pickerEmpty}>
               <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>search_off</span>
@@ -448,7 +419,6 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
             </div>
           )}
 
-          {/* Order picker list — accordion style */}
           <div className={styles.clothPickerList}>
             {filteredOrders.map(order => {
               const isSelected  = selectedOrderId === order.id
@@ -458,14 +428,13 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
               const price       = parseFloat(order.price) || 0
               const isFullyPaid = price > 0 && paid >= price
 
-              // Count how many installments still need a receipt
               const receiptedIds = new Set(
                 receipts
                   .filter(r => String(r.paymentId) === String(payment?.id))
                   .flatMap(r => r.installmentIds || [])
               )
-              const pendingCount   = installs.filter(i => !receiptedIds.has(String(i.id))).length
-              const installCount   = installs.length
+              const pendingCount = installs.filter(i => !receiptedIds.has(String(i.id))).length
+              const installCount = installs.length
 
               return (
                 <div key={order.id}>
@@ -474,13 +443,8 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
                     className={`${styles.clothPickerItem} ${isSelected ? styles.clothPickerItem_selected : ''}`}
                     onClick={() => handleToggleOrder(order)}
                   >
-                    {/* Thumbnail */}
-                    <div className={styles.clothThumb}>
-                      {order.items?.length > 0 && order.items[0]?.imgSrc
-                        ? <img src={order.items[0].imgSrc} alt={order.desc} />
-                        : <span className="mi" style={{ fontSize: '1.1rem' }}>receipt_long</span>
-                      }
-                    </div>
+                    {/* Mosaic thumbnail — sm size, matching InvoiceTab */}
+                    <OrderMosaic items={order.items || []} size="sm" />
 
                     {/* Name + payment status */}
                     <div className={styles.clothInfo}>
@@ -528,7 +492,7 @@ function ReceiptPickerModal({ isOpen, onClose, orders, payments, receipts, onSel
 
 
 // ─────────────────────────────────────────────────────────────
-// RECEIPT CARD — one row in the list
+// RECEIPT CARD — one row in the receipt list
 // ─────────────────────────────────────────────────────────────
 
 function ReceiptCard({ receipt, currency, onTap, isLast, orderItems }) {
@@ -539,12 +503,8 @@ function ReceiptCard({ receipt, currency, onTap, isLast, orderItems }) {
       className={`${styles.receiptRow} ${isLast ? styles.receiptRowLast : ''}`}
       onClick={onTap}
     >
-      <OrderMosaic
-        orderItems={orderItems}
-        fallbackIcon="receipt"
-        fallbackColor={isPaidInFull ? '#22c55e' : '#fb923c'}
-        size={68}
-      />
+      {/* md mosaic for the list rows */}
+      <OrderMosaic items={orderItems} size="md" />
 
       <div className={styles.receiptRowInfo}>
         <div className={styles.receiptRowTitle}>{receipt.orderDesc || 'Payment'}</div>
@@ -605,7 +565,6 @@ export default function ReceiptTab({
   const orderItemsMap = buildOrderItemsMap(orders)
   const groupedByDate = groupReceiptsByDate(receipts)
 
-  // Listen for FAB click from CustomerDetail
   useEffect(() => {
     const openPicker = () => setPickerOpen(true)
     document.addEventListener('openReceiptModal', openPicker)
@@ -615,11 +574,8 @@ export default function ReceiptTab({
   async function handleSelectPayment(payment, installment) {
     setGenerating(installment.id)
     try {
-      // Pass ONLY this single installment — generation is per-installment
       await onGenerateReceipt(payment, installment)
       setGenerating(null)
-      // Keep picker open so user can generate more if needed
-      // Picker auto-filters once the installment gets a receipt via Firestore sub
     } catch {
       setGenerating(null)
       showToast('Failed to generate receipt. Try again.')
@@ -635,12 +591,8 @@ export default function ReceiptTab({
 
   return (
     <>
-      {/* Empty state */}
-      {receipts.length === 0 && (
-        <EmptyState />
-      )}
+      {receipts.length === 0 && <EmptyState />}
 
-      {/* Receipt list grouped by date */}
       {receipts.length > 0 && Object.entries(groupedByDate).map(([date, dateReceipts]) => (
         <div key={date} className={styles.dateGroup}>
           <div className={styles.dateGroupLabel}>{date}</div>
@@ -659,7 +611,6 @@ export default function ReceiptTab({
         </div>
       ))}
 
-      {/* Picker modal — full screen, single scroll, inline accordion */}
       <ReceiptPickerModal
         isOpen={pickerOpen}
         onClose={() => {
@@ -673,7 +624,6 @@ export default function ReceiptTab({
         generating={generating}
       />
 
-      {/* Receipt viewer */}
       {viewingReceipt && (
         <ReceiptViewer
           receipt={viewingReceipt}
@@ -684,7 +634,6 @@ export default function ReceiptTab({
         />
       )}
 
-      {/* Delete confirm */}
       <ConfirmSheet
         open={!!deleteTarget}
         title="Delete this receipt?"
