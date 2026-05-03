@@ -1,1199 +1,85 @@
-/* ═══════════════════════════════════════════════════════════════
-   OrdersTab.module.css
-   ═══════════════════════════════════════════════════════════════ */
-
-
 /* ─────────────────────────────────────────────────────────────
-   EMPTY STATE
+   STEP 2 — PRICING CARD (premium layout)
    ───────────────────────────────────────────────────────────── */
 
-.emptyState {
-  text-align:     center;
-  padding-top:    60px;
-  padding-bottom: 20px;
-  display:        flex;
-  flex-direction: column;
-  align-items:    center;
-  gap:            10px;
+/* Each item block inside the pricing card */
+.pricingItem {
+  padding:       16px 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.emptyState p {
-  font-size: 0.8rem;
-  color:     var(--text3);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ORDER LIST — grouped by date
-   ───────────────────────────────────────────────────────────── */
-
-.orderGroup {
-  margin-bottom: 16px;
-}
-
-.orderGroupDate {
-  font-size:   0.65rem;
-  font-weight: 600;
-  color:       var(--text3);
-  padding:     10px 16px 8px;
-}
-
-.orderGroupDivider {
-  height:      1px;
-  background:  var(--border);
-  width:       calc(100% + 32px);
-  margin-left: -16px;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ORDER ROW
-   ───────────────────────────────────────────────────────────── */
-
-.orderRow {
-  display:    flex;
-  align-items: center;
-  gap:        12px;
-  padding:    12px 0;
-  cursor:     pointer;
-  transition: background 0.15s;
-  background: var(--bg);
-  position:   relative;
-}
-
-.orderRow::after {
-  content:    '';
-  position:   absolute;
-  bottom:     0;
-  left:       0;
-  right:      0;
-  height:     1px;
-  background: var(--border);
-}
-
-.orderRow_last::after {
-  display: none;
-}
-
-.orderRow:active {
-  background: var(--surface);
-}
-
-.orderRowInfo {
-  flex:      1;
-  min-width: 0;
-}
-
-.orderRowDescription {
-  font-size:     0.9rem;
-  font-weight:   600;
-  color:         var(--text);
-  margin-bottom: 3px;
-  white-space:   nowrap;
-  overflow:      hidden;
-  text-overflow: ellipsis;
-}
-
-.orderRowMeta {
-  margin-bottom: 2px;
-}
-
-.orderRowMetaText {
-  font-size:   0.75rem;
-  font-weight: 400;
-  color:       var(--text2);
-}
-
-.orderRowStage {
-  display:     flex;
-  align-items: center;
-  gap:         4px;
-  font-size:   0.72rem;
-  font-weight: 600;
-  color:       var(--accent);
-  margin-top:  3px;
-}
-
-.orderRowRight {
-  text-align:  right;
-  flex-shrink: 0;
-}
-
-.orderRowPrice {
-  font-size:   0.88rem;
-  font-weight: 700;
-  color:       var(--text);
-  white-space: nowrap;
-}
-
-.orderRowDueDate {
-  font-size:      0.6rem;
-  font-weight:    700;
-  color:          #ef4444;
-  margin-top:     4px;
-  letter-spacing: 0.1px;
-  white-space:    nowrap;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ORDER STATUS BADGE
-   ───────────────────────────────────────────────────────────── */
-
-.orderStatusBadge {
-  display:        inline-block;
-  font-size:      0.6rem;
-  font-weight:    700;
-  text-transform: capitalize;
-  letter-spacing: 0.2px;
-  border:         1px solid;
-  border-radius:  5px;
-  padding:        2px 7px;
-  margin-top:     3px;
-}
-
-.orderStatusBadge_pending {
-  color:        #a16207;
-  background:   rgba(234, 179, 8, 0.12);
-  border-color: rgba(234, 179, 8, 0.3);
-}
-
-.orderStatusBadge_in_progress {
-  color:        #2563eb;
-  background:   rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.3);
-}
-
-.orderStatusBadge_completed {
-  color:        #15803d;
-  background:   rgba(21, 128, 61, 0.12);
-  border-color: rgba(21, 128, 61, 0.3);
-}
-
-.orderStatusBadge_delivered {
-  color:        #4f46e5;
-  background:   rgba(129, 140, 248, 0.12);
-  border-color: rgba(129, 140, 248, 0.3);
-}
-
-.orderStatusBadge_cancelled {
-  color:        #dc2626;
-  background:   rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.3);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ORDER MOSAIC THUMBNAIL
-   ───────────────────────────────────────────────────────────── */
-
-.mosaicContainer {
-  width:           80px;
-  height:          80px;
-  border-radius:   12px;
-  background:      var(--surface);
-  border:          1px solid var(--border);
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  flex-shrink:     0;
-}
-
-.mosaicBox {
-  width:           58px;
-  height:          58px;
-  border-radius:   10px;
-  background:      #fff;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  overflow:        hidden;
-}
-
-.mosaicSingleImage {
-  width:         100%;
-  height:        100%;
-  object-fit:    cover;
-  border-radius: 10px;
-}
-
-.mosaicBox_split {
-  padding:        0 !important;
-  display:        flex !important;
-  flex-direction: row !important;
-  align-items:    stretch !important;
-  overflow:       hidden;
-  border-radius:  10px;
-}
-
-.mosaicPanel_left {
-  flex:            0 0 60%;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  overflow:        hidden;
-  background:      #fff;
-  height:          100%;
-}
-
-.mosaicPanel_right {
-  flex:           1;
-  display:        flex;
-  flex-direction: column;
-  overflow:       hidden;
-  background:     #fff;
-}
-
-.mosaicCell {
-  flex:            1;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  overflow:        hidden;
-  position:        relative;
-  background:      #fff;
-}
-
-.mosaicDivider_vertical {
-  width:       1.5px;
-  flex-shrink: 0;
-  background:  var(--border);
-  align-self:  stretch;
-}
-
-.mosaicDivider_horizontal {
-  height:      1.5px;
-  flex-shrink: 0;
-  background:  var(--border);
-  width:       100%;
-}
-
-.mosaicPanelImage {
-  width:      100%;
-  height:     100%;
-  object-fit: cover;
-  display:    block;
-}
-
-.mosaicCell_hasOverlay {
-  position: relative;
-}
-
-.mosaicOverlay {
-  position:        absolute;
-  inset:           0;
-  background:      rgba(0, 0, 0, 0.52);
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  color:           #fff;
-  font-size:       0.65rem;
-  font-weight:     800;
-  letter-spacing:  0.3px;
-  pointer-events:  none;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   NEW ORDER FORM MODAL
-   ───────────────────────────────────────────────────────────── */
-
-.formOverlay {
-  position:       fixed;
-  top:            0;
-  left:           0;
-  width:          100%;
-  height:         100%;
-  background:     var(--bg);
-  z-index:        2000;
-  transform:      translateY(100%);
-  transition:     transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-  display:        flex;
-  flex-direction: column;
-}
-
-.formOverlay_open {
-  transform: translateY(0);
-}
-
-.formScrollBody {
-  flex:                       1;
-  overflow-y:                 auto;
-  padding-bottom:             100px;
-  -webkit-overflow-scrolling: touch;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   FORM SECTIONS
-   ───────────────────────────────────────────────────────────── */
-
-.stepHeading {
-  font-size:      0.65rem;
-  font-weight:    800;
-  color:          var(--text2);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom:  12px;
-}
-
-.clothSearchBar {
-  display:       flex;
-  align-items:   center;
-  gap:           8px;
-  background:    var(--surface);
-  border:        1px solid var(--border2);
-  border-radius: 12px;
-  padding:       0 12px;
-  margin-bottom: 10px;
-}
-
-.clothSearchInput {
-  flex:        1;
-  background:  transparent;
-  border:      none;
-  outline:     none;
-  color:       var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size:   0.85rem;
-  font-weight: 600;
-  padding:     12px 0;
-}
-
-.clothPickerList {
-  display:        flex;
-  flex-direction: column;
-  gap:            8px;
-  margin-bottom:  4px;
-}
-
-.clothPickerItem {
-  display:       flex;
-  align-items:   center;
-  gap:           12px;
-  background:    var(--surface);
-  border:        1px solid var(--border);
-  border-radius: 14px;
-  padding:       12px 14px;
-  cursor:        pointer;
-  transition:    border-color 0.2s;
-}
-
-.clothPickerItem_selected {
-  border-color: var(--accent);
-  background:   var(--surface2);
-}
-
-.clothThumb {
-  width:           38px;
-  height:          38px;
-  border-radius:   9px;
-  background:      var(--surface2);
-  border:          1px solid var(--border2);
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  flex-shrink:     0;
-  overflow:        hidden;
-}
-
-.clothThumb img {
-  width:         100%;
-  height:        100%;
-  object-fit:    cover;
-  border-radius: 8px;
-}
-
-.clothInfo {
-  flex: 1;
-}
-
-.clothInfo h5 {
-  font-size:   0.9rem;
-  font-weight: 700;
-  color:       var(--text);
-}
-
-.clothInfo span {
-  font-size:   0.65rem;
-  color:       var(--text3);
-  font-weight: 600;
-}
-
-.clothCheckCircle {
-  width:           22px;
-  height:          22px;
-  border-radius:   50%;
-  border:          1.5px solid var(--border2);
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  flex-shrink:     0;
-  transition:      all 0.2s;
-}
-
-.clothCheckCircle_checked {
-  background:   var(--accent);
-  border-color: var(--accent);
-  color:        var(--bg);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   CLOTH HIDDEN HINT
-   Shown below the list when results are capped at 3
-   ───────────────────────────────────────────────────────────── */
-
-.clothHiddenHint {
-  display:         flex;
-  align-items:     center;
-  gap:             10px;
-  margin-top:      10px;
-  padding:         10px 14px;
-  background:      var(--surface);
-  border:          1px dashed var(--border2);
-  border-radius:   12px;
-}
-
-/* Three small dots on the left */
-.clothHiddenHintDots {
-  display:     flex;
-  align-items: center;
-  gap:         3px;
-  flex-shrink: 0;
-}
-
-.clothHiddenHintDots span {
-  display:       block;
-  width:         4px;
-  height:        4px;
-  border-radius: 50%;
-  background:    var(--text3);
-  opacity:       0.5;
-}
-
-/* The hint text */
-.clothHiddenHintText {
-  font-size:   0.72rem;
-  font-weight: 600;
-  color:       var(--text3);
-  line-height: 1.4;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   CLOTH EMPTY SEARCH
-   Shown when a search query returns zero results
-   ───────────────────────────────────────────────────────────── */
-
-.clothEmptySearch {
-  display:         flex;
-  flex-direction:  column;
-  align-items:     center;
-  gap:             8px;
-  padding:         28px 16px 20px;
-  background:      var(--surface);
-  border:          1px solid var(--border);
-  border-radius:   14px;
-  margin-top:      4px;
-  text-align:      center;
-  color:           var(--text3);
-  font-size:       0.8rem;
-  font-weight:     600;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   PRICING SECTION
-   ───────────────────────────────────────────────────────────── */
-
-.pricingCard {
-  display:        flex;
-  flex-direction: column;
-  gap:            14px;
-  background:     var(--surface);
-  border:         1px solid var(--border);
-  border-radius:  18px;
-  padding:        16px;
-  margin-bottom:  20px;
-}
-
-.pricingRow {
-  display:        flex;
-  align-items:    flex-start;
-  gap:            12px;
-  padding-bottom: 14px;
-  border-bottom:  1px solid var(--border);
-}
-
-.pricingRow:last-of-type {
-  border-bottom:  none;
+.pricingItem_last {
+  border-bottom: none;
   padding-bottom: 0;
 }
 
-.pricingItemName {
-  font-size:     0.8rem;
-  font-weight:   700;
-  color:         var(--text);
-  margin-bottom: 8px;
-}
-
-.pricingInputRow {
-  display:     flex;
-  gap:         10px;
-  align-items: flex-end;
-}
-
-.pricingField {
-  display:        flex;
-  flex-direction: column;
-  flex:           1;
-  min-width:      0;
-}
-
-.fieldLabel {
-  font-size:      0.58rem;
-  font-weight:    800;
-  color:          var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom:  5px;
-  display:        block;
-}
-
-.requiredStar {
-  color:       var(--danger, #ef4444);
-  margin-left: 1px;
-}
-
-.pricingInput {
-  width:         100%;
-  background:    var(--bg);
-  border:        1px solid var(--border2);
-  border-radius: 8px;
-  padding:       8px 10px;
-  color:         var(--text);
-  font-size:     0.9rem;
-  font-weight:   700;
-  outline:       none;
-  font-family:   'DM Sans', sans-serif;
-  -moz-appearance: textfield;
-}
-
-.pricingInput::-webkit-outer-spin-button,
-.pricingInput::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.pricingInput:focus {
-  border-color: var(--accent);
-}
-
-.pricingAmount {
-  width:         100%;
-  background:    var(--surface2);
-  border:        1px solid var(--border);
-  border-radius: 8px;
-  padding:       8px 10px;
-  color:         var(--accent);
-  font-size:     0.9rem;
-  font-weight:   800;
-  font-family:   'DM Sans', sans-serif;
-  white-space:   nowrap;
-  overflow:      hidden;
-  text-overflow: ellipsis;
-}
-
-.pricingError {
-  display:       flex;
-  align-items:   center;
-  gap:           6px;
-  font-size:     0.72rem;
-  font-weight:   700;
-  color:         var(--danger, #ef4444);
-  background:    rgba(239, 68, 68, 0.08);
-  border:        1px solid rgba(239, 68, 68, 0.25);
-  border-radius: 10px;
-  padding:       8px 12px;
-  margin-top:    4px;
-}
-
-.orderTotalRow {
-  margin-top:      10px;
-  padding-top:     12px;
-  border-top:      2px dashed var(--border);
-  display:         flex;
-  justify-content: space-between;
-  align-items:     center;
-  font-size:       0.85rem;
-  font-weight:     800;
-  text-transform:  uppercase;
-  color:           var(--text2);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   DETAILS CARD — Step 3
-   ───────────────────────────────────────────────────────────── */
-
-.detailsCard {
-  background:    var(--surface);
-  border:        1px solid var(--border);
-  border-radius: 20px;
-  padding:       20px;
-}
-
-.underlineInput {
-  width:          100%;
-  background:     transparent;
-  border:         none;
-  color:          var(--text);
-  font-size:      1.05rem;
-  font-weight:    700;
-  outline:        none;
-  border-bottom:  1px solid var(--border2);
-  padding-bottom: 10px;
-  margin-bottom:  20px;
-  font-family:    'DM Sans', sans-serif;
-}
-
-.underlineInput::placeholder {
-  color: var(--text3);
-}
-
-.notesTextarea {
-  width:          100%;
-  background:     transparent;
-  border:         none;
-  border-bottom:  1px solid var(--border2);
-  color:          var(--text);
-  font-size:      0.9rem;
-  font-weight:    500;
-  outline:        none;
-  resize:         none;
-  min-height:     70px;
-  font-family:    'DM Sans', sans-serif;
-  padding-bottom: 8px;
-}
-
-.notesTextarea::placeholder {
-  color: var(--text3);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   PRIORITY CHIPS
-   ───────────────────────────────────────────────────────────── */
-
-.priorityChipRow {
-  display:       flex;
-  gap:           8px;
-  margin-bottom: 4px;
-}
-
-.priorityChip {
-  flex:          1;
-  text-align:    center;
-  padding:       9px 4px;
-  border-radius: 10px;
-  border:        1px solid var(--border2);
-  font-size:     0.7rem;
-  font-weight:   800;
-  color:         var(--text3);
-  cursor:        pointer;
-  transition:    all 0.2s;
-  font-family:   'DM Sans', sans-serif;
-}
-
-.priorityChip_normal {
-  background:   var(--surface2);
-  border-color: var(--text2);
-  color:        var(--text);
-}
-
-.priorityChip_urgent {
-  background:   rgba(251, 146, 60, 0.15);
-  border-color: var(--warning);
-  color:        var(--warning);
-}
-
-.priorityChip_vip {
-  background:   rgba(168, 85, 247, 0.15);
-  border-color: #a855f7;
-  color:        #a855f7;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   STAGE CHIPS
-   ───────────────────────────────────────────────────────────── */
-
-.stageChipRow {
-  display:    flex;
-  flex-wrap:  wrap;
-  gap:        8px;
-  margin-top: 4px;
-}
-
-.stageChip {
-  display:       flex;
-  align-items:   center;
-  gap:           5px;
-  padding:       8px 12px;
-  border-radius: 20px;
-  border:        1px solid var(--border2);
-  background:    transparent;
-  color:         var(--text3);
-  font-size:     0.7rem;
-  line-height:   1.4;
-  font-weight:   800;
-  font-family:   'DM Sans', sans-serif;
-  cursor:        pointer;
-  transition:    all 0.18s;
-  white-space:   nowrap;
-  flex-shrink:   0;
-}
-
-.stageChip:active {
-  opacity: 0.7;
-}
-
-.stageChip_active {
-  background:   rgba(99, 102, 241, 0.1);
-  border-color: var(--accent);
-  color:        var(--accent);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ORDER DETAIL PANEL
-   ───────────────────────────────────────────────────────────── */
-
-.detailPanel {
-  position:       fixed;
-  top:            0;
-  left:           0;
-  width:          100%;
-  height:         100%;
-  background:     var(--bg);
-  z-index:        3000;
-  transform:      translateX(100%);
-  transition:     transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  display:        flex;
-  flex-direction: column;
-  overflow:       hidden;
-}
-
-.detailPanel_open {
-  transform: translateX(0);
-}
-
-.detailScrollBody {
-  flex:                       1;
-  overflow-y:                 auto;
-  padding:                    20px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.detailFooterDates {
-  font-size:  0.7rem;
-  color:      var(--text3);
-  margin-top: 20px;
-  text-align: center;
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   PRIORITY BANNER
-   ───────────────────────────────────────────────────────────── */
-
-.priorityBanner {
-  font-size:      0.65rem;
-  font-weight:    800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding:        7px 12px;
-  border-radius:  8px;
-  display:        inline-block;
-  margin-bottom:  18px;
-}
-
-.priorityBanner_normal {
-  color:      var(--text2);
-  background: var(--surface);
-  border:     1px solid var(--border2);
-}
-
-.priorityBanner_urgent {
-  color:      var(--warning);
-  background: rgba(251, 146, 60, 0.1);
-  border:     1px solid rgba(251, 146, 60, 0.3);
-}
-
-.priorityBanner_vip {
-  color:      #a855f7;
-  background: rgba(168, 85, 247, 0.1);
-  border:     1px solid rgba(168, 85, 247, 0.3);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   INFO GRID
-   ───────────────────────────────────────────────────────────── */
-
-.infoGrid {
-  display:               grid;
-  grid-template-columns: 1fr 1fr;
-  gap:                   12px;
-  margin-bottom:         20px;
-}
-
-.infoGridCell {
-  background:    var(--surface);
-  border:        1px solid var(--border);
-  border-radius: 14px;
-  padding:       12px 14px;
-}
-
-.infoGridLabel {
-  font-size:      0.6rem;
-  font-weight:    800;
-  color:          var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom:  4px;
-}
-
-.infoGridValue {
-  font-size:   1rem;
-  font-weight: 800;
-  color:       var(--text);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   SECTION CARD
-   ───────────────────────────────────────────────────────────── */
-
-.sectionCard {
-  background:    var(--surface);
-  border:        1px solid var(--border);
-  border-radius: 14px;
-  padding:       14px;
-  margin-bottom: 16px;
-}
-
-.sectionCardLabel {
-  font-size:      0.6rem;
-  font-weight:    800;
-  color:          var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom:  10px;
-}
-
-.garmentRow {
+/* Top row: thumb + name on left, live amount on right */
+.pricingItemMeta {
   display:         flex;
   align-items:     center;
-  justify-content: space-between;
   gap:             10px;
-  margin-bottom:   10px;
+  margin-bottom:   12px;
 }
 
-.garmentRow:last-child {
-  margin-bottom: 0;
-}
-
-.garmentThumb {
-  width:           36px;
-  height:          36px;
+.pricingThumb {
+  width:           32px;
+  height:          32px;
   border-radius:   8px;
   background:      var(--surface2);
   border:          1px solid var(--border2);
   display:         flex;
   align-items:     center;
   justify-content: center;
-  overflow:        hidden;
   flex-shrink:     0;
+  overflow:        hidden;
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   NOTES CARD
-   ───────────────────────────────────────────────────────────── */
-
-.notesCard {
-  background:    var(--surface);
-  border:        1px solid var(--border);
-  border-radius: 14px;
-  padding:       14px;
-  margin-bottom: 16px;
+.pricingThumb img {
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
 }
 
-.notesCard p {
-  font-size:   0.85rem;
-  color:       var(--text2);
-  line-height: 1.5;
+.pricingItemName {
+  flex:        1;
+  font-size:   0.88rem;
+  font-weight: 700;
+  color:       var(--text);
+  min-width:   0;
+  white-space: nowrap;
+  overflow:    hidden;
+  text-overflow: ellipsis;
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   STATUS BUTTONS
-   ───────────────────────────────────────────────────────────── */
-
-.statusButton {
-  flex:          1;
-  padding:       11px;
-  border-radius: 10px;
-  border:        1px solid var(--border2);
-  font-size:     0.72rem;
-  font-weight:   800;
-  font-family:   'DM Sans', sans-serif;
-  cursor:        pointer;
-  transition:    all 0.2s;
-  color:         var(--text3);
-  background:    transparent;
-}
-
-.statusButton_active {
-  background:   var(--surface2);
-  border-color: var(--success);
-  color:        var(--success);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ACTION BUTTONS
-   ───────────────────────────────────────────────────────────── */
-
-.shareReviewButton {
-  width:          100%;
-  display:        flex;
-  align-items:    center;
-  gap:            10px;
-  padding:        14px 16px;
-  border-radius:  14px;
-  border:         1px solid rgba(34, 197, 94, 0.4);
-  background:     rgba(34, 197, 94, 0.07);
-  color:          #22c55e;
-  font-family:    'DM Sans', sans-serif;
-  font-size:      0.72rem;
-  font-weight:    800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor:         pointer;
-  margin-bottom:  16px;
-  transition:     opacity 0.15s, background 0.15s;
-}
-
-.shareReviewButton:active {
-  opacity:    0.75;
-  background: rgba(34, 197, 94, 0.14);
-}
-
-.generateInvoiceButton {
-  width:           100%;
-  margin-top:      20px;
-  padding:         16px;
-  border-radius:   14px;
-  border:          1px solid var(--border2);
-  background:      var(--surface);
-  color:           var(--text2);
-  font-family:     'DM Sans', sans-serif;
-  font-size:       0.82rem;
-  font-weight:     800;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  gap:             8px;
-  cursor:          pointer;
-  transition:      border-color 0.2s, color 0.2s;
-  text-transform:  uppercase;
-  letter-spacing:  0.8px;
-}
-
-.generateInvoiceButton:active {
-  border-color: var(--accent);
-  color:        var(--accent);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   LIGHTBOX
-   ───────────────────────────────────────────────────────────── */
-
-.lightboxOverlay {
-  position:        fixed;
-  inset:           0;
-  z-index:         9000;
-  background:      rgba(0, 0, 0, 0.96);
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  animation:       lightboxFadeIn 0.2s ease;
-}
-
-@keyframes lightboxFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.lightboxImageWrapper {
-  width:           100%;
-  height:          100%;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  padding:         60px 16px 80px;
-  box-sizing:      border-box;
-}
-
-.lightboxImage {
-  max-width:         100%;
-  max-height:        100%;
-  object-fit:        contain;
-  border-radius:     10px;
-  user-select:       none;
-  -webkit-user-drag: none;
-}
-
-.lightboxCloseButton {
-  position:        absolute;
-  top:             calc(14px + var(--st, 0px));
-  right:           16px;
-  width:           40px;
-  height:          40px;
-  border-radius:   50%;
-  background:      rgba(255, 255, 255, 0.15);
-  border:          none;
-  color:           #fff;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  cursor:          pointer;
-  z-index:         10;
-  font-size:       1.3rem;
-  -webkit-tap-highlight-color: transparent;
-  transition:      background 0.15s;
-}
-
-.lightboxCloseButton:active {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.lightboxCounter {
-  position:      absolute;
-  top:           calc(18px + var(--st, 0px));
-  left:          16px;
-  background:    rgba(255, 255, 255, 0.18);
-  color:         #fff;
-  font-size:     0.72rem;
-  font-weight:   800;
-  padding:       5px 12px;
-  border-radius: 20px;
-  pointer-events: none;
-  letter-spacing: 0.3px;
-}
-
-.lightboxArrow {
-  position:        absolute;
-  top:             50%;
-  transform:       translateY(-50%);
-  width:           44px;
-  height:          44px;
-  border-radius:   50%;
-  background:      rgba(255, 255, 255, 0.15);
-  border:          none;
-  color:           #fff;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  cursor:          pointer;
-  z-index:         10;
-  font-size:       1.5rem;
-  -webkit-tap-highlight-color: transparent;
-  transition:      background 0.15s;
-}
-
-.lightboxArrow:active {
-  background: rgba(255, 255, 255, 0.35);
-}
-
-.lightboxArrow_left  { left:  12px; }
-.lightboxArrow_right { right: 12px; }
-
-.lightboxDots {
-  position:        absolute;
-  bottom:          28px;
-  left:            0;
-  right:           0;
-  display:         flex;
-  justify-content: center;
-  gap:             7px;
-  pointer-events:  none;
-}
-
-.lightboxDot {
-  width:          7px;
-  height:         7px;
-  border-radius:  50%;
-  background:     rgba(255, 255, 255, 0.4);
-  border:         none;
-  padding:        0;
-  cursor:         pointer;
-  pointer-events: all;
-  transition:     background 0.2s, transform 0.2s;
-  flex-shrink:    0;
-}
-
-.lightboxDot_active {
-  background: #fff;
-  transform:  scale(1.35);
-}
-
-
-/* ─────────────────────────────────────────────────────────────
-   ANIMATIONS
-   ───────────────────────────────────────────────────────────── */
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0);   }
-}
-
-
-
-/* ─────────────────────────────────────────────────────────────
-   STEP 2 — PRICING CARD (updated layout)
-   ───────────────────────────────────────────────────────────── */
-
-.pricingItemHeader {
-  display:       flex;
-  align-items:   center;
-  gap:           10px;
-  margin-bottom: 12px;
-}
-
-.pricingFieldsStack {
-  display:        flex;
-  flex-direction: column;
-  gap:            10px;
-}
-
-.pricingFieldFull {
-  display:        flex;
-  flex-direction: column;
-  width:          100%;
-}
-
-/* Amount as plain text below the inputs */
+/* Live amount — top-right, accent colour, appears as soon as both fields have values */
 .pricingItemAmount {
-  font-size:   0.82rem;
+  font-size:   0.88rem;
   font-weight: 800;
   color:       var(--accent);
-  margin:      2px 0 0;
-  padding:     0;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Price + Qty inputs — side by side, filling the full card width */
+.pricingInputRow {
+  display: flex;
+  gap:     10px;
+}
+
+/* Price takes 2/3 of the space */
+.pricingFieldPrice {
+  display:        flex;
+  flex-direction: column;
+  flex:           2;
+  min-width:      0;
+}
+
+/* Qty takes 1/3 of the space */
+.pricingFieldQty {
+  display:        flex;
+  flex-direction: column;
+  flex:           1;
+  min-width:      0;
 }
 
 
@@ -1224,7 +110,6 @@
   min-width:   0;
 }
 
-/* Icon box — neutral, matches app's black/white system */
 .chargeIconBox {
   width:           36px;
   height:          36px;
@@ -1255,7 +140,6 @@
   margin-top:  2px;
 }
 
-/* Tax rate badge */
 .taxBadge {
   font-size:      0.6rem;
   font-weight:    800;
@@ -1268,7 +152,6 @@
   padding:        2px 7px;
 }
 
-/* Shipping / tax editable input wrapper */
 .chargeInputWrapper {
   display:       flex;
   align-items:   center;
@@ -1306,7 +189,6 @@
   margin: 0;
 }
 
-/* Tax read-only value */
 .chargeReadOnly {
   display:     flex;
   align-items: center;
@@ -1324,7 +206,6 @@
   opacity:     0.6;
 }
 
-/* Divider between charge rows */
 .chargeDivider {
   height:     1px;
   background: var(--border);
@@ -1343,7 +224,6 @@
   flex-shrink: 0;
 }
 
-/* ₦ / % toggle pill */
 .discountTypeToggle {
   display:       flex;
   border:        1px solid var(--border2);
@@ -1396,14 +276,8 @@
   color:       var(--text3);
 }
 
-/* Discount label has a subtle green tint */
 .chargeSummaryLabel_discount {
   color: var(--success);
-}
-
-.discountPercentHint {
-  font-weight: 600;
-  opacity:     0.8;
 }
 
 .chargeSummaryValue {
@@ -1412,7 +286,6 @@
   color:       var(--text2);
 }
 
-/* Discount value shown in success/green */
 .chargeSummaryValue_discount {
   color: var(--success);
 }
@@ -1458,7 +331,6 @@
   color:       var(--text2);
 }
 
-/* Discount value in the detail panel */
 .detailChargeValue_discount {
   color: var(--success);
 }
@@ -1478,4 +350,3 @@
   color:           var(--accent);
   padding:         2px 0;
 }
-
