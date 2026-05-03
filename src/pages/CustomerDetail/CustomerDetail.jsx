@@ -391,11 +391,14 @@ export default function CustomerDetail({ onMenuClick }) {
       date:      today,
       template:  settingsSnap.invoiceTemplate || 'invoiceTemplate1',
       brandSnapshot,
-      // ── Charge fields frozen from the order at generation time ──
-      shippingFee:  order.shippingFee  ?? 0,
-      taxRate:      order.taxRate      ?? 0,
-      taxAmount:    order.taxAmount    ?? 0,
-      totalAmount:  order.totalAmount  ?? order.price ?? 0,
+      // ── All charge fields frozen from the order at generation time ──
+      shippingFee:    order.shippingFee    ?? 0,
+      discountType:   order.discountType   ?? null,
+      discountValue:  order.discountValue  ?? 0,
+      discountAmount: order.discountAmount ?? 0,
+      taxRate:        order.taxRate        ?? 0,
+      taxAmount:      order.taxAmount      ?? 0,
+      totalAmount:    order.totalAmount    ?? order.price ?? 0,
     }
 
     try {
