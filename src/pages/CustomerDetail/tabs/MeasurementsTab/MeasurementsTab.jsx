@@ -459,7 +459,7 @@ function MeasureModal({ isOpen, onClose, onSave }) {
           {/* ── Step 3: Add Another Cloth Type ── */}
           <p className={styles.stepHeading} style={{ marginTop: 24 }}>3. Add More Cloth Types</p>
           <button className={styles.addClothButton} onClick={addCard}>
-            <span className="mi">add_circle_outline</span>
+            <span className="material-icons">add_circle_outline</span>
             Add Another Cloth Type
           </button>
 
