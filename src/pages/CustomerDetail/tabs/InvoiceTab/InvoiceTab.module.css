@@ -74,17 +74,10 @@
   text-overflow: ellipsis;
 }
 
-.invoiceRowDate {
-  font-size: 0.72rem;
-  font-weight: 400;
-  color: var(--text3);
-}
-
 .invoiceRowItemCount {
   font-size: 0.78rem;
   font-weight: 400;
   color: var(--text2);
-  margin-bottom: 4px;
   display: inline-block;
   align-self: flex-start;
 }
@@ -118,6 +111,152 @@
 }
 
 
+/* ─────────────────────────────────────────────────────────────
+   ORDER MOSAIC THUMBNAIL
+   md (68px) — invoice list rows
+   sm (38px) — picker card thumbs and generate card rows
+   Matches OrdersTab mosaicContainer / mosaicBox exactly.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── md outer / inner ── */
+.mosaicOuter {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mosaicInner {
+  width: 50px;
+  height: 50px;
+  border-radius: 9px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── sm outer / inner ── */
+.mosaicOuter_sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mosaicInner_sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Single full-bleed image */
+.mosaicSingleImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Tiled split layout */
+.mosaicSplit {
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  overflow: hidden;
+}
+
+/* Left panel — 60% width */
+.mosaicLeft {
+  flex: 0 0 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+  height: 100%;
+}
+
+/* Right column — two stacked cells */
+.mosaicRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Each cell in the right column */
+.mosaicCell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+}
+
+/* Image inside any panel */
+.mosaicPanelImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Vertical divider between left and right */
+.mosaicDividerV {
+  width: 1.5px;
+  flex-shrink: 0;
+  background: var(--border);
+  align-self: stretch;
+}
+
+/* Horizontal divider between top and bottom right cells */
+.mosaicDividerH {
+  height: 1.5px;
+  flex-shrink: 0;
+  background: var(--border);
+  width: 100%;
+}
+
+/* Cell with +N overlay */
+.mosaicCell_overlay {
+  position: relative;
+}
+
+.mosaicOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+
 /* ── EMPTY STATE ── */
 
 .emptyState {
@@ -141,28 +280,6 @@
   color: var(--text3);
   margin: 0;
   line-height: 1.5;
-}
-
-.emptyStateCta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 11px 20px;
-  border-radius: 12px;
-  border: 1.5px solid var(--accent);
-  background: transparent;
-  color: var(--accent);
-  font-size: 0.82rem;
-  font-weight: 800;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-
-.emptyStateCta:active {
-  background: var(--accent);
-  color: #fff;
 }
 
 
@@ -189,7 +306,7 @@
 
 /* ─────────────────────────────────────────────────────────────
    ORDER PICKER MODAL
-   Full-screen overlay — mirrors OrderModal (formOverlay) exactly
+   Full-screen overlay — mirrors OrderModal formOverlay exactly
    ───────────────────────────────────────────────────────────── */
 
 .pickerOverlay {
@@ -210,25 +327,19 @@
   transform: translateY(0);
 }
 
-/* Scrollable area below the header — matches .formScrollBody */
+/* Scrollable area below header — matches .formScrollBody */
 .pickerScrollBody {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 120px;   /* extra room for the sticky generate bar */
+  padding-bottom: 100px;
   -webkit-overflow-scrolling: touch;
 }
 
 
 /* ─────────────────────────────────────────────────────────────
-   STEP HEADING ROW — heading + selection count inline
+   STEP HEADING — "1. Select Orders" / "2. Generate Invoices"
+   Identical to OrderModal .stepHeading
    ───────────────────────────────────────────────────────────── */
-
-.stepHeadingRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
 
 .stepHeading {
   font-size: 0.65rem;
@@ -236,25 +347,11 @@
   color: var(--text2);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin: 0;
-}
-
-/* Pill badge showing how many orders are selected */
-.selectionBadge {
-  font-size: 0.6rem;
-  font-weight: 800;
-  color: var(--accent);
-  background: rgba(var(--accent-rgb, 99, 102, 241), 0.1);
-  border: 1px solid rgba(var(--accent-rgb, 99, 102, 241), 0.25);
-  border-radius: 20px;
-  padding: 2px 9px;
-  letter-spacing: 0.02em;
+  margin-bottom: 12px;
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   CLOTH SEARCH BAR — reused from OrderModal
-   ───────────────────────────────────────────────────────────── */
+/* ── CLOTH SEARCH BAR ── */
 
 .clothSearchBar {
   display: flex;
@@ -281,7 +378,8 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   CLOTH PICKER LIST + ITEMS — reused from OrderModal
+   CLOTH PICKER LIST + ITEMS
+   Multi-select — each tap toggles the check circle.
    ───────────────────────────────────────────────────────────── */
 
 .clothPickerList {
@@ -300,7 +398,7 @@
   border-radius: 14px;
   padding: 12px 14px;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.15s;
 }
 
 .clothPickerItem_selected {
@@ -311,26 +409,6 @@
 .clothPickerItem_generating {
   opacity: 0.6;
   pointer-events: none;
-}
-
-.clothThumb {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.clothThumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
 }
 
 .clothInfo {
@@ -354,16 +432,7 @@
   font-weight: 600;
 }
 
-/* Price shown on picker card */
-.pickerOrderPrice {
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: var(--accent);
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-right: 2px;
-}
-
+/* Check circle on the right of each row */
 .clothCheckCircle {
   width: 22px;
   height: 22px;
@@ -384,52 +453,76 @@
 
 
 /* ─────────────────────────────────────────────────────────────
-   GENERATE BAR
-   Sticky bottom bar that appears once ≥1 order is selected.
-   Shows selection count + the single generate button.
+   GENERATE CARD — Step 2
+   Shows all selected orders + a single generate button.
+   Matches pricingCard / detailsCard from OrderModal.
    ───────────────────────────────────────────────────────────── */
 
-.generateBar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
+.generateCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+/* One row per selected order inside the card */
+.generateOrderRow {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 20px;
-  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  background: var(--bg);
-  border-top: 1px solid var(--border);
-  animation: barSlideUp 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
 }
 
-@keyframes barSlideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+/* Last order row — no border below */
+.generateOrderRow_last {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
 }
 
-.generateBarInfo {
+.generateOrderName {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.generateOrderPrice {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Spinner shown next to a row being generated */
+.generateRowSpinnerWrap {
   display: flex;
-  flex-direction: column;
-  gap: 1px;
+  align-items: center;
   flex-shrink: 0;
 }
 
-.generateBarCount {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: var(--text);
+/* Dashed divider above the generate button */
+.generateDivider {
+  border-top: 2px dashed var(--border);
+  margin: 14px -2px 16px;
 }
 
-.generateBarButton {
-  flex: 1;
+/* Primary generate button — full width, accent */
+.generateInlineButton {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 16px;
+  padding: 14px;
   border-radius: 14px;
   border: none;
   background: var(--accent);
@@ -443,19 +536,17 @@
   transition: opacity 0.15s;
 }
 
-.generateBarButton:active {
+.generateInlineButton:active {
   opacity: 0.8;
 }
 
-.generateBarButton:disabled {
-  opacity: 0.6;
+.generateInlineButton:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   PICKER EMPTY STATE
-   ───────────────────────────────────────────────────────────── */
+/* ── PICKER EMPTY STATE ── */
 
 .pickerEmpty {
   display: flex;
@@ -469,23 +560,26 @@
 .pickerEmpty p {
   font-size: 0.82rem;
   color: var(--text3);
+  margin: 0;
 }
 
 
 /* ─────────────────────────────────────────────────────────────
-   SPINNER — used inside checkmark circle when generating
+   SPINNERS
    ───────────────────────────────────────────────────────────── */
 
+/* Dark spinner — inside check circle or row indicator */
 .pickerSpinner {
   width: 12px;
   height: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid var(--border2);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: pickerSpin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
+/* White spinner — inside the accent generate button */
 .pickerSpinnerWhite {
   width: 14px;
   height: 14px;
