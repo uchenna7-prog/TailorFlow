@@ -1162,3 +1162,229 @@
   to   { opacity: 1; transform: translateY(0);   }
 }
 
+
+/* ─────────────────────────────────────────────────────────────
+   STEP 4 — CHARGES & FEES CARD
+   ───────────────────────────────────────────────────────────── */
+
+.chargesCard {
+  background:    var(--surface);
+  border:        1px solid var(--border);
+  border-radius: 20px;
+  overflow:      hidden;
+}
+
+/* Each charge row (shipping / tax) */
+.chargeRow {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             12px;
+  padding:         14px 16px;
+}
+
+.chargeRowLeft {
+  display:     flex;
+  align-items: center;
+  gap:         12px;
+  flex:        1;
+  min-width:   0;
+}
+
+.chargeIconBox {
+  width:           36px;
+  height:          36px;
+  border-radius:   10px;
+  background:      rgba(59, 130, 246, 0.1);
+  border:          1px solid rgba(59, 130, 246, 0.2);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+  color:           #2563eb;
+}
+
+.chargeIconBox_tax {
+  background: rgba(168, 85, 247, 0.1);
+  border:     1px solid rgba(168, 85, 247, 0.2);
+  color:      #a855f7;
+}
+
+.chargeRowLabel {
+  font-size:   0.85rem;
+  font-weight: 700;
+  color:       var(--text);
+  display:     flex;
+  align-items: center;
+  gap:         7px;
+  flex-wrap:   wrap;
+}
+
+.chargeRowSub {
+  font-size:  0.65rem;
+  color:      var(--text3);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Tax rate badge beside label */
+.taxBadge {
+  font-size:      0.6rem;
+  font-weight:    800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color:          #a855f7;
+  background:     rgba(168, 85, 247, 0.12);
+  border:         1px solid rgba(168, 85, 247, 0.25);
+  border-radius:  6px;
+  padding:        2px 7px;
+}
+
+/* Shipping fee editable input */
+.chargeInputWrapper {
+  display:       flex;
+  align-items:   center;
+  background:    var(--bg);
+  border:        1px solid var(--border2);
+  border-radius: 10px;
+  padding:       0 10px;
+  gap:           4px;
+  flex-shrink:   0;
+  width:         110px;
+}
+
+.chargeInputPrefix {
+  font-size:   0.9rem;
+  font-weight: 700;
+  color:       var(--text3);
+}
+
+.chargeInput {
+  width:       100%;
+  background:  transparent;
+  border:      none;
+  outline:     none;
+  color:       var(--text);
+  font-size:   0.9rem;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  padding:     10px 0;
+  -moz-appearance: textfield;
+}
+
+.chargeInput::-webkit-outer-spin-button,
+.chargeInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Tax read-only value */
+.chargeReadOnly {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  font-size:   0.9rem;
+  font-weight: 800;
+  color:       #a855f7;
+  flex-shrink: 0;
+}
+
+.lockIcon {
+  display:     flex;
+  align-items: center;
+  color:       var(--text3);
+  opacity:     0.6;
+}
+
+/* Thin divider between rows */
+.chargeDivider {
+  height:     1px;
+  background: var(--border);
+  margin:     0 16px;
+}
+
+/* Total breakdown block at the bottom of the card */
+.chargeTotalBlock {
+  background:    var(--surface2);
+  border-top:    1px solid var(--border);
+  padding:       14px 16px;
+  display:       flex;
+  flex-direction: column;
+  gap:           8px;
+}
+
+.chargeSummaryRow {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+}
+
+.chargeSummaryLabel {
+  font-size:   0.78rem;
+  font-weight: 600;
+  color:       var(--text3);
+}
+
+.chargeSummaryValue {
+  font-size:   0.78rem;
+  font-weight: 700;
+  color:       var(--text2);
+}
+
+.chargeTotalDivider {
+  height:     1px;
+  background: var(--border2);
+  margin:     2px 0;
+}
+
+.chargeTotalRow {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  font-size:       1rem;
+  font-weight:     800;
+  color:           var(--accent);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   ORDER DETAIL — CHARGES BREAKDOWN
+   ───────────────────────────────────────────────────────────── */
+
+.detailChargeRow {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  padding:         6px 0;
+}
+
+.detailChargeLabel {
+  font-size:   0.8rem;
+  font-weight: 600;
+  color:       var(--text3);
+  display:     flex;
+  align-items: center;
+}
+
+.detailChargeValue {
+  font-size:   0.8rem;
+  font-weight: 700;
+  color:       var(--text2);
+}
+
+.detailChargeDivider {
+  height:     1px;
+  background: var(--border2);
+  margin:     8px 0 6px;
+}
+
+.detailChargeTotalRow {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  font-size:       0.95rem;
+  font-weight:     800;
+  color:           var(--accent);
+  padding:         2px 0;
+}
+
