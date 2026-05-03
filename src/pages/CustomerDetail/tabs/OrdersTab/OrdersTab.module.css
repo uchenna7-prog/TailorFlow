@@ -1163,8 +1163,42 @@
 }
 
 
+
 /* ─────────────────────────────────────────────────────────────
-   STEP 4 — CHARGES & FEES CARD
+   STEP 2 — PRICING CARD (updated layout)
+   ───────────────────────────────────────────────────────────── */
+
+.pricingItemHeader {
+  display:       flex;
+  align-items:   center;
+  gap:           10px;
+  margin-bottom: 12px;
+}
+
+.pricingFieldsStack {
+  display:        flex;
+  flex-direction: column;
+  gap:            10px;
+}
+
+.pricingFieldFull {
+  display:        flex;
+  flex-direction: column;
+  width:          100%;
+}
+
+/* Amount as plain text below the inputs */
+.pricingItemAmount {
+  font-size:   0.82rem;
+  font-weight: 800;
+  color:       var(--accent);
+  margin:      2px 0 0;
+  padding:     0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   STEP 3 — CHARGES & FEES CARD
    ───────────────────────────────────────────────────────────── */
 
 .chargesCard {
@@ -1174,7 +1208,6 @@
   overflow:      hidden;
 }
 
-/* Each charge row (shipping / tax) */
 .chargeRow {
   display:         flex;
   align-items:     center;
@@ -1191,23 +1224,18 @@
   min-width:   0;
 }
 
+/* Icon box — neutral, matches app's black/white system */
 .chargeIconBox {
   width:           36px;
   height:          36px;
   border-radius:   10px;
-  background:      rgba(59, 130, 246, 0.1);
-  border:          1px solid rgba(59, 130, 246, 0.2);
+  background:      var(--surface2);
+  border:          1px solid var(--border2);
   display:         flex;
   align-items:     center;
   justify-content: center;
   flex-shrink:     0;
-  color:           #2563eb;
-}
-
-.chargeIconBox_tax {
-  background: rgba(168, 85, 247, 0.1);
-  border:     1px solid rgba(168, 85, 247, 0.2);
-  color:      #a855f7;
+  color:           var(--text2);
 }
 
 .chargeRowLabel {
@@ -1221,26 +1249,26 @@
 }
 
 .chargeRowSub {
-  font-size:  0.65rem;
-  color:      var(--text3);
+  font-size:   0.65rem;
+  color:       var(--text3);
   font-weight: 600;
-  margin-top: 2px;
+  margin-top:  2px;
 }
 
-/* Tax rate badge beside label */
+/* Tax rate badge */
 .taxBadge {
   font-size:      0.6rem;
   font-weight:    800;
   letter-spacing: 0.3px;
   text-transform: uppercase;
-  color:          #a855f7;
-  background:     rgba(168, 85, 247, 0.12);
-  border:         1px solid rgba(168, 85, 247, 0.25);
+  color:          var(--text2);
+  background:     var(--surface2);
+  border:         1px solid var(--border2);
   border-radius:  6px;
   padding:        2px 7px;
 }
 
-/* Shipping fee editable input */
+/* Shipping / tax editable input wrapper */
 .chargeInputWrapper {
   display:       flex;
   align-items:   center;
@@ -1285,7 +1313,7 @@
   gap:         6px;
   font-size:   0.9rem;
   font-weight: 800;
-  color:       #a855f7;
+  color:       var(--text2);
   flex-shrink: 0;
 }
 
@@ -1296,21 +1324,64 @@
   opacity:     0.6;
 }
 
-/* Thin divider between rows */
+/* Divider between charge rows */
 .chargeDivider {
   height:     1px;
   background: var(--border);
   margin:     0 16px;
 }
 
-/* Total breakdown block at the bottom of the card */
-.chargeTotalBlock {
-  background:    var(--surface2);
-  border-top:    1px solid var(--border);
-  padding:       14px 16px;
+
+/* ─────────────────────────────────────────────────────────────
+   DISCOUNT INPUT GROUP
+   ───────────────────────────────────────────────────────────── */
+
+.discountInputGroup {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  flex-shrink: 0;
+}
+
+/* ₦ / % toggle pill */
+.discountTypeToggle {
   display:       flex;
+  border:        1px solid var(--border2);
+  border-radius: 8px;
+  overflow:      hidden;
+  flex-shrink:   0;
+}
+
+.discountTypeBtn {
+  padding:     8px 12px;
+  font-size:   0.8rem;
+  font-weight: 800;
+  font-family: 'DM Sans', sans-serif;
+  background:  transparent;
+  border:      none;
+  color:       var(--text3);
+  cursor:      pointer;
+  transition:  background 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.discountTypeBtn_active {
+  background: var(--accent);
+  color:      var(--bg);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   CHARGES TOTAL BREAKDOWN BLOCK
+   ───────────────────────────────────────────────────────────── */
+
+.chargeTotalBlock {
+  background:     var(--surface2);
+  border-top:     1px solid var(--border);
+  padding:        14px 16px;
+  display:        flex;
   flex-direction: column;
-  gap:           8px;
+  gap:            8px;
 }
 
 .chargeSummaryRow {
@@ -1325,10 +1396,25 @@
   color:       var(--text3);
 }
 
+/* Discount label has a subtle green tint */
+.chargeSummaryLabel_discount {
+  color: var(--success);
+}
+
+.discountPercentHint {
+  font-weight: 600;
+  opacity:     0.8;
+}
+
 .chargeSummaryValue {
   font-size:   0.78rem;
   font-weight: 700;
   color:       var(--text2);
+}
+
+/* Discount value shown in success/green */
+.chargeSummaryValue_discount {
+  color: var(--success);
 }
 
 .chargeTotalDivider {
@@ -1372,6 +1458,11 @@
   color:       var(--text2);
 }
 
+/* Discount value in the detail panel */
+.detailChargeValue_discount {
+  color: var(--success);
+}
+
 .detailChargeDivider {
   height:     1px;
   background: var(--border2);
@@ -1387,4 +1478,3 @@
   color:           var(--accent);
   padding:         2px 0;
 }
-
