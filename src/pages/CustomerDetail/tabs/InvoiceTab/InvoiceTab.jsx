@@ -25,6 +25,50 @@ const STATUS_STYLES = {
   overdue:   { background: 'rgba(239,68,68,0.12)',  color: '#dc2626', borderColor: 'rgba(239,68,68,0.3)'  },
 }
 
+const ORDER_STATUS_LABELS = {
+  pending:       'Pending',
+  'in-progress': 'In Progress',
+  completed:     'Completed',
+  delivered:     'Delivered',
+  cancelled:     'Cancelled',
+}
+
+const ORDER_STATUS_STYLES = {
+  pending:       { background: 'rgba(234,179,8,0.12)',   color: '#a16207', borderColor: 'rgba(234,179,8,0.3)'   },
+  'in-progress': { background: 'rgba(59,130,246,0.12)',  color: '#2563eb', borderColor: 'rgba(59,130,246,0.3)'  },
+  completed:     { background: 'rgba(34,197,94,0.12)',   color: '#15803d', borderColor: 'rgba(34,197,94,0.3)'   },
+  delivered:     { background: 'rgba(129,140,248,0.12)', color: '#4f46e5', borderColor: 'rgba(129,140,248,0.3)' },
+  cancelled:     { background: 'rgba(239,68,68,0.12)',   color: '#dc2626', borderColor: 'rgba(239,68,68,0.3)'   },
+}
+
+const STAGE_LABELS = {
+  measurement_taken: 'Measurement Taken',
+  fabric_ready:      'Fabric Ready',
+  cutting:           'Cutting',
+  weaving:           'Weaving',
+  sewing:            'Sewing',
+  embroidery:        'Embroidery',
+  fitting:           'Fitting',
+  adjustments:       'Adjustments',
+  finishing:         'Finishing',
+  quality_check:     'Quality Check',
+  ready:             'Ready',
+}
+
+const STAGE_ICONS = {
+  measurement_taken: 'straighten',
+  fabric_ready:      'checkroom',
+  cutting:           'content_cut',
+  weaving:           'texture',
+  sewing:            'construction',
+  embroidery:        'auto_awesome',
+  fitting:           'accessibility',
+  adjustments:       'tune',
+  finishing:         'dry_cleaning',
+  quality_check:     'fact_check',
+  ready:             'check_circle',
+}
+
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -72,33 +116,25 @@ function getInvoiceTotal(invoice) {
 
 
 // ─────────────────────────────────────────────────────────────
-// ORDER MOSAIC THUMBNAIL  (shared between list + picker modal)
+// ORDER MOSAIC THUMBNAIL
+// CSS-module version matching OrdersTab card mosaics exactly.
+// size="sm" → 38px picker thumb   size="md" → 68px list row
 // ─────────────────────────────────────────────────────────────
 
-function OrderMosaic({ orderItems, fallbackIcon, size = 68 }) {
-  const images     = (orderItems || []).map(item => item.imgSrc ?? null).filter(Boolean)
-  const totalItems = (orderItems || []).length
-  const innerSize  = Math.round(size * 0.74)
-  const radius     = Math.round(size * 0.176)
-  const innerRadius = Math.round(innerSize * 0.18)
+function OrderMosaic({ items = [], size = 'md' }) {
+  const images     = items.map(item => item.imgSrc ?? null).filter(Boolean)
+  const totalItems = items.length
+  const isSm      = size === 'sm'
 
-  const outerStyle = {
-    width: size, height: size, borderRadius: radius,
-    background: 'var(--surface)', border: '1px solid var(--border)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-  }
-  const innerStyle = {
-    width: innerSize, height: innerSize, borderRadius: innerRadius,
-    background: '#fff', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', overflow: 'hidden',
-  }
+  const outerCls = isSm ? styles.mosaicOuter_sm : styles.mosaicOuter
+  const innerCls = isSm ? styles.mosaicInner_sm : styles.mosaicInner
 
   if (images.length === 0) {
     return (
-      <div style={outerStyle}>
-        <div style={innerStyle}>
-          <span className="mi" style={{ fontSize: '1.4rem', color: 'var(--text3)' }}>
-            {fallbackIcon || 'receipt_long'}
+      <div className={outerCls}>
+        <div className={innerCls}>
+          <span className="mi" style={{ fontSize: isSm ? '1rem' : '1.4rem', color: 'var(--text3)' }}>
+            receipt_long
           </span>
         </div>
       </div>
@@ -107,67 +143,61 @@ function OrderMosaic({ orderItems, fallbackIcon, size = 68 }) {
 
   if (totalItems === 1) {
     return (
-      <div style={outerStyle}>
-        <div style={innerStyle}>
-          <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div className={outerCls}>
+        <div className={innerCls}>
+          <img src={images[0]} alt="" className={styles.mosaicSingleImage} />
+        </div>
+      </div>
+    )
+  }
+
+  if (totalItems === 2) {
+    return (
+      <div className={outerCls}>
+        <div className={`${innerCls} ${styles.mosaicSplit}`}>
+          <div className={styles.mosaicLeft}>
+            <img src={images[0]} alt="" className={styles.mosaicPanelImg} />
+          </div>
+          <div className={styles.mosaicDividerV} />
+          <div className={styles.mosaicRight}>
+            <div className={styles.mosaicCell}>
+              {images[1]
+                ? <img src={images[1]} alt="" className={styles.mosaicPanelImg} />
+                : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
+              }
+            </div>
+          </div>
         </div>
       </div>
     )
   }
 
   const extraCount = totalItems > 3 ? totalItems - 3 : 0
-  const splitStyle = { ...innerStyle, padding: 0, flexDirection: 'row', alignItems: 'stretch' }
-
-  if (totalItems === 2) {
-    return (
-      <div style={outerStyle}>
-        <div style={splitStyle}>
-          <div style={{ flex: '0 0 60%', overflow: 'hidden' }}>
-            <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-          <div style={{ width: 1.5, background: 'var(--border)', flexShrink: 0 }} />
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-            {images[1]
-              ? <img src={images[1]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
-            }
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div style={outerStyle}>
-      <div style={splitStyle}>
-        <div style={{ flex: '0 0 60%', overflow: 'hidden' }}>
+    <div className={outerCls}>
+      <div className={`${innerCls} ${styles.mosaicSplit}`}>
+        <div className={styles.mosaicLeft}>
           {images[0]
-            ? <img src={images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ? <img src={images[0]} alt="" className={styles.mosaicPanelImg} />
             : <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)' }}>checkroom</span>
           }
         </div>
-        <div style={{ width: 1.5, background: 'var(--border)', flexShrink: 0 }} />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ flex: 1, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className={styles.mosaicDividerV} />
+        <div className={styles.mosaicRight}>
+          <div className={styles.mosaicCell}>
             {images[1]
-              ? <img src={images[1]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <img src={images[1]} alt="" className={styles.mosaicPanelImg} />
               : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
             }
           </div>
-          <div style={{ height: 1.5, background: 'var(--border)', flexShrink: 0 }} />
-          <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className={styles.mosaicDividerH} />
+          <div className={`${styles.mosaicCell} ${extraCount > 0 ? styles.mosaicCell_overlay : ''}`}>
             {images[2]
-              ? <img src={images[2]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <img src={images[2]} alt="" className={styles.mosaicPanelImg} />
               : <span className="mi" style={{ fontSize: '0.7rem', color: 'var(--text3)' }}>checkroom</span>
             }
             {extraCount > 0 && (
-              <div style={{
-                position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontSize: '0.6rem', fontWeight: 800,
-              }}>
-                +{extraCount}
-              </div>
+              <div className={styles.mosaicOverlay}>+{extraCount}</div>
             )}
           </div>
         </div>
@@ -179,35 +209,38 @@ function OrderMosaic({ orderItems, fallbackIcon, size = 68 }) {
 
 // ─────────────────────────────────────────────────────────────
 // ORDER PICKER MODAL
-// Full-screen overlay — matches OrderModal design language.
-// Multi-select: tap cards to toggle selection.
-// Single "Generate Invoice(s)" action in the header.
-// Search bar only visible when orders.length > 5.
+// Full-screen, single scrollable screen.
+// Multi-select: tap orders to toggle. Step 2 appears once at
+// least one order is selected, showing all chosen orders and
+// a single "Generate Invoice(s)" button.
+// No generate action in the header.
 // ─────────────────────────────────────────────────────────────
 
-function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrders, generating }) {
-  const [search,          setSearch]          = useState('')
-  const [selectedOrders,  setSelectedOrders]  = useState([]) // array of order ids
-  const searchRef                             = useRef(null)
-  const showSearch                            = orders.length > 5
+function OrderPickerModal({ isOpen, onClose, orders, invoices, onGenerateSelected, generatingIds }) {
+  const [selectedIds, setSelectedIds] = useState(new Set())
+  const [search,      setSearch]      = useState('')
+  const step2Ref                      = useRef(null)
+  const showSearch                    = orders.length > 5
+  const currency                      = getCurrency()
 
-  // Reset state when modal opens/closes
+  // Reset when modal closes
   useEffect(() => {
-    if (isOpen) {
-      setSelectedOrders([])
+    if (!isOpen) {
+      setSelectedIds(new Set())
       setSearch('')
-      if (showSearch) {
-        setTimeout(() => searchRef.current?.focus(), 350)
-      }
-    } else {
-      setSearch('')
-      setSelectedOrders([])
     }
   }, [isOpen])
 
-  // Build invoiced order id set — only show non-invoiced orders
-  const invoicedOrderIds    = new Set(invoices.map(inv => String(inv.orderId)))
-  const nonInvoicedOrders   = orders.filter(order => !invoicedOrderIds.has(String(order.id)))
+  // Scroll step 2 card into view when first order is selected
+  useEffect(() => {
+    if (selectedIds.size === 1 && step2Ref.current) {
+      setTimeout(() => step2Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60)
+    }
+  }, [selectedIds.size])
+
+  // Only non-invoiced orders
+  const invoicedOrderIds  = new Set(invoices.map(inv => String(inv.orderId)))
+  const nonInvoicedOrders = orders.filter(order => !invoicedOrderIds.has(String(order.id)))
 
   const filtered = nonInvoicedOrders.filter(order => {
     if (!search.trim()) return true
@@ -221,63 +254,39 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrders, g
     )
   })
 
-  function handleCardClick(order) {
-    if (generating) return
-    const id = String(order.id)
-    setSelectedOrders(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    )
+  function toggleOrder(order) {
+    if (generatingIds.size > 0) return
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(order.id) ? next.delete(order.id) : next.add(order.id)
+      return next
+    })
   }
 
-  function handleGenerate() {
-    if (selectedOrders.length === 0 || generating) return
-    const ordersToGenerate = nonInvoicedOrders.filter(o => selectedOrders.includes(String(o.id)))
-    onSelectOrders(ordersToGenerate)
-  }
-
-  const selectionCount = selectedOrders.length
+  const selectedOrders  = nonInvoicedOrders.filter(o => selectedIds.has(o.id))
+  const isAnyGenerating = generatingIds.size > 0
 
   return (
     <div className={`${styles.pickerOverlay} ${isOpen ? styles.pickerOverlay_open : ''}`}>
 
-      {/* Full-screen header — generate button appears when ≥1 order selected */}
+      {/* Header — no action button */}
       <Header
         type="back"
         title="New Invoice"
-        onBackClick={onClose}
-        customActions={
-          selectionCount > 0
-            ? [{
-                label: generating
-                  ? 'Generating…'
-                  : selectionCount === 1
-                    ? 'Generate Invoice'
-                    : `Generate ${selectionCount} Invoices`,
-                onClick: handleGenerate,
-              }]
-            : []
-        }
+        onBackClick={isAnyGenerating ? undefined : onClose}
       />
 
       <div className={styles.pickerScrollBody}>
         <div style={{ padding: '20px' }}>
 
-          {/* ── Step heading + selection count ── */}
-          <div className={styles.stepHeadingRow}>
-            <p className={styles.stepHeading}>Select Orders</p>
-            {selectionCount > 0 && (
-              <span className={styles.selectionBadge}>
-                {selectionCount} selected
-              </span>
-            )}
-          </div>
+          {/* ── Step 1: Select Orders ── */}
+          <p className={styles.stepHeading}>1. Select Orders</p>
 
-          {/* Search bar — only shown when there are many orders */}
+          {/* Search bar */}
           {showSearch && (
             <div className={styles.clothSearchBar}>
               <span className="mi" style={{ fontSize: '1.1rem', color: 'var(--text3)' }}>search</span>
               <input
-                ref={searchRef}
                 type="text"
                 placeholder="Search orders…"
                 value={search}
@@ -295,7 +304,7 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrders, g
             </div>
           )}
 
-          {/* Empty state — no uninvoiced orders */}
+          {/* Empty — all invoiced */}
           {nonInvoicedOrders.length === 0 && (
             <div className={styles.pickerEmpty}>
               <span className="mi" style={{ fontSize: '2rem', color: 'var(--text3)' }}>receipt_long</span>
@@ -311,27 +320,24 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrders, g
             </div>
           )}
 
-          {/* Order picker list */}
+          {/* Multi-select order list */}
           <div className={styles.clothPickerList}>
             {filtered.map(order => {
-              const id           = String(order.id)
-              const isSelected   = selectedOrders.includes(id)
-              const isGenerating = generating === id
-              const items        = order.items || []
+              const isSelected   = selectedIds.has(order.id)
+              const isGenerating = generatingIds.has(order.id)
 
               return (
                 <div
                   key={order.id}
-                  className={`${styles.clothPickerItem} ${isSelected ? styles.clothPickerItem_selected : ''} ${isGenerating ? styles.clothPickerItem_generating : ''}`}
-                  onClick={() => handleCardClick(order)}
+                  className={`
+                    ${styles.clothPickerItem}
+                    ${isSelected   ? styles.clothPickerItem_selected   : ''}
+                    ${isGenerating ? styles.clothPickerItem_generating : ''}
+                  `}
+                  onClick={() => toggleOrder(order)}
                 >
-                  {/* Thumbnail */}
-                  <div className={styles.clothThumb}>
-                    {items.length > 0 && items[0]?.imgSrc
-                      ? <img src={items[0].imgSrc} alt={order.desc} />
-                      : <span className="mi" style={{ fontSize: '1.1rem' }}>receipt_long</span>
-                    }
-                  </div>
+                  {/* Full mosaic thumbnail */}
+                  <OrderMosaic items={order.items || []} size="sm" />
 
                   {/* Order name + due date */}
                   <div className={styles.clothInfo}>
@@ -342,14 +348,7 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrders, g
                     }
                   </div>
 
-                  {/* Price */}
-                  {order.price != null && (
-                    <div className={styles.pickerOrderPrice}>
-                      ₦{Number(order.price).toLocaleString()}
-                    </div>
-                  )}
-
-                  {/* Checkmark or spinner */}
+                  {/* Check circle or per-order spinner */}
                   <div className={`${styles.clothCheckCircle} ${isSelected ? styles.clothCheckCircle_checked : ''}`}>
                     {isGenerating
                       ? <div className={styles.pickerSpinner} />
@@ -363,34 +362,76 @@ function OrderPickerModal({ isOpen, onClose, orders, invoices, onSelectOrders, g
             })}
           </div>
 
-          {/* ── Bottom generate bar — visible when ≥1 order selected ── */}
-          {selectionCount > 0 && (
-            <div className={styles.generateBar}>
-              <div className={styles.generateBarInfo}>
-                <span className={styles.generateBarCount}>
-                  {selectionCount} {selectionCount === 1 ? 'order' : 'orders'} selected
-                </span>
+
+          {/* ── Step 2: Generate Invoices ── */}
+          {selectedOrders.length > 0 && (
+            <div ref={step2Ref}>
+              <p className={styles.stepHeading} style={{ marginTop: 24 }}>
+                {`2. Generate Invoice${selectedOrders.length > 1 ? 's' : ''}`}
+              </p>
+
+              <div className={styles.generateCard}>
+
+                {/* One row per selected order */}
+                {selectedOrders.map((order, idx) => {
+                  const isGenerating = generatingIds.has(order.id)
+                  const isLast       = idx === selectedOrders.length - 1
+
+                  return (
+                    <div
+                      key={order.id}
+                      className={`${styles.generateOrderRow} ${isLast ? styles.generateOrderRow_last : ''}`}
+                    >
+                      <OrderMosaic items={order.items || []} size="sm" />
+
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className={styles.generateOrderName}>
+                          {order.desc || 'Untitled Order'}
+                        </div>
+                        {order.price != null && (
+                          <div className={styles.generateOrderPrice}>
+                            {formatMoney(currency, order.price)}
+                          </div>
+                        )}
+                      </div>
+
+                      {isGenerating && (
+                        <div className={styles.generateRowSpinnerWrap}>
+                          <div className={styles.pickerSpinner} />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+
+                {/* Dashed divider — matches orderTotalRow in OrderModal */}
+                <div className={styles.generateDivider} />
+
+                {/* Generate button — ONLY here, not in header */}
+                <button
+                  className={styles.generateInlineButton}
+                  onClick={() => onGenerateSelected(selectedOrders)}
+                  disabled={isAnyGenerating}
+                >
+                  {isAnyGenerating
+                    ? (
+                      <>
+                        <div className={styles.pickerSpinnerWhite} />
+                        Generating…
+                      </>
+                    )
+                    : (
+                      <>
+                        <span className="mi" style={{ fontSize: '1.1rem' }}>receipt_long</span>
+                        {selectedOrders.length > 1
+                          ? `Generate ${selectedOrders.length} Invoices`
+                          : 'Generate Invoice'
+                        }
+                      </>
+                    )
+                  }
+                </button>
               </div>
-              <button
-                className={styles.generateBarButton}
-                onClick={handleGenerate}
-                disabled={!!generating}
-              >
-                {generating
-                  ? (
-                    <>
-                      <div className={styles.pickerSpinnerWhite} />
-                      Generating…
-                    </>
-                  )
-                  : (
-                    <>
-                      <span className="mi" style={{ fontSize: '1.1rem' }}>receipt_long</span>
-                      {selectionCount === 1 ? 'Generate Invoice' : `Generate ${selectionCount} Invoices`}
-                    </>
-                  )
-                }
-              </button>
             </div>
           )}
 
@@ -417,11 +458,10 @@ function InvoiceCard({ invoice, currency, onTap, isLast, orderItems }) {
       className={`${styles.invoiceRow} ${isLast ? styles.invoiceRowLast : ''}`}
       onClick={onTap}
     >
-      <OrderMosaic orderItems={orderItems} fallbackIcon="receipt_long" size={68} />
+      <OrderMosaic items={orderItems} size="md" />
 
       <div className={styles.invoiceRowInfo}>
         <div className={styles.invoiceRowTitle}>{invoice.orderDesc || 'Order'}</div>
-
         {itemCount && (
           <div className={styles.invoiceRowItemCount}>
             {itemCount} {itemCount === 1 ? 'item' : 'items'}
@@ -472,10 +512,10 @@ export default function InvoiceTab({
   onGenerateInvoice,
   showToast,
 }) {
-  const [viewingInvoice,  setViewingInvoice]  = useState(null)
-  const [deleteTarget,    setDeleteTarget]    = useState(null)
-  const [pickerOpen,      setPickerOpen]      = useState(false)
-  const [generating,      setGenerating]      = useState(false) // true while any generation is running
+  const [viewingInvoice, setViewingInvoice] = useState(null)
+  const [deleteTarget,   setDeleteTarget]   = useState(null)
+  const [pickerOpen,     setPickerOpen]     = useState(false)
+  const [generatingIds,  setGeneratingIds]  = useState(new Set())
 
   const currency      = getCurrency()
   const orderItemsMap = buildOrderItemsMap(orders)
@@ -488,40 +528,36 @@ export default function InvoiceTab({
     return () => document.removeEventListener('openInvoiceModal', openPicker)
   }, [])
 
-  // Generate invoices for all selected orders sequentially
-  async function handleSelectOrders(selectedOrders) {
-    if (selectedOrders.length === 0) return
+  // Generate invoices for all selected orders sequentially,
+  // lighting up per-order spinners as each one resolves.
+  async function handleGenerateSelected(selectedOrders) {
+    if (generatingIds.size > 0) return
 
-    setGenerating(true)
-    let successCount = 0
-    let failCount    = 0
+    setGeneratingIds(new Set(selectedOrders.map(o => o.id)))
+    let anyFailed = false
 
     for (const order of selectedOrders) {
       try {
         await onGenerateInvoice(order.id)
-        successCount++
       } catch {
-        failCount++
+        anyFailed = true
+        showToast(`Failed to generate invoice for "${order.desc || 'order'}".`)
       }
+      setGeneratingIds(prev => {
+        const next = new Set(prev)
+        next.delete(order.id)
+        return next
+      })
     }
 
-    setGenerating(false)
+    if (!anyFailed) {
+      showToast(selectedOrders.length > 1
+        ? `${selectedOrders.length} invoices generated`
+        : 'Invoice generated'
+      )
+    }
 
-    // Brief delay so the user sees the spinner complete before modal closes
-    setTimeout(() => {
-      setPickerOpen(false)
-      if (failCount === 0) {
-        showToast(
-          successCount === 1
-            ? 'Invoice generated ✓'
-            : `${successCount} invoices generated ✓`
-        )
-      } else if (successCount === 0) {
-        showToast('Failed to generate invoices. Try again.')
-      } else {
-        showToast(`${successCount} generated, ${failCount} failed.`)
-      }
-    }, 300)
+    setTimeout(() => setPickerOpen(false), 300)
   }
 
   function handleConfirmDelete() {
@@ -550,10 +586,7 @@ export default function InvoiceTab({
 
   return (
     <>
-      {/* Empty state */}
-      {invoices.length === 0 && (
-        <EmptyState />
-      )}
+      {invoices.length === 0 && <EmptyState />}
 
       {/* Invoice list grouped by date */}
       {invoices.length > 0 && Object.entries(groupedByDate).map(([date, dateInvoices]) => (
@@ -574,17 +607,17 @@ export default function InvoiceTab({
         </div>
       ))}
 
-      {/* Order picker modal — full screen */}
+      {/* Order picker modal */}
       <OrderPickerModal
         isOpen={pickerOpen}
         onClose={() => {
-          if (generating) return  // prevent closing mid-generation
+          if (generatingIds.size > 0) return
           setPickerOpen(false)
         }}
         orders={orders}
         invoices={invoices}
-        onSelectOrders={handleSelectOrders}
-        generating={generating}
+        onGenerateSelected={handleGenerateSelected}
+        generatingIds={generatingIds}
       />
 
       {/* Invoice viewer */}
