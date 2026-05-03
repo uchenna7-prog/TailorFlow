@@ -10,23 +10,38 @@ export function ItemsTable({ invoice, brand }) {
 
   useBrandTokens(brand.colourId, tableRef)
 
-  const { currency, showTax, taxRate } = brand
+  const { currency, showTax, taxRate: brandTaxRate } = brand
 
   const subtotal = invoice.items?.length > 0
     ? invoice.items.reduce((sum, item) => sum + ((item.qty ?? 1) * (parseFloat(item.price) || 0)), 0)
     : 0
 
-  const tax   = calcTax(subtotal, taxRate, showTax)
-  const total = subtotal + tax
+  // Prefer frozen values from the invoice object; fall back to brand/calc
+  const shippingFee    = parseFloat(invoice.shippingFee)    || 0
+  const discountAmount = parseFloat(invoice.discountAmount) || 0
+  const discountType   = invoice.discountType   || null   // 'percent' | 'flat' | null
+  const discountValue  = parseFloat(invoice.discountValue)  || 0
+  const useTax         = invoice.taxRate != null ? invoice.taxRate > 0 : (showTax && brandTaxRate > 0)
+  const taxRate        = invoice.taxRate != null ? invoice.taxRate : brandTaxRate
+  const taxAmount      = parseFloat(invoice.taxAmount) || calcTax(subtotal, taxRate, useTax)
+  const grandTotal     = invoice.totalAmount != null
+    ? parseFloat(invoice.totalAmount)
+    : subtotal + shippingFee - discountAmount + taxAmount
+
+  // Build discount label
+  const discountLabel = discountType === 'percent'
+    ? `Discount (${discountValue}%)`
+    : discountType === 'flat'
+      ? 'Discount'
+      : 'Discount'
 
   return (
     <div className={styles.table} ref={tableRef}>
 
-      {/* Order name + total — sits above the column headers */}
+      {/* Order descriptor row */}
       <div className={styles.orderDescriptionRow}>
         <div className={styles.orderText}>ORDER:</div>
         <div className={styles.orderDescLabel}>{invoice.orderDesc || 'Garment Order'}</div>
-
       </div>
 
       <table className={styles.tableEl}>
@@ -57,7 +72,7 @@ export function ItemsTable({ invoice, brand }) {
         )}
       </table>
 
-      {/* Summary block */}
+      {/* ── Right-aligned summary block ── */}
       <div className={styles.summaryBlock}>
 
         <div className={styles.summaryRow}>
@@ -65,10 +80,24 @@ export function ItemsTable({ invoice, brand }) {
           <span className={styles.summaryVal}>{fmt(currency, subtotal)}</span>
         </div>
 
-        {showTax && taxRate > 0 && (
+        {shippingFee > 0 && (
           <div className={styles.summaryRow}>
-            <span className={styles.summaryKey}>Tax ({taxRate}%)</span>
-            <span className={styles.summaryVal}>{fmt(currency, tax)}</span>
+            <span className={styles.summaryKey}>Shipping &amp; Delivery</span>
+            <span className={styles.summaryVal}>{fmt(currency, shippingFee)}</span>
+          </div>
+        )}
+
+        {discountAmount > 0 && (
+          <div className={styles.summaryRow}>
+            <span className={`${styles.summaryKey} ${styles.summaryKeyDiscount}`}>{discountLabel}</span>
+            <span className={`${styles.summaryVal} ${styles.summaryValDiscount}`}>−{fmt(currency, discountAmount)}</span>
+          </div>
+        )}
+
+        {useTax && taxAmount > 0 && (
+          <div className={styles.summaryRow}>
+            <span className={styles.summaryKey}>VAT ({taxRate}%)</span>
+            <span className={styles.summaryVal}>{fmt(currency, taxAmount)}</span>
           </div>
         )}
 
@@ -76,7 +105,7 @@ export function ItemsTable({ invoice, brand }) {
 
         <div className={styles.summaryTotalRow}>
           <span className={styles.summaryTotalKey}>Total Due</span>
-          <span className={styles.summaryTotalVal}>{fmt(currency, total)}</span>
+          <span className={styles.summaryTotalVal}>{fmt(currency, grandTotal)}</span>
         </div>
 
       </div>
