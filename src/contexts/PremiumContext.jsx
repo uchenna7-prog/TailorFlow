@@ -13,7 +13,7 @@ const PremiumContext = createContext(null)
 
 export function PremiumProvider({ children }) {
   const { user } = useAuth()
-  const [isPremium, setIsPremium] = useState(false)
+  const [isPremium, setIsPremium] = useState(true)
   const [loading,   setLoading]   = useState(true)
 
   useEffect(() => {
