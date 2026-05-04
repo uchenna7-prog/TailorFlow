@@ -112,6 +112,43 @@
   }
 }
 
+/* ── HEADER AVATAR ───────────────────────────────────────────
+   Shown in back-type headers when an avatar prop is passed.
+   e.g. CustomerDetail profile photo / initials circle.
+   ─────────────────────────────────────────────────────────── */
+.headerAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border2);
+  color: var(--text);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 0.15s, opacity 0.15s;
+  padding: 0;
+  user-select: none;
+}
+
+.headerAvatar:active {
+  transform: scale(0.9);
+  opacity: 0.8;
+}
+
+.headerAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 /* ── NOTIFICATION BADGE (red — unread alerts) ── */
 .notifDot {
   position: absolute;
