@@ -70,17 +70,6 @@ function BotIcon() {
   )
 }
 
-// ── Small camera / expand badge on the right avatar ──────────
-function PhotoBadge() {
-  return (
-    <span className={styles.avatarPhotoBadge} aria-hidden="true">
-      <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M21 19V7a2 2 0 0 0-2-2h-2.586l-1.707-1.707A1 1 0 0 0 14 3h-4a1 1 0 0 0-.707.293L7.586 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM12 17a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
-      </svg>
-    </span>
-  )
-}
-
 function Header({
   onMenuClick,
   onBackClick,
@@ -89,9 +78,12 @@ function Header({
   customActions = [],
   backIcon = 'arrow_back_ios',
   agentPendingCount = 2,
-  // Avatar props for back-header with scroll transition
-  scrolledAvatar = null,   // { src, initials, onClick } — shown right when not scrolled, decorative left when scrolled
+  // scrolledAvatar: { src, initials, onClick }
+  // Only drives the LEFT avatar transition — no right avatar rendered
+  scrolledAvatar = null,
   isScrolled = false,
+  // showRightAvatar is accepted but intentionally ignored — no right avatar
+  showRightAvatar = false,
 }) {
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifTab,  setNotifTab]  = useState('all')
@@ -134,7 +126,7 @@ function Header({
     { id: 'read',   label: 'Read',   count: notifications.length - unreadCount },
   ]
 
-  // ── Filter out the scrolledAvatar customNode — we render it ourselves ──
+  // Filter out any legacy scrollAvatar customNode actions
   const filteredActions = customActions.filter(a => !a._isScrollAvatar)
 
   return (
@@ -152,11 +144,14 @@ function Header({
             </button>
           )}
 
-          {/* ── Decorative left avatar — appears when scrolled ── */}
+          {/* ── Left avatar — WhatsApp-style, glides in when scrolled ── */}
           {type === 'back' && scrolledAvatar && (
             <div
               className={`${styles.leftAvatar} ${isScrolled ? styles.leftAvatarVisible : styles.leftAvatarHidden}`}
-              aria-hidden="true"
+              onClick={isScrolled ? scrolledAvatar.onClick : undefined}
+              role={isScrolled ? 'button' : undefined}
+              aria-label={isScrolled ? 'View profile photo' : undefined}
+              aria-hidden={!isScrolled}
             >
               {scrolledAvatar.src
                 ? <img src={scrolledAvatar.src} className={styles.leftAvatarImg} alt="" />
@@ -172,31 +167,9 @@ function Header({
           </div>
         </div>
 
-        {/* ── BACK HEADER ACTIONS ── */}
+        {/* ── BACK HEADER ACTIONS — edit + delete icons only, no avatar ── */}
         {type === 'back' && (
           <div className={styles.rightActions}>
-
-            {/* ── Scrollable right avatar (with photo badge) ── */}
-            {scrolledAvatar && (
-              <div
-                className={`${styles.rightAvatarWrap} ${isScrolled ? styles.rightAvatarHidden : styles.rightAvatarVisible}`}
-                aria-hidden={isScrolled}
-              >
-                <button
-                  className={styles.rightAvatar}
-                  onClick={isScrolled ? undefined : scrolledAvatar.onClick}
-                  tabIndex={isScrolled ? -1 : 0}
-                  aria-label="View profile photo"
-                >
-                  {scrolledAvatar.src
-                    ? <img src={scrolledAvatar.src} className={styles.rightAvatarImg} alt="" />
-                    : <span className={styles.rightAvatarInitials}>{scrolledAvatar.initials}</span>
-                  }
-                </button>
-                <PhotoBadge />
-              </div>
-            )}
-
             {filteredActions.map((action, i) => {
               if (action.customNode) {
                 return (

@@ -44,6 +44,8 @@ const TABS = [
   { id: 'receipts', label: 'Receipts'     },
 ]
 
+
+
 function readBrandSnapshot(settingsSnap, invoiceBrand) {
   return {
     name:     settingsSnap.brandName      || invoiceBrand?.name    || '',
@@ -270,6 +272,17 @@ export default function CustomerDetail({ onMenuClick }) {
   useEffect(() => {
     if (data.invoices) setInvoicesState(data.invoices)
   }, [data.invoices])
+
+  // ── Eager payments subscription (top-level, not tab-gated) ──
+  useEffect(() => {
+    if (!user || !id) return
+    const unsub = subscribeToPayments(
+      user.uid, id,
+      (data) => setPayments(data),
+      (err)  => console.error('[CustomerDetail] payments:', err)
+    )
+    return unsub
+  }, [user, id])
 
   useEffect(() => {
     if (!user || !id || healedRef.current) return
@@ -526,7 +539,6 @@ export default function CustomerDetail({ onMenuClick }) {
 
   const initials = getInitials(customer.name)
   const birthday = getBirthday(customer.birthday)
-  // Show photo if available (premium or not — just check if photo exists)
   const hasPhoto = isPremium && customer.photo
 
   const lastOrder = orders.length > 0
@@ -565,8 +577,6 @@ export default function CustomerDetail({ onMenuClick }) {
   }
   const activeTabIsEmpty = tabItemCounts[activeTab] === 0
 
-  // ── scrolledAvatar — no right avatar, only left transition avatar
-  // Pass null for src when no photo so initials render in left avatar
   const scrolledAvatar = {
     src:      hasPhoto ? customer.photo : null,
     initials: initials,
@@ -811,6 +821,7 @@ export default function CustomerDetail({ onMenuClick }) {
           <PaymentsTab
             customerId={id}
             orders={orders}
+            payments={payments}
             showToast={showToast}
             onGenerateReceipt={handleGenerateReceipt}
             onInvoicePaid={handleInvoicePaid}

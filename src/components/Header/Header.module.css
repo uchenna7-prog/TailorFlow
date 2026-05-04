@@ -7,10 +7,9 @@
   justify-content: space-between;
   padding: 14px 16px;
   background: var(--bg);
-
+  /* border-bottom intentionally removed */
   min-height: 56px;
 }
-
 
 .leftSide {
   display: flex;
@@ -30,9 +29,8 @@
   transition: opacity 0.2s ease;
 }
 
-/* Slight nudge so title sits right after the left avatar naturally */
 .titleShifted {
-  /* no extra margin needed — gap on leftSide handles it */
+  /* gap on leftSide handles spacing naturally */
 }
 
 :global(.header-title) {
@@ -43,22 +41,19 @@
   text-overflow: ellipsis;
 }
 
-/* ── RIGHT ACTIONS — evenly spaced with consistent gap ── */
+/* ── RIGHT ACTIONS ── */
 .rightActions {
   display: flex;
   align-items: center;
-  gap: 0px;        /* uniform gap between ALL action items */
+  gap: 0px;
   flex-shrink: 0;
 }
 
-/* ── Wrapper for customNode actions — aligns them to the same
-   44×44 hit-area as iconBtn so spacing is visually consistent ── */
 .customActionNode {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  /* ensure same 44px footprint as iconBtn */
   width: 44px;
   height: 44px;
 }
@@ -123,7 +118,7 @@
   border-radius: 2px;
 }
 
-/* Hide hamburger button on desktop */
+/* Hide hamburger on desktop */
 @media (min-width: 769px) {
   .iconBtn:has(.hamburgerLines) {
     display: none;
@@ -131,12 +126,14 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   LEFT AVATAR — decorative, appears when scrolled
-   Slides in from the left / fades in smoothly
+   LEFT AVATAR — WhatsApp-style scroll transition
+   When not scrolled: hidden (scale down, translate left, opacity 0)
+   When scrolled: glides in smoothly — matches the profile avatar
+   fading out, creating the illusion it "moved" to the header.
    ───────────────────────────────────────────────────────────── */
 .leftAvatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--surface2);
   border: 1.5px solid var(--border2);
@@ -145,8 +142,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  pointer-events: none;   /* purely decorative */
-  /* Base transition for both states */
+  cursor: pointer;
+  /* Smooth transition matching the profile avatar's transition timing */
   transition:
     opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
@@ -157,16 +154,18 @@
 .leftAvatarVisible {
   opacity: 1;
   transform: translateX(0) scale(1);
-  width: 30px;
+  width: 32px;
   margin-right: 0;
+  pointer-events: all;
 }
 
 .leftAvatarHidden {
   opacity: 0;
-  transform: translateX(-10px) scale(0.7);
+  transform: translateX(-12px) scale(0.6);
   width: 0;
-  margin-right: -8px;   /* collapse the gap when hidden */
+  margin-right: -8px;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .leftAvatarImg {
@@ -185,129 +184,8 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   RIGHT AVATAR WRAP — tappable, shows photo-badge, hides when scrolled
+   NOTIFICATION BADGE
    ───────────────────────────────────────────────────────────── */
-.rightAvatarWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  /* Match iconBtn footprint for even spacing */
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  transition:
-    opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-    width 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-  display: none;
-}
-
-.rightAvatarVisible {
-  opacity: 1;
-  transform: translateX(0) scale(1);
-  width: 44px;
-  pointer-events: all;
-}
-
-.rightAvatarHidden {
-  opacity: 0;
-  transform: translateX(10px) scale(0.7);
-  width: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.rightAvatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--text);
-  color: var(--bg);
-  padding: 0;
-  overflow: hidden;
-  cursor: pointer;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: transform 0.15s, opacity 0.15s;
-}
-
-.rightAvatar:active {
-  transform: scale(0.9);
-  opacity: 0.8;
-}
-
-.rightAvatarImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.rightAvatarInitials {
-  font-size: 0.6rem;
-  font-weight: 800;
-  color: var(--bg);
-  letter-spacing: 0.5px;
-  user-select: none;
-}
-
-/* ── Photo badge (camera icon overlay) ── */
-.avatarPhotoBadge {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--bg);
-  border: 1px solid var(--border2);
-  color: var(--text2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-/* ── HEADER AVATAR (legacy avatar prop — kept for back-compat) ── */
-.headerAvatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--surface2);
-  border: 2px solid var(--border2);
-  color: var(--text);
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  overflow: hidden;
-  flex-shrink: 0;
-  transition: transform 0.15s, opacity 0.15s;
-  padding: 0;
-  user-select: none;
-}
-
-.headerAvatar:active {
-  transform: scale(0.9);
-  opacity: 0.8;
-}
-
-.headerAvatarImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-/* ── NOTIFICATION BADGE (red — unread alerts) ── */
 .notifDot {
   position: absolute;
   top: 5px;
@@ -328,7 +206,7 @@
   pointer-events: none;
 }
 
-/* ── AGENT BADGE (indigo — pending tasks, distinct from alerts) ── */
+/* ── AGENT BADGE ── */
 .botBadge {
   position: absolute;
   top: 5px;
@@ -349,7 +227,9 @@
   pointer-events: none;
 }
 
-/* ── NOTIFICATION OVERLAY — mobile full screen ── */
+/* ─────────────────────────────────────────────────────────────
+   NOTIFICATION OVERLAY — mobile full screen
+   ───────────────────────────────────────────────────────────── */
 .notifOverlay {
   position: fixed;
   inset: 0;
@@ -607,6 +487,40 @@
   letter-spacing: 0.5px;
   margin-top: 4px;
   margin-bottom: 2px;
+}
+
+/* ── Legacy classes kept for back-compat with other pages ── */
+.headerAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border2);
+  color: var(--text);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 0.15s, opacity 0.15s;
+  padding: 0;
+  user-select: none;
+}
+
+.headerAvatar:active {
+  transform: scale(0.9);
+  opacity: 0.8;
+}
+
+.headerAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 @keyframes fadeIn {
