@@ -195,7 +195,7 @@
   justify-content: center;
   gap: 5px;
   text-align: center;
-  white-space: pre-line;
+  white-space: nowrap;
   line-height: 1.2;
   min-height: 48px;
 }
@@ -272,6 +272,30 @@
 
 
 /* ─────────────────────────────────────────────────────────────
+   LAST ORDER LINE
+   ───────────────────────────────────────────────────────────── */
+
+.lastOrderLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: var(--text2);
+  line-height: 1.45;
+}
+
+.lastOrderText {
+  color: var(--text2);
+  font-size: 0.74rem;
+}
+
+.lastOrderText strong {
+  font-weight: 700;
+  color: var(--text);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
    NOTES LINE — collapsible italic preview
    ───────────────────────────────────────────────────────────── */
 
@@ -342,9 +366,8 @@
 
 /* ─────────────────────────────────────────────────────────────
    HEADER AVATAR BUTTON
-   Sits in the customActions row of the Header component.
-   Even spacing is achieved by the Header's own gap — the button
-   is sized to match the other icon buttons (36×36).
+   Fixed spacing: sits evenly among the icon buttons via the
+   Header's rightActions flex gap. Width/height match iconBtn.
    ───────────────────────────────────────────────────────────── */
 
 .headerAvatarBtn {
@@ -352,7 +375,8 @@
   height: 34px;
   border-radius: 50%;
   border: 2px solid var(--border2);
-  background: var(--surface2);
+  background: var(--text);
+  color: var(--bg);
   padding: 0;
   overflow: hidden;
   cursor: pointer;
@@ -360,11 +384,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: transform 0.15s;
+  transition: transform 0.15s, opacity 0.15s;
 }
 
 .headerAvatarBtn:active {
   transform: scale(0.9);
+  opacity: 0.8;
 }
 
 .headerAvatarImg {
@@ -376,8 +401,9 @@
 .headerAvatarText {
   font-size: 0.62rem;
   font-weight: 800;
-  color: var(--accent);
+  color: var(--bg);
   letter-spacing: 0.5px;
+  user-select: none;
 }
 
 
@@ -429,7 +455,7 @@
   height: 210px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--surface2);
+  background: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -451,7 +477,7 @@
 .photoBigInitials {
   font-size: 3.8rem;
   font-weight: 800;
-  color: var(--accent);
+  color: var(--bg);
   letter-spacing: 2px;
   user-select: none;
 }
