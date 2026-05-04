@@ -7,7 +7,7 @@
   justify-content: space-between;
   padding: 14px 16px;
   background: var(--bg);
-  border-bottom: 1px solid var(--border);
+
   min-height: 56px;
 }
 
@@ -30,6 +30,11 @@
   transition: opacity 0.2s ease;
 }
 
+/* Slight nudge so title sits right after the left avatar naturally */
+.titleShifted {
+  /* no extra margin needed — gap on leftSide handles it */
+}
+
 :global(.header-title) {
   display: block;
   max-width: 350px;
@@ -42,7 +47,7 @@
 .rightActions {
   display: flex;
   align-items: center;
-  gap: 6px;        /* uniform gap between all action items */
+  gap: 0px;        /* uniform gap between ALL action items */
   flex-shrink: 0;
 }
 
@@ -53,6 +58,9 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  /* ensure same 44px footprint as iconBtn */
+  width: 44px;
+  height: 44px;
 }
 
 .iconBtn {
@@ -122,10 +130,149 @@
   }
 }
 
-/* ── HEADER AVATAR ───────────────────────────────────────────
-   Shown in back-type headers when an avatar prop is passed.
-   e.g. CustomerDetail profile photo / initials circle.
-   ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────
+   LEFT AVATAR — decorative, appears when scrolled
+   Slides in from the left / fades in smoothly
+   ───────────────────────────────────────────────────────────── */
+.leftAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  pointer-events: none;   /* purely decorative */
+  /* Base transition for both states */
+  transition:
+    opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    margin-right 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.leftAvatarVisible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  width: 30px;
+  margin-right: 0;
+}
+
+.leftAvatarHidden {
+  opacity: 0;
+  transform: translateX(-10px) scale(0.7);
+  width: 0;
+  margin-right: -8px;   /* collapse the gap when hidden */
+  overflow: hidden;
+}
+
+.leftAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.leftAvatarInitials {
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.3px;
+  user-select: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RIGHT AVATAR WRAP — tappable, shows photo-badge, hides when scrolled
+   ───────────────────────────────────────────────────────────── */
+.rightAvatarWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* Match iconBtn footprint for even spacing */
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  transition:
+    opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rightAvatarVisible {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  width: 44px;
+  pointer-events: all;
+}
+
+.rightAvatarHidden {
+  opacity: 0;
+  transform: translateX(10px) scale(0.7);
+  width: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.rightAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--bg);
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.rightAvatar:active {
+  transform: scale(0.9);
+  opacity: 0.8;
+}
+
+.rightAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.rightAvatarInitials {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--bg);
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+
+/* ── Photo badge (camera icon overlay) ── */
+.avatarPhotoBadge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* ── HEADER AVATAR (legacy avatar prop — kept for back-compat) ── */
 .headerAvatar {
   width: 34px;
   height: 34px;
@@ -412,13 +559,13 @@
   align-items: center;
   justify-content: center;
   background: var(--surface2);
-  color: var(--text3);
+  color: var(--text);
   font-size: 0.58rem;
   font-weight: 800;
   border-radius: 20px;
   padding: 1px 5px;
   min-width: 16px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border2);
 }
 
 .notifTabBadgeAlert {

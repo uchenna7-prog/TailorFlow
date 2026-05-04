@@ -1,3 +1,6 @@
+/* ─────────────────────────────────────────────────────────────
+   PAGE SHELL
+   ───────────────────────────────────────────────────────────── */
 .page {
   background: var(--bg);
   min-height: 100dvh;
@@ -6,6 +9,7 @@
   position: relative;
 }
 
+/* Scroll sentinel — sits at the very top to detect scroll position */
 .sentinel {
   position: absolute;
   top: 0;
@@ -14,14 +18,25 @@
   pointer-events: none;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   STICKY NAV HEADER
+   The header itself is sticky at top:0. We track its height via
+   the --header-h custom property (56px default). The sticky tabs
+   below it must use the same value for their own `top`.
+   ───────────────────────────────────────────────────────────── */
 .navHeader {
   position: sticky;
   top: 0;
   z-index: 110;
   background: var(--bg);
-  min-height: 56px;
+  /* Expose actual rendered height so .stickyTabsWrapper can match */
+  --header-h: 56px;
+  min-height: var(--header-h);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   PROFILE CONTAINER
+   ───────────────────────────────────────────────────────────── */
 .profileContainer {
   background: var(--bg);
   width: 100%;
@@ -59,7 +74,7 @@
 }
 
 .lastOrderBlock {
-  /* just a wrapper so you can independently style or hide */
+  /* wrapper — style independently if needed */
 }
 
 .notesBlock {
@@ -129,6 +144,7 @@
   align-items: center;
 }
 
+/* All profile meta icons normalised to 1rem */
 .meta {
   display: flex;
   gap: 4px;
@@ -137,12 +153,24 @@
   align-items: center;
 }
 
+.meta .mi,
+.meta [class^="mi"] {
+  font-size: 1rem;   /* unified icon size in profile section */
+  flex-shrink: 0;
+}
+
 .metaAddress {
   display: flex;
   gap: 4px;
   color: var(--text2);
   font-size: 0.75rem;
   align-items: center;
+}
+
+.metaAddress .mi,
+.metaAddress [class^="mi"] {
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .metaInline {
@@ -161,6 +189,12 @@
   font-size: 0.78rem;
 }
 
+.metaItem .mi,
+.metaItem [class^="mi"] {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
 .metaItem:not(:last-child)::after {
   content: '·';
   margin-left: 8px;
@@ -173,6 +207,12 @@
   gap: 5px;
   color: var(--text2);
   font-size: 0.78rem;
+}
+
+.metaItemAddress .mi,
+.metaItemAddress [class^="mi"] {
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .verticalBar {
@@ -223,10 +263,13 @@
 
 /* ─────────────────────────────────────────────────────────────
    STICKY TABS
+   top must equal the rendered height of .navHeader (56px).
+   If you ever change the header height, update --header-h above
+   and this value together.
    ───────────────────────────────────────────────────────────── */
 .stickyTabsWrapper {
   position: sticky;
-  top: 56px;
+  top: 75px;            /* ← matches .navHeader min-height */
   z-index: 100;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
@@ -279,7 +322,11 @@
   background: var(--accent);
 }
 
-/* ── Tab badge ── */
+/* ── Tab badge ──────────────────────────────────────────────
+   FIX: was using var(--surface2) background which disappeared
+   in dark mode. Now uses explicit border + text colour vars so
+   the number is always readable in both light and dark themes.
+   ──────────────────────────────────────────────────────────── */
 .tabBadge {
   display: inline-flex;
   align-items: center;
@@ -290,33 +337,47 @@
   height: 16px;
   padding: 0 4px;
   border-radius: 20px;
-  background: var(--surface2);
+  /* Use border so it shows on any background */
+  background: transparent;
   color: var(--text2);
-  transition: background 0.18s, color 0.18s;
+  border: 1.5px solid var(--border2);
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
   line-height: 1;
 }
 
 .tabBadge_active {
   background: var(--accent);
-  color: #fff;
+  color: var(--text2);
+  border-color: var(--accent);
 }
 
 /* ─────────────────────────────────────────────────────────────
    TAB CONTENT
+   FIX: when a tab has only a few cards that don't fill the
+   viewport the content area was still scrollable, letting cards
+   creep under the sticky header. We enforce a minimum height
+   equal to the remaining viewport (full height minus header
+   minus tabs bar — approximately 56px + 44px = 100px total).
+   This means the page body always fills the screen, so short
+   lists sit below the sticky tabs and don't scroll under them.
    ───────────────────────────────────────────────────────────── */
 .tabContent {
   padding: 12px 20px 120px;
   flex: 1;
+  min-height: calc(100dvh - 75px - 44px);
+
+  
 }
 
+/* When the tab is empty we also prevent overflow so the blank
+   area is contained and there's nothing to scroll at all. */
 .tabContent[data-empty='true'] {
-  min-height: calc(100dvh - 56px - 44px);
-  max-height: calc(100dvh - 56px - 44px);
   overflow: hidden;
 }
 
+/* When content is present let it grow naturally */
 .tabContent[data-empty='false'] {
-  min-height: 100vh;
+  min-height: calc(100dvh - 56px - 44px);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -352,6 +413,13 @@
   line-height: 1.4;
 }
 
+/* Normalise schedule icon to match other profile icons */
+.lastOrderLine .mi,
+.lastOrderLine [class^="mi"] {
+  font-size: 1rem !important;
+  flex-shrink: 0;
+}
+
 .lastOrderText {
   color: var(--text3);
   font-size: 0.73rem;
@@ -364,11 +432,21 @@
 
 /* ─────────────────────────────────────────────────────────────
    NOTES LINE
+   FIX: edit_note icon was rendering smaller than other icons.
+   Normalised to 1rem to match all other profile-section icons.
    ───────────────────────────────────────────────────────────── */
 .notesLine {
   display: flex;
   align-items: flex-start;
   gap: 7px;
+}
+
+/* Target the icon specifically inside the notes line */
+.notesLine .mi,
+.notesLine [class^="mi"] {
+  font-size: 1rem !important;   /* was 0.85rem inline — now consistent */
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .notesText {
@@ -405,7 +483,6 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
-
 }
 
 .statAmount {
@@ -440,7 +517,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   HEADER AVATAR BUTTON
+   HEADER AVATAR BUTTON (legacy — kept for back-compat)
    ───────────────────────────────────────────────────────────── */
 .headerAvatarBtn {
   width: 32px;

@@ -568,6 +568,13 @@ export default function CustomerDetail({ onMenuClick }) {
   }
   const activeTabIsEmpty = tabItemCounts[activeTab] === 0
 
+  // ── scrolledAvatar config passed to Header ──────────────────
+  const scrolledAvatar = {
+    src:      hasPhoto ? customer.photo : null,
+    initials: initials,
+    onClick:  () => setPhotoOpen(true),
+  }
+
   // ── Shared stats block (rendered in both premium + free) ──
   const StatsBlock = () => (
     <div className={styles.statsBlock}>
@@ -590,7 +597,7 @@ export default function CustomerDetail({ onMenuClick }) {
               <span className={styles.statLabel}>Total Paid</span>
             </div>
           )}
-     
+
           {outstanding === 0 && totalSpent > 0 && (
             <div className={`${styles.statCell} ${styles.statCell_clear}`}>
               <span className={styles.statAmount}>All clear</span>
@@ -615,22 +622,9 @@ export default function CustomerDetail({ onMenuClick }) {
         <Header
           type="back"
           title={isScrolled ? customer.name : 'Customer Details'}
+          isScrolled={isScrolled}
+          scrolledAvatar={scrolledAvatar}
           customActions={[
-            {
-              customNode: (
-                <button
-                  key="avatar"
-                  className={styles.headerAvatarBtn}
-                  onClick={() => setPhotoOpen(true)}
-                  aria-label="View photo"
-                >
-                  {hasPhoto
-                    ? <img src={customer.photo} alt={customer.name} className={styles.headerAvatarImg} />
-                    : <span className={styles.headerAvatarText}>{initials}</span>
-                  }
-                </button>
-              ),
-            },
             {
               icon: 'edit',
               onClick: () => setEditModalOpen(true),
@@ -648,7 +642,7 @@ export default function CustomerDetail({ onMenuClick }) {
 
       <div className={styles.profileContainer}>
 
-        {isPremium ? (
+        {true ? (
           <div className={styles.profileSection}>
 
             {/* Row: avatar + name/phone */}
@@ -710,7 +704,7 @@ export default function CustomerDetail({ onMenuClick }) {
             {lastOrderLabel && (
               <div className={styles.lastOrderBlock}>
                 <div className={styles.lastOrderLine}>
-                  <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
+                  <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
                   <span className={styles.lastOrderText}>
                     <strong>{lastOrderLabel}</strong>
                   </span>
@@ -781,7 +775,7 @@ export default function CustomerDetail({ onMenuClick }) {
             {lastOrderLabel && (
               <div className={styles.lastOrderBlock}>
                 <div className={styles.lastOrderLine}>
-                  <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
+                  <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
                   <span className={styles.lastOrderText}>
                     <strong>{lastOrderLabel}</strong>
                   </span>
