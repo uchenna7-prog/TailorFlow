@@ -21,7 +21,7 @@ import styles from './CustomerDetail.module.css'
 
 function fmt(currency, amount) {
   const n = parseFloat(amount) || 0
-  return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 }
 
 
@@ -583,6 +583,14 @@ export default function CustomerDetail({ onMenuClick }) {
               <span className={styles.statLabel}>Balance Due</span>
             </div>
           )}
+
+          {totalPaidAcrossPayments > 0 && (
+            <div className={`${styles.statCell} ${styles.statCell_paid}`}>
+              <span className={styles.statAmount}>{fmt("₦", totalPaidAcrossPayments)}</span>
+              <span className={styles.statLabel}>Total Paid</span>
+            </div>
+          )}
+     
           {outstanding === 0 && totalSpent > 0 && (
             <div className={`${styles.statCell} ${styles.statCell_clear}`}>
               <span className={styles.statAmount}>All clear</span>

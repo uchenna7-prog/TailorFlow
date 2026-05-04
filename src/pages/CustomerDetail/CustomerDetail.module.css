@@ -405,6 +405,7 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
+
 }
 
 .statAmount {
@@ -425,6 +426,10 @@
 
 .statCell_owed .statAmount {
   color: var(--danger);
+}
+
+.statCell_paid .statAmount {
+  color: green;
 }
 
 .statCell_clear .statAmount {
