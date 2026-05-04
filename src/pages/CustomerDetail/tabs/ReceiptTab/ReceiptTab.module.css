@@ -245,26 +245,6 @@
   border-bottom-color: transparent;
 }
 
-.clothThumb {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.clothThumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
 .clothInfo {
   flex: 1;
 }
@@ -597,6 +577,152 @@
 
 @keyframes pickerSpin {
   to { transform: rotate(360deg); }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   ORDER MOSAIC THUMBNAIL
+   md (68px) — receipt list rows
+   sm (38px) — picker card thumbs
+   Matches InvoiceTab mosaics exactly.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── md outer / inner ── */
+.mosaicOuter {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mosaicInner {
+  width: 50px;
+  height: 50px;
+  border-radius: 9px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── sm outer / inner ── */
+.mosaicOuter_sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mosaicInner_sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Single full-bleed image */
+.mosaicSingleImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Tiled split layout */
+.mosaicSplit {
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  overflow: hidden;
+}
+
+/* Left panel — 60% width */
+.mosaicLeft {
+  flex: 0 0 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+  height: 100%;
+}
+
+/* Right column — two stacked cells */
+.mosaicRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Each cell in the right column */
+.mosaicCell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+}
+
+/* Image inside any panel */
+.mosaicPanelImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Vertical divider between left and right */
+.mosaicDividerV {
+  width: 1.5px;
+  flex-shrink: 0;
+  background: var(--border);
+  align-self: stretch;
+}
+
+/* Horizontal divider between top and bottom right cells */
+.mosaicDividerH {
+  height: 1.5px;
+  flex-shrink: 0;
+  background: var(--border);
+  width: 100%;
+}
+
+/* Cell with +N overlay */
+.mosaicCell_overlay {
+  position: relative;
+}
+
+.mosaicOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  pointer-events: none;
 }
 
 
