@@ -78,9 +78,6 @@ function Header({
   customActions = [],
   backIcon = 'arrow_back_ios',
   agentPendingCount = 2,
-  // ── avatar prop ──────────────────────────────────────────────
-  // Optional. Pass { initials, src, onClick } to show a profile
-  // avatar circle in the header (used by CustomerDetail).
   avatar = null,
 }) {
   const [notifOpen, setNotifOpen] = useState(false)
@@ -144,7 +141,7 @@ function Header({
         {/* ── BACK HEADER ACTIONS ── */}
         {type === 'back' && (
           <div className={styles.rightActions}>
-            {/* Avatar — shown when provided (e.g. CustomerDetail) */}
+            {/* Legacy avatar prop support */}
             {avatar && (
               <button
                 className={styles.headerAvatar}
@@ -158,26 +155,36 @@ function Header({
               </button>
             )}
 
-            {customActions.map((action, i) => (
-              <button
-                key={i}
-                className={action.label ? styles.textBtn : styles.iconBtn}
-                onClick={action.onClick}
-                aria-label={action.label}
-                disabled={action.disabled}
-                style={!action.label ? { color: action.color || 'var(--text2)' } : {}}
-              >
-                {action.icon && (
-                  <span
-                    className={`mi${action.outlined ? '-outlined' : ''}`}
-                    style={{ fontSize: action.label ? '1.1rem' : '1.4rem' }}
-                  >
-                    {action.icon}
-                  </span>
-                )}
-                {action.label && <span>{action.label}</span>}
-              </button>
-            ))}
+            {customActions.map((action, i) => {
+              // Support customNode — render raw JSX directly
+              if (action.customNode) {
+                return (
+                  <div key={i} className={styles.customActionNode}>
+                    {action.customNode}
+                  </div>
+                )
+              }
+              return (
+                <button
+                  key={i}
+                  className={action.label ? styles.textBtn : styles.iconBtn}
+                  onClick={action.onClick}
+                  aria-label={action.label || action.icon}
+                  disabled={action.disabled}
+                  style={!action.label ? { color: action.color || 'var(--text2)' } : {}}
+                >
+                  {action.icon && (
+                    <span
+                      className={`mi${action.outlined ? '-outlined' : ''}`}
+                      style={{ fontSize: action.label ? '1.1rem' : '1.4rem' }}
+                    >
+                      {action.icon}
+                    </span>
+                  )}
+                  {action.label && <span>{action.label}</span>}
+                </button>
+              )
+            })}
           </div>
         )}
 
@@ -209,7 +216,6 @@ function Header({
                     {agentPendingCount > 9 ? '9+' : agentPendingCount}
                   </span>
                 )}
-
               </button>
             )}
 
