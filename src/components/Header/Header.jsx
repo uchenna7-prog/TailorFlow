@@ -78,6 +78,10 @@ function Header({
   customActions = [],
   backIcon = 'arrow_back_ios',
   agentPendingCount = 2,
+  // ── avatar prop ──────────────────────────────────────────────
+  // Optional. Pass { initials, src, onClick } to show a profile
+  // avatar circle in the header (used by CustomerDetail).
+  avatar = null,
 }) {
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifTab,  setNotifTab]  = useState('all')
@@ -138,8 +142,22 @@ function Header({
         </div>
 
         {/* ── BACK HEADER ACTIONS ── */}
-        {type === 'back' && customActions.length > 0 && (
+        {type === 'back' && (
           <div className={styles.rightActions}>
+            {/* Avatar — shown when provided (e.g. CustomerDetail) */}
+            {avatar && (
+              <button
+                className={styles.headerAvatar}
+                onClick={avatar.onClick}
+                aria-label="View profile photo"
+              >
+                {avatar.src
+                  ? <img src={avatar.src} className={styles.headerAvatarImg} alt="profile" />
+                  : avatar.initials
+                }
+              </button>
+            )}
+
             {customActions.map((action, i) => (
               <button
                 key={i}
@@ -191,7 +209,7 @@ function Header({
                     {agentPendingCount > 9 ? '9+' : agentPendingCount}
                   </span>
                 )}
-           
+
               </button>
             )}
 
