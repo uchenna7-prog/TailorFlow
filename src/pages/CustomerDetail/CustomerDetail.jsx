@@ -34,7 +34,7 @@ function getBirthday(birthday) {
 }
 
 const TABS = [
-  { id: 'dress',    label: 'Dress\nMeasurements' },
+  { id: 'dress',    label: 'Measurements' },
   { id: 'orders',   label: 'Orders'             },
   { id: 'invoice',  label: 'Invoices'           },
   { id: 'payments', label: 'Payments'           },
@@ -695,7 +695,7 @@ export default function CustomerDetail({ onMenuClick }) {
             className={`${styles.btn} ${styles.primary}`}
             onClick={() => navigate(`/customers/${id}/body-measurements`)}
           >
-            <span className="mi">straighten</span>Full Body Measurements
+            <span className="mi">straighten</span>Body Measurements
           </button>
         </div>
       </div>
