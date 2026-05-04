@@ -33,7 +33,6 @@ function getBirthday(birthday) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-// ── Tab label changed from 'Dress\nMeasurements' → 'Measurements' ──
 const TABS = [
   { id: 'dress',    label: 'Measurements' },
   { id: 'orders',   label: 'Orders'       },
@@ -42,9 +41,6 @@ const TABS = [
   { id: 'receipts', label: 'Receipts'     },
 ]
 
-// ─────────────────────────────────────────────────────────────
-// Helper: read a fresh brand snapshot from localStorage.
-// ─────────────────────────────────────────────────────────────
 function readBrandSnapshot(settingsSnap, invoiceBrand) {
   return {
     name:     settingsSnap.brandName      || invoiceBrand?.name    || '',
@@ -64,9 +60,7 @@ function readBrandSnapshot(settingsSnap, invoiceBrand) {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// PHOTO OVERLAY — full-screen avatar pop (same animation as HTML)
-// ─────────────────────────────────────────────────────────────
+// ── Photo Overlay ─────────────────────────────────────────────
 function PhotoOverlay({ open, onClose, photo, initials, name }) {
   useEffect(() => {
     if (open) document.body.style.overflow = 'hidden'
@@ -85,14 +79,12 @@ function PhotoOverlay({ open, onClose, photo, initials, name }) {
       >
         <span className="mi">close</span>
       </button>
-
       <div className={styles.photoBig} onClick={e => e.stopPropagation()}>
         {photo
           ? <img src={photo} alt={name} className={styles.photoBigImg} />
           : <span className={styles.photoBigInitials}>{initials}</span>
         }
       </div>
-
       <div className={styles.photoNameBig}>{name}</div>
     </div>
   )
@@ -114,8 +106,8 @@ function EditCustomerModal({ customer, onSave, onClose }) {
   const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }))
 
   const handleSave = async () => {
-    if (!form.name.trim())  { return }
-    if (!form.phone.trim()) { return }
+    if (!form.name.trim())  return
+    if (!form.phone.trim()) return
     setSaving(true)
     try {
       await onSave(form)
@@ -206,7 +198,7 @@ function DeleteConfirmModal({ customer, onConfirm, onCancel }) {
           You're about to permanently remove <strong>{customer.name}</strong> from your customer list.
           This action cannot be undone — all their details will be lost forever.
         </p>
-        <p className={styles.deleteWarning}>⚠️ Are you absolutely sure you want to continue?</p>
+        <p className={styles.deleteWarning}>Are you absolutely sure you want to continue?</p>
         <div className={styles.deleteActions}>
           <button className={styles.deleteCancelBtn} onClick={onCancel}>No, Keep Customer</button>
           <button className={styles.deleteConfirmBtn} onClick={onConfirm}>
@@ -258,7 +250,6 @@ export default function CustomerDetail({ onMenuClick }) {
   const topSentinelRef = useRef(null)
   const healedRef      = useRef(false)
 
-  // Swipe state
   const touchStartX = useRef(null)
   const touchStartY = useRef(null)
 
@@ -277,7 +268,6 @@ export default function CustomerDetail({ onMenuClick }) {
     if (data.invoices) setInvoicesState(data.invoices)
   }, [data.invoices])
 
-  // ── One-time heal ──
   useEffect(() => {
     if (!user || !id || healedRef.current) return
     if (!data.invoices || data.invoices.length === 0) return
@@ -505,14 +495,12 @@ export default function CustomerDetail({ onMenuClick }) {
     e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
   }
 
-  // ── Swipe handlers (mobile only — guarded by window.innerWidth) ──
   const handleTouchStart = useCallback((e) => {
     touchStartX.current = e.touches[0].clientX
     touchStartY.current = e.touches[0].clientY
   }, [])
 
   const handleTouchEnd = useCallback((e) => {
-    // Only swipe on mobile screens
     if (window.innerWidth > 600) return
     if (touchStartX.current === null) return
     const dx = e.changedTouches[0].clientX - touchStartX.current
@@ -537,7 +525,6 @@ export default function CustomerDetail({ onMenuClick }) {
   const birthday = getBirthday(customer.birthday)
   const hasPhoto = isPremium && customer.photo
 
-  // ── Last order ──
   const lastOrder = orders.length > 0
     ? orders.reduce((latest, o) => {
         const oDate = o.createdAt?.toDate?.() || new Date(o.createdAt || 0)
@@ -549,7 +536,6 @@ export default function CustomerDetail({ onMenuClick }) {
     ? `${lastOrder.desc || 'Order'} · ${formatLastOrderDate(lastOrder.createdAt?.toDate?.()?.toISOString?.() || lastOrder.createdAt || '')}`
     : null
 
-  // ── Financial summary ──
   const totalSpent = orders.reduce((sum, o) => sum + (parseFloat(o.totalAmount || o.price) || 0), 0)
   const totalPaidAcrossPayments = payments.reduce((sum, p) => {
     return sum + (p.installments || []).reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
@@ -581,6 +567,32 @@ export default function CustomerDetail({ onMenuClick }) {
   }
   const activeTabIsEmpty = tabItemCounts[activeTab] === 0
 
+  // ── Shared stats block (rendered in both premium + free) ──
+  const StatsBlock = () => (
+    <div className={styles.statsBlock}>
+      {totalSpent > 0 && (
+        <div className={styles.statsGrid}>
+          <div className={styles.statCell}>
+            <span className={styles.statAmount}>{fmtK(totalSpent)}</span>
+            <span className={styles.statLabel}>Total Spent</span>
+          </div>
+          {outstanding > 0 && (
+            <div className={`${styles.statCell} ${styles.statCell_owed}`}>
+              <span className={styles.statAmount}>{fmtK(outstanding)}</span>
+              <span className={styles.statLabel}>Outstanding</span>
+            </div>
+          )}
+          {outstanding === 0 && totalSpent > 0 && (
+            <div className={`${styles.statCell} ${styles.statCell_clear}`}>
+              <span className={styles.statAmount}>All clear</span>
+              <span className={styles.statLabel}>Balance</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <div
       className={styles.page}
@@ -596,7 +608,6 @@ export default function CustomerDetail({ onMenuClick }) {
           title={isScrolled ? customer.name : 'Customer Details'}
           customActions={[
             {
-              // Avatar button — opens photo overlay
               customNode: (
                 <button
                   key="avatar"
@@ -627,10 +638,12 @@ export default function CustomerDetail({ onMenuClick }) {
       </div>
 
       <div className={styles.profileContainer}>
+
         {isPremium ? (
           <div className={styles.profileSection}>
-            <div className={styles.topColumn}>
-              {/* Clickable avatar */}
+
+            {/* Row: avatar + name/phone */}
+            <div className={styles.topRow}>
               <div
                 className={styles.avatar}
                 onClick={() => setPhotoOpen(true)}
@@ -642,132 +655,153 @@ export default function CustomerDetail({ onMenuClick }) {
                   : initials
                 }
               </div>
-
-              <div className={styles.rightColumn}>
+              <div className={styles.identityBlock}>
                 <div className={styles.name}>{customer.name}</div>
                 <div className={styles.primaryDetailsContainer}>
-                  <span className={styles.meta}><span className="mi">call</span>{customer.phone}</span>
+                  <span className={styles.meta}>
+                    <span className="mi">call</span>
+                    {customer.phone}
+                  </span>
                   {customer.sex && (
-                    <div className={`${styles.metaItem} ${styles.sex}`}>
-                      <span className={styles.verticalBar}>|</span>
+                    <span className={`${styles.meta} ${styles.verticalBar}`}>|</span>
+                  )}
+                  {customer.sex && (
+                    <span className={styles.meta}>
                       <span className="mi">person</span>
-                      <span>{customer.sex}</span>
-                    </div>
+                      {customer.sex}
+                    </span>
                   )}
                   {birthday && (
-                    <div className={`${styles.metaItem} ${styles.birthday}`}>
+                    <span className={`${styles.meta} ${styles.birthday}`}>
                       <span className="mi">cake</span>
-                      <span>{birthday}</span>
-                    </div>
+                      {birthday}
+                    </span>
                   )}
                 </div>
               </div>
             </div>
 
-            {customer.email   && <div className={styles.meta}><span className="mi">mail_outline</span>{customer.email}</div>}
-            {customer.address && <div className={styles.metaAddress}><span className="mi">place</span>{customer.address}</div>}
-
-            {/* Last order line */}
-            {lastOrderLabel && (
-              <div className={styles.lastOrderLine}>
-                <span className="mi" style={{ fontSize: '0.82rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
-                <span className={styles.lastOrderText}>Last order: <strong>{lastOrderLabel}</strong></span>
-              </div>
-            )}
-
-            {/* Notes — collapsible italic preview */}
-            {customer.notes && (
-              <div className={styles.notesLine}>
-                <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0, marginTop: 2 }}>edit_note</span>
-                <p
-                  className={`${styles.notesText} ${notesExpanded ? styles.notesText_expanded : ''}`}
-                  onClick={() => setNotesExpanded(prev => !prev)}
-                >
-                  {customer.notes}
-                </p>
-              </div>
-            )}
-
-            {/* Financial summary */}
-            {totalSpent > 0 && (
-              <div className={styles.financialLine}>
-                <span className={styles.finValue}>{fmtK(totalSpent)} spent</span>
-                {outstanding > 0 && (
-                  <>
-                    <span className={styles.finSep}>·</span>
-                    <span className={`${styles.finValue} ${styles.finValue_owed}`}>{fmtK(outstanding)} outstanding</span>
-                  </>
-                )}
-                {outstanding === 0 && totalSpent > 0 && (
-                  <>
-                    <span className={styles.finSep}>·</span>
-                    <span className={`${styles.finValue} ${styles.finValue_clear}`}>All clear ✓</span>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className={styles.profileSectionFree}>
-            <div className={styles.name}>{customer.name}</div>
-            <div className={styles.metaInline}>
-              <div className={styles.metaItem}><span className="mi">call</span><span>{customer.phone}</span></div>
-              {customer.sex && (
-                <div className={`${styles.metaItem} ${styles.sex}`}><span className="mi">person</span><span>{customer.sex}</span></div>
-              )}
-              {birthday && (
-                <div className={`${styles.metaItem} ${styles.birthday}`}><span className="mi">cake</span><span>{birthday}</span></div>
-              )}
+            {/* Contact details */}
+            <div className={styles.contactBlock}>
               {customer.email && (
-                <div className={styles.metaItem}><span className="mi">mail_outline</span><span>{customer.email}</span></div>
+                <div className={styles.meta}>
+                  <span className="mi">mail_outline</span>
+                  {customer.email}
+                </div>
               )}
               {customer.address && (
-                <div className={styles.metaItemAddress}><span className="mi">place</span><span>{customer.address}</span></div>
+                <div className={styles.metaAddress}>
+                  <span className="mi">place</span>
+                  {customer.address}
+                </div>
               )}
             </div>
 
-            {/* Last order line — free tier */}
+            {/* Last order */}
             {lastOrderLabel && (
-              <div className={styles.lastOrderLine}>
-                <span className="mi" style={{ fontSize: '0.82rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
-                <span className={styles.lastOrderText}>Last order: <strong>{lastOrderLabel}</strong></span>
+              <div className={styles.lastOrderBlock}>
+                <div className={styles.lastOrderLine}>
+                  <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
+                  <span className={styles.lastOrderText}>
+                    <strong>{lastOrderLabel}</strong>
+                  </span>
+                </div>
               </div>
             )}
 
-            {/* Notes for free tier */}
+            {/* Notes */}
             {customer.notes && (
-              <div className={styles.notesLine}>
-                <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0, marginTop: 2 }}>edit_note</span>
-                <p
-                  className={`${styles.notesText} ${notesExpanded ? styles.notesText_expanded : ''}`}
-                  onClick={() => setNotesExpanded(prev => !prev)}
-                >
-                  {customer.notes}
-                </p>
+              <div className={styles.notesBlock}>
+                <div className={styles.notesLine}>
+                  <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0, marginTop: 2 }}>edit_note</span>
+                  <p
+                    className={`${styles.notesText} ${notesExpanded ? styles.notesText_expanded : ''}`}
+                    onClick={() => setNotesExpanded(prev => !prev)}
+                  >
+                    {customer.notes}
+                  </p>
+                </div>
               </div>
             )}
 
-            {/* Financial summary for free tier */}
-            {totalSpent > 0 && (
-              <div className={styles.financialLine}>
-                <span className={styles.finValue}>{fmtK(totalSpent)} spent</span>
-                {outstanding > 0 && (
-                  <>
-                    <span className={styles.finSep}>·</span>
-                    <span className={`${styles.finValue} ${styles.finValue_owed}`}>{fmtK(outstanding)} outstanding</span>
-                  </>
+            {/* Stats */}
+            <StatsBlock />
+
+          </div>
+        ) : (
+          <div className={styles.profileSectionFree}>
+
+            {/* Name */}
+            <div className={styles.name}>{customer.name}</div>
+
+            {/* Contact details inline */}
+            <div className={styles.contactBlock}>
+              <div className={styles.metaInline}>
+                <div className={styles.metaItem}>
+                  <span className="mi">call</span>
+                  <span>{customer.phone}</span>
+                </div>
+                {customer.sex && (
+                  <div className={styles.metaItem}>
+                    <span className="mi">person</span>
+                    <span>{customer.sex}</span>
+                  </div>
                 )}
-                {outstanding === 0 && totalSpent > 0 && (
-                  <>
-                    <span className={styles.finSep}>·</span>
-                    <span className={`${styles.finValue} ${styles.finValue_clear}`}>All clear ✓</span>
-                  </>
+                {birthday && (
+                  <div className={`${styles.metaItem} ${styles.birthday}`}>
+                    <span className="mi">cake</span>
+                    <span>{birthday}</span>
+                  </div>
+                )}
+                {customer.email && (
+                  <div className={styles.metaItem}>
+                    <span className="mi">mail_outline</span>
+                    <span>{customer.email}</span>
+                  </div>
                 )}
               </div>
+              {customer.address && (
+                <div className={styles.metaItemAddress}>
+                  <span className="mi">place</span>
+                  <span>{customer.address}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Last order */}
+            {lastOrderLabel && (
+              <div className={styles.lastOrderBlock}>
+                <div className={styles.lastOrderLine}>
+                  <span className="mi" style={{ fontSize: '0.8rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
+                  <span className={styles.lastOrderText}>
+                    <strong>{lastOrderLabel}</strong>
+                  </span>
+                </div>
+              </div>
             )}
+
+            {/* Notes */}
+            {customer.notes && (
+              <div className={styles.notesBlock}>
+                <div className={styles.notesLine}>
+                  <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0, marginTop: 2 }}>edit_note</span>
+                  <p
+                    className={`${styles.notesText} ${notesExpanded ? styles.notesText_expanded : ''}`}
+                    onClick={() => setNotesExpanded(prev => !prev)}
+                  >
+                    {customer.notes}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Stats */}
+            <StatsBlock />
+
           </div>
         )}
 
+        {/* Action buttons */}
         <div className={styles.actions}>
           <button className={`${styles.btn} ${styles.light}`} onClick={() => window.location = `tel:${customer.phone}`}>
             <span className="mi">call</span>Call
@@ -775,7 +809,6 @@ export default function CustomerDetail({ onMenuClick }) {
           <button className={`${styles.btn} ${styles.light}`} onClick={() => window.location = `mailto:${customer.email}`}>
             <span className="mi">mail_outline</span>Email
           </button>
-          {/* Label changed from "Full Body Measurements" → "Body Measurements" */}
           <button
             className={`${styles.btn} ${styles.primary}`}
             onClick={() => navigate(`/customers/${id}/body-measurements`)}
@@ -783,9 +816,10 @@ export default function CustomerDetail({ onMenuClick }) {
             <span className="mi">straighten</span>Body Measurements
           </button>
         </div>
+
       </div>
 
-      {/* ── Tabs with badges ── */}
+      {/* ── Tabs ── */}
       <div className={styles.stickyTabsWrapper}>
         <div className={styles.tabs} ref={tabsRef}>
           {TABS.map(tab => (
@@ -870,7 +904,6 @@ export default function CustomerDetail({ onMenuClick }) {
 
       <Toast message={toastMsg} />
 
-      {/* Photo overlay — full screen on avatar click */}
       <PhotoOverlay
         open={photoOpen}
         onClose={() => setPhotoOpen(false)}
