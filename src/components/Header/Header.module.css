@@ -38,10 +38,20 @@
   text-overflow: ellipsis;
 }
 
+/* ── RIGHT ACTIONS — evenly spaced with consistent gap ── */
 .rightActions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;        /* uniform gap between all action items */
+  flex-shrink: 0;
+}
+
+/* ── Wrapper for customNode actions — aligns them to the same
+   44×44 hit-area as iconBtn so spacing is visually consistent ── */
+.customActionNode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
