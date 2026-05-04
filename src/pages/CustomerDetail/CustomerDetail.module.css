@@ -20,16 +20,12 @@
 
 /* ─────────────────────────────────────────────────────────────
    STICKY NAV HEADER
-   The header itself is sticky at top:0. We track its height via
-   the --header-h custom property (56px default). The sticky tabs
-   below it must use the same value for their own `top`.
    ───────────────────────────────────────────────────────────── */
 .navHeader {
   position: sticky;
   top: 0;
   z-index: 110;
   background: var(--bg);
-  /* Expose actual rendered height so .stickyTabsWrapper can match */
   --header-h: 56px;
   min-height: var(--header-h);
 }
@@ -43,7 +39,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   PROFILE SECTION — premium
+   PROFILE SECTION — single unified version
    ───────────────────────────────────────────────────────────── */
 .profileSection {
   display: flex;
@@ -54,7 +50,7 @@
 
 .topRow {
   display: flex;
-  gap: 12px;
+  gap: 13px;
   align-items: center;
 }
 
@@ -62,59 +58,46 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   justify-content: center;
   min-width: 0;
 }
 
-.contactBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.lastOrderBlock {
-  /* wrapper — style independently if needed */
-}
-
-.notesBlock {
-  /* wrapper for notes line */
-}
-
-.statsBlock {
-  padding-top: 14px;
-}
-
-/* ─────────────────────────────────────────────────────────────
-   PROFILE SECTION — free tier
-   ───────────────────────────────────────────────────────────── */
-.profileSectionFree {
-  display: flex;
-  flex-direction: column;
-  padding: 16px 18px 20px;
-  gap: 10px;
-}
-
 /* ─────────────────────────────────────────────────────────────
    AVATAR
+   WhatsApp-style: when scrolled, the avatar visually "moves"
+   to the left header slot via opacity + scale + translate.
+   The profile avatar shrinks away while the header left avatar
+   grows in — creating the illusion of one continuous motion.
    ───────────────────────────────────────────────────────────── */
 .avatar {
-  width: 66px;
-  height: 66px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: var(--surface2);
   display: grid;
   place-items: center;
-  font-weight: 500;
-  font-size: 24px;
-  color: var(--accent);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--text);
   overflow: hidden;
   cursor: pointer;
   flex-shrink: 0;
-  transition: transform 0.15s;
+  /* WhatsApp-style transition: smooth scale + fade when scrolling */
+  transition:
+    opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
 }
 
-.avatar:active {
+/* When header is scrolled, profile avatar fades+scales away
+   mimicking the avatar "flying" to the header */
+.avatarScrolled {
+  opacity: 0;
+  transform: scale(0.55) translateX(-18px);
+}
+
+.avatar:not(.avatarScrolled):active {
   transform: scale(0.93);
 }
 
@@ -124,12 +107,21 @@
   object-fit: cover;
 }
 
+/* Initials inside the avatar */
+.avatarInitials {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+
 /* ─────────────────────────────────────────────────────────────
-   NAME + META
+   NAME
    ───────────────────────────────────────────────────────────── */
 .name {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.08rem;
+  font-weight: 700;
   color: var(--text);
   line-height: 1.2;
   white-space: nowrap;
@@ -137,93 +129,95 @@
   text-overflow: ellipsis;
 }
 
-.primaryDetailsContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
-
-/* All profile meta icons normalised to 1rem */
-.meta {
-  display: flex;
-  gap: 4px;
-  color: var(--text2);
-  font-size: 0.75rem;
-  align-items: center;
-}
-
-.meta .mi,
-.meta [class^="mi"] {
-  font-size: 1rem;   /* unified icon size in profile section */
-  flex-shrink: 0;
-}
-
-.metaAddress {
-  display: flex;
-  gap: 4px;
-  color: var(--text2);
-  font-size: 0.75rem;
-  align-items: center;
-}
-
-.metaAddress .mi,
-.metaAddress [class^="mi"] {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.metaInline {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 12px;
-  row-gap: 6px;
-  align-items: center;
-}
-
-.metaItem {
+/* ─────────────────────────────────────────────────────────────
+   META ROW — phone · sex · birthday, always single line
+   Key: nowrap on the container, overflow hidden, each chip
+   is flex-shrink:0 so they never break to a new line.
+   ───────────────────────────────────────────────────────────── */
+.metaRow {
   display: flex;
   align-items: center;
   gap: 5px;
+  flex-wrap: nowrap;        /* ← NEVER wrap */
+  overflow: hidden;         /* clip if truly too long */
+  min-width: 0;
+}
+
+.metaChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   color: var(--text2);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
+  font-weight: 500;
+  flex-shrink: 0;           /* ← prevent shrinking / wrapping */
+  white-space: nowrap;
+  min-width: 0;
 }
 
-.metaItem .mi,
-.metaItem [class^="mi"] {
-  font-size: 1rem;
+.metaChip .mi {
+  font-size: 0.95rem;
   flex-shrink: 0;
-}
-
-.metaItem:not(:last-child)::after {
-  content: '·';
-  margin-left: 8px;
   color: var(--text3);
 }
 
-.metaItemAddress {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--text2);
-  font-size: 0.78rem;
+.metaChipText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.metaItemAddress .mi,
-.metaItemAddress [class^="mi"] {
-  font-size: 1rem;
+/* Phone number can shrink slightly if truly needed */
+.metaChip:first-child .metaChipText {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaDot {
+  color: var(--border2);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.metaChipBirthday {
+  color: var(--warning);
+  font-weight: 700;
+}
+
+.metaChipBirthday .mi {
+  color: var(--warning);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CONTACT BLOCK — email + address (secondary details)
+   ───────────────────────────────────────────────────────────── */
+.contactBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text2);
+  font-size: 0.75rem;
+}
+
+.contactRow .mi {
+  font-size: 0.95rem;
+  color: var(--text3);
   flex-shrink: 0;
 }
 
-.verticalBar {
-  color: var(--border);
-  opacity: 0.9;
-}
-
-.birthday {
-  font-weight: 600;
-  color: var(--warning);
+.contactText {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -263,13 +257,10 @@
 
 /* ─────────────────────────────────────────────────────────────
    STICKY TABS
-   top must equal the rendered height of .navHeader (56px).
-   If you ever change the header height, update --header-h above
-   and this value together.
    ───────────────────────────────────────────────────────────── */
 .stickyTabsWrapper {
   position: sticky;
-  top: 75px;            /* ← matches .navHeader min-height */
+  top: 75px;
   z-index: 100;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
@@ -322,11 +313,7 @@
   background: var(--accent);
 }
 
-/* ── Tab badge ──────────────────────────────────────────────
-   FIX: was using var(--surface2) background which disappeared
-   in dark mode. Now uses explicit border + text colour vars so
-   the number is always readable in both light and dark themes.
-   ──────────────────────────────────────────────────────────── */
+/* ── Tab badge ── */
 .tabBadge {
   display: inline-flex;
   align-items: center;
@@ -337,7 +324,6 @@
   height: 16px;
   padding: 0 4px;
   border-radius: 20px;
-  /* Use border so it shows on any background */
   background: transparent;
   color: var(--text2);
   border: 1.5px solid var(--border2);
@@ -347,37 +333,25 @@
 
 .tabBadge_active {
   background: var(--accent);
-  color: var(--text2);
+  color: var(--bg);
   border-color: var(--accent);
 }
 
 /* ─────────────────────────────────────────────────────────────
    TAB CONTENT
-   FIX: when a tab has only a few cards that don't fill the
-   viewport the content area was still scrollable, letting cards
-   creep under the sticky header. We enforce a minimum height
-   equal to the remaining viewport (full height minus header
-   minus tabs bar — approximately 56px + 44px = 100px total).
-   This means the page body always fills the screen, so short
-   lists sit below the sticky tabs and don't scroll under them.
    ───────────────────────────────────────────────────────────── */
 .tabContent {
   padding: 12px 20px 120px;
   flex: 1;
   min-height: calc(100dvh - 75px - 44px);
-
-  
 }
 
-/* When the tab is empty we also prevent overflow so the blank
-   area is contained and there's nothing to scroll at all. */
 .tabContent[data-empty='true'] {
   overflow: hidden;
 }
 
-/* When content is present let it grow naturally */
 .tabContent[data-empty='false'] {
-  min-height: calc(100dvh - 56px - 44px);
+  min-height: calc(100dvh - 75px - 44px);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -385,7 +359,7 @@
    ───────────────────────────────────────────────────────────── */
 .fab {
   position: fixed;
-  bottom: calc(28px + var(--sb) + 60px);
+  bottom: calc(28px + var(--sb));
   right: 22px;
   width: 56px;
   height: 56px;
@@ -404,6 +378,10 @@
 /* ─────────────────────────────────────────────────────────────
    LAST ORDER LINE
    ───────────────────────────────────────────────────────────── */
+.lastOrderBlock {
+  /* wrapper */
+}
+
 .lastOrderLine {
   display: flex;
   align-items: center;
@@ -413,16 +391,18 @@
   line-height: 1.4;
 }
 
-/* Normalise schedule icon to match other profile icons */
-.lastOrderLine .mi,
-.lastOrderLine [class^="mi"] {
-  font-size: 1rem !important;
+.lastOrderLine .mi {
+  font-size: 0.95rem;
   flex-shrink: 0;
+  color: var(--text3);
 }
 
 .lastOrderText {
   color: var(--text3);
   font-size: 0.73rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .lastOrderText strong {
@@ -432,21 +412,22 @@
 
 /* ─────────────────────────────────────────────────────────────
    NOTES LINE
-   FIX: edit_note icon was rendering smaller than other icons.
-   Normalised to 1rem to match all other profile-section icons.
    ───────────────────────────────────────────────────────────── */
+.notesBlock {
+  /* wrapper */
+}
+
 .notesLine {
   display: flex;
   align-items: flex-start;
   gap: 7px;
 }
 
-/* Target the icon specifically inside the notes line */
-.notesLine .mi,
-.notesLine [class^="mi"] {
-  font-size: 1rem !important;   /* was 0.85rem inline — now consistent */
+.notesLine .mi {
+  font-size: 0.95rem;
   flex-shrink: 0;
   margin-top: 2px;
+  color: var(--text3);
 }
 
 .notesText {
@@ -471,8 +452,12 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   STATS GRID
+   STATS BLOCK
    ───────────────────────────────────────────────────────────── */
+.statsBlock {
+  padding-top: 12px;
+}
+
 .statsGrid {
   display: flex;
   gap: 24px;
@@ -506,7 +491,7 @@
 }
 
 .statCell_paid .statAmount {
-  color: green;
+  color: #15803d;
 }
 
 .statCell_clear .statAmount {
@@ -514,45 +499,6 @@
   font-size: 0.82rem;
   font-weight: 600;
   padding-top: 3px;
-}
-
-/* ─────────────────────────────────────────────────────────────
-   HEADER AVATAR BUTTON (legacy — kept for back-compat)
-   ───────────────────────────────────────────────────────────── */
-.headerAvatarBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--text);
-  color: var(--bg);
-  padding: 0;
-  overflow: hidden;
-  cursor: pointer;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: transform 0.15s, opacity 0.15s;
-}
-
-.headerAvatarBtn:active {
-  transform: scale(0.9);
-  opacity: 0.8;
-}
-
-.headerAvatarImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.headerAvatarText {
-  font-size: 0.6rem;
-  font-weight: 800;
-  color: var(--bg);
-  letter-spacing: 0.5px;
-  user-select: none;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -602,7 +548,7 @@
   height: 210px;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--text);
+  background: var(--surface2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -623,7 +569,7 @@
 .photoBigInitials {
   font-size: 3.8rem;
   font-weight: 800;
-  color: var(--bg);
+  color: var(--text);
   letter-spacing: 2px;
   user-select: none;
 }
@@ -794,7 +740,7 @@
 
 .modalSexChipActive {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--bg);
   border-color: var(--accent);
 }
 
@@ -902,21 +848,12 @@
     bottom: calc(28px + var(--sb));
   }
 
-  .metaItemAddress,
-  .metaAddress {
-    align-items: flex-start;
-  }
-
   .actions {
     gap: 8px;
     padding: 4px 14px 16px;
   }
 
   .profileSection {
-    padding: 14px 16px 18px;
-  }
-
-  .profileSectionFree {
     padding: 14px 16px 18px;
   }
 }

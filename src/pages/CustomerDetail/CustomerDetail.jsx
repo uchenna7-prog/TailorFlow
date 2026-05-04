@@ -24,7 +24,6 @@ function fmt(currency, amount) {
   return `${currency}${n.toLocaleString('en-NG', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 }
 
-
 function getInitials(name) {
   if (!name) return ''
   const parts = name.trim().split(/\s+/)
@@ -529,6 +528,7 @@ export default function CustomerDetail({ onMenuClick }) {
 
   const initials = getInitials(customer.name)
   const birthday = getBirthday(customer.birthday)
+  // Show photo if available (premium or not — just check if photo exists)
   const hasPhoto = isPremium && customer.photo
 
   const lastOrder = orders.length > 0
@@ -547,7 +547,6 @@ export default function CustomerDetail({ onMenuClick }) {
     return sum + (p.installments || []).reduce((s, i) => s + (parseFloat(i.amount) || 0), 0)
   }, 0)
   const outstanding = Math.max(0, totalSpent - totalPaidAcrossPayments)
-
 
   const handleFabClick = () => {
     if (activeTab === 'dress')     document.dispatchEvent(new CustomEvent('openMeasureModal'))
@@ -568,14 +567,15 @@ export default function CustomerDetail({ onMenuClick }) {
   }
   const activeTabIsEmpty = tabItemCounts[activeTab] === 0
 
-  // ── scrolledAvatar config passed to Header ──────────────────
+  // ── scrolledAvatar — no right avatar, only left transition avatar
+  // Pass null for src when no photo so initials render in left avatar
   const scrolledAvatar = {
     src:      hasPhoto ? customer.photo : null,
     initials: initials,
     onClick:  () => setPhotoOpen(true),
   }
 
-  // ── Shared stats block (rendered in both premium + free) ──
+  // ── Stats block ──────────────────────────────────────────────
   const StatsBlock = () => (
     <div className={styles.statsBlock}>
       {totalSpent > 0 && (
@@ -590,14 +590,12 @@ export default function CustomerDetail({ onMenuClick }) {
               <span className={styles.statLabel}>Balance Due</span>
             </div>
           )}
-
           {totalPaidAcrossPayments > 0 && (
             <div className={`${styles.statCell} ${styles.statCell_paid}`}>
               <span className={styles.statAmount}>{fmt("₦", totalPaidAcrossPayments)}</span>
               <span className={styles.statLabel}>Total Paid</span>
             </div>
           )}
-
           {outstanding === 0 && totalSpent > 0 && (
             <div className={`${styles.statCell} ${styles.statCell_clear}`}>
               <span className={styles.statAmount}>All clear</span>
@@ -615,6 +613,7 @@ export default function CustomerDetail({ onMenuClick }) {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      {/* Sentinel to detect when profile scrolls out of view */}
       <div ref={topSentinelRef} className={styles.sentinel} />
 
       {/* ── Sticky Header ── */}
@@ -624,6 +623,7 @@ export default function CustomerDetail({ onMenuClick }) {
           title={isScrolled ? customer.name : 'Customer Details'}
           isScrolled={isScrolled}
           scrolledAvatar={scrolledAvatar}
+          showRightAvatar={false}
           customActions={[
             {
               icon: 'edit',
@@ -641,168 +641,102 @@ export default function CustomerDetail({ onMenuClick }) {
       </div>
 
       <div className={styles.profileContainer}>
+        {/* ── Single unified profile section ── */}
+        <div className={styles.profileSection}>
 
-        {true ? (
-          <div className={styles.profileSection}>
-
-            {/* Row: avatar + name/phone */}
-            <div className={styles.topRow}>
-              <div
-                className={styles.avatar}
-                onClick={() => setPhotoOpen(true)}
-                role="button"
-                aria-label="View profile photo"
-              >
-                {hasPhoto
-                  ? <img src={customer.photo} className={styles.avatarImg} alt={customer.name} />
-                  : initials
-                }
-              </div>
-              <div className={styles.identityBlock}>
-                <div className={styles.name}>{customer.name}</div>
-                <div className={styles.primaryDetailsContainer}>
-                  <span className={styles.meta}>
-                    <span className="mi">call</span>
-                    {customer.phone}
-                  </span>
-                  {customer.sex && (
-                    <span className={`${styles.meta} ${styles.verticalBar}`}>|</span>
-                  )}
-                  {customer.sex && (
-                    <span className={styles.meta}>
-                      <span className="mi">person</span>
-                      {customer.sex}
-                    </span>
-                  )}
-                  {birthday && (
-                    <span className={`${styles.meta} ${styles.birthday}`}>
-                      <span className="mi">cake</span>
-                      {birthday}
-                    </span>
-                  )}
-                </div>
-              </div>
+          {/* Row: avatar + name/details */}
+          <div className={styles.topRow}>
+            <div
+              className={`${styles.avatar} ${isScrolled ? styles.avatarScrolled : ''}`}
+              onClick={() => setPhotoOpen(true)}
+              role="button"
+              aria-label="View profile photo"
+            >
+              {hasPhoto
+                ? <img src={customer.photo} className={styles.avatarImg} alt={customer.name} />
+                : <span className={styles.avatarInitials}>{initials}</span>
+              }
             </div>
 
-            {/* Contact details */}
-            <div className={styles.contactBlock}>
-              {customer.email && (
-                <div className={styles.meta}>
-                  <span className="mi">mail_outline</span>
-                  {customer.email}
-                </div>
-              )}
-              {customer.address && (
-                <div className={styles.metaAddress}>
-                  <span className="mi">place</span>
-                  {customer.address}
-                </div>
-              )}
-            </div>
+            <div className={styles.identityBlock}>
+              <div className={styles.name}>{customer.name}</div>
 
-            {/* Last order */}
-            {lastOrderLabel && (
-              <div className={styles.lastOrderBlock}>
-                <div className={styles.lastOrderLine}>
-                  <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
-                  <span className={styles.lastOrderText}>
-                    <strong>{lastOrderLabel}</strong>
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Notes */}
-            {customer.notes && (
-              <div className={styles.notesBlock}>
-                <div className={styles.notesLine}>
-                  <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0, marginTop: 2 }}>edit_note</span>
-                  <p
-                    className={`${styles.notesText} ${notesExpanded ? styles.notesText_expanded : ''}`}
-                    onClick={() => setNotesExpanded(prev => !prev)}
-                  >
-                    {customer.notes}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Stats */}
-            <StatsBlock />
-
-          </div>
-        ) : (
-          <div className={styles.profileSectionFree}>
-
-            {/* Name */}
-            <div className={styles.name}>{customer.name}</div>
-
-            {/* Contact details inline */}
-            <div className={styles.contactBlock}>
-              <div className={styles.metaInline}>
-                <div className={styles.metaItem}>
+              {/* Phone · Sex · Birthday — always one line, no wrap */}
+              <div className={styles.metaRow}>
+                <span className={styles.metaChip}>
                   <span className="mi">call</span>
-                  <span>{customer.phone}</span>
-                </div>
+                  <span className={styles.metaChipText}>{customer.phone}</span>
+                </span>
                 {customer.sex && (
-                  <div className={styles.metaItem}>
-                    <span className="mi">person</span>
-                    <span>{customer.sex}</span>
-                  </div>
+                  <>
+                    <span className={styles.metaDot} aria-hidden="true">·</span>
+                    <span className={styles.metaChip}>
+                      <span className="mi">person</span>
+                      <span className={styles.metaChipText}>{customer.sex}</span>
+                    </span>
+                  </>
                 )}
                 {birthday && (
-                  <div className={`${styles.metaItem} ${styles.birthday}`}>
-                    <span className="mi">cake</span>
-                    <span>{birthday}</span>
-                  </div>
-                )}
-                {customer.email && (
-                  <div className={styles.metaItem}>
-                    <span className="mi">mail_outline</span>
-                    <span>{customer.email}</span>
-                  </div>
+                  <>
+                    <span className={styles.metaDot} aria-hidden="true">·</span>
+                    <span className={`${styles.metaChip} ${styles.metaChipBirthday}`}>
+                      <span className="mi">cake</span>
+                      <span className={styles.metaChipText}>{birthday}</span>
+                    </span>
+                  </>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Secondary contact details */}
+          {(customer.email || customer.address) && (
+            <div className={styles.contactBlock}>
+              {customer.email && (
+                <div className={styles.contactRow}>
+                  <span className="mi">mail_outline</span>
+                  <span className={styles.contactText}>{customer.email}</span>
+                </div>
+              )}
               {customer.address && (
-                <div className={styles.metaItemAddress}>
+                <div className={styles.contactRow}>
                   <span className="mi">place</span>
-                  <span>{customer.address}</span>
+                  <span className={styles.contactText}>{customer.address}</span>
                 </div>
               )}
             </div>
+          )}
 
-            {/* Last order */}
-            {lastOrderLabel && (
-              <div className={styles.lastOrderBlock}>
-                <div className={styles.lastOrderLine}>
-                  <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0 }}>schedule</span>
-                  <span className={styles.lastOrderText}>
-                    <strong>{lastOrderLabel}</strong>
-                  </span>
-                </div>
+          {/* Last order */}
+          {lastOrderLabel && (
+            <div className={styles.lastOrderBlock}>
+              <div className={styles.lastOrderLine}>
+                <span className="mi">schedule</span>
+                <span className={styles.lastOrderText}>
+                  <strong>{lastOrderLabel}</strong>
+                </span>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Notes */}
-            {customer.notes && (
-              <div className={styles.notesBlock}>
-                <div className={styles.notesLine}>
-                  <span className="mi" style={{ fontSize: '0.85rem', color: 'var(--text3)', flexShrink: 0, marginTop: 2 }}>edit_note</span>
-                  <p
-                    className={`${styles.notesText} ${notesExpanded ? styles.notesText_expanded : ''}`}
-                    onClick={() => setNotesExpanded(prev => !prev)}
-                  >
-                    {customer.notes}
-                  </p>
-                </div>
+          {/* Notes */}
+          {customer.notes && (
+            <div className={styles.notesBlock}>
+              <div className={styles.notesLine}>
+                <span className="mi">edit_note</span>
+                <p
+                  className={`${styles.notesText} ${notesExpanded ? styles.notesText_expanded : ''}`}
+                  onClick={() => setNotesExpanded(prev => !prev)}
+                >
+                  {customer.notes}
+                </p>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Stats */}
-            <StatsBlock />
-
-          </div>
-        )}
+          {/* Stats */}
+          <StatsBlock />
+        </div>
 
         {/* Action buttons */}
         <div className={styles.actions}>
@@ -819,7 +753,6 @@ export default function CustomerDetail({ onMenuClick }) {
             <span className="mi">straighten</span>Body Measurements
           </button>
         </div>
-
       </div>
 
       {/* ── Tabs ── */}
