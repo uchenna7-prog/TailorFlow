@@ -27,6 +27,7 @@ export function TemplateModal({
   const { brand } = useBrand()
   const modalRef = useRef(null)
 
+
   const [selectedInvoiceTemplate, setSelectedInvoiceTemplate] = useState(
     currentInvoiceTemplate || 'invoiceTemplate1'
   )
@@ -34,13 +35,12 @@ export function TemplateModal({
     currentReceiptTemplate || 'receiptTemplate1'
   )
   const [activeTab, setActiveTab] = useState('invoice')
+  const [inActiveTab, setInActiveTab] = useState("receipt")
 
   useBrandTokens(colourId, modalRef)
 
   if (!isOpen) return null
 
-  // ── Tab config ─────────────────────────────────────────────────────────────
-  // Everything tab-specific lives here. Adding a new tab = add one entry.
   const tabs = {
     invoice: {
       label: 'Invoice',
@@ -69,8 +69,8 @@ export function TemplateModal({
   }
 
   const currentTab = tabs[activeTab]
+  const nonCurrentTab = tabs[inActiveTab]
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
   function handleConfirmSelection() {
     onSelect({
       invoiceTemplate: selectedInvoiceTemplate,
@@ -90,13 +90,34 @@ export function TemplateModal({
         customActions={[{ label: 'Select', onClick: handleConfirmSelection }]}
       />
 
-      {/* ── Tab Switcher ──────────────────────────────────────────────────── */}
+ 
       <div className={styles.tabRow}>
         {Object.entries(tabs).map(([tabKey, tab]) => (
           <button
             key={tabKey}
             className={`${styles.tabButton} ${activeTab === tabKey ? styles.tabButtonActive : ''}`}
-            onClick={() => setActiveTab(tabKey)}
+            onClick={() => {
+
+              if(tabKey=="invoice"){
+
+                setActiveTab("invoice")
+                setInActiveTab("receipt")
+              }
+
+              else{
+
+                setActiveTab("receipt")
+                setInActiveTab("invoice")
+
+              }   
+              
+
+            }
+
+            
+              
+            
+            }
           >
             <span className="mi" style={{ fontSize: '1rem' }}>{tab.icon}</span>
             {tab.label}
@@ -104,7 +125,7 @@ export function TemplateModal({
         ))}
       </div>
 
-      {/* ── Template List ─────────────────────────────────────────────────── */}
+
       <div className={styles.templateList}>
         {currentTab.templateGroups.map((group, groupIndex) => (
           <div key={group.groupLabel}>
@@ -123,20 +144,47 @@ export function TemplateModal({
             <div className={styles.groupTemplateGrid}>
               {group.templates.map(template => {
                 const isSelected = currentTab.selectedId === template.id
+                
 
                 return (
                   <div
                     key={template.id}
                     className={styles.templateCard}
-                    onClick={() => currentTab.onSelectTemplate(template.id)}
+                    onClick={() => {
+
+                      let templateNumber = 0
+                      let invoiceTemplate = ""
+                      let receiptTemplate = ""
+
+                      if (currentTab.label==="Invoice"){
+
+                        templateNumber = template.id.replace("invoiceTemplate","")
+                        invoiceTemplate = template.id
+                        receiptTemplate = "receiptTemplate" + templateNumber
+                        currentTab.onSelectTemplate(template.id)
+                        nonCurrentTab.onSelectTemplate(receiptTemplate)
+                      }
+
+                      else{
+
+                        templateNumber = template.id.replace("receiptTemplate","")
+                        receiptTemplate = template.id
+                        invoiceTemplate = "invoiceTemplate" + templateNumber
+                        currentTab.onSelectTemplate(template.id)
+                        nonCurrentTab.onSelectTemplate(invoiceTemplate)
+
+                      }
+
+                    }
+                    }
                   >
                     {/* Preview */}
                     <div className={`${styles.templatePreview} ${isSelected ? styles.templatePreviewSelected : ''}`}>
                       <template.Component {...currentTab.getSampleProps()} />
                     </div>
 
-                    {/* Label row */}
                     <div className={styles.templateLabelRow}>
+
                       <div className={`${styles.radioCircle} ${isSelected ? styles.radioCircleSelected : ''}`} />
                       <div className={styles.templateTextGroup}>
                         <span className={styles.templateName}>{template.label}</span>

@@ -175,8 +175,8 @@
 
 /* ── md ── */
 .mosaicOuter {
-  width: 68px;
-  height: 68px;
+  width: 80px;
+  height: 80px;
   border-radius: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -187,8 +187,8 @@
 }
 
 .mosaicInner {
-  width: 50px;
-  height: 50px;
+  width: 58px;
+  height: 58px;
   border-radius: 9px;
   background: #fff;
   display: flex;
@@ -608,7 +608,6 @@
   font-family: 'DM Sans', sans-serif;
 }
 
-.textInput::placeholder { color: var(--text3); }
 
 .textareaInput {
   width: 100%;

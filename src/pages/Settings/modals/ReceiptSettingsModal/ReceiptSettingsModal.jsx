@@ -8,7 +8,9 @@ import { FullModal } from "../../components/FullModal/FullModal"
 
 
 export function ReceiptSettingsModal({ onBack, showToast }) {
+  
   const { settings, updateMany } = useSettings()
+
   const [local, setLocal] = useState({
     receiptPrefix:  settings.receiptPrefix  ?? 'RCP',
     receiptFooter:  settings.receiptFooter  ?? '',

@@ -1,15 +1,37 @@
 import styles from "../styles/Template10.module.css"
-import { calcTax, fmt } from "../utils/receiptUtils"
+import { calcTax } from "../utils/receiptUtils"
 import { ReceiptPaymentSummary } from "../components/ReceiptPaymentSummary/ReceiptPaymentSummary"
+import { formatCurrency } from "../../../utils/formatCurrency"
+
 
 export function ReceiptTemplate10({ receipt, customer, brand }) {
   const accentColor = brand.colour || '#0057D7'
-  const { currency, showTax, taxRate } = brand
+   const { currency, showTax, taxRate: brandTaxRate } = brand
+
   const subtotal = receipt.items?.length > 0
     ? receipt.items.reduce((sum, item) => sum + ((item.qty ?? 1) * (parseFloat(item.price) || 0)), 0)
-     : 0
-  const tax   = calcTax(subtotal, taxRate, showTax)
-  const total = subtotal + tax
+    : 0
+
+  // Prefer frozen values from the receipt object; fall back to brand/calc
+  const shippingFee    = parseFloat(receipt.shippingFee)    || 0
+  const discountAmount = parseFloat(receipt.discountAmount) || 0
+  const discountType   = receipt.discountType   || null   // 'percent' | 'flat' | null
+  const discountValue  = parseFloat(receipt.discountValue)  || 0
+  const useTax         = receipt.taxRate != null ? receipt.taxRate > 0 : (showTax && brandTaxRate > 0)
+  const taxRate        = receipt.taxRate != null ? receipt.taxRate : brandTaxRate
+  const taxAmount      = parseFloat(receipt.taxAmount) || calcTax(subtotal, taxRate, useTax)
+  const grandTotal     = receipt.totalAmount != null
+    ? parseFloat(receipt.totalAmount)
+    : subtotal + shippingFee - discountAmount + taxAmount
+
+  const discountLabel = discountType === 'percent'
+    ? `Discount (${discountValue}%)`
+    : 'Discount'
+
+  const hasExtras = shippingFee > 0 || discountAmount > 0 || (useTax && taxAmount > 0)
+
+ 
+
 
   return (
     <div className={styles.template}>
@@ -78,20 +100,55 @@ export function ReceiptTemplate10({ receipt, customer, brand }) {
                 <tr key={i} className={styles.tableRow}>
                   <td className={styles.colDesc}>{item.name}</td>
                   <td className={styles.colQty}>{qty}</td>
-                  <td className={styles.colPrice}>{fmt(currency, unitPrice)}</td>
-                  <td className={styles.colTotal}>{fmt(currency, lineAmount)}</td>
+                  <td className={styles.colPrice}>{ formatCurrency(currency, unitPrice)}</td>
+                  <td className={styles.colTotal}>{ formatCurrency(currency, lineAmount)}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
 
-        <div className={styles.orderTotalWrap}>
-        
+        <div >
+
+          {/* Breakdown rows — only shown when there are extras beyond subtotal */}
+          {hasExtras && (
+            <div className={styles.breakdownBlock}>
+              <div className={styles.breakdownRow}>
+                <span className={styles.breakdownKey}>Subtotal</span>
+                <span className={styles.breakdownVal}>{ formatCurrency(currency, subtotal)}</span>
+              </div>
+  
+              {shippingFee > 0 && (
+                <div className={styles.breakdownRow}>
+                  <span className={styles.breakdownKey}>Shipping &amp; Delivery</span>
+                  <span className={styles.breakdownVal}>{ formatCurrency(currency, shippingFee)}</span>
+                </div>
+              )}
+  
+              {discountAmount > 0 && (
+                <div className={styles.breakdownRow}>
+                  <span className={`${styles.breakdownKey} ${styles.breakdownKeyDiscount}`}>{discountLabel}</span>
+                  <span className={`${styles.breakdownVal} ${styles.breakdownValDiscount}`}>−{ formatCurrency(currency, discountAmount)}</span>
+                </div>
+              )}
+  
+              {useTax && taxAmount > 0 && (
+                <div className={styles.breakdownRow}>
+                  <span className={styles.breakdownKey}>VAT ({taxRate}%)</span>
+                  <span className={styles.breakdownVal}>{ formatCurrency(currency, taxAmount)}</span>
+                </div>
+              )}
+            </div>
+          )}
+  
+          {/* Grand total bar — always shown, full width */}
+          <div className={styles.orderTotalWrap}>
+            <div className={styles.orderTotalLabel}>Order Total</div>
+            <div className={styles.orderTotalValue}>{ formatCurrency(currency, grandTotal)}</div>
+          </div>
+
           
-          <div className={styles.orderTotalLabel}>Order Total</div>
-          
-          <div className={styles.orderTotalValue}>{fmt(currency, total)}</div>
+
         </div>
 
         <ReceiptPaymentSummary receipt={receipt} brand={brand} />

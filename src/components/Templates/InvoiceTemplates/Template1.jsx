@@ -1,11 +1,16 @@
 import styles from "../styles/Template1.module.css"
 import { ItemsTable } from "../components/InvoiceItemsTable/InvoiceItemsTable"
-import { getDueDate } from "../utils/invoiceUtils";
+import { getDueDate } from "../utils/invoiceUtils"
+
+
 
 export function InvoiceTemplate1({ invoice, customer, brand }) {
 
+
   const dueDate   = getDueDate(invoice, brand.dueDays)
   const lineColor = brand.colour || '#0057D7'
+
+
 
   return (
 
@@ -40,17 +45,17 @@ export function InvoiceTemplate1({ invoice, customer, brand }) {
         <div style={{ textAlign : 'right' }}>
 
           <div>
-            <span className={styles.metaKey}>INVOICE # :</span>
+            <span className={styles.metaKey}>INVOICE # </span>
             <span className={styles.metaValue}> {invoice.number}</span>
           </div>
 
           <div>
-            <span className={styles.metaKey}>Issue Date :</span>
+            <span className={styles.metaKey}>Issue Date </span>
             <span className={styles.metaValue}> {invoice.date}</span>
           </div>
 
           <div>
-            <span className={styles.metaKey}>Due Date :</span>
+            <span className={styles.metaKey}>Due Date </span>
             <span className={styles.metaValue}> {dueDate}</span>
           </div>
 
@@ -59,7 +64,6 @@ export function InvoiceTemplate1({ invoice, customer, brand }) {
       </div>
 
       <ItemsTable invoice={invoice} brand={brand} />
-
 
       {(brand.accountBank || brand.phone || brand.email || brand.footer) && (
 
@@ -72,7 +76,9 @@ export function InvoiceTemplate1({ invoice, customer, brand }) {
               <strong style={{fontWeight :900,color :"var(--brand-primary-dark)"}}>Payment Information :</strong><br />
 
               <div>
+
                 <div>
+
                   {brand.accountBank && (
                     <div>Bank Name : {brand.accountBank}</div>
                   )}
@@ -86,6 +92,7 @@ export function InvoiceTemplate1({ invoice, customer, brand }) {
                   )}
                   
                 </div>
+                
               </div>
 
             </div>

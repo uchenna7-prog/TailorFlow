@@ -1,24 +1,15 @@
-// src/pages/CustomerDetail/tabs/MeasurementsTab.jsx
-
 import { useState, useEffect, useRef } from 'react'
 import ConfirmSheet from '../../../../components/ConfirmSheet/ConfirmSheet'
-import Header       from '../../../../components/Header/Header'
-import styles       from './MeasurementsTab.module.css'
+import Header from '../../../../components/Header/Header'
+import styles from './MeasurementsTab.module.css'
 
-
-// ─────────────────────────────────────────────────────────────
-// CONSTANTS
-// ─────────────────────────────────────────────────────────────
 
 const UNIT_SHORT = { in: '"', cm: 'cm', yd: 'yd' }
 const UNIT_FULL  = { in: 'Inches (")', cm: 'Centimetres (cm)', yd: 'Yards (yd)' }
 
 
-// ─────────────────────────────────────────────────────────────
-// IMAGE COMPRESSION UTILITY
-// ─────────────────────────────────────────────────────────────
-
 function compressImage(file, maxWidth = 1200, quality = 0.78) {
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onerror = () => reject(new Error('Failed to read file'))
@@ -44,10 +35,6 @@ function compressImage(file, maxWidth = 1200, quality = 0.78) {
   })
 }
 
-
-// ─────────────────────────────────────────────────────────────
-// FULLSCREEN LIGHTBOX
-// ─────────────────────────────────────────────────────────────
 
 function ImageLightbox({ images, startIndex = 0, onClose }) {
   const [currentIndex, setCurrentIndex] = useState(startIndex)
@@ -109,10 +96,6 @@ function ImageLightbox({ images, startIndex = 0, onClose }) {
 }
 
 
-// ─────────────────────────────────────────────────────────────
-// IMAGE CAROUSEL — used inside the detail panel
-// ─────────────────────────────────────────────────────────────
-
 function ImageCarousel({ images, className, onImageClick }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   if (!images || images.length === 0) return null
@@ -157,10 +140,6 @@ function ImageCarousel({ images, className, onImageClick }) {
   )
 }
 
-
-// ─────────────────────────────────────────────────────────────
-// MULTI-IMAGE UPLOAD
-// ─────────────────────────────────────────────────────────────
 
 function MultiImageUpload({ images, onChange, cardId }) {
   const [previewIndex, setPreviewIndex] = useState(0)
@@ -254,10 +233,6 @@ function MultiImageUpload({ images, onChange, cardId }) {
 }
 
 
-// ─────────────────────────────────────────────────────────────
-// BLANK CARD FACTORY
-// ─────────────────────────────────────────────────────────────
-
 function createBlankCard(cardNumber) {
   return {
     id:      Date.now() + Math.random(),
@@ -268,10 +243,6 @@ function createBlankCard(cardNumber) {
   }
 }
 
-
-// ─────────────────────────────────────────────────────────────
-// MEASURE MODAL
-// ─────────────────────────────────────────────────────────────
 
 function MeasureModal({ isOpen, onClose, onSave }) {
   const [unit,  setUnit]  = useState('in')
@@ -361,7 +332,6 @@ function MeasureModal({ isOpen, onClose, onSave }) {
       <div className={styles.formScrollBody}>
         <div style={{ padding: '20px' }}>
 
-          {/* ── Step 1: Unit ── */}
           <p className={styles.stepHeading}>1. Unit of Measurement</p>
           <div className={styles.unitChipRow}>
             {['in', 'cm', 'yd'].map(u => (
@@ -375,13 +345,11 @@ function MeasureModal({ isOpen, onClose, onSave }) {
             ))}
           </div>
 
-          {/* ── Step 2: Cloth Types ── */}
           <p className={styles.stepHeading} style={{ marginTop: 24 }}>2. Cloth Types</p>
 
           {cards.map((card, index) => (
             <div key={card.id} className={styles.clothCard}>
 
-              {/* Card header */}
               <div className={styles.clothCardHeader}>
                 <span className={styles.clothCardLabel}>{card.label}</span>
                 {index > 0 && (
@@ -394,7 +362,6 @@ function MeasureModal({ isOpen, onClose, onSave }) {
                 )}
               </div>
 
-              {/* Cloth name */}
               <label className={styles.fieldLabel}>Name</label>
               <input
                 type="text"
@@ -404,7 +371,6 @@ function MeasureModal({ isOpen, onClose, onSave }) {
                 onChange={e => updateCard(card.id, 'name', e.target.value)}
               />
 
-              {/* Design reference images */}
               <label className={styles.fieldLabel}>Design References</label>
               <MultiImageUpload
                 images={card.imgSrcs}
@@ -412,7 +378,6 @@ function MeasureModal({ isOpen, onClose, onSave }) {
                 onChange={imgs => updateCard(card.id, 'imgSrcs', imgs)}
               />
 
-              {/* Measurement fields */}
               <label className={styles.fieldLabel} style={{ marginTop: 4 }}>Measurements</label>
 
               <div className={styles.measureFieldList}>
@@ -456,8 +421,6 @@ function MeasureModal({ isOpen, onClose, onSave }) {
             </div>
           ))}
 
-          {/* ── Step 3: Add Another Cloth Type ── */}
-          <p className={styles.stepHeading} style={{ marginTop: 24 }}>3. Add More Cloth Types</p>
           <button className={styles.addClothButton} onClick={addCard}>
             <span className="material-icons">add_circle_outline</span>
             Add Another Cloth Type
@@ -469,10 +432,6 @@ function MeasureModal({ isOpen, onClose, onSave }) {
   )
 }
 
-
-// ─────────────────────────────────────────────────────────────
-// MEASURE DETAIL PANEL
-// ─────────────────────────────────────────────────────────────
 
 function MeasureDetail({ measurement, onClose, onDelete }) {
   const [lightboxIndex, setLightboxIndex] = useState(null)
@@ -500,7 +459,6 @@ function MeasureDetail({ measurement, onClose, onDelete }) {
 
         <div className={styles.detailScrollBody}>
 
-          {/* Design reference carousel */}
           {images.length > 0 && (
             <ImageCarousel
               images={images}
@@ -509,7 +467,6 @@ function MeasureDetail({ measurement, onClose, onDelete }) {
             />
           )}
 
-          {/* Summary info grid — unit + field count */}
           <div className={styles.infoGrid}>
             <div className={styles.infoGridCell}>
               <div className={styles.infoGridLabel}>Unit</div>
@@ -534,7 +491,7 @@ function MeasureDetail({ measurement, onClose, onDelete }) {
                   >
                     <span className={styles.measurementFieldName}>{field.name}</span>
                     <span className={styles.measurementFieldValue}>
-                      {field.value || '—'}{field.value ? <span className={styles.measurementFieldUnit}>{UNIT_FULL[measurement.unit] ?? ''}</span> : ''}
+                      {field.value || '—'}{field.value ? <span className={styles.measurementFieldUnit}>{UNIT_SHORT[measurement.unit] ?? ''}</span> : ''}
                     </span>
                   </div>
                 ))
@@ -556,10 +513,6 @@ function MeasureDetail({ measurement, onClose, onDelete }) {
   )
 }
 
-
-// ─────────────────────────────────────────────────────────────
-// MAIN MEASUREMENTS TAB
-// ─────────────────────────────────────────────────────────────
 
 export default function MeasurementsTab({ measurements, onSave, onDelete, showToast }) {
   const [isModalOpen,         setIsModalOpen]         = useState(false)
@@ -594,16 +547,15 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
 
   return (
     <>
-      {/* Empty state */}
+
       {measurements.length === 0 && (
         <div className={styles.emptyState}>
           <span className="mi" style={{ fontSize: '2.8rem', opacity: 0.4 }}>straighten</span>
-          <p>No measurements added yet.</p>
+          <p>No garment measurements added yet.</p>
           <span className={styles.emptyStateHint}>Tap + to add the first one</span>
         </div>
       )}
 
-      {/* Measurements grouped by date */}
       {Object.entries(measurementsByDate).map(([date, measurementsInGroup]) => (
         <div key={date} className={styles.measurementGroup}>
           <div className={styles.measurementGroupDate}>{date}</div>
@@ -620,7 +572,7 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
                 className={`${styles.measurementRow} ${isLastInGroup ? styles.measurementRow_last : ''}`}
                 onClick={() => setSelectedMeasurement(measurement)}
               >
-                {/* Thumbnail */}
+      
                 <div className={styles.thumbnailContainer}>
                   <div className={styles.thumbnailBox}>
                     {coverImage
@@ -633,7 +585,6 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
                   </div>
                 </div>
 
-                {/* Info */}
                 <div className={styles.measurementRowInfo}>
                   <div className={styles.measurementRowName}>{measurement.name}</div>
                   <div className={styles.measurementRowMeta}>
@@ -641,7 +592,6 @@ export default function MeasurementsTab({ measurements, onSave, onDelete, showTo
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className={styles.measurementRowActions}>
                   <button
                     className={styles.deleteButton}

@@ -3,6 +3,7 @@ import { getDueDate } from "../utils/invoiceUtils"
 import { ItemsTable } from "../components/InvoiceItemsTable/InvoiceItemsTable"
 import { LogoOrName } from "../components/LogoOrBrandName/LogoOrBrandName"
 
+
 export function InvoiceTemplate2({ invoice, customer, brand }) {
 
   const dueDate = getDueDate(invoice, brand.dueDays)

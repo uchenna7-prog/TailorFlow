@@ -5,7 +5,7 @@ export const RECEIPT_SAMPLE_DATA = {
   number: 'RCP-0001',
   date: '12 Apr 2025',
   orderDesc: 'Complete Suit Set',
-  orderPrice: '60000',
+  price: '60000',
     items: [
     { name: 'Suit Jacket', price: '25000' },
     { name: 'Trousers', price: '15000' },
@@ -15,9 +15,9 @@ export const RECEIPT_SAMPLE_DATA = {
 
   payments: [
     { date: '10 Apr 2025', amount: '30000', method: 'transfer' },
-    { date: '12 Apr 2025', amount: '30000', method: 'cash' },
+    { date: '12 Apr 2025', amount: '35000', method: 'cash' },
   ],
-  cumulativePaid: '60000',
+  cumulativePaid: '65000',
   shippingFee:6000,
   discountType:"flat",
   discountAmount:1000
@@ -59,7 +59,7 @@ export const INVOICE_SAMPLE_DATA = {
   date: '12 Apr 2025',
   dueDate: '26 Apr 2025',
   orderDesc: 'Complete Suit Set',
-  orderPrice: '60000',
+  price: '60000',
     items: [
     { name: 'Suit Jacket', price: '25000' },
     { name: 'Trousers', price: '15000' },

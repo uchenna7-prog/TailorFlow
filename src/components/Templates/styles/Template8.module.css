@@ -149,7 +149,7 @@ th.colTotal, td.colTotal {
 .divider { 
    height: 1px; 
    background: var(--brand-muted); 
-   margin: 4px 16px; 
+   margin: 40px 16px; 
 }
 .bottom { 
    display: flex; 
@@ -202,12 +202,12 @@ th.colTotal, td.colTotal {
 }
 
 .summaryKey {
-  font-size: 10px;
+  font-size: 9px;
   color: #6b7280;
 }
 
 .summaryVal {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
   color: #1a1a1a;
   font-variant-numeric: tabular-nums;
@@ -228,7 +228,7 @@ th.colTotal, td.colTotal {
 .summaryDivider {
   height: 1.5px;
   background: var(--brand-primary-dark, #a07d20);
-  margin: 8px 0;
+  margin: 5px 0;
 }
 
 .summaryTotalRow {
@@ -240,29 +240,223 @@ th.colTotal, td.colTotal {
 }
 
 .summaryTotalKey {
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 900;
   color: var(--brand-primary-dark, #a07d20);
   letter-spacing: 0.03em;
 }
 
 .summaryTotalVal {
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 900;
   color: #1a1a1a;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
-.signLine { 
-   font-size: 9px; 
-   color: #999; 
-   border-top: 1px solid var(--brand-muted); 
-   padding-top: 2px; 
-   margin-top: 10px; 
-   text-align: center; 
+
+.historySection {
+  padding-top: 10px;
 }
 
-/* ── Thank You Footer ── */
+.sectionLabel {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+
+.paymentRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+
+}
+
+.paymentRow:last-of-type {
+  border-bottom: 1px solid var(--brand-primary-dark);
+}
+
+
+
+.emoji {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+
+.paymentMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.paymentMethod {
+  font-size: 9px;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.paymentDate {
+  font-size: 8px;
+  color: #a8a8a8;
+  margin-top: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+
+.amountCurrent {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+
+.latestBadge {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #e8f3f1;
+  color: #595f6c;
+  padding: 2px 5px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+
+.paymentAmount {
+  font-size: 10px;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.totalsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 12px;
+  padding: 4px 0;
+  margin-left: auto;
+
+}
+
+.totalsKey {
+  font-size: 9px;
+  color: #6b7280;
+}
+
+
+.totalsVal {
+  font-size: 9px;
+  font-weight: 500;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.amountPaid {
+  color: #16a34a;
+  font-weight: 700;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+
+
+.totalsDivider {
+  margin: 8px 0;
+  
+}
+
+
+.totalPaidRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 12px;
+  padding: 4px 0 10px;
+}
+
+.totalPaidKey {
+  font-size: 9px;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: 0.02em;
+}
+
+.totalPaidVal {
+  font-size: 10px;
+  font-weight: 900;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+
+
+
+.balanceCallout,
+.paidCallout {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 12px;
+  padding: 4px 0;
+}
+
+
+.balanceLabel {
+  font-size: 10px;
+  font-weight: 900;
+  color: red;
+  text-transform: uppercase;
+}
+
+
+.balanceAmount {
+  font-size: 13px;
+  font-weight: 900;
+  color:red;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
+
+
+
+.paidLabel {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #16a34a;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+
+}
+
+
+
+.paidAmount {
+  color: #16a34a;
+  font-size: 10px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
+
+
+
 .thankYouFooter {
   display: flex;
   align-items: center;
@@ -270,6 +464,7 @@ th.colTotal, td.colTotal {
   padding: 8px 16px 12px;
   text-transform: uppercase;
   font-style:italic ;
+  margin-top: auto;
 
 }
 .thankYouLine {
@@ -284,12 +479,6 @@ th.colTotal, td.colTotal {
   white-space: nowrap;
 }
 
-.orderTotalWrap {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding:7px 0px;
-}
 
 .orderTotalLabel {
   font-size: 11px;
@@ -298,6 +487,74 @@ th.colTotal, td.colTotal {
   letter-spacing: 0.1em;
   color: var(--brand-primary-dark);
 }
+.orderTotalValue {
+  font-size: 11px;
+  font-weight: 900;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.summarySection {
+  width: 100%;
+  margin-top: 0;
+}
+
+.breakdownBlock {
+  width: 100%;
+  padding: 8px 0 4px;
+  border-bottom: 1px solid var(--brand-primary-dark);
+  margin-bottom: 0;
+}
+
+.breakdownRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.breakdownKey {
+  font-size: 9.5px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.breakdownVal {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Discount row — green */
+.breakdownKeyDiscount {
+  color: #15803d;
+}
+
+.breakdownValDiscount {
+  color: #15803d;
+  font-weight: 700;
+}
+
+
+.orderTotalLabel {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--brand-primary-dark);
+}
+
+
+.orderTotalWrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+}
+
 .orderTotalValue {
   font-size: 11px;
   font-weight: 900;

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import ReceiptViewer from '../../../../components/ReceiptViewer/ReceiptViewer'
 import ConfirmSheet from '../../../../components/ConfirmSheet/ConfirmSheet'
 import Header from '../../../../components/Header/Header'
-import styles from './ReceiptTab.module.css'
+import styles from './ReceiptsTab.module.css'
 
 
 // ─────────────────────────────────────────────────────────────

@@ -113,7 +113,6 @@ th.colAmount, td.colAmount {
   margin-top: 0;
 }
 
-/* Breakdown block — subtotal, shipping, discount, tax rows */
 .breakdownBlock {
   width: 100%;
   padding: 8px 0 4px;

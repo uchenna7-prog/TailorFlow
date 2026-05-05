@@ -2,14 +2,15 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { useAuth } from './AuthContext'
 import {
   subscribeToCustomers,
-  addCustomer    as fsAdd,
-  updateCustomer as fsUpdate,
-  deleteCustomer as fsDelete,
+  addCustomer,
+  updateCustomer,
+  deleteCustomer
 } from '../services/customerService'
 
 const CustomerContext = createContext(null)
 
 export function CustomerProvider({ children }) {
+
   const { user } = useAuth()
 
   const [customers, setCustomers] = useState([])
@@ -17,7 +18,9 @@ export function CustomerProvider({ children }) {
   const [error,     setError]     = useState(null)
 
   useEffect(() => {
+
     if (!user) {
+
       setCustomers([])
       setLoading(false)
       return
@@ -36,20 +39,26 @@ export function CustomerProvider({ children }) {
   }, [user])
 
   const addCustomer = useCallback(async (customer) => {
+
     if (!user) return
+
     try {
-      const { id: _localId, ...data } = customer
-      return await fsAdd(user.uid, data)
-    } catch (err) {
+      const { id, ...data } = customer
+      
+      return await addCustomer(user.uid, data)
+    } 
+    catch (err) {
       setError(err.message)
       throw err
     }
   }, [user])
 
   const updateCustomer = useCallback(async (id, updates) => {
+
     if (!user) return
+
     try {
-      await fsUpdate(user.uid, String(id), updates)
+      await updateCustomer(user.uid, String(id), updates)
     } catch (err) {
       setError(err.message)
       throw err
@@ -57,17 +66,20 @@ export function CustomerProvider({ children }) {
   }, [user])
 
   const deleteCustomer = useCallback(async (id) => {
+
     if (!user) return
     try {
-      await fsDelete(user.uid, String(id))
-    } catch (err) {
+      await deleteCustomer(user.uid, String(id))
+    } 
+    catch (err) {
       setError(err.message)
       throw err
     }
   }, [user])
 
   const getCustomer = useCallback((id) => {
-    return customers.find(c => String(c.id) === String(id)) ?? null
+
+    return customers.find(customer => String(customer.id) === String(id)) ?? null
   }, [customers])
 
   return (

@@ -11,7 +11,7 @@ import Header from '../../components/Header/Header'
 import Toast from '../../components/Toast/Toast'
 import ConfirmSheet from '../../components/ConfirmSheet/ConfirmSheet'
 import BrandColourPicker from '../../components/BrandColourPicker/BrandColourPicker'
-import { getColourById, DEFAULT_COLOUR_ID } from '../../config/brandPalette'
+import { getPaletteById, DEFAULT_COLOUR_ID } from '../../config/brandPalette'
 import styles from './Profile.module.css'
 import BottomNav from '../../components/BottomNav/BottomNav'
 
@@ -547,7 +547,7 @@ function BrandModal({ onBack, showToast }) {
   }, [user?.uid])
 
   const save = () => {
-    const entry = getColourById(local.brandColourId)
+    const entry = getPaletteById(local.brandColourId)
     updateMany({
       ...local,
       brandColour: entry?.tokens.primary || '#D4AF37',
@@ -1338,8 +1338,8 @@ export default function Profile({ onMenuClick, isPremium = false, onUpgrade = ()
   const hasAccountDetails = !!(settings.accountBank || settings.accountNumber)
   const hasBusinessContact = !!(settings.brandPhone || settings.brandEmail || settings.brandAddress)
 
-  const brandColourHex = getColourById(settings.brandColourId)?.tokens.primary
-    || getColourById(DEFAULT_COLOUR_ID)?.tokens.primary
+  const brandColourHex = getPaletteById(settings.brandColourId)?.tokens.primary
+    || getPaletteById(DEFAULT_COLOUR_ID)?.tokens.primary
     || null
 
   return (

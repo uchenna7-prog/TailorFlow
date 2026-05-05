@@ -307,7 +307,7 @@ function InlinePaymentForm({ order, onSave, saving }) {
           )
           : (
             <>
-              <span className="mi" style={{ fontSize: '1.1rem' }}>payments</span>
+              <span className="material-icons" style={{ fontSize: '1.1rem' }}>payments</span>
               Record Payment
             </>
           )

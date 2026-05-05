@@ -481,7 +481,7 @@ function OrderModal({ isOpen, onClose, measurements, onSave, taxRate, taxEnabled
 
               {/* ── Step 3: Charges & Fees ── */}
               <p className={styles.stepHeading} style={{ marginTop: 24 }}>
-                3. Charges &amp; Fees
+                3. Discount &amp; Charges
               </p>
 
               <div className={styles.chargesCard}>
@@ -782,7 +782,7 @@ function OrderDetail({ order, measurements, onClose, onDelete, onStatusChange, o
 
         {hasCharges && (
           <div className={styles.sectionCard}>
-            <div className={styles.sectionCardLabel}>Charges &amp; Fees</div>
+            <div className={styles.sectionCardLabel}>Discount &amp; Charges</div>
 
             <div className={styles.detailChargeRow}>
               <span className={styles.detailChargeLabel}>Subtotal</span>

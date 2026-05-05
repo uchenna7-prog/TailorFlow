@@ -1,13 +1,5 @@
-// src/config/brandPalette.js
-// ─────────────────────────────────────────────────────────────
-// 30 curated brand colours, organised into 6 style groups.
-// Each colour has a full token set — never use raw hex in UI,
-// always reference these tokens via useBrandTokens.
-// ─────────────────────────────────────────────────────────────
-
 export const BRAND_PALETTE = [
 
-  // ── CLASSIC ─────────────────────────────────────────────────
   {
     id:    'classic-deep-gold',
     style: 'Classic',
@@ -94,7 +86,6 @@ export const BRAND_PALETTE = [
     },
   },
 
-  // ── LUXURY ──────────────────────────────────────────────────
   {
     id:    'luxury-champagne-gold',
     style: 'Luxury',
@@ -112,6 +103,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(201,168,76,0.35)',
     },
   },
+
   {
     id:    'luxury-deep-plum',
     style: 'Luxury',
@@ -129,6 +121,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(122,43,140,0.38)',
     },
   },
+
   {
     id:    'luxury-onyx',
     style: 'Luxury',
@@ -163,6 +156,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(183,110,121,0.35)',
     },
   },
+
   {
     id:    'luxury-midnight-blue',
     style: 'Luxury',
@@ -181,7 +175,6 @@ export const BRAND_PALETTE = [
     },
   },
 
-  // ── BOLD ────────────────────────────────────────────────────
   {
     id:    'bold-flame-red',
     style: 'Bold',
@@ -199,6 +192,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(224,34,20,0.38)',
     },
   },
+
   {
     id:    'bold-electric-blue',
     style: 'Bold',
@@ -216,6 +210,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(26,110,245,0.38)',
     },
   },
+
   {
     id:    'bold-vivid-emerald',
     style: 'Bold',
@@ -233,6 +228,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(0,168,112,0.38)',
     },
   },
+
   {
     id:    'bold-hot-magenta',
     style: 'Bold',
@@ -250,6 +246,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(224,30,130,0.38)',
     },
   },
+
   {
     id:    'bold-vivid-orange',
     style: 'Bold',
@@ -268,7 +265,6 @@ export const BRAND_PALETTE = [
     },
   },
 
-  // ── EARTHY ──────────────────────────────────────────────────
   {
     id:    'earthy-terracotta',
     style: 'Earthy',
@@ -286,6 +282,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(216,86,42,0.35)',
     },
   },
+
   {
     id:    'earthy-camel',
     style: 'Earthy',
@@ -303,6 +300,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(200,154,88,0.35)',
     },
   },
+
   {
     id:    'earthy-olive',
     style: 'Earthy',
@@ -320,6 +318,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(136,136,48,0.35)',
     },
   },
+
   {
     id:    'earthy-clay-brown',
     style: 'Earthy',
@@ -337,6 +336,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(168,104,72,0.35)',
     },
   },
+
   {
     id:    'earthy-burnt-sienna',
     style: 'Earthy',
@@ -355,7 +355,6 @@ export const BRAND_PALETTE = [
     },
   },
 
-  // ── SOFT ────────────────────────────────────────────────────
   {
     id:    'soft-dusty-rose',
     style: 'Soft',
@@ -373,6 +372,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(203,128,146,0.35)',
     },
   },
+
   {
     id:    'soft-lavender',
     style: 'Soft',
@@ -390,6 +390,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(152,132,188,0.35)',
     },
   },
+
   {
     id:    'soft-blush-pink',
     style: 'Soft',
@@ -407,6 +408,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(216,142,162,0.35)',
     },
   },
+
   {
     id:    'soft-sage-green',
     style: 'Soft',
@@ -424,6 +426,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(116,142,120,0.35)',
     },
   },
+
   {
     id:    'soft-lilac',
     style: 'Soft',
@@ -442,7 +445,6 @@ export const BRAND_PALETTE = [
     },
   },
 
-  // ── MINIMAL ─────────────────────────────────────────────────
   {
     id:    'minimal-slate-grey',
     style: 'Minimal',
@@ -460,6 +462,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(116,130,146,0.35)',
     },
   },
+
   {
     id:    'minimal-charcoal',
     style: 'Minimal',
@@ -477,6 +480,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(85,85,85,0.38)',
     },
   },
+
   {
     id:    'minimal-pure-white',
     style: 'Minimal',
@@ -494,6 +498,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(220,220,220,0.40)',
     },
   },
+
   {
     id:    'minimal-muted-teal',
     style: 'Minimal',
@@ -511,6 +516,7 @@ export const BRAND_PALETTE = [
       glow:          'rgba(60,152,152,0.35)',
     },
   },
+
   {
     id:    'minimal-steel-blue',
     style: 'Minimal',
@@ -530,20 +536,18 @@ export const BRAND_PALETTE = [
   },
 ]
 
-// ── Helpers ──────────────────────────────────────────────────
 
-/** All unique style group names in order */
+
 export const STYLE_GROUPS = ['Classic', 'Luxury', 'Bold', 'Earthy', 'Soft', 'Minimal']
 
-/** Look up a colour entry by ID */
-export function getColourById(id) {
-  return BRAND_PALETTE.find(c => c.id === id) || null
+
+export function getPaletteById(id) {
+  return BRAND_PALETTE.find(palette => palette.id === id) || null
 }
 
-/** Get all colours in a style group */
-export function getColoursByStyle(style) {
-  return BRAND_PALETTE.filter(c => c.style === style)
+export function getPalettesByStyle(style) {
+  return BRAND_PALETTE.filter(palette => palette.style === style)
 }
 
-/** Default colour when nothing is set */
-export const DEFAULT_COLOUR_ID = 'classic-deep-gold'
+
+export const DEFAULT_COLOUR_ID = 'soft-sage-green'

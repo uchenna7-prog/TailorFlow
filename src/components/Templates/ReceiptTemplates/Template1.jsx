@@ -40,12 +40,12 @@ export function ReceiptTemplate1({ receipt, customer, brand }) {
         <div style={{ textAlign : 'right' }}>
 
           <div>
-            <span className={styles.metaKey}>RECEIPT # :</span>
+            <span className={styles.metaKey}>RECEIPT # </span>
             <span className={styles.metaValue}> {receipt.number}</span>
           </div>
 
           <div>
-            <span className={styles.metaKey}>Issue Date :</span>
+            <span className={styles.metaKey}>Issue Date </span>
             <span className={styles.metaValue}> {receipt.date}</span>
           </div>
 
@@ -73,7 +73,7 @@ export function ReceiptTemplate1({ receipt, customer, brand }) {
                 <div>
 
                   {brand.name && (
-                    <div>Received By  : {brand.name}</div>
+                    <div>Received By: {brand.name}</div>
                   )}
                   
                 </div>

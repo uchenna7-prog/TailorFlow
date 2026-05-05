@@ -1,10 +1,9 @@
-// src/pages/CustomerDetail/tabs/InvoiceTab/InvoiceTab.jsx
 
 import { useState, useEffect, useRef } from 'react'
 import InvoiceViewer from '../../../../components/InvoiceViewer/InvoiceViewer'
 import ConfirmSheet from '../../../../components/ConfirmSheet/ConfirmSheet'
 import Header from '../../../../components/Header/Header'
-import styles from './InvoiceTab.module.css'
+import styles from './InvoicesTab.module.css'
 
 
 // ─────────────────────────────────────────────────────────────

@@ -2,10 +2,35 @@ import styles from "../styles/Template4.module.css"
 import { ReceiptPaymentSummary } from "../components/ReceiptPaymentSummary/ReceiptPaymentSummary"
 import { ItemsTable } from "../components/ReceiptItemsTable/ReceiptItemsTable"
 import { LogoOrName } from "../components/LogoOrBrandName/LogoOrBrandName"
+import { calcTax} from "../utils/receiptUtils"
 
 export function ReceiptTemplate4({ receipt, customer, brand }) {
 
   const bannerBg = brand.colour || '#0057D7'
+  const { currency, showTax, taxRate: brandTaxRate } = brand
+  
+    const subtotal = receipt.items?.length > 0
+      ? receipt.items.reduce((sum, item) => sum + ((item.qty ?? 1) * (parseFloat(item.price) || 0)), 0)
+      : 0
+  
+    // Prefer frozen values from the receipt object; fall back to brand/calc
+    const shippingFee    = parseFloat(receipt.shippingFee)    || 0
+    const discountAmount = parseFloat(receipt.discountAmount) || 0
+    const discountType   = receipt.discountType   || null   // 'percent' | 'flat' | null
+    const discountValue  = parseFloat(receipt.discountValue)  || 0
+    const useTax         = receipt.taxRate != null ? receipt.taxRate > 0 : (showTax && brandTaxRate > 0)
+    const taxRate        = receipt.taxRate != null ? receipt.taxRate : brandTaxRate
+    const taxAmount      = parseFloat(receipt.taxAmount) || calcTax(subtotal, taxRate, useTax)
+    const grandTotal     = receipt.totalAmount != null
+      ? parseFloat(receipt.totalAmount)
+      : subtotal + shippingFee - discountAmount + taxAmount
+  
+    const discountLabel = discountType === 'percent'
+      ? `Discount (${discountValue}%)`
+      : 'Discount'
+  
+    const hasExtras = shippingFee > 0 || discountAmount > 0 || (useTax && taxAmount > 0)
+  
 
   return (
 

@@ -1,5 +1,6 @@
 import styles from "../styles/Template5.module.css"
-import { getDueDate,calcTax,fmt } from "../utils/invoiceUtils"
+import { getDueDate,calcTax } from "../utils/invoiceUtils"
+import { formatCurrency } from "../../../utils/formatCurrency"
 
 
 export function InvoiceTemplate5({ invoice, customer, brand }) {
@@ -83,9 +84,9 @@ export function InvoiceTemplate5({ invoice, customer, brand }) {
             return (
               <tr key={i} className={styles.tableRow}>
                 <td className={styles.colDesc}>{item.name}</td>
-                <td className={styles.colPrice}>{fmt(currency, unitPrice)}</td>
+                <td className={styles.colPrice}>{ formatCurrency(currency, unitPrice)}</td>
                 <td className={styles.colQty}>{qty}</td>
-                <td className={styles.colTotal}>{fmt(currency, lineAmount)}</td>
+                <td className={styles.colTotal}>{ formatCurrency(currency, lineAmount)}</td>
               </tr>
             );
           })}
@@ -98,27 +99,27 @@ export function InvoiceTemplate5({ invoice, customer, brand }) {
 
         <div className={styles.summaryRow}>
           <span className={styles.summaryKey}>Subtotal</span>
-          <span className={styles.summaryVal}>{fmt(currency, subtotal)}</span>
+          <span className={styles.summaryVal}>{ formatCurrency(currency, subtotal)}</span>
         </div>
 
         {shippingFee > 0 && (
           <div className={styles.summaryRow}>
             <span className={styles.summaryKey}>Shipping &amp; Delivery</span>
-            <span className={styles.summaryVal}>{fmt(currency, shippingFee)}</span>
+            <span className={styles.summaryVal}>{ formatCurrency(currency, shippingFee)}</span>
           </div>
         )}
 
         {discountAmount > 0 && (
           <div className={styles.summaryRow}>
             <span className={`${styles.summaryKey} ${styles.summaryKeyDiscount}`}>{discountLabel}</span>
-            <span className={`${styles.summaryVal} ${styles.summaryValDiscount}`}>−{fmt(currency, discountAmount)}</span>
+            <span className={`${styles.summaryVal} ${styles.summaryValDiscount}`}>−{ formatCurrency(currency, discountAmount)}</span>
           </div>
         )}
 
         {useTax && taxAmount > 0 && (
           <div className={styles.summaryRow}>
             <span className={styles.summaryKey}>VAT ({taxRate}%)</span>
-            <span className={styles.summaryVal}>{fmt(currency, taxAmount)}</span>
+            <span className={styles.summaryVal}>{ formatCurrency(currency, taxAmount)}</span>
           </div>
         )}
 
@@ -126,7 +127,7 @@ export function InvoiceTemplate5({ invoice, customer, brand }) {
 
         <div className={styles.summaryTotalRow}>
           <span className={styles.summaryTotalKey}>Total Due</span>
-          <span className={styles.summaryTotalVal}>{fmt(currency, grandTotal)}</span>
+          <span className={styles.summaryTotalVal}>{ formatCurrency(currency, grandTotal)}</span>
         </div>
 
       </div>

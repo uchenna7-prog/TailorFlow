@@ -208,37 +208,64 @@ th.colTotal, td.colTotal {
   padding: 5px 0;
 }
 
-.totalsArea {
+
+.summaryBlock {
   margin-left: auto;
-  width: 48%;
-  padding: 5px 16px 0 0;
-  margin-top: 4px;
-  word-break: break-word;
-}
-.totalRow { 
-   display: flex; 
-   justify-content: space-between; 
-   padding: 2px 0; 
-   font-size: 10px; 
-}
-.total { 
-   display: flex; 
-   justify-content: space-between; 
-   background: var(--brand-gradient); 
-   color: var(--brand-on-primary); 
-   padding: 5px 8px; 
-   font-weight: 900; 
-   font-size: 10px; 
-   margin-top: 3px; 
-   opacity: 0.88; 
+  width: 55%;
+  margin-top: 14px;
+  padding: 8px 16px; 
 }
 
-.orderTotalWrap {
+.summaryRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding:7px 0px;
+  column-gap: 12px;
+  padding: 3px 0;
 }
+
+.summaryKey {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.summaryVal {
+  font-size: 10px;
+  font-weight: 500;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Discount row — muted green tint */
+.summaryKeyDiscount {
+  color: #15803d;
+}
+
+.summaryValDiscount {
+  color: #15803d;
+  font-weight: 700;
+}
+
+
+.totalBar {
+   width: 55%; 
+  margin-left: auto;
+   display: flex; 
+   justify-content: space-between; 
+   align-items: baseline; 
+   background: var(--brand-gradient); 
+   color: var(--brand-on-primary); 
+   padding: 8px 16px; 
+   margin-top: auto; 
+   font-weight: 900; 
+   font-size: 10px; 
+}
+.totalAmount { 
+   font-size: 13px; 
+   font-weight: 900; 
+}
+
 
 .orderTotalLabel {
   font-size: 11px;
@@ -247,6 +274,75 @@ th.colTotal, td.colTotal {
   letter-spacing: 0.1em;
   color: var(--brand-primary-dark);
 }
+.orderTotalValue {
+  font-size: 11px;
+  font-weight: 900;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.summarySection {
+  width: 100%;
+  margin-top: 0;
+}
+
+.breakdownBlock {
+  width: 100%;
+  padding: 8px 0 4px;
+  border-bottom: 1px solid var(--brand-primary-dark);
+  margin-bottom: 0;
+}
+
+.breakdownRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+
+.breakdownKey {
+  font-size: 9.5px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.breakdownVal {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Discount row — green */
+.breakdownKeyDiscount {
+  color: #15803d;
+}
+
+.breakdownValDiscount {
+  color: #15803d;
+  font-weight: 700;
+}
+
+
+
+.orderTotalLabel {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--brand-primary-dark);
+}
+
+
+.orderTotalWrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+}
+
 .orderTotalValue {
   font-size: 11px;
   font-weight: 900;

@@ -1,6 +1,6 @@
 import { calcTax } from "../../utils/receiptUtils"
 import styles from "./ReceiptItemsTable.module.css"
-import { fmt } from "../../utils/receiptUtils"
+import { formatCurrency } from "../../../../utils/formatCurrency"
 import { useBrandTokens } from "../../../../hooks/useBrandTokens"
 import { useRef } from "react"
 
@@ -61,9 +61,9 @@ export function ItemsTable({ receipt, brand }) {
               return (
                 <tr key={idx} className={styles.itemRow}>
                   <td className={`${styles.colItem} ${styles.itemName}`}>{item.name}</td>
-                  <td className={`${styles.colPrice} ${styles.itemUnitPrice}`}>{fmt(currency, unitPrice)}</td>
+                  <td className={`${styles.colPrice} ${styles.itemUnitPrice}`}>{ formatCurrency(currency, unitPrice)}</td>
                   <td className={`${styles.colQty} ${styles.itemQty}`}>{qty}</td>
-                  <td className={`${styles.colAmount} ${styles.itemLineAmount}`}>{fmt(currency, lineAmount)}</td>
+                  <td className={`${styles.colAmount} ${styles.itemLineAmount}`}>{ formatCurrency(currency, lineAmount)}</td>
                 </tr>
               )
             })}
@@ -79,27 +79,27 @@ export function ItemsTable({ receipt, brand }) {
           <div className={styles.breakdownBlock}>
             <div className={styles.breakdownRow}>
               <span className={styles.breakdownKey}>Subtotal</span>
-              <span className={styles.breakdownVal}>{fmt(currency, subtotal)}</span>
+              <span className={styles.breakdownVal}>{ formatCurrency(currency, subtotal)}</span>
             </div>
 
             {shippingFee > 0 && (
               <div className={styles.breakdownRow}>
                 <span className={styles.breakdownKey}>Shipping &amp; Delivery</span>
-                <span className={styles.breakdownVal}>{fmt(currency, shippingFee)}</span>
+                <span className={styles.breakdownVal}>{ formatCurrency(currency, shippingFee)}</span>
               </div>
             )}
 
             {discountAmount > 0 && (
               <div className={styles.breakdownRow}>
                 <span className={`${styles.breakdownKey} ${styles.breakdownKeyDiscount}`}>{discountLabel}</span>
-                <span className={`${styles.breakdownVal} ${styles.breakdownValDiscount}`}>−{fmt(currency, discountAmount)}</span>
+                <span className={`${styles.breakdownVal} ${styles.breakdownValDiscount}`}>−{ formatCurrency(currency, discountAmount)}</span>
               </div>
             )}
 
             {useTax && taxAmount > 0 && (
               <div className={styles.breakdownRow}>
                 <span className={styles.breakdownKey}>VAT ({taxRate}%)</span>
-                <span className={styles.breakdownVal}>{fmt(currency, taxAmount)}</span>
+                <span className={styles.breakdownVal}>{ formatCurrency(currency, taxAmount)}</span>
               </div>
             )}
           </div>
@@ -108,7 +108,7 @@ export function ItemsTable({ receipt, brand }) {
         {/* Grand total bar — always shown, full width */}
         <div className={styles.orderTotalWrap}>
           <div className={styles.orderTotalLabel}>Order Total</div>
-          <div className={styles.orderTotalValue}>{fmt(currency, grandTotal)}</div>
+          <div className={styles.orderTotalValue}>{ formatCurrency(currency, grandTotal)}</div>
         </div>
 
       </div>

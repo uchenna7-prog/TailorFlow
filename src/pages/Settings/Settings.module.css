@@ -11,12 +11,11 @@
   padding: 8px 0 40px;
 }
 
-/* ── Premium Badge ──────────────────────────────────────────────────────── */
 .premiumBadge {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  background: linear-gradient(135deg, var(--accent), #b8942a);
+  background: linear-gradient(135deg, var(--accent));
   color: var(--bg);
   font-size: 0.55rem;
   font-weight: 900;

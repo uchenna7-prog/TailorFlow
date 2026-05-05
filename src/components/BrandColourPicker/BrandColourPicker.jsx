@@ -7,14 +7,14 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useState } from 'react'
-import { STYLE_GROUPS, getColoursByStyle, getColourById, DEFAULT_COLOUR_ID } from '../../config/brandPalette'
+import { STYLE_GROUPS, getPalettesByStyle, getPaletteById, DEFAULT_COLOUR_ID } from '../../config/brandPalette'
 import styles from './BrandColourPicker.module.css'
 
 export default function BrandColourPicker({ value, onChange }) {
   // value = colourId string e.g. "classic-deep-gold"
-  const selected     = getColourById(value) || getColourById(DEFAULT_COLOUR_ID)
+  const selected     = getPaletteById(value) || getPaletteById(DEFAULT_COLOUR_ID)
   const [activeStyle, setActiveStyle] = useState(selected?.style || 'Classic')
-  const swatches     = getColoursByStyle(activeStyle)
+  const swatches     = getPalettesByStyle(activeStyle)
 
   return (
     <div className={styles.picker}>

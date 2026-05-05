@@ -65,6 +65,20 @@ export default function Settings({ onMenuClick }) {
     showToast('Settings reset')
   }
 
+  const getSelectedTemplates = () => {
+
+    const invoiceTemplate = settings.invoiceTemplate
+    const receiptTemplate = settings.receiptTemplate
+    const invoiceTemplateNumber = invoiceTemplate.replace("invoiceTemplate","")
+    const receiptTemplateNumber = receiptTemplate.replace("receiptTemplate","")
+
+    if (invoiceTemplateNumber === receiptTemplateNumber){
+      return "Templates " + receiptTemplateNumber || invoiceTemplateNumber
+
+    }
+    return ""
+  }
+
 
   return (
     <div className={styles.settingsPage}>
@@ -110,7 +124,7 @@ export default function Settings({ onMenuClick }) {
           icon="description"
           label="Templates"
           sub="Choose your preferred invoice and receipt designs"
-          value={`${settings.invoiceTemplate} · ${settings.receiptTemplate}`}
+          value={getSelectedTemplates()}
           onClick={() => setIsTemplateModalOpen(true)}
           chevron
         />
@@ -177,7 +191,6 @@ export default function Settings({ onMenuClick }) {
 
       </div>
 
-      {/* ── Modals ────────────────────────────────────────────────────────── */}
       <TemplateModal
         isOpen={isTemplateModalOpen}
         currentInvoiceTemplate={settings.invoiceTemplate || 'invoiceTemplate1'}

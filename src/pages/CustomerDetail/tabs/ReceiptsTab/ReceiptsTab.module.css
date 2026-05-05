@@ -582,17 +582,9 @@
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   ORDER MOSAIC THUMBNAIL
-   md (68px) — receipt list rows
-   sm (38px) — picker card thumbs
-   Matches InvoiceTab mosaics exactly.
-   ───────────────────────────────────────────────────────────── */
-
-/* ── md outer / inner ── */
 .mosaicOuter {
-  width: 68px;
-  height: 68px;
+  width: 80px;
+  height: 80px;
   border-radius: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -603,8 +595,8 @@
 }
 
 .mosaicInner {
-  width: 50px;
-  height: 50px;
+  width: 58px;
+  height: 58px;
   border-radius: 9px;
   background: #fff;
   display: flex;
